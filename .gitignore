@@ -12,5 +12,17 @@ __pycache__/
 # pytest
 .cache
 
+# sphinx
+docs/_build/
+
 # eclipse
 .settings/
+
+# debian
+debian/edi/
+debian/edi.*.debhelper
+debian/debhelper-build-stamp
+debian/edi.debhelper.log
+debian/edi.substvars
+debian/files
+.pybuild/
