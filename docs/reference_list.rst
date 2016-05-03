@@ -22,6 +22,15 @@ Packaging
 .. _Packaging and Distributing Projects: http://python-packaging-user-guide.readthedocs.io/en/latest/distributing/
 .. _setuptools_scm: https://github.com/pypa/setuptools_scm/
 
+Documentation
+-------------
+
+- `Sphinx - Python Documentation Generator`_
+
+.. _Sphinx - Python Documentation Generator: http://www.sphinx-doc.org/en/stable/
+
+http://www.sphinx-doc.org/en/stable/
+
 LXC/LXD
 +++++++
 
