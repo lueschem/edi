@@ -4,6 +4,10 @@ Reference List
 Debian
 ++++++
 
+- `Debian Python Policy`_
+
+.. _Debian Python Policy: https://www.debian.org/doc/packaging-manuals/python-policy/
+
 Python
 ++++++
 
