@@ -22,6 +22,19 @@
 import sys
 import argparse
 from setuptools_scm import get_version
+import logging
+
+def _setup_logging(cli_args):
+    log_level = logging.WARNING
+        
+    if cli_args.log:
+        log_level = getattr(logging, cli_args.log)
+    
+    if cli_args.verbose:
+        # only make logging more verbose
+        log_level = min([log_level, logging.INFO])
+    
+    logging.basicConfig(level=log_level)
 
 class _HelpAction(argparse._HelpAction):
 
@@ -42,16 +55,23 @@ def main():
     parser = argparse.ArgumentParser(description="Setup and manage an embedded development infrastructure.",
                                      add_help=False)
     parser.add_argument('--help', action=_HelpAction, help="Show this help")
-    parser.add_argument("-v", "--verbose", action="count", default=0, help="Increase output verbosity (2 levels)")
-
+    parser.add_argument("-v", "--verbose", action="store_true", help="Increase output verbosity to INFO")
+    parser.add_argument('--log', choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'], help="Modify log level (default is WARNING)")
     parser.add_argument('--version', action="store_true", help="Print version and exit")
 
     # TODO: set log level
-    args = parser.parse_args(sys.argv[1:])
+    cli_args = parser.parse_args(sys.argv[1:])
     
-    if args.version:
+    if cli_args.version:
         print(get_version(root='..', relative_to=__file__))
         sys.exit(0)
+        
+    _setup_logging(cli_args)
+    
+    logging.debug("Some debug message")
+    logging.info("Some info message")
+    logging.warning("Some warning message")
+    logging.error("Some error message")
     
     print("Welcome to edi!") 
     print(sys.argv)
