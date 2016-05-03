@@ -5,8 +5,10 @@ Debian
 ++++++
 
 - `Debian Python Policy`_
+- `Building Debian Packages with git`_
 
 .. _Debian Python Policy: https://www.debian.org/doc/packaging-manuals/python-policy/
+.. _Building Debian Packages with git: https://wiki.debian.org/PackagingWithGit
 
 Python
 ++++++

@@ -63,7 +63,7 @@ setup(
 
     keywords='embedded Linux container toolchain',
 
-    packages=find_packages(exclude=['docs', 'debian', 'bin']),
+    packages=find_packages(exclude=['docs', 'debian', 'bin', '.git']),
 
     install_requires=['ansible'],
 
