@@ -21,6 +21,7 @@
 
 import sys
 import argparse
+from setuptools_scm import get_version
 
 class _HelpAction(argparse._HelpAction):
 
@@ -46,7 +47,11 @@ def main():
     parser.add_argument('--version', action="store_true", help="Print version and exit")
 
     # TODO: set log level
-    parser.parse_args(sys.argv[1:])
+    args = parser.parse_args(sys.argv[1:])
+    
+    if args.version:
+        print(get_version(root='..', relative_to=__file__))
+        sys.exit(0)
     
     print("Welcome to edi!") 
     print(sys.argv)
