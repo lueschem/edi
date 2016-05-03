@@ -1,0 +1,31 @@
+Reference List
+==============
+
+Debian
+++++++
+
+Python
+++++++
+
+Packaging
+---------
+
+- `Packaging and Distributing Projects`_ using setuptools.
+- Using `setuptools_scm`_ to derive version from git tag.
+
+.. _Packaging and Distributing Projects: http://python-packaging-user-guide.readthedocs.io/en/latest/distributing/
+.. _setuptools_scm: https://github.com/pypa/setuptools_scm/
+
+LXC/LXD
++++++++
+
+
+
+Restructured Text
++++++++++++++++++
+
+- `Wikipedia about ReStructuredText`_.
+- `reStructuredText Markup Specification`_.
+
+.. _Wikipedia about ReStructuredText: https://en.wikipedia.org/wiki/ReStructuredText
+.. _reStructuredText Markup Specification: http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html
