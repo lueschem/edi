@@ -45,13 +45,13 @@ def _setup_command_line_interface():
                                                   "embedded development "
                                                   "infrastructure."))
     parser.add_argument("-v", "--verbose", action="store_true",
-                        help="Increase output verbosity to INFO")
+                        help="increase output verbosity to INFO")
     parser.add_argument('--log', choices=['DEBUG', 'INFO', 'WARNING',
                                           'ERROR', 'CRITICAL'],
-                        help="Modify log level (default is WARNING)")
+                        help="modify log level (default is WARNING)")
 
     parser.add_argument('--version', action="store_true",
-                        help="Print version and exit")
+                        help="print version and exit")
 
     subparsers = parser.add_subparsers(title='subcommands',
                                        dest="command_name")

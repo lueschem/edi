@@ -24,21 +24,17 @@ import argparse
 import logging
 
 
-class bootstrap_cmd(edi_cmd):
+class bootstrapimage(edi_cmd):
 
     @classmethod
     def advertise(cls, subparsers):
-        help_text = 'Bootstrap an initial image'
+        help_text = "bootstrap an initial image"
         description_text = "Bootstrap an initial image."
-        parser = subparsers.add_parser(cls.name(),
+        parser = subparsers.add_parser(cls.__name__,
                                        help=help_text,
                                        description=description_text)
         parser.add_argument('config_file',
                             type=argparse.FileType('r', encoding='UTF-8'))
-
-    @staticmethod
-    def name():
-        return "bootstrap"
 
     def run(self, cli_args):
         logging.info(("bootstrapping with config file {0} ..."

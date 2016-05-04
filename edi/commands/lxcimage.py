@@ -23,21 +23,17 @@ from edi.lib.edi_cmd import edi_cmd
 import argparse
 
 
-class lxcimage_cmd(edi_cmd):
+class lxcimage(edi_cmd):
 
     @classmethod
     def advertise(cls, subparsers):
-        help_text = "Upgrade a bootstrap image to a lxcimage."
+        help_text = "upgrade a bootstrap image to a lxcimage"
         description_text = "Upgrade a bootstrap image to a lxcimage."
-        parser = subparsers.add_parser(cls.name(),
+        parser = subparsers.add_parser(cls.__name__,
                                        help=help_text,
                                        description=description_text)
         parser.add_argument('config_file',
                             type=argparse.FileType('r', encoding='UTF-8'))
-
-    @staticmethod
-    def name():
-        return "lxcimage"
 
     def run(self, cli_args):
         pass
