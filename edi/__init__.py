@@ -23,6 +23,8 @@ import sys
 import argparse
 from setuptools_scm import get_version
 import logging
+from edi.commands import *
+from edi.lib.command_factory import command_registry
 
 
 def _setup_logging(cli_args):
@@ -51,25 +53,27 @@ def main():
     main_parser.add_argument('--version', action="store_true",
                              help="Print version and exit")
 
-    subparsers = main_parser.add_subparsers(title='subcommands')
-    bootstrap_parser = subparsers.add_parser('bootstrap',
-                                             help='Bootstrap an initial image')
-    bootstrap_parser.add_argument('config_file',
-                                  type=argparse.FileType('r', encoding='UTF-8')
-                                  )
+    subparsers = main_parser.add_subparsers(title='subcommands',
+                                            dest="command_name")
+
+#     for (importer, modname, ispkg
+#          ) in pkgutil.iter_modules(edi.commands.__path__):
+#         print("Found submodule %s (is a package: %s)" % (modname, ispkg))
+#         if not ispkg:
+#             print("foo")
+#             print(importer.find_module(modname).load_module(modname).get_info())
+    for _, command in command_registry.items():
+        command.advertise(subparsers)
 
     cli_args = main_parser.parse_args(sys.argv[1:])
+    _setup_logging(cli_args)
 
     if cli_args.version:
         print(get_version(root='..', relative_to=__file__))
         sys.exit(0)
 
-    _setup_logging(cli_args)
+    if cli_args.command_name is None:
+        main_parser.print_help()
+        sys.exit(1)
 
-    logging.debug("Some debug message")
-    logging.info("Some info message")
-    logging.warning("Some warning message")
-    logging.error("Some error message")
-
-    print("Welcome to edi!")
-    print(sys.argv)
+    command_registry[cli_args.command_name]().run(cli_args)
