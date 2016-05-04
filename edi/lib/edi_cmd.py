@@ -19,4 +19,8 @@
 # You should have received a copy of the GNU General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
-__all__ = ["bootstrap", "lxcimage"]
+from edi.lib.command_factory import command_factory
+
+
+class edi_cmd(metaclass=command_factory):
+    pass

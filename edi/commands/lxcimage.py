@@ -19,4 +19,25 @@
 # You should have received a copy of the GNU General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
-__all__ = ["bootstrap", "lxcimage"]
+from edi.lib.edi_cmd import edi_cmd
+import argparse
+
+
+class lxcimage_cmd(edi_cmd):
+
+    @classmethod
+    def advertise(cls, subparsers):
+        help_text = "Upgrade a bootstrap image to a lxcimage."
+        description_text = "Upgrade a bootstrap image to a lxcimage."
+        parser = subparsers.add_parser(cls.name(),
+                                       help=help_text,
+                                       description=description_text)
+        parser.add_argument('config_file',
+                            type=argparse.FileType('r', encoding='UTF-8'))
+
+    @staticmethod
+    def name():
+        return "lxcimage"
+
+    def run(self, cli_args):
+        pass

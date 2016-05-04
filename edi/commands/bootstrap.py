@@ -19,19 +19,20 @@
 # You should have received a copy of the GNU General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
-from edi.lib.command_factory import command_factory
+from edi.lib.edi_cmd import edi_cmd
 import argparse
 import logging
 
 
-class bootstrap_cmd(metaclass=command_factory):
+class bootstrap_cmd(edi_cmd):
 
-    @staticmethod
-    def advertise(subparsers):
-        parser = subparsers.add_parser(bootstrap_cmd.name(),
-                                       help='Bootstrap an initial image',
-                                       description=("Bootstrap an initial "
-                                                    "image."))
+    @classmethod
+    def advertise(cls, subparsers):
+        help_text = 'Bootstrap an initial image'
+        description_text = "Bootstrap an initial image."
+        parser = subparsers.add_parser(cls.name(),
+                                       help=help_text,
+                                       description=description_text)
         parser.add_argument('config_file',
                             type=argparse.FileType('r', encoding='UTF-8'))
 

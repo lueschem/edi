@@ -31,5 +31,6 @@ class command_factory(type):
     def __new__(cls, clsname, bases, attrs):
         new_class = super(command_factory, cls).__new__(cls, clsname,
                                                         bases, attrs)
-        command_registry[new_class.name()] = new_class
+        if clsname != "edi_cmd":
+            command_registry[new_class.name()] = new_class
         return new_class
