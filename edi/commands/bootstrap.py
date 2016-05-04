@@ -21,6 +21,7 @@
 
 from edi.lib.command_factory import command_factory
 import argparse
+import logging
 
 
 class bootstrap_cmd(metaclass=command_factory):
@@ -39,6 +40,7 @@ class bootstrap_cmd(metaclass=command_factory):
         return "bootstrap"
 
     def run(self, cli_args):
-        print(("bootstrapping with config file {0} ..."
-               ).format(cli_args.config_file.name))
-        print("done")
+        logging.info(("bootstrapping with config file {0} ..."
+                      ).format(cli_args.config_file.name))
+        logging.info(("bootstrapping with config file {0} ... done"
+                      ).format(cli_args.config_file.name))

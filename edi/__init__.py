@@ -40,32 +40,30 @@ def _setup_logging(cli_args):
     logging.basicConfig(level=log_level)
 
 
-def main():
-    main_parser = argparse.ArgumentParser(description=("Setup and manage an "
-                                                       "embedded development "
-                                                       "infrastructure."))
-    main_parser.add_argument("-v", "--verbose", action="store_true",
-                             help="Increase output verbosity to INFO")
-    main_parser.add_argument('--log', choices=['DEBUG', 'INFO', 'WARNING',
-                                               'ERROR', 'CRITICAL'],
-                             help="Modify log level (default is WARNING)")
+def _setup_command_line_interface():
+    parser = argparse.ArgumentParser(description=("Setup and manage an "
+                                                  "embedded development "
+                                                  "infrastructure."))
+    parser.add_argument("-v", "--verbose", action="store_true",
+                        help="Increase output verbosity to INFO")
+    parser.add_argument('--log', choices=['DEBUG', 'INFO', 'WARNING',
+                                          'ERROR', 'CRITICAL'],
+                        help="Modify log level (default is WARNING)")
 
-    main_parser.add_argument('--version', action="store_true",
-                             help="Print version and exit")
+    parser.add_argument('--version', action="store_true",
+                        help="Print version and exit")
 
-    subparsers = main_parser.add_subparsers(title='subcommands',
-                                            dest="command_name")
+    subparsers = parser.add_subparsers(title='subcommands',
+                                       dest="command_name")
 
-#     for (importer, modname, ispkg
-#          ) in pkgutil.iter_modules(edi.commands.__path__):
-#         print("Found submodule %s (is a package: %s)" % (modname, ispkg))
-#         if not ispkg:
-#             print("foo")
-#             print(importer.find_module(modname).load_module(modname).get_info())
     for _, command in command_registry.items():
         command.advertise(subparsers)
+    return parser
 
-    cli_args = main_parser.parse_args(sys.argv[1:])
+
+def main():
+    cli_interface = _setup_command_line_interface()
+    cli_args = cli_interface.parse_args(sys.argv[1:])
     _setup_logging(cli_args)
 
     if cli_args.version:
@@ -73,7 +71,7 @@ def main():
         sys.exit(0)
 
     if cli_args.command_name is None:
-        main_parser.print_help()
+        cli_interface.print_help()
         sys.exit(1)
 
     command_registry[cli_args.command_name]().run(cli_args)
