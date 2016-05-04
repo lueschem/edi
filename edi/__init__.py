@@ -38,39 +38,27 @@ def _setup_logging(cli_args):
     logging.basicConfig(level=log_level)
 
 
-class _HelpAction(argparse._HelpAction):
-
-    def __call__(self, parser, namespace, values, option_string=None):
-        parser.print_help()
-        # retrieve subparsers from parser
-        subparsers_actions = [
-            action for action in parser._actions
-            if isinstance(action, argparse._SubParsersAction)]
-        for subparsers_action in subparsers_actions:
-            # get all subparsers and print help
-            for choice, subparser in subparsers_action.choices.items():
-                print(_("* Command '{}':").format(choice))
-                print(subparser.format_help())
-        parser.exit()
-
-
 def main():
-    parser = argparse.ArgumentParser(description=("Setup and manage an "
-                                                  "embedded development "
-                                                  "infrastructure."),
-                                     add_help=False)
-    parser.add_argument('--help', action=_HelpAction, help="Show this help")
-    parser.add_argument("-v", "--verbose", action="store_true",
-                        help="Increase output verbosity to INFO")
-    parser.add_argument('--log', choices=['DEBUG', 'INFO', 'WARNING',
-                                          'ERROR', 'CRITICAL'],
-                        help="Modify log level (default is WARNING)")
+    main_parser = argparse.ArgumentParser(description=("Setup and manage an "
+                                                       "embedded development "
+                                                       "infrastructure."))
+    main_parser.add_argument("-v", "--verbose", action="store_true",
+                             help="Increase output verbosity to INFO")
+    main_parser.add_argument('--log', choices=['DEBUG', 'INFO', 'WARNING',
+                                               'ERROR', 'CRITICAL'],
+                             help="Modify log level (default is WARNING)")
 
-    parser.add_argument('--version', action="store_true",
-                        help="Print version and exit")
+    main_parser.add_argument('--version', action="store_true",
+                             help="Print version and exit")
 
-    # TODO: set log level
-    cli_args = parser.parse_args(sys.argv[1:])
+    subparsers = main_parser.add_subparsers(title='subcommands')
+    bootstrap_parser = subparsers.add_parser('bootstrap',
+                                             help='Bootstrap an initial image')
+    bootstrap_parser.add_argument('config_file',
+                                  type=argparse.FileType('r', encoding='UTF-8')
+                                  )
+
+    cli_args = main_parser.parse_args(sys.argv[1:])
 
     if cli_args.version:
         print(get_version(root='..', relative_to=__file__))
