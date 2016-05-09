@@ -65,7 +65,7 @@ setup(
 
     packages=find_packages(exclude=['docs', 'debian', 'bin', '.git']),
 
-    install_requires=['ansible'],
+    install_requires=['ansible', 'argcomplete', 'pyyaml', 'sphinx'],
 
     extras_require={
     #    'dev': ['check-manifest'],
