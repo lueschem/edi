@@ -21,6 +21,7 @@
 
 import sys
 import argparse
+import argcomplete
 from setuptools_scm import get_version
 import logging
 from edi.commands import *
@@ -58,6 +59,7 @@ def _setup_command_line_interface():
 
     for _, command in command_registry.items():
         command.advertise(subparsers)
+    argcomplete.autocomplete(parser)
     return parser
 
 

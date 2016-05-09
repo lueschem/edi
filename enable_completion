@@ -1,0 +1,2 @@
+# source this file in order to enable shell completion
+eval "$(register-python-argcomplete3 bin/edi)"
