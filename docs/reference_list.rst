@@ -25,11 +25,9 @@ Packaging
 Documentation
 -------------
 
-- `Sphinx - Python Documentation Generator`_
+- `Sphinx`_ - a Python documentation generator.
 
-.. _Sphinx - Python Documentation Generator: http://www.sphinx-doc.org/en/stable/
-
-http://www.sphinx-doc.org/en/stable/
+.. _Sphinx: http://www.sphinx-doc.org/en/stable/
 
 LXC/LXD
 +++++++
