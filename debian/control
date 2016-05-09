@@ -17,7 +17,6 @@ Package: edi
 Architecture: all
 Depends: ${misc:Depends},
          ${python3:Depends},
-         python3-argcomplete,	
 Description: Embedded Development Infrastructure - edi
  Details go here...
 

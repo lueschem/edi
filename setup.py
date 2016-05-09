@@ -26,11 +26,17 @@
 from setuptools import setup, find_packages
 from codecs import open
 from os import path
+from pip.req import parse_requirements
 
 here = path.abspath(path.dirname(__file__))
 
 with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
+
+
+def get_install_requires():
+    install_reqs = parse_requirements("requirements.txt", session=False)
+    return [str(ir.req) for ir in install_reqs]
 
 setup(
     name='edi',
@@ -65,8 +71,8 @@ setup(
 
     packages=find_packages(exclude=['docs', 'debian', 'bin', '.git']),
 
-    install_requires=['ansible', 'argcomplete', 'pyyaml', 'sphinx'],
-
+    install_requires=get_install_requires(),
+    
     extras_require={
     #    'dev': ['check-manifest'],
     #    'test': ['coverage'],
