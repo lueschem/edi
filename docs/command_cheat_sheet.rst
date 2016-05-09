@@ -13,6 +13,12 @@ Enable bash completion during development:
 Debian
 ++++++
 
+Build an edi .deb package directly:
+
+::
+
+  debuild -us -uc
+
 Build an edi .deb package using git-buildpackage:
 
 ::
