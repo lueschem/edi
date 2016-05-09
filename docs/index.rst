@@ -12,6 +12,7 @@ Contents:
    :maxdepth: 2
 
    reference_list
+   command_cheat_sheet
 
 Indices and tables
 ==================
