@@ -1,0 +1,19 @@
+---
+use_case:               edi_test # valid use cases: edi_run, edi_test, edi_build, edi_develop
+
+bootstrap_stage:
+    distribution:       jessie
+    architecture:       amd64
+    repository_url:     http://ftp.ch.debian.org/debian/
+    repository_key_url: https://ftp-master.debian.org/keys/archive-key-8.asc
+
+configuration_stage:
+    - identifier:       Linux container
+      playbook:         edi/plugins/lxc/lxc.yml
+      parameters:
+          - foobar:     Hello world!
+          - bingo:      42
+
+    - identifier:       Minimal system
+      playbook:         edi/plugins/minimal/minimal.yml
+          
