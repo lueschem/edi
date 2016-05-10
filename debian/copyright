@@ -3,7 +3,7 @@ Upstream-Name: edi
 Source: https://gitlab.com/lueschem/edi
 
 Files: *
-Copyright: (C) 2016 Matthias Lüscher
+Copyright: (C) 2016 Matthias Luescher
 License: GPL-3+
  edi is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by

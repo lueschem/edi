@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Matthias Lüscher
+# Copyright (C) 2016 Matthias Luescher
 #
 # Authors:
-#  Matthias Lüscher
+#  Matthias Luescher
 #
 # This file is part of edi.
 #
