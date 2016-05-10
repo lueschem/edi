@@ -19,20 +19,13 @@
 # You should have received a copy of the GNU General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
-from edi.lib.edi_cmd import edi_cmd
+import yaml
 
 
-class bootstrapimage(edi_cmd):
+class ConfigurationParser():
 
-    @classmethod
-    def advertise(cls, subparsers):
-        help_text = "bootstrap an initial image"
-        description_text = "Bootstrap an initial image."
-        parser = subparsers.add_parser(cls.__name__,
-                                       help=help_text,
-                                       description=description_text)
-        edi_cmd.require_config_file(parser)
+    def __init__(self, basic_config_file):
+        self.basic_config_file = basic_config_file
 
-    def run(self):
-        print("Basic config: ")
-        self.config_parser.dump()
+    def dump(self):
+        print(yaml.load(self.basic_config_file.read()))

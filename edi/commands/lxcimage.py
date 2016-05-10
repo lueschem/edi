@@ -20,7 +20,6 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 from edi.lib.edi_cmd import edi_cmd
-import argparse
 
 
 class lxcimage(edi_cmd):
@@ -32,8 +31,7 @@ class lxcimage(edi_cmd):
         parser = subparsers.add_parser(cls.__name__,
                                        help=help_text,
                                        description=description_text)
-        parser.add_argument('config_file',
-                            type=argparse.FileType('r', encoding='UTF-8'))
+        edi_cmd.require_config_file(parser)
 
     def run(self, cli_args):
         pass

@@ -20,7 +20,16 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 from edi.lib.command_factory import command_factory
+from edi.lib.configuration_parser import ConfigurationParser
+import argparse
 
 
 class edi_cmd(metaclass=command_factory):
-    pass
+
+    def __init__(self, cli_args):
+        self.config_parser = ConfigurationParser(cli_args.config_file)
+
+    @staticmethod
+    def require_config_file(parser):
+        parser.add_argument('config_file',
+                            type=argparse.FileType('r', encoding='UTF-8'))

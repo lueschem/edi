@@ -76,4 +76,4 @@ def main():
     if cli_args.command_name is None:
         print_error_and_exit("Missing subcommand. Use 'edi --help' for help.")
 
-    command_registry[cli_args.command_name]().run(cli_args)
+    command_registry[cli_args.command_name](cli_args).run()
