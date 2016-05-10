@@ -26,6 +26,7 @@ class ConfigurationParser():
 
     def __init__(self, basic_config_file):
         self.basic_config_file = basic_config_file
+        self.basic_config = yaml.load(self.basic_config_file.read())
 
     def dump(self):
-        print(yaml.load(self.basic_config_file.read()))
+        print(self.basic_config)

@@ -31,8 +31,9 @@ class bootstrapimage(edi_cmd):
         parser = subparsers.add_parser(cls.__name__,
                                        help=help_text,
                                        description=description_text)
-        edi_cmd.require_config_file(parser)
+        cls.require_config_file(parser)
 
     def run(self):
+        self.require_sudo()
         print("Basic config: ")
         self.config_parser.dump()

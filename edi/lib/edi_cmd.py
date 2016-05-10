@@ -22,6 +22,8 @@
 from edi.lib.command_factory import command_factory
 from edi.lib.configuration_parser import ConfigurationParser
 import argparse
+import os
+from edi.lib.helpers import print_error_and_exit
 
 
 class edi_cmd(metaclass=command_factory):
@@ -33,3 +35,10 @@ class edi_cmd(metaclass=command_factory):
     def require_config_file(parser):
         parser.add_argument('config_file',
                             type=argparse.FileType('r', encoding='UTF-8'))
+
+    def require_sudo(self):
+        if os.getuid() != 0:
+            print_error_and_exit(("The subcommand '{0}' requires superuser "
+                                  "privileges.\n"
+                                  "Use 'sudo edi {0} ...'."
+                                  ).format(type(self).__name__))
