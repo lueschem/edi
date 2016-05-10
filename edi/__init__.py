@@ -26,6 +26,7 @@ from setuptools_scm import get_version
 import logging
 from edi.commands import *
 from edi.lib.command_factory import command_registry
+from edi.lib.helpers import print_error_and_exit
 
 
 def _setup_logging(cli_args):
@@ -73,7 +74,6 @@ def main():
         sys.exit(0)
 
     if cli_args.command_name is None:
-        cli_interface.print_help()
-        sys.exit(1)
+        print_error_and_exit("Missing subcommand. Use 'edi --help' for help.")
 
     command_registry[cli_args.command_name]().run(cli_args)
