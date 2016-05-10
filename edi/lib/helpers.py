@@ -20,6 +20,8 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
+import os
+from pwd import getpwnam
 
 
 def print_error_and_exit(*args, **kwargs):
@@ -27,3 +29,17 @@ def print_error_and_exit(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
     sys.exit(1)
 
+
+def get_user():
+    if 'SUDO_USER' in os.environ:
+        return os.environ['SUDO_USER']
+    else:
+        return os.environ['USER']
+
+
+def get_user_uid():
+    return getpwnam(get_user()).pw_uid
+
+
+def get_user_gid():
+    return getpwnam(get_user()).pw_gid
