@@ -35,5 +35,3 @@ class bootstrapimage(edi_cmd):
 
     def run(self):
         self.require_sudo()
-        print("Basic config: ")
-        self.config_parser.dump()

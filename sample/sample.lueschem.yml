@@ -10,4 +10,4 @@ configuration_stage:
     - identifier:       Minimal system
       playbook:         edi/plugins/minimal/max.yml
           
-    - identifier:       Linux container
+    - identifier:       Linux container 2
