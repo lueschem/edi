@@ -22,6 +22,7 @@
 import sys
 import os
 from pwd import getpwnam
+import socket
 
 
 def print_error_and_exit(*args, **kwargs):
@@ -43,3 +44,7 @@ def get_user_uid():
 
 def get_user_gid():
     return getpwnam(get_user()).pw_gid
+
+
+def get_hostname():
+    return socket.gethostname()
