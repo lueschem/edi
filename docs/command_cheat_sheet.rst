@@ -4,11 +4,11 @@ Command Cheat Sheet
 edi
 +++
 
-Enable bash completion during development:
+Enable bash completion during development and add the edi bin folder to the PATH:
 
 ::
 
-  source enable_completion
+  source local_setup
 
 Debian
 ++++++
