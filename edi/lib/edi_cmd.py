@@ -28,11 +28,8 @@ from edi.lib.helpers import print_error_and_exit
 
 class edi_cmd(metaclass=command_factory):
 
-    config_parser = None
-
     def __init__(self, cli_args):
-        if edi_cmd.config_parser is None:
-            edi_cmd.config_parser = ConfigurationParser(cli_args.config_file)
+        self.config_parser = ConfigurationParser(cli_args.config_file)
 
     @staticmethod
     def require_config_file(parser):

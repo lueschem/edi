@@ -34,4 +34,4 @@ class lxcimage(edi_cmd):
         edi_cmd.require_config_file(parser)
 
     def run(self, cli_args):
-        pass
+        self.require_sudo()

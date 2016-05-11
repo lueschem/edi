@@ -27,16 +27,28 @@ import logging
 
 class ConfigurationParser():
 
-    def __init__(self, base_config_file):
-        logging.info(("Using base configuration file '{0}'"
-                      ).format(base_config_file.name))
-        base_config = yaml.load(base_config_file.read())
-        host_config = self.get_overlay_config(base_config_file, get_hostname())
-        user_config = self.get_overlay_config(base_config_file, get_user())
+    # shared data for all configuration parsers
+    configurations = {}
 
-        tmp_merge = self.merge_configurations(base_config, host_config)
-        self.config = self.merge_configurations(tmp_merge, user_config)
-        logging.info("Merged configuration:\n{0}".format(self.dump()))
+    def __init__(self, base_config_file):
+        self.config_id = base_config_file.name
+        if not ConfigurationParser.configurations.get(self.config_id):
+            logging.info(("Using base configuration file '{0}'"
+                          ).format(base_config_file.name))
+            base_config = yaml.load(base_config_file.read())
+            host_config = self.get_overlay_config(base_config_file,
+                                                  get_hostname())
+            user_config = self.get_overlay_config(base_config_file, get_user())
+
+            tmp_merge = self.merge_configurations(base_config, host_config)
+
+            ConfigurationParser.configurations
+            merged_config = self.merge_configurations(tmp_merge, user_config)
+            ConfigurationParser.configurations[self.config_id] = merged_config
+            logging.info("Merged configuration:\n{0}".format(self.dump()))
+
+    def get_config(self):
+        return ConfigurationParser.configurations.get(self.config_id, {})
 
     def get_overlay_config(self, base_config_file, overlay_name):
         filename, file_extension = os.path.splitext(base_config_file.name)
@@ -50,7 +62,7 @@ class ConfigurationParser():
             return {}
 
     def dump(self):
-        return yaml.dump(self.config, default_flow_style=False)
+        return yaml.dump(self.get_config(), default_flow_style=False)
 
     def merge_configurations(self, base, overlay):
         merged_configuration = {}
