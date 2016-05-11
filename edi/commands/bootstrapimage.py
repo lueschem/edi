@@ -24,6 +24,7 @@ from edi.lib.helpers import require_executable, print_error_and_exit
 import tempfile
 import requests
 import codecs
+import subprocess
 
 
 class BootstrapImage(EdiCommand):
@@ -45,7 +46,8 @@ class BootstrapImage(EdiCommand):
         workdir = self.config.get_workdir()
 
         with tempfile.TemporaryDirectory(dir=workdir) as tempdir:
-            self._fetch_bootstrap_repository_key(tempdir)
+            key_file = self._fetch_bootstrap_repository_key(tempdir)
+            subprocess.run(["cat", key_file])
 
     def _fetch_bootstrap_repository_key(self, tempdir):
         key_url = self.config.get_bootstrap_repository_key()
@@ -57,3 +59,4 @@ class BootstrapImage(EdiCommand):
         key_file = "{0}/bootstrap_key.asc".format(tempdir)
         with codecs.open(key_file, "w", key_req.encoding) as f:
             f.write(key_req.text)
+        return key_file
