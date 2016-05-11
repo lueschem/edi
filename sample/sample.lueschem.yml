@@ -1,9 +1,5 @@
 ---
-use_case:               edi_test # valid use cases: edi_run, edi_test, edi_build, edi_develop
+global_configuration:
+    edi_use_case:       edi_test
+    edi_log:            INFO
 
-bootstrap_stage:
-
-configuration_stage:
-    - identifier:       Minimal system
-      playbook:         edi/plugins/minimal/max.yml
-    - identifier:       Linux container 2
