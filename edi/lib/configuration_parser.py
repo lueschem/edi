@@ -23,34 +23,60 @@ import yaml
 from edi.lib.helpers import get_user, get_hostname, print_error_and_exit
 import os
 import logging
+from aptsources.sourceslist import SourceEntry
 
 
 class ConfigurationParser():
 
     # shared data for all configuration parsers
-    configurations = {}
+    _configurations = {}
+
+    def dump(self):
+        return yaml.dump(self._get_config(), default_flow_style=False)
+
+    def get_workdir(self):
+        # we might want to overwrite it by a config setting
+        return os.getcwd()
+
+    def get_distribution(self):
+        repository = self._get_bootstrap_item("repository", "")
+        return SourceEntry(repository).dist
+
+    def get_architecture(self):
+        return self._get_bootstrap_item("architecture", None)
+
+    def get_bootstrap_uri(self):
+        repository = self._get_bootstrap_item("repository", "")
+        return SourceEntry(repository).uri
+
+    def get_bootstrap_repository_key(self):
+        return self._get_bootstrap_item("repository_key", None)
+
+    def get_bootstrap_compontents(self):
+        repository = self._get_bootstrap_item("repository", "")
+        return SourceEntry(repository).comps
 
     def __init__(self, base_config_file):
         self.config_id = base_config_file.name
-        if not ConfigurationParser.configurations.get(self.config_id):
+        if not ConfigurationParser._configurations.get(self.config_id):
             logging.info(("Using base configuration file '{0}'"
                           ).format(base_config_file.name))
             base_config = yaml.load(base_config_file.read())
-            host_config = self.get_overlay_config(base_config_file,
-                                                  get_hostname())
-            user_config = self.get_overlay_config(base_config_file, get_user())
+            host_config = self._get_overlay_config(base_config_file,
+                                                   get_hostname())
+            user_config = self._get_overlay_config(base_config_file,
+                                                   get_user())
 
-            tmp_merge = self.merge_configurations(base_config, host_config)
+            tmp_merge = self._merge_configurations(base_config, host_config)
 
-            ConfigurationParser.configurations
-            merged_config = self.merge_configurations(tmp_merge, user_config)
-            ConfigurationParser.configurations[self.config_id] = merged_config
+            merged_config = self._merge_configurations(tmp_merge, user_config)
+            ConfigurationParser._configurations[self.config_id] = merged_config
             logging.info("Merged configuration:\n{0}".format(self.dump()))
 
-    def get_config(self):
-        return ConfigurationParser.configurations.get(self.config_id, {})
+    def _get_config(self):
+        return ConfigurationParser._configurations.get(self.config_id, {})
 
-    def get_overlay_config(self, base_config_file, overlay_name):
+    def _get_overlay_config(self, base_config_file, overlay_name):
         filename, file_extension = os.path.splitext(base_config_file.name)
         fn = "{0}.{1}{2}".format(filename, overlay_name, file_extension)
         if os.path.isfile(fn) and os.access(fn, os.R_OK):
@@ -61,23 +87,20 @@ class ConfigurationParser():
         else:
             return {}
 
-    def dump(self):
-        return yaml.dump(self.get_config(), default_flow_style=False)
-
-    def merge_configurations(self, base, overlay):
+    def _merge_configurations(self, base, overlay):
         merged_configuration = {}
 
         elements = ["global_configuration", "bootstrap_stage"]
         for element in elements:
             merged_configuration[element
-                                 ] = self.merge_key_value_node(base, overlay,
-                                                               element)
+                                 ] = self._merge_key_value_node(base, overlay,
+                                                                element)
 
         merged_configuration["configuration_stage"
-                             ] = self.merge_configuration_stage(base, overlay)
+                             ] = self._merge_configuration_stage(base, overlay)
         return merged_configuration
 
-    def merge_key_value_node(self, base, overlay, node_name):
+    def _merge_key_value_node(self, base, overlay, node_name):
         base_node = base.get(node_name, {})
         overlay_node = overlay.get(node_name, {})
         if base_node is None and overlay_node is None:
@@ -88,7 +111,7 @@ class ConfigurationParser():
             return base_node
         return dict(base_node, **overlay_node)
 
-    def get_identifier(self, element):
+    def _get_identifier(self, element):
         identifier = element.get("identifier", None)
         if identifier is None:
             print_error_and_exit(("Missing identifier for "
@@ -96,7 +119,7 @@ class ConfigurationParser():
                                   ).format(element))
         return identifier
 
-    def merge_configuration_stage(self, base, overlay):
+    def _merge_configuration_stage(self, base, overlay):
         merged_list = []
 
         if "configuration_stage" in overlay:
@@ -105,17 +128,17 @@ class ConfigurationParser():
             if overlay_list:
                 base_dict = {}
                 for element in base.get("configuration_stage", []):
-                    base_dict[self.get_identifier(element)] = element
+                    base_dict[self._get_identifier(element)] = element
 
                 for element in overlay_list:
-                    identifier = self.get_identifier(element)
+                    identifier = self._get_identifier(element)
                     base_element = base_dict.get(identifier, {})
                     if base_element:
                         del base_dict[identifier]
                     merged_element = dict(base_element, **element)
-                    merged_params = self.merge_key_value_node(base_element,
-                                                              element,
-                                                              "parameters")
+                    merged_params = self._merge_key_value_node(base_element,
+                                                               element,
+                                                               "parameters")
                     if merged_params:
                         merged_element["parameters"] = merged_params
                     merged_list.append(merged_element)
@@ -129,3 +152,7 @@ class ConfigurationParser():
             return merged_list
         else:
             return base.get("configuration_stage", [])
+
+    def _get_bootstrap_item(self, item, default):
+        return self._get_config().get("bootstrap_stage", {}
+                                      ).get(item, default)

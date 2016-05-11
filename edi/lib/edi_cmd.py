@@ -29,7 +29,7 @@ from edi.lib.helpers import print_error_and_exit
 class edi_cmd(metaclass=command_factory):
 
     def __init__(self, cli_args):
-        self.config_parser = ConfigurationParser(cli_args.config_file)
+        self.config = ConfigurationParser(cli_args.config_file)
 
     @staticmethod
     def require_config_file(parser):

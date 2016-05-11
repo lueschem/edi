@@ -48,3 +48,28 @@ def get_user_gid():
 
 def get_hostname():
     return socket.gethostname()
+
+
+def which(executable):
+    def is_exe(fpath):
+        return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+
+    fpath, _ = os.path.split(executable)
+    if fpath:
+        if is_exe(executable):
+            return executable
+    else:
+        for path in os.environ["PATH"].split(os.pathsep):
+            path = path.strip('"')
+            exe_file_path = os.path.join(path, executable)
+            if is_exe(exe_file_path):
+                return exe_file_path
+
+    return None
+
+
+def require_executable(executable, hint):
+    if which(executable) is None:
+        print_error_and_exit(("Missing executable '{0}'.\n"
+                              "Use '{1}' to install it.").format(executable,
+                                                                 hint))
