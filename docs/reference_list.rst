@@ -29,6 +29,14 @@ Documentation
 
 .. _Sphinx: http://www.sphinx-doc.org/en/stable/
 
+Libraries
+---------
+
+- "`Requests`_ is an elegant and simple HTTP library for Python, built for human beings."
+
+.. _Requests: http://docs.python-requests.org/en/latest/index.html
+
+
 LXC/LXD
 +++++++
 
