@@ -47,7 +47,17 @@ class BootstrapImage(EdiCommand):
 
         with tempfile.TemporaryDirectory(dir=workdir) as tempdir:
             key_file = self._fetch_bootstrap_repository_key(tempdir)
-            subprocess.run(["cat", key_file])
+            result1 = subprocess.run(["cat", key_file], stdout=subprocess.PIPE)
+            print(result1)
+            result2 = subprocess.run(["cat", key_file], stdout=subprocess.PIPE, universal_newlines=True)
+            print(result2)
+            result3 = subprocess.run(["/home/lueschem/workspace/edi/bin/edi", "bootstrapimage", "--help"], stdout=subprocess.PIPE, universal_newlines=True)
+            print(result3)
+            print(result3.stdout)
+            result0 = subprocess.run(["sudo", "-u", "lueschem", "cat", key_file], stdout=subprocess.PIPE, universal_newlines=True)
+            print(result0.stdout)
+            print(result0)
+
 
     def _fetch_bootstrap_repository_key(self, tempdir):
         key_url = self.config.get_bootstrap_repository_key()
