@@ -22,15 +22,15 @@
 command_registry = {}
 
 
-class command_factory(type):
+class CommandFactory(type):
     """Command factory metaclass
 
     Metaclass that adds all commands to the command registry.
     """
 
     def __new__(cls, clsname, bases, attrs):
-        new_class = super(command_factory, cls).__new__(cls, clsname,
-                                                        bases, attrs)
-        if clsname != "edi_cmd":
-            command_registry[clsname] = new_class
+        new_class = super(CommandFactory, cls).__new__(cls, clsname,
+                                                       bases, attrs)
+        if clsname != "EdiCommand":
+            command_registry[clsname.lower()] = new_class
         return new_class

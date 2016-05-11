@@ -19,20 +19,20 @@
 # You should have received a copy of the GNU General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
-from edi.lib.edi_cmd import edi_cmd
+from edi.lib.edicommand import EdiCommand
 from edi.lib.helpers import require_executable, print_error_and_exit
 import tempfile
 import requests
 import codecs
 
 
-class bootstrapimage(edi_cmd):
+class BootstrapImage(EdiCommand):
 
     @classmethod
     def advertise(cls, subparsers):
         help_text = "bootstrap an initial image"
         description_text = "Bootstrap an initial image."
-        parser = subparsers.add_parser(cls.__name__,
+        parser = subparsers.add_parser(cls.__name__.lower(),
                                        help=help_text,
                                        description=description_text)
         cls.require_config_file(parser)

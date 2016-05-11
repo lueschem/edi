@@ -19,19 +19,19 @@
 # You should have received a copy of the GNU General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
-from edi.lib.edi_cmd import edi_cmd
+from edi.lib.edicommand import EdiCommand
 
 
-class lxcimage(edi_cmd):
+class LxcImage(EdiCommand):
 
     @classmethod
     def advertise(cls, subparsers):
         help_text = "upgrade a bootstrap image to a lxcimage"
         description_text = "Upgrade a bootstrap image to a lxcimage."
-        parser = subparsers.add_parser(cls.__name__,
+        parser = subparsers.add_parser(cls.__name__.lower(),
                                        help=help_text,
                                        description=description_text)
-        edi_cmd.require_config_file(parser)
+        cls.require_config_file(parser)
 
-    def run(self, cli_args):
+    def run(self):
         self.require_sudo()

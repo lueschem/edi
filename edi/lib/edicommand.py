@@ -19,14 +19,14 @@
 # You should have received a copy of the GNU General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
-from edi.lib.command_factory import command_factory
-from edi.lib.configuration_parser import ConfigurationParser
+from edi.lib.commandfactory import CommandFactory
+from edi.lib.configurationparser import ConfigurationParser
 import argparse
 import os
 from edi.lib.helpers import print_error_and_exit
 
 
-class edi_cmd(metaclass=command_factory):
+class EdiCommand(metaclass=CommandFactory):
 
     def __init__(self, cli_args):
         self.config = ConfigurationParser(cli_args.config_file)

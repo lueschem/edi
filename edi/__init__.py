@@ -25,7 +25,7 @@ import argcomplete
 from setuptools_scm import get_version
 import logging
 from edi.commands import *
-from edi.lib.command_factory import command_registry
+from edi.lib.commandfactory import command_registry
 from edi.lib.helpers import print_error_and_exit
 
 
