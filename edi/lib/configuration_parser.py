@@ -65,41 +65,54 @@ class ConfigurationParser():
         return merged_configuration
 
     def merge_key_value_node(self, base, overlay, node_name):
-        return dict(base.get(node_name, {}),
-                    **overlay.get(node_name, {}))
+        base_node = base.get(node_name, {})
+        overlay_node = overlay.get(node_name, {})
+        if base_node is None and overlay_node is None:
+            return {}
+        if base_node is None:
+            return overlay_node
+        if overlay_node is None:
+            return base_node
+        return dict(base_node, **overlay_node)
+
+    def get_identifier(self, element):
+        identifier = element.get("identifier", None)
+        if identifier is None:
+            print_error_and_exit(("Missing identifier for "
+                                  "element:\n'{}'"
+                                  ).format(element))
+        return identifier
 
     def merge_configuration_stage(self, base, overlay):
+        merged_list = []
+
         if "configuration_stage" in overlay:
-            base_dict = {}
-            for playbook in base.get("configuration_stage", []):
-                identifier = playbook.get("identifier", None)
-                if identifier is None:
-                    print_error_and_exit(("Missing identifier for "
-                                          "element:\n'{}'").format(playbook))
-                base_dict[identifier] = playbook
+            overlay_list = overlay.get("configuration_stage", [])
 
-            merged_list = []
-            for playbook in overlay.get("configuration_stage", []):
-                identifier = playbook.get("identifier", None)
-                if identifier is None:
-                    print_error_and_exit(("Missing identifier for "
-                                          "element:\n'{}'").format(playbook))
-                base_playbook = base_dict.get(identifier, {})
-                if base_playbook:
-                    del base_dict[identifier]
-                merged_playbook = dict(base_playbook, **playbook)
-                merged_parameters = self.merge_key_value_node(base_playbook,
-                                                              playbook,
+            if overlay_list:
+                base_dict = {}
+                for element in base.get("configuration_stage", []):
+                    base_dict[self.get_identifier(element)] = element
+
+                for element in overlay_list:
+                    identifier = self.get_identifier(element)
+                    base_element = base_dict.get(identifier, {})
+                    if base_element:
+                        del base_dict[identifier]
+                    merged_element = dict(base_element, **element)
+                    merged_params = self.merge_key_value_node(base_element,
+                                                              element,
                                                               "parameters")
-                if merged_parameters:
-                    merged_playbook["parameters"] = merged_parameters
-                merged_list.append(merged_playbook)
+                    if merged_params:
+                        merged_element["parameters"] = merged_params
+                    merged_list.append(merged_element)
 
-            for _, element in base_dict.items():
-                logging.info(("Overlay configuration does not use the "
-                              "following configuration stage element:\n{0}"
-                              ).format(element))
+                for _, element in base_dict.items():
+                    logging.info(("Overlay configuration does not use the "
+                                  "following configuration stage element:\n{0}"
+                                  ).format(element))
 
+        if merged_list:
             return merged_list
         else:
-            return base.get("configuration_stage", {})
+            return base.get("configuration_stage", [])
