@@ -1,5 +1,16 @@
 ---
 global_configuration:
-    edi_use_case:       edi_test
-    edi_log:            INFO
+    # change the use case:
+    use_case:           edi_test
+
+# apply no changes to the bootstrap stage
+
+configuration_stage:
+    # keep the element but change the message:
+    - identifier:       Linux container
+      parameters:
+          edi_message:  Hello Matthias!
+
+    # keep the element without change:
+    - identifier:       Minimal system
 

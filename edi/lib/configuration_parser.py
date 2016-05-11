@@ -54,12 +54,13 @@ class ConfigurationParser():
 
     def merge_configurations(self, base, overlay):
         merged_configuration = {}
-        merged_configuration["global_config"
-                             ] = self.merge_key_value_node(base, overlay,
-                                                           "global_config")
-        merged_configuration["bootstrap_stage"
-                             ] = self.merge_key_value_node(base, overlay,
-                                                           "bootstrap_stage")
+
+        elements = ["global_configuration", "bootstrap_stage"]
+        for element in elements:
+            merged_configuration[element
+                                 ] = self.merge_key_value_node(base, overlay,
+                                                               element)
+
         merged_configuration["configuration_stage"
                              ] = self.merge_configuration_stage(base, overlay)
         return merged_configuration
@@ -108,9 +109,9 @@ class ConfigurationParser():
                     merged_list.append(merged_element)
 
                 for _, element in base_dict.items():
-                    logging.info(("Overlay configuration does not use the "
-                                  "following configuration stage element:\n{0}"
-                                  ).format(element))
+                    logging.warning(("Overlay configuration does not use the "
+                                     "following configuration stage "
+                                     "element:\n{0}").format(element))
 
         if merged_list:
             return merged_list

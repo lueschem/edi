@@ -1,7 +1,7 @@
 ---
-global_config:
+global_configuration:
     # valid use cases: edi_run, edi_test, edi_build, edi_develop
-    edi_use_case:       edi_run
+    use_case:           edi_run
 
 bootstrap_stage:
     architecture:       amd64
