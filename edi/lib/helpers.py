@@ -23,6 +23,7 @@ import sys
 import os
 from pwd import getpwnam
 import socket
+import logging
 
 
 def print_error_and_exit(*args, **kwargs):
@@ -32,10 +33,15 @@ def print_error_and_exit(*args, **kwargs):
 
 
 def get_user():
-    if 'SUDO_USER' in os.environ:
-        return os.environ['SUDO_USER']
-    else:
-        return os.environ['USER']
+    try:
+        if 'SUDO_USER' in os.environ:
+            return os.environ['SUDO_USER']
+        else:
+            return os.environ['USER']
+    except KeyError:
+        # Hint: there is no $USER during debuild
+        logging.warn("Unable to get user from environment variable.")
+        return "unknown"
 
 
 def get_user_uid():

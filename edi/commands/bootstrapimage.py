@@ -44,6 +44,7 @@ class BootstrapImage(EdiCommand):
         require_executable("debootstrap", "sudo apt install debootstrap")
 
         workdir = self.config.get_workdir()
+        return
 
         with tempfile.TemporaryDirectory(dir=workdir) as tempdir:
             key_file = self._fetch_bootstrap_repository_key(tempdir)
