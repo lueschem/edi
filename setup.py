@@ -69,7 +69,7 @@ setup(
 
     keywords='embedded Linux container toolchain',
 
-    packages=find_packages(exclude=['docs', 'debian', 'bin', '.git']),
+    packages=find_packages(exclude=['docs', 'debian', 'bin', '.git', 'tests']),
 
     install_requires=get_install_requires(),
     

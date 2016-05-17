@@ -39,22 +39,25 @@ class ConfigurationParser():
         return os.getcwd()
 
     def get_distribution(self):
-        repository = self._get_bootstrap_item("repository", "")
+        repository = self._get_bootstrap_stage_item("repository", "")
         return SourceEntry(repository).dist
 
     def get_architecture(self):
-        return self._get_bootstrap_item("architecture", None)
+        return self._get_bootstrap_stage_item("architecture", None)
 
     def get_bootstrap_uri(self):
-        repository = self._get_bootstrap_item("repository", "")
+        repository = self._get_bootstrap_stage_item("repository", "")
         return SourceEntry(repository).uri
 
     def get_bootstrap_repository_key(self):
-        return self._get_bootstrap_item("repository_key", None)
+        return self._get_bootstrap_stage_item("repository_key", None)
 
     def get_bootstrap_compontents(self):
-        repository = self._get_bootstrap_item("repository", "")
+        repository = self._get_bootstrap_stage_item("repository", "")
         return SourceEntry(repository).comps
+
+    def get_use_case(self):
+        return self._get_global_configuration_item("use_case", "edi_run")
 
     def __init__(self, base_config_file):
         self.config_id = base_config_file.name
@@ -153,6 +156,10 @@ class ConfigurationParser():
         else:
             return base.get("configuration_stage", [])
 
-    def _get_bootstrap_item(self, item, default):
+    def _get_bootstrap_stage_item(self, item, default):
         return self._get_config().get("bootstrap_stage", {}
+                                      ).get(item, default)
+
+    def _get_global_configuration_item(self, item, default):
+        return self._get_config().get("global_configuration", {}
                                       ).get(item, default)
