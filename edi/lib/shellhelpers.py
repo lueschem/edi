@@ -24,15 +24,25 @@ import subprocess
 import os
 from edi.lib.helpers import get_user
 
+ADAPTIVE = -42
+
 
 def run(popenargs, sudo=False, input=None, timeout=None,
-        check=True, universal_newlines=True, stdout=subprocess.PIPE,
+        check=True, universal_newlines=True, stdout=ADAPTIVE,
         **kwargs):
     """
     Small wrapper around subprocess.run().
     """
 
     assert type(popenargs) is list
+
+    subprocess_stdout = stdout
+
+    if subprocess_stdout == ADAPTIVE:
+        if logging.getLogger().isEnabledFor(logging.INFO):
+            subprocess_stdout = None
+        else:
+            subprocess_stdout = subprocess.PIPE
 
     myargs = popenargs.copy()
 
@@ -45,10 +55,10 @@ def run(popenargs, sudo=False, input=None, timeout=None,
 
     result = subprocess.run(myargs, input=input, timeout=timeout, check=check,
                             universal_newlines=universal_newlines,
-                            stdout=stdout, **kwargs)
+                            stdout=subprocess_stdout, **kwargs)
 
-    if (logging.getLogger().isEnabledFor(logging.DEBUG) and
-            stdout is subprocess.PIPE):
-        logging.debug(result.stdout)
+    if (logging.getLogger().isEnabledFor(logging.INFO) and
+            subprocess_stdout is subprocess.PIPE):
+        logging.info(result.stdout)
 
     return result
