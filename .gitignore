@@ -11,6 +11,8 @@ __pycache__/
 
 # pytest
 .cache
+htmlcov/
+.coverage
 
 # sphinx
 docs/_build/

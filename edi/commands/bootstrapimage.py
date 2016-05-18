@@ -24,7 +24,7 @@ from edi.lib.helpers import require_executable, print_error_and_exit
 import tempfile
 import requests
 import codecs
-import subprocess
+from edi.lib.shellhelpers import run
 
 
 class BootstrapImage(EdiCommand):
@@ -44,21 +44,10 @@ class BootstrapImage(EdiCommand):
         require_executable("debootstrap", "sudo apt install debootstrap")
 
         workdir = self.config.get_workdir()
-        return
 
         with tempfile.TemporaryDirectory(dir=workdir) as tempdir:
             key_file = self._fetch_bootstrap_repository_key(tempdir)
-            result1 = subprocess.run(["cat", key_file], stdout=subprocess.PIPE)
-            print(result1)
-            result2 = subprocess.run(["cat", key_file], stdout=subprocess.PIPE, universal_newlines=True)
-            print(result2)
-            result3 = subprocess.run(["/home/lueschem/workspace/edi/bin/edi", "bootstrapimage", "--help"], stdout=subprocess.PIPE, universal_newlines=True)
-            print(result3)
-            print(result3.stdout)
-            result0 = subprocess.run(["sudo", "-u", "lueschem", "cat", key_file], stdout=subprocess.PIPE, universal_newlines=True)
-            print(result0.stdout)
-            print(result0)
-
+            run(["cat", key_file], sudo=True)
 
     def _fetch_bootstrap_repository_key(self, tempdir):
         key_url = self.config.get_bootstrap_repository_key()
