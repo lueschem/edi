@@ -1,5 +1,5 @@
-ansible
 argcomplete
 pyyaml
 python-apt
 requests
+gnupg

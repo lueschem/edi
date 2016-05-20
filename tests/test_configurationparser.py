@@ -70,20 +70,28 @@ configuration_stage:
     - identifier:       Minimal system
 """
 
+config_name = "sample"
+
 
 @pytest.fixture(scope='module')
 def config_files(tmpdir_factory):
     dir_name = tmpdir_factory.mktemp('configuration')
-    main_file = "sample.yml"
+    main_file = "{0}.yml".format(config_name)
     with open(str(dir_name.join(main_file)), "w") as file:
         file.write(sample_file)
-    user_file = "sample.{0}.yml".format(get_user())
+    user_file = "{0}.{1}.yml".format(config_name, get_user())
     with open(str(dir_name.join(user_file)), "w") as file:
         file.write(sample_user_file)
-    host_file = "sample.{0}.yml".format(get_hostname())
+    host_file = "{0}.{1}.yml".format(config_name, get_hostname())
     with open(str(dir_name.join(host_file)), "w") as file:
         file.write(sample_host_file)
     return str(dir_name.join(main_file))
+
+
+def test_project_name(config_files):
+    with open(config_files, "r") as main_file:
+        parser = ConfigurationParser(main_file)
+        assert parser.get_project_name() == config_name
 
 
 def test_global_configuration_overlay(config_files):
@@ -98,7 +106,7 @@ def test_bootstrap_stage_overlay(config_files):
         parser = ConfigurationParser(main_file)
         # the host file shall win
         assert parser.get_architecture() == "i386"
-        assert "main" in parser.get_bootstrap_compontents()
+        assert "main" in parser.get_bootstrap_components()
         assert parser.get_bootstrap_uri() == "http://ftp.ch.debian.org/debian/"
         expected_key = "https://ftp-master.debian.org/keys/archive-key-8.asc"
         assert parser.get_bootstrap_repository_key() == expected_key

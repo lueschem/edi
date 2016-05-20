@@ -22,6 +22,7 @@
 import yaml
 from edi.lib.helpers import get_user, get_hostname, print_error_and_exit
 import os
+from os.path import basename, splitext
 import logging
 from aptsources.sourceslist import SourceEntry
 
@@ -33,6 +34,9 @@ class ConfigurationParser():
 
     def dump(self):
         return yaml.dump(self._get_config(), default_flow_style=False)
+
+    def get_project_name(self):
+        return self.config_id
 
     def get_workdir(self):
         # we might want to overwrite it by a config setting
@@ -52,7 +56,7 @@ class ConfigurationParser():
     def get_bootstrap_repository_key(self):
         return self._get_bootstrap_stage_item("repository_key", None)
 
-    def get_bootstrap_compontents(self):
+    def get_bootstrap_components(self):
         repository = self._get_bootstrap_stage_item("repository", "")
         return SourceEntry(repository).comps
 
@@ -60,7 +64,7 @@ class ConfigurationParser():
         return self._get_global_configuration_item("use_case", "edi_run")
 
     def __init__(self, base_config_file):
-        self.config_id = base_config_file.name
+        self.config_id = splitext(basename(base_config_file.name))[0]
         if not ConfigurationParser._configurations.get(self.config_id):
             logging.info(("Using base configuration file '{0}'"
                           ).format(base_config_file.name))

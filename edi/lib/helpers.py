@@ -24,6 +24,7 @@ import os
 from pwd import getpwnam
 import socket
 import logging
+import shutil
 
 
 def print_error_and_exit(*args, **kwargs):
@@ -79,3 +80,7 @@ def require_executable(executable, hint):
         print_error_and_exit(("Missing executable '{0}'.\n"
                               "Use '{1}' to install it.").format(executable,
                                                                  hint))
+
+
+def chown_to_user(path):
+    shutil.chown(path, get_user_uid(), get_user_gid())
