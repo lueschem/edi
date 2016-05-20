@@ -24,6 +24,7 @@ import requests
 import os
 import gnupg
 import shutil
+import logging
 from edi.lib.edicommand import EdiCommand
 from edi.lib.helpers import (require_executable, print_error_and_exit,
                              chown_to_user)
@@ -43,6 +44,8 @@ class BootstrapImage(EdiCommand):
 
     def run(self):
         if os.path.isfile(self.result()):
+            logging.info(("{0} is already there. "
+                          "Delete it to regenerate it.").format(self.result()))
             return
 
         self.require_sudo()
