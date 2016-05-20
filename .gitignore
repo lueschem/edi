@@ -28,3 +28,6 @@ debian/edi.debhelper.log
 debian/edi.substvars
 debian/files
 .pybuild/
+
+# edi results
+*.tar.*

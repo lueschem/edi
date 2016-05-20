@@ -27,7 +27,7 @@ import shutil
 from edi.lib.edicommand import EdiCommand
 from edi.lib.helpers import (require_executable, print_error_and_exit,
                              chown_to_user)
-from edi.lib.shellhelpers import run
+from edi.lib.shellhelpers import run, mount_proc_sys_dev, get_chroot_cmd
 
 
 class BootstrapImage(EdiCommand):
@@ -42,6 +42,9 @@ class BootstrapImage(EdiCommand):
         cls.require_config_file(parser)
 
     def run(self):
+        if os.path.isfile(self.result()):
+            return
+
         self.require_sudo()
 
         require_executable("debootstrap", "sudo apt install debootstrap")
@@ -53,9 +56,16 @@ class BootstrapImage(EdiCommand):
             key_data = self._fetch_bootstrap_repository_key(tempdir)
             keyring_file = self._build_keyring(tempdir, key_data)
             rootfs = self._run_debootstrap(tempdir, keyring_file)
+            self._postprocess_rootfs(rootfs, key_data)
             archive = self._pack_rootfs(tempdir, rootfs)
             chown_to_user(archive)
-            shutil.move(archive, self.config.get_workdir())
+            shutil.move(archive, self.result())
+
+    def result(self):
+        archive_name = ("{0}_{1}.tar.xz"
+                        ).format(self.config.get_project_name(),
+                                 type(self).__name__.lower())
+        return os.path.join(self.config.get_workdir(), archive_name)
 
     def _fetch_bootstrap_repository_key(self, tempdir):
         key_url = self.config.get_bootstrap_repository_key()
@@ -99,13 +109,24 @@ class BootstrapImage(EdiCommand):
         run(cmd, sudo=True)
         return rootfs
 
+    def _postprocess_rootfs(self, rootfs, key_data):
+        with mount_proc_sys_dev(rootfs):
+            if key_data:
+                key_cmd = get_chroot_cmd(rootfs)
+                key_cmd.append("apt-key")
+                key_cmd.append("add")
+                key_cmd.append("-")
+                run(key_cmd, input=key_data, sudo=True)
+
+            clean_cmd = get_chroot_cmd(rootfs)
+            clean_cmd.append("apt-get")
+            clean_cmd.append("clean")
+            run(clean_cmd, sudo=True)
+
     def _pack_rootfs(self, tempdir, rootfs):
         # advanced options such as numeric-owner are not supported by
         # python tarfile library - therefore we use the tar command line tool
-        archive_name = ("{0}_{1}.tar.xz"
-                        ).format(self.config.get_project_name(),
-                                 type(self).__name__.lower())
-        archive_path = os.path.join(tempdir, archive_name)
+        archive_path = os.path.join(tempdir, "result.tar.xz")
 
         cmd = []
         cmd.append("tar")

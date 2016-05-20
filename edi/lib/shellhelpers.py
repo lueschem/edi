@@ -22,6 +22,7 @@
 import logging
 import subprocess
 import os
+from contextlib import contextmanager
 from edi.lib.helpers import get_user
 
 ADAPTIVE = -42
@@ -62,3 +63,83 @@ def run(popenargs, sudo=False, input=None, timeout=None,
         logging.info(result.stdout)
 
     return result
+
+
+def _get_umount_cmd(mountpoint):
+    umount_cmd = []
+    umount_cmd.append("umount")
+    umount_cmd.append(mountpoint)
+    return umount_cmd
+
+
+@contextmanager
+def _mount_proc(rootfs):
+    mountpoint = "{0}/proc".format(rootfs)
+    mount_cmd = []
+    mount_cmd.append("mount")
+    mount_cmd.extend(["-t", "proc"])
+    mount_cmd.append("proc")
+    mount_cmd.append(mountpoint)
+
+    run(mount_cmd, sudo=True)
+
+    try:
+        yield
+    finally:
+        run(_get_umount_cmd(mountpoint), sudo=True)
+
+
+@contextmanager
+def _mount_sys(rootfs):
+    mountpoint = "{0}/sys".format(rootfs)
+    mount_cmd = []
+    mount_cmd.append("mount")
+    mount_cmd.extend(["-t", "sysfs"])
+    mount_cmd.append("sys")
+    mount_cmd.append(mountpoint)
+
+    run(mount_cmd, sudo=True)
+
+    try:
+        yield
+    finally:
+        run(_get_umount_cmd(mountpoint), sudo=True)
+
+
+@contextmanager
+def _mount_dev_ro(rootfs):
+    mountpoint = "{0}/dev".format(rootfs)
+    mount_cmd = []
+    mount_cmd.append("mount")
+    mount_cmd.extend(["-o", "bind"])
+    mount_cmd.append("/dev")
+    mount_cmd.append(mountpoint)
+
+    run(mount_cmd, sudo=True)
+
+    try:
+        remount_cmd = []
+        remount_cmd.append("mount")
+        remount_cmd.extend(["-o", "remount,ro"])
+        remount_cmd.append(mountpoint)
+
+        run(remount_cmd, sudo=True)
+
+        yield
+    finally:
+        run(_get_umount_cmd(mountpoint), sudo=True)
+
+
+@contextmanager
+def mount_proc_sys_dev(rootfs):
+    with _mount_proc(rootfs):
+        with _mount_sys(rootfs):
+            with _mount_dev_ro(rootfs):
+                yield
+
+
+def get_chroot_cmd(rootfs):
+    cmd = []
+    cmd.append("chroot")
+    cmd.append(rootfs)
+    return cmd
