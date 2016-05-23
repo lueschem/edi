@@ -70,9 +70,10 @@ class BootstrapImage(EdiCommand):
             shutil.move(archive, self.result())
 
     def result(self):
-        archive_name = ("{0}_{1}.tar.xz"
+        archive_name = ("{0}_{1}.tar.{2}"
                         ).format(self.config.get_project_name(),
-                                 self._get_command_name())
+                                 self._get_command_name(),
+                                 self.config.get_compression())
         return os.path.join(self.config.get_workdir(), archive_name)
 
     def _fetch_bootstrap_repository_key(self, tempdir):
@@ -134,7 +135,8 @@ class BootstrapImage(EdiCommand):
     def _pack_rootfs(self, tempdir, rootfs):
         # advanced options such as numeric-owner are not supported by
         # python tarfile library - therefore we use the tar command line tool
-        archive_path = os.path.join(tempdir, "result.tar.xz")
+        tempresult = "result.tar.{0}".format(self.config.get_compression())
+        archive_path = os.path.join(tempdir, tempresult)
 
         cmd = []
         cmd.append("tar")

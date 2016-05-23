@@ -27,6 +27,7 @@ sample_file = """
 ---
 global_configuration:
     use_case:           edi_run
+    compression:        gz
 
 bootstrap_stage:
     architecture:       amd64
@@ -110,6 +111,7 @@ def test_global_configuration_overlay(config_files):
         parser = ConfigurationParser(main_file)
         # the user file shall win:
         assert parser.get_use_case() == "edi_test"
+        assert parser.get_compression() == "gz"
 
 
 def test_bootstrap_stage_overlay(config_files):

@@ -63,6 +63,9 @@ class ConfigurationParser():
     def get_use_case(self):
         return self._get_global_configuration_item("use_case", "edi_run")
 
+    def get_compression(self):
+        return self._get_global_configuration_item("compression", "xz")
+
     def __init__(self, base_config_file):
         self.config_id = splitext(basename(base_config_file.name))[0]
         if not ConfigurationParser._configurations.get(self.config_id):
