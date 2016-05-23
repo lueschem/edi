@@ -25,11 +25,11 @@ import os
 from contextlib import contextmanager
 from edi.lib.helpers import get_user
 
-ADAPTIVE = -42
+_ADAPTIVE = -42
 
 
 def run(popenargs, sudo=False, input=None, timeout=None,
-        check=True, universal_newlines=True, stdout=ADAPTIVE,
+        check=True, universal_newlines=True, stdout=_ADAPTIVE,
         **kwargs):
     """
     Small wrapper around subprocess.run().
@@ -39,7 +39,7 @@ def run(popenargs, sudo=False, input=None, timeout=None,
 
     subprocess_stdout = stdout
 
-    if subprocess_stdout == ADAPTIVE:
+    if subprocess_stdout == _ADAPTIVE:
         if logging.getLogger().isEnabledFor(logging.INFO):
             subprocess_stdout = None
         else:
