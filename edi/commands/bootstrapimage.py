@@ -43,15 +43,17 @@ class BootstrapImage(EdiCommand):
         cls.require_config_file(parser)
 
     def run_cli(self, cli_args):
-        self.run(cli_args.config_file)
+        result = self.run(cli_args.config_file)
+        print("Generated {}.".format(result))
 
     def run(self, config_file):
         self._setup_parser(config_file)
 
-        if os.path.isfile(self.result()):
+        if os.path.isfile(self._result()):
             logging.info(("{0} is already there. "
-                          "Delete it to regenerate it.").format(self.result()))
-            return
+                          "Delete it to regenerate it."
+                          ).format(self._result()))
+            return self._result()
 
         self.require_sudo()
 
@@ -73,7 +75,9 @@ class BootstrapImage(EdiCommand):
             chown_to_user(archive)
             shutil.move(archive, self.result())
 
-    def result(self):
+        return self._result()
+
+    def _result(self):
         archive_name = ("{0}_{1}.tar.{2}"
                         ).format(self.config.get_project_name(),
                                  self._get_command_name(),
