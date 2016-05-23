@@ -37,12 +37,14 @@ class BootstrapImage(EdiCommand):
     def advertise(cls, subparsers):
         help_text = "bootstrap an initial image"
         description_text = "Bootstrap an initial image."
-        parser = subparsers.add_parser(cls.__name__.lower(),
+        parser = subparsers.add_parser(cls._get_command_name(),
                                        help=help_text,
                                        description=description_text)
         cls.require_config_file(parser)
 
-    def run(self):
+    def run_cli(self, cli_args):
+        self._setup_parser(cli_args.config_file)
+
         if os.path.isfile(self.result()):
             logging.info(("{0} is already there. "
                           "Delete it to regenerate it.").format(self.result()))
@@ -67,7 +69,7 @@ class BootstrapImage(EdiCommand):
     def result(self):
         archive_name = ("{0}_{1}.tar.xz"
                         ).format(self.config.get_project_name(),
-                                 type(self).__name__.lower())
+                                 self._get_command_name())
         return os.path.join(self.config.get_workdir(), archive_name)
 
     def _fetch_bootstrap_repository_key(self, tempdir):

@@ -28,10 +28,12 @@ class LxcImage(EdiCommand):
     def advertise(cls, subparsers):
         help_text = "upgrade a bootstrap image to a lxcimage"
         description_text = "Upgrade a bootstrap image to a lxcimage."
-        parser = subparsers.add_parser(cls.__name__.lower(),
+        parser = subparsers.add_parser(cls._get_command_name(),
                                        help=help_text,
                                        description=description_text)
         cls.require_config_file(parser)
 
-    def run(self):
+    def run_cli(self, cli_args):
+        self._setup_parser(cli_args.config_file)
+
         self.require_sudo()
