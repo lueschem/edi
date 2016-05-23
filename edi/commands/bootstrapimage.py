@@ -43,7 +43,10 @@ class BootstrapImage(EdiCommand):
         cls.require_config_file(parser)
 
     def run_cli(self, cli_args):
-        self._setup_parser(cli_args.config_file)
+        self.run(cli_args.config_file)
+
+    def run(self, config_file):
+        self._setup_parser(config_file)
 
         if os.path.isfile(self.result()):
             logging.info(("{0} is already there. "
