@@ -55,6 +55,10 @@ class BootstrapImage(EdiCommand):
 
         self.require_sudo()
 
+        if self.config.get_bootstrap_tool() != "debootstrap":
+            print_error_and_exit(("At the moment only debootstrap "
+                                  "is supported for bootstrapping!"))
+
         require_executable("debootstrap", "sudo apt install debootstrap")
 
         workdir = self.config.get_workdir()

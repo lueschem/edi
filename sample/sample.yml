@@ -3,12 +3,13 @@ global_configuration:
     # valid use cases: edi_run, edi_test, edi_build, edi_develop
     use_case:           edi_run
 
-bootstrap_stage:
+bootstrap:
+    bootstrap_tool:     debootstrap
     architecture:       amd64
     repository:         deb http://ftp.ch.debian.org/debian/ jessie main
     repository_key:     https://ftp-master.debian.org/keys/archive-key-8.asc
 
-configuration_stage:
+ansible_playbooks:
     - identifier:       Linux container
       playbook:         edi/plugins/lxc/lxc.yml
       parameters:

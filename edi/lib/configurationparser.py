@@ -43,21 +43,24 @@ class ConfigurationParser():
         return os.getcwd()
 
     def get_distribution(self):
-        repository = self._get_bootstrap_stage_item("repository", "")
+        repository = self._get_bootstrap_item("repository", "")
         return SourceEntry(repository).dist
 
     def get_architecture(self):
-        return self._get_bootstrap_stage_item("architecture", None)
+        return self._get_bootstrap_item("architecture", None)
+
+    def get_bootstrap_tool(self):
+        return self._get_bootstrap_item("bootstrap_tool", "debootstrap")
 
     def get_bootstrap_uri(self):
-        repository = self._get_bootstrap_stage_item("repository", "")
+        repository = self._get_bootstrap_item("repository", "")
         return SourceEntry(repository).uri
 
     def get_bootstrap_repository_key(self):
-        return self._get_bootstrap_stage_item("repository_key", None)
+        return self._get_bootstrap_item("repository_key", None)
 
     def get_bootstrap_components(self):
-        repository = self._get_bootstrap_stage_item("repository", "")
+        repository = self._get_bootstrap_item("repository", "")
         return SourceEntry(repository).comps
 
     def get_use_case(self):
@@ -100,17 +103,19 @@ class ConfigurationParser():
             return {}
 
     def _merge_configurations(self, base, overlay):
-        merged_configuration = {}
+        merged_config = {}
 
-        elements = ["global_configuration", "bootstrap_stage"]
+        elements = ["global_configuration", "bootstrap"]
         for element in elements:
-            merged_configuration[element
-                                 ] = self._merge_key_value_node(base, overlay,
-                                                                element)
+            merged_config[element
+                          ] = self._merge_key_value_node(base, overlay,
+                                                         element)
 
-        merged_configuration["configuration_stage"
-                             ] = self._merge_configuration_stage(base, overlay)
-        return merged_configuration
+        playbook_element = "ansible_playbooks"
+        merged_config[playbook_element
+                      ] = self._merge_ansible_playbooks(base, overlay,
+                                                        playbook_element)
+        return merged_config
 
     def _merge_key_value_node(self, base, overlay, node_name):
         base_node = base.get(node_name, {})
@@ -131,15 +136,15 @@ class ConfigurationParser():
                                   ).format(element))
         return identifier
 
-    def _merge_configuration_stage(self, base, overlay):
+    def _merge_ansible_playbooks(self, base, overlay, playbook_node):
         merged_list = []
 
-        if "configuration_stage" in overlay:
-            overlay_list = overlay.get("configuration_stage", [])
+        if playbook_node in overlay:
+            overlay_list = overlay.get(playbook_node, [])
 
             if overlay_list:
                 base_dict = {}
-                for element in base.get("configuration_stage", []):
+                for element in base.get(playbook_node, []):
                     base_dict[self._get_identifier(element)] = element
 
                 for element in overlay_list:
@@ -163,10 +168,10 @@ class ConfigurationParser():
         if merged_list:
             return merged_list
         else:
-            return base.get("configuration_stage", [])
+            return base.get(playbook_node, [])
 
-    def _get_bootstrap_stage_item(self, item, default):
-        return self._get_config().get("bootstrap_stage", {}
+    def _get_bootstrap_item(self, item, default):
+        return self._get_config().get("bootstrap", {}
                                       ).get(item, default)
 
     def _get_global_configuration_item(self, item, default):

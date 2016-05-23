@@ -29,11 +29,12 @@ global_configuration:
     use_case:           edi_run
     compression:        gz
 
-bootstrap_stage:
+bootstrap:
+    bootstrap_tool:     debootstrap
     architecture:       amd64
     repository:         deb http://ftp.ch.debian.org/debian/ jessie main
 
-configuration_stage:
+ansible_playbooks:
     - identifier:       Linux container
       playbook:         edi/plugins/lxc/lxc.yml
       parameters:
@@ -48,7 +49,7 @@ global_configuration:
     # change the use case:
     use_case:           edi_develop
 
-bootstrap_stage:
+bootstrap:
     repository_key:     https://ftp-master.debian.org/keys/archive-key-8.asc
 """
 
@@ -57,7 +58,7 @@ global_configuration:
     # change the use case:
     use_case:           edi_build
 
-bootstrap_stage:
+bootstrap:
     architecture:       i386
 """
 
@@ -67,9 +68,9 @@ global_configuration:
     # change the use case again:
     use_case:           edi_test
 
-# apply no changes to the bootstrap stage
+# apply no changes to bootstrap section
 
-configuration_stage:
+ansible_playbooks:
     # keep the element but change the message:
     - identifier:       Linux container
       parameters:
@@ -114,7 +115,7 @@ def test_global_configuration_overlay(config_files):
         assert parser.get_compression() == "gz"
 
 
-def test_bootstrap_stage_overlay(config_files):
+def test_bootstrap_overlay(config_files):
     with open(config_files, "r") as main_file:
         parser = ConfigurationParser(main_file)
         # the host file shall win
@@ -125,8 +126,9 @@ def test_bootstrap_stage_overlay(config_files):
         expected_key = "https://ftp-master.debian.org/keys/archive-key-8.asc"
         assert parser.get_bootstrap_repository_key() == expected_key
         assert parser.get_distribution() == "jessie"
+        assert parser.get_bootstrap_tool() == "debootstrap"
 
 
-def test_configuration_stage_overlay(config_files):
+def test_ansible_playbooks_overlay(config_files):
     # TODO
     pass

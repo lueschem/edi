@@ -4,9 +4,9 @@ global_configuration:
     use_case:           edi_test
     compression:        gz
 
-# apply no changes to the bootstrap stage
+# apply no changes to bootstrap section
 
-configuration_stage:
+ansible_playbooks:
     # keep the element but change the message:
     - identifier:       Linux container
       parameters:
