@@ -20,6 +20,7 @@ Depends: ${misc:Depends},
          ${python3:Depends},
          ansible,
          lxd,
+         debootstrap,
 Description: Embedded Development Infrastructure - edi
  Details go here...
 
