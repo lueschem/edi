@@ -40,7 +40,9 @@ Libraries
 LXC/LXD
 +++++++
 
+- The `LXD blog`_ gives a very good introduction to lxc/lxd 2.0.
 
+.. _LXD blog: https://www.stgraber.org/2016/03/11/lxd-2-0-blog-post-series-012/
 
 Restructured Text
 +++++++++++++++++

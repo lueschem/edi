@@ -18,6 +18,8 @@ Package: edi
 Architecture: all
 Depends: ${misc:Depends},
          ${python3:Depends},
+         ansible,
+         lxd,
 Description: Embedded Development Infrastructure - edi
  Details go here...
 
