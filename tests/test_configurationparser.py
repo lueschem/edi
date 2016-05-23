@@ -31,7 +31,6 @@ global_configuration:
 bootstrap_stage:
     architecture:       amd64
     repository:         deb http://ftp.ch.debian.org/debian/ jessie main
-    repository_key:     https://ftp-master.debian.org/keys/archive-key-8.asc
 
 configuration_stage:
     - identifier:       Linux container
@@ -41,6 +40,15 @@ configuration_stage:
 
     - identifier:       Minimal system
       playbook:         edi/plugins/minimal/minimal.yml
+"""
+
+sample_all_file = """
+global_configuration:
+    # change the use case:
+    use_case:           edi_develop
+
+bootstrap_stage:
+    repository_key:     https://ftp-master.debian.org/keys/archive-key-8.asc
 """
 
 sample_host_file = """
@@ -79,6 +87,9 @@ def config_files(tmpdir_factory):
     main_file = "{0}.yml".format(config_name)
     with open(str(dir_name.join(main_file)), "w") as file:
         file.write(sample_file)
+    all_file = "{0}.{1}.yml".format(config_name, "all")
+    with open(str(dir_name.join(all_file)), "w") as file:
+        file.write(sample_all_file)
     user_file = "{0}.{1}.yml".format(config_name, get_user())
     with open(str(dir_name.join(user_file)), "w") as file:
         file.write(sample_user_file)
@@ -108,6 +119,7 @@ def test_bootstrap_stage_overlay(config_files):
         assert parser.get_architecture() == "i386"
         assert "main" in parser.get_bootstrap_components()
         assert parser.get_bootstrap_uri() == "http://ftp.ch.debian.org/debian/"
+        # the all file shall provide this key
         expected_key = "https://ftp-master.debian.org/keys/archive-key-8.asc"
         assert parser.get_bootstrap_repository_key() == expected_key
         assert parser.get_distribution() == "jessie"

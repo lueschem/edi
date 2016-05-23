@@ -69,14 +69,16 @@ class ConfigurationParser():
             logging.info(("Using base configuration file '{0}'"
                           ).format(base_config_file.name))
             base_config = yaml.load(base_config_file.read())
+            all_config = self._get_overlay_config(base_config_file, "all")
             host_config = self._get_overlay_config(base_config_file,
                                                    get_hostname())
             user_config = self._get_overlay_config(base_config_file,
                                                    get_user())
 
-            tmp_merge = self._merge_configurations(base_config, host_config)
+            merge_1 = self._merge_configurations(base_config, all_config)
+            merge_2 = self._merge_configurations(merge_1, host_config)
+            merged_config = self._merge_configurations(merge_2, user_config)
 
-            merged_config = self._merge_configurations(tmp_merge, user_config)
             ConfigurationParser._configurations[self.config_id] = merged_config
             logging.info("Merged configuration:\n{0}".format(self.dump()))
 
