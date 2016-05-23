@@ -40,11 +40,11 @@ class BootstrapImage(EdiCommand):
         parser = subparsers.add_parser(cls._get_command_name(),
                                        help=help_text,
                                        description=description_text)
-        cls.require_config_file(parser)
+        cls._require_config_file(parser)
 
     def run_cli(self, cli_args):
         result = self.run(cli_args.config_file)
-        print("Generated {}.".format(result))
+        print("Generated {0}.".format(result))
 
     def run(self, config_file):
         self._setup_parser(config_file)
@@ -55,7 +55,7 @@ class BootstrapImage(EdiCommand):
                           ).format(self._result()))
             return self._result()
 
-        self.require_sudo()
+        self._require_sudo()
 
         if self.config.get_bootstrap_tool() != "debootstrap":
             print_error_and_exit(("At the moment only debootstrap "
@@ -71,9 +71,9 @@ class BootstrapImage(EdiCommand):
             keyring_file = self._build_keyring(tempdir, key_data)
             rootfs = self._run_debootstrap(tempdir, keyring_file)
             self._postprocess_rootfs(rootfs, key_data)
-            archive = self._pack_rootfs(tempdir, rootfs)
+            archive = self._pack_image(tempdir, rootfs)
             chown_to_user(archive)
-            shutil.move(archive, self.result())
+            shutil.move(archive, self._result())
 
         return self._result()
 
@@ -139,18 +139,3 @@ class BootstrapImage(EdiCommand):
             clean_cmd.append("apt-get")
             clean_cmd.append("clean")
             run(clean_cmd, sudo=True)
-
-    def _pack_rootfs(self, tempdir, rootfs):
-        # advanced options such as numeric-owner are not supported by
-        # python tarfile library - therefore we use the tar command line tool
-        tempresult = "result.tar.{0}".format(self.config.get_compression())
-        archive_path = os.path.join(tempdir, tempresult)
-
-        cmd = []
-        cmd.append("tar")
-        cmd.append("--numeric-owner")
-        cmd.extend(["-C", rootfs])
-        cmd.extend(["-acf", archive_path])
-        cmd.append("./")
-        run(cmd, sudo=True)
-        return archive_path
