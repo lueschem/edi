@@ -22,12 +22,12 @@
 from edi.lib.edicommand import EdiCommand
 
 
-class LxcImage(EdiCommand):
+class LxdImage(EdiCommand):
 
     @classmethod
     def advertise(cls, subparsers):
-        help_text = "upgrade a bootstrap image to a lxcimage"
-        description_text = "Upgrade a bootstrap image to a lxcimage."
+        help_text = "upgrade a bootstrap image to a lxd image"
+        description_text = "Upgrade a bootstrap image to a lxd image."
         parser = subparsers.add_parser(cls._get_command_name(),
                                        help=help_text,
                                        description=description_text)
