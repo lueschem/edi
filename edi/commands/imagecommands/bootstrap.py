@@ -25,19 +25,19 @@ import os
 import gnupg
 import shutil
 import logging
-from edi.lib.edicommand import EdiCommand
+from edi.commands.image import Image
 from edi.lib.helpers import (require_executable, print_error_and_exit,
                              chown_to_user)
 from edi.lib.shellhelpers import run, mount_proc_sys_dev, get_chroot_cmd
 
 
-class BootstrapImage(EdiCommand):
+class Bootstrap(Image):
 
     @classmethod
     def advertise(cls, subparsers):
         help_text = "bootstrap an initial image"
         description_text = "Bootstrap an initial image."
-        parser = subparsers.add_parser(cls._get_command_name(),
+        parser = subparsers.add_parser(cls._get_short_command_name(),
                                        help=help_text,
                                        description=description_text)
         cls._require_config_file(parser)
@@ -80,7 +80,7 @@ class BootstrapImage(EdiCommand):
     def _result(self):
         archive_name = ("{0}_{1}.tar.{2}"
                         ).format(self.config.get_project_name(),
-                                 self._get_command_name(),
+                                 self._get_command_file_name_prefix(),
                                  self.config.get_compression())
         return os.path.join(self.config.get_workdir(), archive_name)
 

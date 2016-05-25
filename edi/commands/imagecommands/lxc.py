@@ -27,18 +27,18 @@ import calendar
 import yaml
 import shutil
 from codecs import open
-from edi.lib.edicommand import EdiCommand
-from edi.commands.bootstrapimage import BootstrapImage
+from edi.commands.image import Image
+from edi.commands.imagecommands.bootstrap import Bootstrap
 from edi.lib.helpers import chown_to_user
 
 
-class LxdImage(EdiCommand):
+class Lxc(Image):
 
     @classmethod
     def advertise(cls, subparsers):
-        help_text = "upgrade a bootstrap image to a lxd image"
-        description_text = "Upgrade a bootstrap image to a lxd image."
-        parser = subparsers.add_parser(cls._get_command_name(),
+        help_text = "upgrade a bootstrap image to a lxc image"
+        description_text = "Upgrade a bootstrap image to a lxc image."
+        parser = subparsers.add_parser(cls._get_short_command_name(),
                                        help=help_text,
                                        description=description_text)
         cls._require_config_file(parser)
@@ -58,7 +58,7 @@ class LxdImage(EdiCommand):
 
         self._require_sudo()
 
-        bootstrap_cmd = BootstrapImage()
+        bootstrap_cmd = Bootstrap()
 
         # This command is based upon the output of the bootstrap command
         bootstrap_result = bootstrap_cmd.run(config_file)
@@ -67,10 +67,10 @@ class LxdImage(EdiCommand):
 
         with tempfile.TemporaryDirectory(dir=workdir) as tempdir:
             chown_to_user(tempdir)
-            lxdimagedir = os.path.join(tempdir, "lxdimage")
-            self._unpack_image(bootstrap_result, lxdimagedir)
-            self._write_container_metadata(lxdimagedir)
-            archive = self._pack_image(tempdir, lxdimagedir)
+            lxcimagedir = os.path.join(tempdir, "lxcimage")
+            self._unpack_image(bootstrap_result, lxcimagedir)
+            self._write_container_metadata(lxcimagedir)
+            archive = self._pack_image(tempdir, lxcimagedir)
             chown_to_user(archive)
             shutil.move(archive, self._result())
 
@@ -79,7 +79,7 @@ class LxdImage(EdiCommand):
     def _result(self):
         archive_name = ("{0}_{1}.tar.{2}"
                         ).format(self.config.get_project_name(),
-                                 self._get_command_name(),
+                                 self._get_command_file_name_prefix(),
                                  self.config.get_compression())
         return os.path.join(self.config.get_workdir(), archive_name)
 

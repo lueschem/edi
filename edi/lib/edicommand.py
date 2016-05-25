@@ -25,6 +25,7 @@ import argparse
 import os
 from edi.lib.helpers import print_error_and_exit
 from edi.lib.shellhelpers import run
+from edi.lib.commandfactory import get_sub_commands, get_command
 
 
 class EdiCommand(metaclass=CommandFactory):
@@ -34,7 +35,39 @@ class EdiCommand(metaclass=CommandFactory):
 
     @classmethod
     def _get_command_name(cls):
+        assert len(cls.__bases__) == 1
+        if EdiCommand in cls.__bases__:
+            return cls.__name__.lower()
+        else:
+            return "{}.{}".format(cls.__bases__[0].__name__.lower(),
+                                  cls.__name__.lower())
+
+    @classmethod
+    def _get_short_command_name(cls):
         return cls.__name__.lower()
+
+    @classmethod
+    def _get_cli_command_string(cls):
+        return cls._get_command_name().replace(".", " ")
+
+    @classmethod
+    def _get_command_file_name_prefix(cls):
+        return cls._get_command_name().replace(".", "_")
+
+    @classmethod
+    def _add_sub_commands(cls, parser):
+        title = "{} commands".format(cls._get_short_command_name())
+        subparsers = parser.add_subparsers(title=title,
+                                           dest="sub_command_name")
+
+        for _, command in get_sub_commands(cls._get_command_name()).items():
+            command.advertise(subparsers)
+
+    def _run_sub_command(self, cli_args):
+        sub_command = "{}.{}".format(self._get_command_name(),
+                                     cli_args.sub_command_name)
+        cmd = get_command(sub_command)
+        cmd().run_cli(cli_args)
 
     @staticmethod
     def _require_config_file(parser):
@@ -45,8 +78,9 @@ class EdiCommand(metaclass=CommandFactory):
         if os.getuid() != 0:
             print_error_and_exit(("The subcommand '{0}' requires superuser "
                                   "privileges.\n"
-                                  "Use 'sudo edi {0} ...'."
-                                  ).format(type(self).__name__))
+                                  "Use 'sudo edi {1} ...'."
+                                  ).format(self._get_short_command_name(),
+                                           self._get_cli_command_string()))
 
     def _pack_image(self, tempdir, datadir, name="result"):
         # advanced options such as numeric-owner are not supported by

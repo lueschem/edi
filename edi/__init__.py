@@ -25,7 +25,7 @@ import argcomplete
 from setuptools_scm import get_version
 import logging
 from edi.commands import *
-from edi.lib.commandfactory import command_registry
+from edi.lib.commandfactory import get_commands, get_command
 from edi.lib.helpers import print_error_and_exit
 
 
@@ -55,10 +55,10 @@ def _setup_command_line_interface():
     parser.add_argument('--version', action="store_true",
                         help="print version and exit")
 
-    subparsers = parser.add_subparsers(title='subcommands',
+    subparsers = parser.add_subparsers(title='commands',
                                        dest="command_name")
 
-    for _, command in command_registry.items():
+    for _, command in get_commands().items():
         command.advertise(subparsers)
     argcomplete.autocomplete(parser)
     return parser
@@ -76,4 +76,4 @@ def main():
     if cli_args.command_name is None:
         print_error_and_exit("Missing subcommand. Use 'edi --help' for help.")
 
-    command_registry[cli_args.command_name]().run_cli(cli_args)
+    get_command(cli_args.command_name)().run_cli(cli_args)

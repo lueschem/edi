@@ -19,6 +19,21 @@
 # You should have received a copy of the GNU General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
-from edi.commands.imagecommands import *
+from edi.lib.edicommand import EdiCommand
+from edi.lib.commandfactory import get_command
 
-__all__ = ["image"]
+
+class Image(EdiCommand):
+
+    @classmethod
+    def advertise(cls, subparsers):
+        help_text = "handle edi images"
+        description_text = "Do processing of edi images."
+        parser = subparsers.add_parser(cls._get_short_command_name(),
+                                       help=help_text,
+                                       description=description_text)
+
+        cls._add_sub_commands(parser)
+
+    def run_cli(self, cli_args):
+        self._run_sub_command(cli_args)

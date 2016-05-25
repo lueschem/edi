@@ -19,7 +19,23 @@
 # You should have received a copy of the GNU General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
-command_registry = {}
+_command_anchor = "edicommand"
+
+_command_registry = {}
+
+
+def get_commands():
+    return {k: v for (k, v) in _command_registry.items() if "." not in k}
+
+
+def get_command(command):
+    return _command_registry.get(command)
+
+
+def get_sub_commands(parent_command):
+    sub_command_prefix = "{}.".format(parent_command)
+    return {k: v for (k, v) in _command_registry.items()
+            if k.startswith(sub_command_prefix)}
 
 
 class CommandFactory(type):
@@ -31,6 +47,6 @@ class CommandFactory(type):
     def __new__(cls, clsname, bases, attrs):
         new_class = super(CommandFactory, cls).__new__(cls, clsname,
                                                        bases, attrs)
-        if clsname != "EdiCommand":
-            command_registry[clsname.lower()] = new_class
+        if clsname.lower() != _command_anchor:
+            _command_registry[new_class._get_command_name()] = new_class
         return new_class
