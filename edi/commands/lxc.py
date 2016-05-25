@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-# Copyright (C) 2016 Matthias Luescher
-#
-# Authors:
-#  Matthias Luescher
-#
-# This file is part of edi.
 #
 # edi is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,12 +15,12 @@
 from edi.lib.edicommand import EdiCommand
 
 
-class Image(EdiCommand):
+class Lxc(EdiCommand):
 
     @classmethod
     def advertise(cls, subparsers):
-        help_text = "handle edi images"
-        description_text = "Do processing of edi images."
+        help_text = "run lxc related operations"
+        description_text = "Run edi images within lxc."
         parser = subparsers.add_parser(cls._get_short_command_name(),
                                        help=help_text,
                                        description=description_text)

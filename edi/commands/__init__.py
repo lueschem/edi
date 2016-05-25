@@ -20,5 +20,6 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 from edi.commands.imagecommands import *
+from edi.commands.lxccommands import *
 
-__all__ = ["image"]
+__all__ = ["image", "lxc"]

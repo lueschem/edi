@@ -19,20 +19,31 @@
 # You should have received a copy of the GNU General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
-from edi.lib.edicommand import EdiCommand
+from edi.commands.lxc import Lxc
+from edi.commands.imagecommands.lxc import Lxc as LxcImageCommand
 
 
-class Image(EdiCommand):
+class Import(Lxc):
 
     @classmethod
     def advertise(cls, subparsers):
-        help_text = "handle edi images"
-        description_text = "Do processing of edi images."
+        help_text = "import an edi image into the LXD image store"
+        description_text = "Import an edi image into the LXD image store."
         parser = subparsers.add_parser(cls._get_short_command_name(),
                                        help=help_text,
                                        description=description_text)
-
-        cls._add_sub_commands(parser)
+        cls._require_config_file(parser)
 
     def run_cli(self, cli_args):
-        self._run_sub_command(cli_args)
+        result = self.run(cli_args.config_file)
+        print("Imported edi image as {}.".format(result))
+
+    def run(self, config_file):
+        self._setup_parser(config_file)
+
+        image = LxcImageCommand().run(config_file)
+        return self._result()
+
+    def _result(self):
+        return "{}_{}".format(self.config.get_project_name(),
+                              self._get_command_file_name_prefix())
