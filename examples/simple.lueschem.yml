@@ -1,0 +1,7 @@
+---
+global_configuration:
+    # change the use case:
+    use_case:           edi_test
+    # use faster compression during development:
+    compression:        gz
+
