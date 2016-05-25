@@ -17,6 +17,14 @@ from edi.lib.edicommand import EdiCommand
 
 class Lxc(EdiCommand):
 
+    """
+    Note: python3-pylxd version 2.0.0-0ubuntu1 does currently have some issues
+    with python3. As soon as
+    https://github.com/lxc/pylxd/commit/96a44e4755252e45db7aec027390a01722289823
+    gets released with a new Debian package, we can try to replace the shell
+    stuff within the subcommands with pylxd calls.
+    """
+
     @classmethod
     def advertise(cls, subparsers):
         help_text = "run lxc related operations"
