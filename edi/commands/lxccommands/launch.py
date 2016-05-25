@@ -1,0 +1,78 @@
+# -*- coding: utf-8 -*-
+# Copyright (C) 2016 Matthias Luescher
+#
+# Authors:
+#  Matthias Luescher
+#
+# This file is part of edi.
+#
+# edi is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# edi is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with edi.  If not, see <http://www.gnu.org/licenses/>.
+
+import logging
+import subprocess
+from edi.commands.lxc import Lxc
+from edi.commands.lxccommands.importcmd import Import
+from edi.lib.shellhelpers import run
+
+
+class Launch(Lxc):
+
+    @classmethod
+    def advertise(cls, subparsers):
+        help_text = "launch an edi image using LXC"
+        description_text = "Launch an edi image using LXC."
+        parser = subparsers.add_parser(cls._get_short_command_name(),
+                                       help=help_text,
+                                       description=description_text)
+        parser.add_argument('container_name')
+        cls._require_config_file(parser)
+
+    def run_cli(self, cli_args):
+        result = self.run(cli_args.container_name, cli_args.config_file)
+        print("Launched container {}.".format(result))
+
+    def run(self, container_name, config_file):
+        self._setup_parser(config_file)
+        self.container_name = container_name
+
+        if self._is_container_existing():
+            logging.info(("Container {0} is already existing. "
+                          "Destroy it to regenerate it or reconfigure it."
+                          ).format(self._result()))
+            return self._result()
+
+        image = Import().run(config_file)
+
+        self._launch_container(image)
+
+        return self._result()
+
+    def _result(self):
+        return self.container_name
+
+    def _is_container_existing(self):
+        cmd = []
+        cmd.append("lxc")
+        cmd.append("info")
+        cmd.append(self._result())
+        result = run(cmd, check=False, stderr=subprocess.PIPE)
+        return result.returncode == 0
+
+    def _launch_container(self, image):
+        cmd = []
+        cmd.append("lxc")
+        cmd.append("launch")
+        cmd.append("local:{}".format(image))
+        cmd.append(self._result())
+        run(cmd)
