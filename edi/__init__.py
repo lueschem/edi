@@ -22,7 +22,6 @@
 import sys
 import argparse
 import argcomplete
-from setuptools_scm import get_version
 import logging
 from edi.commands import *
 from edi.lib.commandfactory import get_commands, get_command
@@ -52,9 +51,6 @@ def _setup_command_line_interface():
                                           'ERROR', 'CRITICAL'],
                         help="modify log level (default is WARNING)")
 
-    parser.add_argument('--version', action="store_true",
-                        help="print version and exit")
-
     subparsers = parser.add_subparsers(title='commands',
                                        dest="command_name")
 
@@ -68,10 +64,6 @@ def main():
     cli_interface = _setup_command_line_interface()
     cli_args = cli_interface.parse_args(sys.argv[1:])
     _setup_logging(cli_args)
-
-    if cli_args.version:
-        print(get_version(root='..', relative_to=__file__))
-        sys.exit(0)
 
     if cli_args.command_name is None:
         print_error_and_exit("Missing subcommand. Use 'edi --help' for help.")
