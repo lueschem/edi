@@ -50,7 +50,7 @@ class ConfigurationParser():
         return self._get_bootstrap_item("architecture", None)
 
     def get_bootstrap_tool(self):
-        return self._get_bootstrap_item("bootstrap_tool", "debootstrap")
+        return self._get_bootstrap_item("tool", "debootstrap")
 
     def get_bootstrap_uri(self):
         repository = self._get_bootstrap_item("repository", "")
@@ -111,10 +111,10 @@ class ConfigurationParser():
                           ] = self._merge_key_value_node(base, overlay,
                                                          element)
 
-        playbook_element = "ansible_playbooks"
-        merged_config[playbook_element
-                      ] = self._merge_ansible_playbooks(base, overlay,
-                                                        playbook_element)
+        # playbook_element = "ansible_playbooks"
+        # merged_config[playbook_element
+        #               ] = self._merge_ansible_playbooks(base, overlay,
+        #                                                 playbook_element)
         return merged_config
 
     def _merge_key_value_node(self, base, overlay, node_name):

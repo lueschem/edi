@@ -30,18 +30,19 @@ global_configuration:
     compression:        gz
 
 bootstrap:
-    bootstrap_tool:     debootstrap
+    tool:               debootstrap
     architecture:       amd64
     repository:         deb http://ftp.ch.debian.org/debian/ jessie main
 
-ansible_playbooks:
-    - identifier:       Linux container
-      playbook:         edi/plugins/lxc/lxc.yml
-      parameters:
-          edi_message:  Hello world!
-
-    - identifier:       Minimal system
-      playbook:         edi/plugins/minimal/minimal.yml
+playbooks:
+    10_base_system:
+        tool:               ansible
+        path:               debian/base_system/main.yml
+        parameters:
+            kernel_package: linux-image-amd64
+    20_networking:
+        tool:               ansible
+        path:               debian/networking/main.yml
 """
 
 sample_all_file = """
@@ -70,14 +71,12 @@ global_configuration:
 
 # apply no changes to bootstrap section
 
-ansible_playbooks:
-    # keep the element but change the message:
-    - identifier:       Linux container
-      parameters:
-          edi_message:  Hello user!
-
-    # keep the element without change:
-    - identifier:       Minimal system
+playbooks:
+    10_base_system:
+        parameters:
+            kernel_package: linux-image-amd64-rt
+    20_networking:
+        path:               debian/other_networking/main.yml
 """
 
 config_name = "sample"

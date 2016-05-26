@@ -1,20 +1,22 @@
 ---
 global_configuration:
     # valid use cases: edi_run, edi_test, edi_build, edi_develop
-    use_case:           edi_run
+    use_case:               edi_run
+    compression:            xz
 
 bootstrap:
-    bootstrap_tool:     debootstrap
-    architecture:       amd64
-    repository:         deb http://ftp.ch.debian.org/debian/ jessie main
-    repository_key:     https://ftp-master.debian.org/keys/archive-key-8.asc
+    tool:                   debootstrap
+    architecture:           amd64
+    repository:             deb http://ftp.ch.debian.org/debian/ jessie main
+    repository_key:         https://ftp-master.debian.org/keys/archive-key-8.asc
 
-ansible_playbooks:
-    - identifier:       Linux container
-      playbook:         edi/plugins/lxc/lxc.yml
-      parameters:
-          edi_message:  Hello world!
+playbooks:
+    10_base_system:
+        tool:               ansible
+        path:               debian/base_system/main.yml
+        parameters:
+            kernel_package: linux-image-amd64
+    20_networking:
+        tool:               ansible
+        path:               debian/networking/main.yml
 
-    - identifier:       Minimal system
-      playbook:         edi/plugins/minimal/minimal.yml
-          
