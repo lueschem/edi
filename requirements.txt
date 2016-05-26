@@ -2,4 +2,4 @@ argcomplete
 pyyaml
 python-apt
 requests
-gnupg
+python-gnupg
