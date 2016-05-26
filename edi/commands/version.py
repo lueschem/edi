@@ -31,4 +31,4 @@ class Version(EdiCommand):
         print(version)
 
     def run(self):
-        return get_version(root='../..', relative_to=__file__)
+        return get_version()
