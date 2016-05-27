@@ -20,3 +20,8 @@ playbooks:
         tool:               ansible
         path:               debian/networking/main.yml
 
+keys:
+    {{ edi_current_user_name }}:
+        type:               ssh
+    ansible:
+        type:               ssh

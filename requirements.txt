@@ -3,3 +3,4 @@ pyyaml
 python-apt
 requests
 python-gnupg
+jinja2

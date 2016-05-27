@@ -22,10 +22,12 @@
 import yaml
 import collections
 import os
+from jinja2 import Template
 from os.path import basename, splitext
 import logging
 from aptsources.sourceslist import SourceEntry
-from edi.lib.helpers import get_user, get_hostname, print_error_and_exit
+from edi.lib.helpers import (get_user, get_user_gid, get_user_uid,
+                             get_hostname, print_error_and_exit)
 
 
 class ConfigurationParser():
@@ -96,8 +98,12 @@ class ConfigurationParser():
     def _get_config(self):
         return ConfigurationParser._configurations.get(self.config_id, {})
 
-    def _get_base_config(self, base_config_file):
-        return yaml.load(base_config_file.read())
+    def _parse_jina2_file(self, config_file):
+        template = Template(config_file.read())
+        return template.render(self._get_jinja2_dictionary())
+
+    def _get_base_config(self, config_file):
+        return yaml.load(self._parse_jina2_file(config_file))
 
     def _get_overlay_config(self, base_config_file, overlay_name):
         filename, file_extension = os.path.splitext(base_config_file.name)
@@ -106,7 +112,7 @@ class ConfigurationParser():
             with open(fn, encoding="UTF-8", mode="r") as config_file:
                 logging.info(("Using overlay configuration file '{0}'"
                               ).format(config_file.name))
-                return yaml.load(config_file.read())
+                return yaml.load(self._parse_jina2_file(config_file))
         else:
             return {}
 
@@ -119,10 +125,11 @@ class ConfigurationParser():
                           ] = self._merge_key_value_node(base, overlay,
                                                          element)
 
-        playbook_element = "playbooks"
-        merged_config[playbook_element
-                      ] = self._merge_ansible_playbooks(base, overlay,
-                                                        playbook_element)
+        nested_elements = ["playbooks", "keys"]
+        for element in nested_elements:
+            merged_config[element
+                          ] = self._merge_nested_node(base, overlay,
+                                                      element)
         return merged_config
 
     def _merge_key_value_node(self, base, overlay, node_name):
@@ -144,28 +151,27 @@ class ConfigurationParser():
                                   ).format(element))
         return identifier
 
-    def _merge_ansible_playbooks(self, base, overlay, playbook_node):
-        merged_playbooks = self._merge_key_value_node(base, overlay,
-                                                      playbook_node)
+    def _merge_nested_node(self, base, overlay, node):
+        merged_node = self._merge_key_value_node(base, overlay,
+                                                 node)
 
-        for key, _ in merged_playbooks.items():
-            playbook_base = base.get(playbook_node, {})
-            playbook_overlay = overlay.get(playbook_node, {})
-            merged_playbooks[key
-                             ] = self._merge_key_value_node(playbook_base,
-                                                            playbook_overlay,
-                                                            key)
+        for key, _ in merged_node.items():
+            base_node = base.get(node, {})
+            overlay_node = overlay.get(node, {})
+            merged_node[key] = self._merge_key_value_node(base_node,
+                                                          overlay_node,
+                                                          key)
 
             element = "parameters"
-            base_params = playbook_base.get(key, {})
-            overlay_params = playbook_overlay.get(key, {})
+            base_params = base_node.get(key, {})
+            overlay_params = overlay_node.get(key, {})
             merged_params = self._merge_key_value_node(base_params,
                                                        overlay_params,
                                                        element)
             if merged_params:
-                merged_playbooks[key][element] = merged_params
+                merged_node[key][element] = merged_params
 
-        return merged_playbooks
+        return merged_node
 
     def _get_bootstrap_item(self, item, default):
         return self._get_config().get("bootstrap", {}
@@ -174,3 +180,11 @@ class ConfigurationParser():
     def _get_global_configuration_item(self, item, default):
         return self._get_config().get("global_configuration", {}
                                       ).get(item, default)
+
+    def _get_jinja2_dictionary(self):
+        jina2_dict = {}
+        jina2_dict["edi_current_user_name"] = get_user()
+        jina2_dict["edi_current_user_uid"] = get_user_uid()
+        jina2_dict["edi_current_user_gid"] = get_user_gid()
+        jina2_dict["edi_host_hostname"] = get_hostname()
+        return jina2_dict
