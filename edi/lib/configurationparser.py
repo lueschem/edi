@@ -20,11 +20,12 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 import yaml
-from edi.lib.helpers import get_user, get_hostname, print_error_and_exit
+import collections
 import os
 from os.path import basename, splitext
 import logging
 from aptsources.sourceslist import SourceEntry
+from edi.lib.helpers import get_user, get_hostname, print_error_and_exit
 
 
 class ConfigurationParser():
@@ -69,12 +70,16 @@ class ConfigurationParser():
     def get_compression(self):
         return self._get_global_configuration_item("compression", "xz")
 
+    def get_playbooks(self):
+        playbooks = self._get_config().get("playbooks", {})
+        return collections.OrderedDict(sorted(playbooks.items()))
+
     def __init__(self, base_config_file):
         self.config_id = splitext(basename(base_config_file.name))[0]
         if not ConfigurationParser._configurations.get(self.config_id):
             logging.info(("Using base configuration file '{0}'"
                           ).format(base_config_file.name))
-            base_config = yaml.load(base_config_file.read())
+            base_config = self._get_base_config(base_config_file)
             all_config = self._get_overlay_config(base_config_file, "all")
             host_config = self._get_overlay_config(base_config_file,
                                                    get_hostname())
@@ -90,6 +95,9 @@ class ConfigurationParser():
 
     def _get_config(self):
         return ConfigurationParser._configurations.get(self.config_id, {})
+
+    def _get_base_config(self, base_config_file):
+        return yaml.load(base_config_file.read())
 
     def _get_overlay_config(self, base_config_file, overlay_name):
         filename, file_extension = os.path.splitext(base_config_file.name)

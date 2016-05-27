@@ -40,6 +40,7 @@ playbooks:
         path:               debian/base_system/main.yml
         parameters:
             kernel_package: linux-image-amd64
+            message:        some message
     20_networking:
         tool:               ansible
         path:               debian/networking/main.yml
@@ -61,6 +62,10 @@ global_configuration:
 
 bootstrap:
     architecture:       i386
+
+playbooks:
+    30_foo:
+        path:               debian/foo/main.yml
 """
 
 sample_user_file = """
@@ -128,6 +133,23 @@ def test_bootstrap_overlay(config_files):
         assert parser.get_bootstrap_tool() == "debootstrap"
 
 
-def test_ansible_playbooks_overlay(config_files):
-    # TODO
-    pass
+def test_playbooks_overlay(config_files):
+    with open(config_files, "r") as main_file:
+        parser = ConfigurationParser(main_file)
+        playbooks = parser.get_playbooks()
+        assert len(playbooks) == 3
+        expected_playbooks = ["10_base_system",
+                              "20_networking",
+                              "30_foo"]
+        for playbook, expected in zip(playbooks.items(), expected_playbooks):
+            assert playbook[0] == expected
+            if playbook[0] == "10_base_system":
+                value = playbook[1].get("parameters"
+                                        ).get("kernel_package")
+                assert value == "linux-image-amd64-rt"
+                value = playbook[1].get("parameters"
+                                        ).get("message")
+                assert value == "some message"
+            if playbook[0] == "20_networking":
+                value = playbook[1].get("path")
+                assert value == "debian/other_networking/main.yml"
