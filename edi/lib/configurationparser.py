@@ -111,10 +111,10 @@ class ConfigurationParser():
                           ] = self._merge_key_value_node(base, overlay,
                                                          element)
 
-        # playbook_element = "ansible_playbooks"
-        # merged_config[playbook_element
-        #               ] = self._merge_ansible_playbooks(base, overlay,
-        #                                                 playbook_element)
+        playbook_element = "playbooks"
+        merged_config[playbook_element
+                      ] = self._merge_ansible_playbooks(base, overlay,
+                                                        playbook_element)
         return merged_config
 
     def _merge_key_value_node(self, base, overlay, node_name):
@@ -137,38 +137,27 @@ class ConfigurationParser():
         return identifier
 
     def _merge_ansible_playbooks(self, base, overlay, playbook_node):
-        merged_list = []
+        merged_playbooks = self._merge_key_value_node(base, overlay,
+                                                      playbook_node)
 
-        if playbook_node in overlay:
-            overlay_list = overlay.get(playbook_node, [])
+        for key, _ in merged_playbooks.items():
+            playbook_base = base.get(playbook_node, {})
+            playbook_overlay = overlay.get(playbook_node, {})
+            merged_playbooks[key
+                             ] = self._merge_key_value_node(playbook_base,
+                                                            playbook_overlay,
+                                                            key)
 
-            if overlay_list:
-                base_dict = {}
-                for element in base.get(playbook_node, []):
-                    base_dict[self._get_identifier(element)] = element
+            element = "parameters"
+            base_params = playbook_base.get(key, {})
+            overlay_params = playbook_overlay.get(key, {})
+            merged_params = self._merge_key_value_node(base_params,
+                                                       overlay_params,
+                                                       element)
+            if merged_params:
+                merged_playbooks[key][element] = merged_params
 
-                for element in overlay_list:
-                    identifier = self._get_identifier(element)
-                    base_element = base_dict.get(identifier, {})
-                    if base_element:
-                        del base_dict[identifier]
-                    merged_element = dict(base_element, **element)
-                    merged_params = self._merge_key_value_node(base_element,
-                                                               element,
-                                                               "parameters")
-                    if merged_params:
-                        merged_element["parameters"] = merged_params
-                    merged_list.append(merged_element)
-
-                for _, element in base_dict.items():
-                    logging.warning(("Overlay configuration does not use the "
-                                     "following configuration stage "
-                                     "element:\n{0}").format(element))
-
-        if merged_list:
-            return merged_list
-        else:
-            return base.get(playbook_node, [])
+        return merged_playbooks
 
     def _get_bootstrap_item(self, item, default):
         return self._get_config().get("bootstrap", {}
