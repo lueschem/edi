@@ -30,8 +30,8 @@ from edi.lib.commandfactory import get_sub_commands, get_command
 
 class EdiCommand(metaclass=CommandFactory):
 
-    def _setup_parser(self, config_file):
-        self.config = ConfigurationParser(config_file)
+    def _setup_parser(self, config_file, running_in_chroot=False):
+        self.config = ConfigurationParser(config_file, running_in_chroot)
 
     @classmethod
     def _get_command_name(cls):

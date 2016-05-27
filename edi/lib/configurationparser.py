@@ -21,9 +21,9 @@
 
 import yaml
 import collections
-import os
 from jinja2 import Template
-from os.path import basename, splitext
+import os
+from os.path import dirname, abspath, basename, splitext, isfile
 import logging
 from aptsources.sourceslist import SourceEntry
 from edi.lib.helpers import (get_user, get_user_gid, get_user_uid,
@@ -76,7 +76,9 @@ class ConfigurationParser():
         playbooks = self._get_config().get("playbooks", {})
         return collections.OrderedDict(sorted(playbooks.items()))
 
-    def __init__(self, base_config_file):
+    def __init__(self, base_config_file, running_in_chroot=False):
+        self.running_in_chroot = running_in_chroot
+        self.config_directory = dirname(abspath(base_config_file.name))
         self.config_id = splitext(basename(base_config_file.name))[0]
         if not ConfigurationParser._configurations.get(self.config_id):
             logging.info(("Using base configuration file '{0}'"
@@ -106,9 +108,9 @@ class ConfigurationParser():
         return yaml.load(self._parse_jina2_file(config_file))
 
     def _get_overlay_config(self, base_config_file, overlay_name):
-        filename, file_extension = os.path.splitext(base_config_file.name)
+        filename, file_extension = splitext(base_config_file.name)
         fn = "{0}.{1}{2}".format(filename, overlay_name, file_extension)
-        if os.path.isfile(fn) and os.access(fn, os.R_OK):
+        if isfile(fn) and os.access(fn, os.R_OK):
             with open(fn, encoding="UTF-8", mode="r") as config_file:
                 logging.info(("Using overlay configuration file '{0}'"
                               ).format(config_file.name))
@@ -182,9 +184,13 @@ class ConfigurationParser():
                                       ).get(item, default)
 
     def _get_jinja2_dictionary(self):
-        jina2_dict = {}
-        jina2_dict["edi_current_user_name"] = get_user()
-        jina2_dict["edi_current_user_uid"] = get_user_uid()
-        jina2_dict["edi_current_user_gid"] = get_user_gid()
-        jina2_dict["edi_host_hostname"] = get_hostname()
-        return jina2_dict
+        jinja2_dict = {}
+        jinja2_dict["edi_current_user_name"] = get_user()
+        jinja2_dict["edi_current_user_uid"] = get_user_uid()
+        jinja2_dict["edi_current_user_gid"] = get_user_gid()
+        jinja2_dict["edi_host_hostname"] = get_hostname()
+        jinja2_dict["edi_running_in_chroot"] = str(self.running_in_chroot)
+        jinja2_dict["edi_work_directory"] = self.get_workdir()
+        jinja2_dict["edi_config_directory"] = self.config_directory
+        logging.info("Jinja2 dictionary:\n{}".format(jinja2_dict))
+        return jinja2_dict

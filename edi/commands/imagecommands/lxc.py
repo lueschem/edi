@@ -48,7 +48,7 @@ class Lxc(Image):
         print("Generated {0}.".format(result))
 
     def run(self, config_file):
-        self._setup_parser(config_file)
+        self._setup_parser(config_file, running_in_chroot=True)
 
         if os.path.isfile(self._result()):
             logging.info(("{0} is already there. "
