@@ -24,18 +24,16 @@ _command_anchor = "edicommand"
 _command_registry = {}
 
 
-def get_commands():
-    return {k: v for (k, v) in _command_registry.items() if "." not in k}
-
-
 def get_command(command):
     return _command_registry.get(command)
 
 
-def get_sub_commands(parent_command):
+def get_sub_commands(parent_command=_command_anchor):
+    level = len(parent_command.split("."))
     sub_command_prefix = "{}.".format(parent_command)
     return {k: v for (k, v) in _command_registry.items()
-            if k.startswith(sub_command_prefix)}
+            if k.startswith(sub_command_prefix)
+            if len(k.split(".")) == level + 1}
 
 
 class CommandFactory(type):

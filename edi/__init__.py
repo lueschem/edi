@@ -24,8 +24,9 @@ import argparse
 import argcomplete
 import logging
 from edi.commands import *
-from edi.lib.commandfactory import get_commands, get_command
+from edi.lib.commandfactory import get_sub_commands, get_command
 from edi.lib.helpers import print_error_and_exit
+from edi.lib.edicommand import EdiCommand
 
 
 def _setup_logging(cli_args):
@@ -54,7 +55,7 @@ def _setup_command_line_interface():
     subparsers = parser.add_subparsers(title='commands',
                                        dest="command_name")
 
-    for _, command in get_commands().items():
+    for _, command in get_sub_commands().items():
         command.advertise(subparsers)
     argcomplete.autocomplete(parser)
     return parser
@@ -68,4 +69,6 @@ def main():
     if cli_args.command_name is None:
         print_error_and_exit("Missing subcommand. Use 'edi --help' for help.")
 
-    get_command(cli_args.command_name)().run_cli(cli_args)
+    command_name = "{0}.{1}".format(EdiCommand._get_command_name(),
+                                    cli_args.command_name)
+    get_command(command_name)().run_cli(cli_args)

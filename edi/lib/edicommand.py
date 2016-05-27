@@ -28,19 +28,46 @@ from edi.lib.shellhelpers import run
 from edi.lib.commandfactory import get_sub_commands, get_command
 
 
+def compose_command_name(current_class):
+    if EdiCommand is current_class:
+        return EdiCommand.__name__.lower()
+    else:
+        assert len(current_class.__bases__) == 1
+        return "{}.{}".format(compose_command_name(current_class.__bases__[0]),
+                              current_class.__name__.lower())
+
+
 class EdiCommand(metaclass=CommandFactory):
+
+    def clean(self, config_file):
+        pass
+
+    def _get_sibling_commands(self):
+        assert len(type(self).__bases__) == 1
+        commands = []
+        parent_command = type(self).__bases__[0]._get_command_name()
+        for _, command in get_sub_commands(parent_command).items():
+            if command != self.__class__:
+                commands.append(command)
+        return commands
+
+    def _clean_siblings_and_sub_commands(self, config_file):
+        for command in self._get_sibling_commands():
+            print("cleaning {}".format(command))
+            command().clean(config_file)
+            command().clean_sub_commands(config_file)
+
+    def clean_sub_commands(self, config_file):
+        command = self._get_sub_command("clean")
+        if command:
+            command().clean(config_file)
 
     def _setup_parser(self, config_file, running_in_chroot=False):
         self.config = ConfigurationParser(config_file, running_in_chroot)
 
     @classmethod
     def _get_command_name(cls):
-        assert len(cls.__bases__) == 1
-        if EdiCommand in cls.__bases__:
-            return cls.__name__.lower()
-        else:
-            return "{}.{}".format(cls.__bases__[0].__name__.lower(),
-                                  cls.__name__.lower())
+        return compose_command_name(cls)
 
     @classmethod
     def _get_short_command_name(cls):
@@ -63,11 +90,13 @@ class EdiCommand(metaclass=CommandFactory):
         for _, command in get_sub_commands(cls._get_command_name()).items():
             command.advertise(subparsers)
 
-    def _run_sub_command(self, cli_args):
+    def _run_sub_command_cli(self, cli_args):
+        self._get_sub_command(cli_args.sub_command_name)().run_cli(cli_args)
+
+    def _get_sub_command(self, command):
         sub_command = "{}.{}".format(self._get_command_name(),
-                                     cli_args.sub_command_name)
-        cmd = get_command(sub_command)
-        cmd().run_cli(cli_args)
+                                     command)
+        return get_command(sub_command)
 
     @staticmethod
     def _require_config_file(parser):

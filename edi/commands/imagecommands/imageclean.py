@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-# Copyright (C) 2016 Matthias Luescher
-#
-# Authors:
-#  Matthias Luescher
-#
-# This file is part of edi.
 #
 # edi is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,20 +12,24 @@
 # You should have received a copy of the GNU General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
-from edi.lib.edicommand import EdiCommand
+from edi.commands.image import Image
 
 
-class Image(EdiCommand):
-
+class Clean(Image):
     @classmethod
     def advertise(cls, subparsers):
-        help_text = "handle edi images"
-        description_text = "Do processing of edi images."
+        help_text = "clean all intermediate images"
+        description_text = "Clean all intermediate images."
         parser = subparsers.add_parser(cls._get_short_command_name(),
                                        help=help_text,
                                        description=description_text)
-
-        cls._add_sub_commands(parser)
+        cls._require_config_file(parser)
 
     def run_cli(self, cli_args):
-        self._run_sub_command_cli(cli_args)
+        self.run(cli_args.config_file)
+
+    def run(self, config_file):
+        self.clean(config_file)
+
+    def clean(self, config_file):
+        self._clean_siblings_and_sub_commands(config_file)

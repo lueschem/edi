@@ -22,7 +22,7 @@
 import logging
 import subprocess
 from edi.commands.lxc import Lxc
-from edi.commands.imagecommands.lxc import Lxc as LxcImageCommand
+from edi.commands.imagecommands.imagelxc import Lxc as LxcImageCommand
 from edi.lib.shellhelpers import run
 
 

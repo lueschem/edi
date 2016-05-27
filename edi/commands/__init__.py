@@ -22,4 +22,4 @@
 from edi.commands.imagecommands import *
 from edi.commands.lxccommands import *
 
-__all__ = ["image", "lxc", "version"]
+__all__ = ["image", "lxc", "version", "clean"]

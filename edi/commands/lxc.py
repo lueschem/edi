@@ -36,4 +36,4 @@ class Lxc(EdiCommand):
         cls._add_sub_commands(parser)
 
     def run_cli(self, cli_args):
-        self._run_sub_command(cli_args)
+        self._run_sub_command_cli(cli_args)
