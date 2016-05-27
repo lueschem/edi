@@ -25,7 +25,7 @@ print_error_and_exit()
 SCRIPTDIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
 # Hint: $0 might be "-bash" if logged in via ssh.
-if [ "$(basename "x/$0")" == "$(basename "${BASH_SOURCE[0]}")" ]
+if [[ "$(basename "x/$0")" == "$(basename "${BASH_SOURCE[0]}")" ]]
 then
     usage
     print_error_and_exit "Please do not run this script directly."
@@ -35,7 +35,7 @@ fi
 # bash manual:
 # If the last character of the alias value is a space or
 # tab character, then the next command word following the
-# alias is also checked for alias expansion. 
+# alias is also checked for alias expansion.
 alias sudo="sudo "
 alias edi="${SCRIPTDIR}/bin/edi"
 
@@ -44,6 +44,15 @@ BINFOLDER="${SCRIPTDIR}/bin"
 if [[ ! ":$PATH:" == *":${BINFOLDER}:"* ]]
 then
     export PATH=${BINFOLDER}:${PATH}
+fi
+
+# load additional completion wrapper when SHELL == zsh
+if [[ "$(basename "${SHELL}")" == "zsh" ]]
+then
+    autoload bashcompinit
+    bashcompinit
+    autoload compinit
+    compinit
 fi
 
 # enable bash completion
