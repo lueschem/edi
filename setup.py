@@ -27,6 +27,8 @@ from setuptools import setup, find_packages
 from codecs import open
 from os import path
 from pip.req import parse_requirements
+import glob
+import os
 
 here = path.abspath(path.dirname(__file__))
 
@@ -72,17 +74,19 @@ setup(
     packages=find_packages(exclude=['docs', 'debian', 'bin', '.git', 'tests']),
 
     install_requires=get_install_requires(),
-    
+
     extras_require={
     #    'dev': ['check-manifest'],
     #    'test': ['coverage'],
     },
 
     package_data={
-    #    'sample': ['package_data.dat'],
+        'edi': [f[len('edi/'):] for f in glob.iglob('edi/plugins/**',
+                                                    recursive=True)
+                if os.path.isfile(f)],
     },
 
-    #data_files=[('my_data', ['data/data_file'])],
+    # data_files=[('my_data', ['data/data_file'])],
 
     entry_points={
         'console_scripts': [
