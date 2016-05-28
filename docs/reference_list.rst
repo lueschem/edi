@@ -33,8 +33,11 @@ Libraries
 ---------
 
 - "`Requests`_ is an elegant and simple HTTP library for Python, built for human beings."
+- `Jinja2`_ is a template engine for Python.
+
 
 .. _Requests: http://docs.python-requests.org/en/latest/index.html
+.. _Jinja2: http://jinja.pocoo.org/
 
 
 LXC/LXD
