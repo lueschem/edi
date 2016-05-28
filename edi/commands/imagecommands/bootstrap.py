@@ -146,3 +146,7 @@ class Bootstrap(Image):
             clean_cmd.append("apt-get")
             clean_cmd.append("clean")
             run(clean_cmd, sudo=True)
+
+            resolv_conf = os.path.join(rootfs, "etc/resolv.conf")
+            if os.path.isfile(resolv_conf):
+                os.remove(resolv_conf)

@@ -22,6 +22,7 @@
 import logging
 import subprocess
 import os
+import shutil
 from contextlib import contextmanager
 from edi.lib.helpers import get_user
 
@@ -128,6 +129,28 @@ def _mount_dev_ro(rootfs):
         yield
     finally:
         run(_get_umount_cmd(mountpoint), sudo=True)
+
+
+@contextmanager
+def resolv_conf(rootfs):
+    resolv_conf = "etc/resolv.conf"
+    src = os.path.join("/", resolv_conf)
+    dest = os.path.join(rootfs, resolv_conf)
+    file_copied = False
+    if not os.path.isfile(dest):
+        file_copied = True
+        shutil.copy(src, dest)
+
+    assert os.path.isfile(dest)
+    file_date_1 = os.path.getmtime(dest)
+
+    try:
+        yield
+    finally:
+        if os.path.isfile(dest) and file_copied:
+            file_date_2 = os.path.getmtime(dest)
+            if file_date_1 == file_date_2:  # resolv.conf has not been modified
+                os.remove(dest)
 
 
 @contextmanager
