@@ -42,7 +42,7 @@ def get_user():
     except KeyError:
         # Hint: there is no $USER during debuild
         logging.warn("Unable to get user from environment variable.")
-        return "unknown"
+        return "root"
 
 
 def get_user_uid():
