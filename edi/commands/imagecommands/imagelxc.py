@@ -76,6 +76,13 @@ class Lxc(Image):
 
         return self._result()
 
+    def clean(self, config_file):
+        self._setup_parser(config_file, running_in_chroot=True)
+
+        if os.path.isfile(self._result()):
+            logging.info("Removing '{}'.".format(self._result()))
+            os.remove(self._result())
+
     def _result(self):
         archive_name = ("{0}_{1}.tar.{2}"
                         ).format(self.config.get_project_name(),

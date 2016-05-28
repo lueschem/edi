@@ -44,7 +44,7 @@ class Import(Lxc):
     def run(self, config_file):
         self._setup_parser(config_file)
 
-        if self._is_already_in_image_store():
+        if self._is_in_image_store():
             logging.info(("{0} is already in image store. "
                           "Delete it to regenerate it."
                           ).format(self._result()))
@@ -56,11 +56,19 @@ class Import(Lxc):
 
         return self._result()
 
+    def clean(self, config_file):
+        self._setup_parser(config_file)
+
+        if self._is_in_image_store():
+            logging.info(("Removing '{}' from image store."
+                          ).format(self._result()))
+            self._delete_image()
+
     def _result(self):
         return "{}_{}".format(self.config.get_project_name(),
                               self._get_command_file_name_prefix())
 
-    def _is_already_in_image_store(self):
+    def _is_in_image_store(self):
         cmd = []
         cmd.append("lxc")
         cmd.append("image")
@@ -77,4 +85,12 @@ class Import(Lxc):
         cmd.append(image)
         cmd.append("local:")
         cmd.extend(["--alias", self._result()])
+        run(cmd)
+
+    def _delete_image(self):
+        cmd = []
+        cmd.append("lxc")
+        cmd.append("image")
+        cmd.append("delete")
+        cmd.append("local:{}".format(self._result()))
         run(cmd)

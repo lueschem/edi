@@ -53,7 +53,6 @@ class EdiCommand(metaclass=CommandFactory):
 
     def _clean_siblings_and_sub_commands(self, config_file):
         for command in self._get_sibling_commands():
-            print("cleaning {}".format(command))
             command().clean(config_file)
             command().clean_sub_commands(config_file)
 
