@@ -23,7 +23,7 @@ import yaml
 import collections
 from jinja2 import Template
 import os
-from os.path import dirname, abspath, basename, splitext, isfile
+from os.path import dirname, abspath, basename, splitext, isfile, join
 import logging
 from aptsources.sourceslist import SourceEntry
 from edi.lib.helpers import (get_user, get_user_gid, get_user_uid,
@@ -75,6 +75,12 @@ class ConfigurationParser():
     def get_playbooks(self):
         playbooks = self._get_config().get("playbooks", {})
         return collections.OrderedDict(sorted(playbooks.items()))
+
+    def get_edi_plugin_directory(self):
+        return abspath(join(dirname(__file__), "../plugins"))
+
+    def get_project_plugin_directory(self):
+        return join(self.config_directory, "plugins")
 
     def __init__(self, base_config_file, running_in_chroot=False):
         self.running_in_chroot = running_in_chroot
@@ -192,5 +198,9 @@ class ConfigurationParser():
         jinja2_dict["edi_running_in_chroot"] = str(self.running_in_chroot)
         jinja2_dict["edi_work_directory"] = self.get_workdir()
         jinja2_dict["edi_config_directory"] = self.config_directory
+        jinja2_dict["edi_edi_plugin_directory"
+                    ] = self.get_edi_plugin_directory()
+        jinja2_dict["edi_project_plugin_directory"
+                    ] = self.get_project_plugin_directory()
         logging.info("Jinja2 dictionary:\n{}".format(jinja2_dict))
         return jinja2_dict
