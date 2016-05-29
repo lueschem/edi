@@ -18,7 +18,7 @@ playbooks:
             kernel_package: linux-image-amd64
 #    20_networking:
 #        tool:               ansible
-#        path:               debian/networking/main.yml
+#        path:               playbooks/debian/networking/main.yml
 
 keys:
     {{ edi_current_user_name }}:
