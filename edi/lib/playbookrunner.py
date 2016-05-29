@@ -54,12 +54,11 @@ class PlaybookRunner():
                 assert tool == "ansible"
                 playbook = self._resolve_path(path)
 
-                print(yaml.dump(self.config.get_playbook_dictionary(self.environment, k),
-                                default_flow_style=False))
+                extra_vars = self._write_extra_vars_file(tempdir, k)
 
-                self._run_playbook(playbook, inventory)
+                self._run_playbook(playbook, inventory, extra_vars)
 
-    def _run_playbook(self, playbook, inventory):
+    def _run_playbook(self, playbook, inventory, extra_vars):
         require_executable("ansible-playbook", "sudo apt install ansible")
 
         cmd = []
@@ -67,6 +66,7 @@ class PlaybookRunner():
         cmd.extend(["-c", "chroot"])
         cmd.append(playbook)
         cmd.extend(["--inventory", inventory])
+        cmd.extend(["--extra-vars", "@{}".format(extra_vars)])
         if logging.getLogger().isEnabledFor(logging.DEBUG):
             cmd.append("-vvvv")
 
@@ -76,8 +76,6 @@ class PlaybookRunner():
         else:
             # TODO: implement non chroot version
             assert False
-
-        # sudo -E bash -c "cd ${PLAYBOOK_DIR} && ansible-playbook -c chroot ${PLAYBOOK_FILE} --inventory ${INVENTORY_FILE} ${VERBOSE} --extra-vars='@${EXTRA_VARS_FILE}' ${QUIET}"
 
     def _resolve_path(self, path):
         # TODO: generalize for any plugin
@@ -106,5 +104,12 @@ class PlaybookRunner():
         chown_to_user(inventory_file)
         return inventory_file
 
-    def _write_extra_vars_file(self, tempdir):
-        pass
+    def _write_extra_vars_file(self, tempdir, playbookname):
+        extra_vars_file = os.path.join(tempdir,
+                                       "extra_vars_{}".format(playbookname))
+        with open(extra_vars_file, encoding='utf-8', mode='w') as f:
+            extra_vars = self.config.get_playbook_dictionary(self.environment,
+                                                             playbookname)
+            f.write(yaml.dump(extra_vars))
+
+        return extra_vars_file
