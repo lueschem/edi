@@ -30,6 +30,7 @@ from codecs import open
 from edi.commands.image import Image
 from edi.commands.imagecommands.bootstrap import Bootstrap
 from edi.lib.helpers import chown_to_user
+from edi.lib.playbookrunner import PlaybookRunner
 
 
 class Lxc(Image):
@@ -68,8 +69,13 @@ class Lxc(Image):
         with tempfile.TemporaryDirectory(dir=workdir) as tempdir:
             chown_to_user(tempdir)
             lxcimagedir = os.path.join(tempdir, "lxcimage")
-            self._unpack_image(bootstrap_result, lxcimagedir)
+            rootfsdir = self._unpack_image(bootstrap_result, lxcimagedir)
             self._write_container_metadata(lxcimagedir)
+            playbook_runner = PlaybookRunner(self.config,
+                                             rootfsdir,
+                                             "edi_lxc",
+                                             running_in_chroot=True)
+            playbook_runner.run_all()
             archive = self._pack_image(tempdir, lxcimagedir)
             chown_to_user(archive)
             shutil.move(archive, self._result())

@@ -1,0 +1,3 @@
+---
+- name: Run an update and upgrade
+  apt: update_cache=yes upgrade=dist

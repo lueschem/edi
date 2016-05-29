@@ -13,12 +13,12 @@ bootstrap:
 playbooks:
     10_base_system:
         tool:               ansible
-        path:               debian/base_system/main.yml
+        path:               playbooks/debian/base_system/main.yml
         parameters:
             kernel_package: linux-image-amd64
-    20_networking:
-        tool:               ansible
-        path:               debian/networking/main.yml
+#    20_networking:
+#        tool:               ansible
+#        path:               debian/networking/main.yml
 
 keys:
     {{ edi_current_user_name }}:
