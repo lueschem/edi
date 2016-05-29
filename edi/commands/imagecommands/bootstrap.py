@@ -114,7 +114,9 @@ class Bootstrap(Image):
             return None
 
     def _run_debootstrap(self, tempdir, keyring_file):
-        additional_packages = "python-minimal"
+        # Ansible uses python on the target system
+        # sudo is needed for privilege escalation
+        additional_packages = "python,sudo"
         rootfs = os.path.join(tempdir, "rootfs")
         components = ",".join(self.config.get_bootstrap_components())
 
