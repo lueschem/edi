@@ -26,7 +26,7 @@ from edi.lib.configurationparser import ConfigurationParser
 sample_file = """
 ---
 global_configuration:
-    use_case:           edi_run
+    use_case:           edi_uc_run
     compression:        gz
 
 bootstrap:
@@ -49,7 +49,7 @@ playbooks:
 sample_all_file = """
 global_configuration:
     # change the use case:
-    use_case:           edi_develop
+    use_case:           edi_uc_develop
 
 bootstrap:
     repository_key:     https://ftp-master.debian.org/keys/archive-key-8.asc
@@ -58,7 +58,7 @@ bootstrap:
 sample_host_file = """
 global_configuration:
     # change the use case:
-    use_case:           edi_build
+    use_case:           edi_uc_build
 
 bootstrap:
     architecture:       i386
@@ -72,7 +72,7 @@ sample_user_file = """
 ---
 global_configuration:
     # change the use case again:
-    use_case:           edi_test
+    use_case:           edi_uc_test
 
 # apply no changes to bootstrap section
 
@@ -115,7 +115,7 @@ def test_global_configuration_overlay(config_files):
     with open(config_files, "r") as main_file:
         parser = ConfigurationParser(main_file)
         # the user file shall win:
-        assert parser.get_use_case() == "edi_test"
+        assert parser.get_use_case() == "edi_uc_test"
         assert parser.get_compression() == "gz"
 
 

@@ -29,6 +29,11 @@ from aptsources.sourceslist import SourceEntry
 from edi.lib.helpers import (get_user, get_user_gid, get_user_uid,
                              get_hostname, print_error_and_exit)
 
+_supported_environments = ["edi_env_lxc", "edi_env_bare_metal"]
+
+_supported_use_cases = ["edi_uc_run", "edi_uc_build",
+                        "edi_uc_test", "edi_uc_develop"]
+
 
 class ConfigurationParser():
 
@@ -67,7 +72,7 @@ class ConfigurationParser():
         return SourceEntry(repository).comps
 
     def get_use_case(self):
-        return self._get_global_configuration_item("use_case", "edi_run")
+        return self._get_global_configuration_item("use_case", "edi_uc_run")
 
     def get_compression(self):
         return self._get_global_configuration_item("compression", "xz")
@@ -108,7 +113,7 @@ class ConfigurationParser():
 
     def _parse_jina2_file(self, config_file):
         template = Template(config_file.read())
-        return template.render(self._get_jinja2_dictionary())
+        return template.render(self._get_load_time_dictionary())
 
     def _get_base_config(self, config_file):
         return yaml.load(self._parse_jina2_file(config_file))
@@ -151,14 +156,6 @@ class ConfigurationParser():
             return base_node
         return dict(base_node, **overlay_node)
 
-    def _get_identifier(self, element):
-        identifier = element.get("identifier", None)
-        if identifier is None:
-            print_error_and_exit(("Missing identifier for "
-                                  "element:\n'{}'"
-                                  ).format(element))
-        return identifier
-
     def _merge_nested_node(self, base, overlay, node):
         merged_node = self._merge_key_value_node(base, overlay,
                                                  node)
@@ -189,18 +186,51 @@ class ConfigurationParser():
         return self._get_config().get("global_configuration", {}
                                       ).get(item, default)
 
-    def _get_jinja2_dictionary(self):
-        jinja2_dict = {}
-        jinja2_dict["edi_current_user_name"] = get_user()
-        jinja2_dict["edi_current_user_uid"] = get_user_uid()
-        jinja2_dict["edi_current_user_gid"] = get_user_gid()
-        jinja2_dict["edi_host_hostname"] = get_hostname()
-        jinja2_dict["edi_running_in_chroot"] = str(self.running_in_chroot)
-        jinja2_dict["edi_work_directory"] = self.get_workdir()
-        jinja2_dict["edi_config_directory"] = self.config_directory
-        jinja2_dict["edi_edi_plugin_directory"
-                    ] = self.get_edi_plugin_directory()
-        jinja2_dict["edi_project_plugin_directory"
-                    ] = self.get_project_plugin_directory()
-        logging.info("Jinja2 dictionary:\n{}".format(jinja2_dict))
-        return jinja2_dict
+    def _get_load_time_dictionary(self):
+        load_dict = {}
+        load_dict["edi_current_user_name"] = get_user()
+        load_dict["edi_current_user_uid"] = get_user_uid()
+        load_dict["edi_current_user_gid"] = get_user_gid()
+        load_dict["edi_host_hostname"] = get_hostname()
+        load_dict["edi_running_in_chroot"] = str(self.running_in_chroot)
+        load_dict["edi_work_directory"] = self.get_workdir()
+        load_dict["edi_config_directory"] = self.config_directory
+        load_dict["edi_edi_plugin_directory"
+                  ] = self.get_edi_plugin_directory()
+        load_dict["edi_project_plugin_directory"
+                  ] = self.get_project_plugin_directory()
+        logging.info("Load time dictionary:\n{}".format(load_dict))
+        return load_dict
+
+    def get_playbook_dictionary(self, environment, playbook):
+        # TODO: return the playbook stuff as a list of tuples:
+        # (tool, path, dict)
+        playbook_dict = self._get_load_time_dictionary()
+        if self.get_use_case() not in _supported_use_cases:
+            print_error_and_exit(("Use case '{0}' is not supported.\n"
+                                  "Choose from: {1}."
+                                  ).format(self.get_use_case(),
+                                           ", ".join(_supported_use_cases)))
+        # environment is implicit
+        assert environment in _supported_environments
+
+        for env in _supported_environments:
+            if env == environment:
+                playbook_dict[env] = True
+            else:
+                playbook_dict[env] = False
+
+        for uc in _supported_use_cases:
+            if uc == self.get_use_case():
+                playbook_dict[uc] = True
+            else:
+                playbook_dict[uc] = False
+
+        parameters = self._get_config().get("playbooks", {}
+                                            ).get(playbook, {}
+                                                  ).get("parameters", None)
+
+        if parameters:
+            return dict(playbook_dict, **parameters)
+
+        return playbook_dict

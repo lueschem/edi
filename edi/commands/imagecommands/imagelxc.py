@@ -73,7 +73,7 @@ class Lxc(Image):
             self._write_container_metadata(lxcimagedir)
             playbook_runner = PlaybookRunner(self.config,
                                              rootfsdir,
-                                             "edi_lxc",
+                                             "edi_env_lxc",
                                              running_in_chroot=True)
             playbook_runner.run_all()
             archive = self._pack_image(tempdir, lxcimagedir)

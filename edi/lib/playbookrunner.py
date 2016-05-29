@@ -22,6 +22,7 @@
 import os
 import logging
 import tempfile
+import yaml
 from codecs import open
 from edi.lib.helpers import chown_to_user
 from docutils.parsers.rst.directives import path
@@ -52,6 +53,10 @@ class PlaybookRunner():
                 tool = v.get("tool", "ansible")
                 assert tool == "ansible"
                 playbook = self._resolve_path(path)
+
+                print(yaml.dump(self.config.get_playbook_dictionary(self.environment, k),
+                                default_flow_style=False))
+
                 self._run_playbook(playbook, inventory)
 
     def _run_playbook(self, playbook, inventory):

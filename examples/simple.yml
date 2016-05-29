@@ -1,7 +1,7 @@
 ---
 global_configuration:
-    # valid use cases: edi_run, edi_test, edi_build, edi_develop
-    use_case:               edi_run
+    # valid use cases: edi_uc_run, edi_uc_test, edi_uc_build, edi_uc_develop
+    use_case:               edi_uc_run
     compression:            xz
 
 bootstrap:
