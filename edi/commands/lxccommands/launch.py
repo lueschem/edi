@@ -23,7 +23,9 @@ import logging
 import subprocess
 from edi.commands.lxc import Lxc
 from edi.commands.lxccommands.importcmd import Import
+from edi.lib.helpers import print_error_and_exit
 from edi.lib.shellhelpers import run
+from edi.lib.networkhelpers import is_valid_hostname
 
 
 class Launch(Lxc):
@@ -45,6 +47,10 @@ class Launch(Lxc):
     def run(self, container_name, config_file):
         self._setup_parser(config_file)
         self.container_name = container_name
+
+        if not is_valid_hostname(container_name):
+            print_error_and_exit(("'{}'is not a valid host name."
+                                  ).format(container_name))
 
         if self._is_container_existing():
             logging.info(("Container {0} is already existing. "
