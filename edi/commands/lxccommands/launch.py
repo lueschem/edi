@@ -49,7 +49,8 @@ class Launch(Lxc):
         self.container_name = container_name
 
         if not is_valid_hostname(container_name):
-            print_error_and_exit(("'{}'is not a valid host name."
+            print_error_and_exit(("The provided container name '{}' "
+                                  "is not a valid host name."
                                   ).format(container_name))
 
         if self._is_container_existing():
