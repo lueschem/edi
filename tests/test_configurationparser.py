@@ -20,6 +20,7 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 import pytest
+import os
 from edi.lib.helpers import get_user, get_hostname
 from edi.lib.configurationparser import ConfigurationParser
 
@@ -36,14 +37,12 @@ bootstrap:
 
 playbooks:
     10_base_system:
-        tool:               ansible
-        path:               debian/base_system/main.yml
+        path:               playbooks/foo.yml
         parameters:
             kernel_package: linux-image-amd64
             message:        some message
     20_networking:
-        tool:               ansible
-        path:               debian/networking/main.yml
+        path:               playbooks/bar.yml
 """
 
 sample_global_file = """
@@ -65,7 +64,7 @@ bootstrap:
 
 playbooks:
     30_foo:
-        path:               debian/foo/main.yml
+        path:               playbooks/foo.yml
 """
 
 sample_user_file = """
@@ -81,7 +80,7 @@ playbooks:
         parameters:
             kernel_package: linux-image-amd64-rt
     20_networking:
-        path:               debian/other_networking/main.yml
+        path:               playbooks/foo.yml
 """
 
 config_name = "sample"
@@ -102,6 +101,10 @@ def config_files(tmpdir_factory):
     host_file = "{0}.{1}.yml".format(config_name, get_hostname())
     with open(str(dir_name.join(host_file)), "w") as file:
         file.write(sample_system_file)
+    playbook_dir = dir_name.join("plugins/playbooks")
+    os.makedirs(str(playbook_dir))
+    with open(str(playbook_dir.join("foo.yml")), "w") as file:
+        file.write("baz")
     return str(dir_name.join(main_file))
 
 
@@ -136,20 +139,18 @@ def test_bootstrap_overlay(config_files):
 def test_playbooks_overlay(config_files):
     with open(config_files, "r") as main_file:
         parser = ConfigurationParser(main_file)
-        playbooks = parser.get_playbooks()
+        playbooks = parser.get_playbooks("edi_env_baremetal")
         assert len(playbooks) == 3
         expected_playbooks = ["10_base_system",
                               "20_networking",
                               "30_foo"]
-        for playbook, expected in zip(playbooks.items(), expected_playbooks):
-            assert playbook[0] == expected
-            if playbook[0] == "10_base_system":
-                value = playbook[1].get("parameters"
-                                        ).get("kernel_package")
+        for playbook, expected in zip(playbooks, expected_playbooks):
+            name, path, extra_vars = playbook
+            assert name == expected
+            if name == "10_base_system":
+                value = extra_vars.get("kernel_package")
                 assert value == "linux-image-amd64-rt"
-                value = playbook[1].get("parameters"
-                                        ).get("message")
+                value = extra_vars.get("message")
                 assert value == "some message"
-            if playbook[0] == "20_networking":
-                value = playbook[1].get("path")
-                assert value == "debian/other_networking/main.yml"
+            if name == "20_networking":
+                assert path.endswith("playbooks/foo.yml")

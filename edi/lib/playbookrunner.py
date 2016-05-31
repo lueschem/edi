@@ -26,7 +26,7 @@ import yaml
 from codecs import open
 from edi.lib.helpers import chown_to_user
 from docutils.parsers.rst.directives import path
-from edi.lib.helpers import print_error_and_exit, require_executable
+from edi.lib.helpers import require_executable
 from edi.lib.shellhelpers import run, resolv_conf
 
 
@@ -46,17 +46,20 @@ class PlaybookRunner():
             chown_to_user(tempdir)
             inventory = self._write_inventory_file(tempdir)
 
-            for k, v in self.config.get_playbooks().items():
-                logging.info("Running playbook {}".format(k))
-                path = v.get("path", None)
-                assert path is not None
-                tool = v.get("tool", "ansible")
-                assert tool == "ansible"
-                playbook = self._resolve_path(path)
+            playbook_list = self.config.get_playbooks(self.environment)
+            for name, path, extra_vars in playbook_list:
+                logging.info(("Running playbook {} located in "
+                              "{} with extra vars:\n{}"
+                              ).format(name, path,
+                                       yaml.dump(extra_vars,
+                                                 default_flow_style=False)))
 
-                extra_vars = self._write_extra_vars_file(tempdir, k)
+                extra_vars_file = os.path.join(tempdir, ("extra_vars_{}"
+                                                         ).format(name))
+                with open(extra_vars_file, encoding='utf-8', mode='w') as f:
+                    f.write(yaml.dump(extra_vars))
 
-                self._run_playbook(playbook, inventory, extra_vars)
+                self._run_playbook(path, inventory, extra_vars_file)
 
     def _run_playbook(self, playbook, inventory, extra_vars):
         require_executable("ansible-playbook", "sudo apt install ansible")
@@ -77,39 +80,9 @@ class PlaybookRunner():
             # TODO: implement non chroot version
             assert False
 
-    def _resolve_path(self, path):
-        # TODO: generalize for any plugin
-        if os.path.isabs(path):
-            if not os.path.isfile(path):
-                print_error_and_exit(("'{}' does not exist."
-                                      ).format(path))
-            return path
-        else:
-            locations = [self.config.get_project_plugin_directory(),
-                         self.config.get_edi_plugin_directory()]
-
-            for location in locations:
-                abspath = os.path.join(location, path)
-                if os.path.isfile(abspath):
-                    return abspath
-
-            print_error_and_exit(("'{0}' not found in the "
-                                  "following locations:\n{1}"
-                                  ).format(path, "\n".join(locations)))
-
     def _write_inventory_file(self, tempdir):
         inventory_file = os.path.join(tempdir, "inventory")
         with open(inventory_file, encoding='utf-8', mode='w') as f:
             f.write("[edi]\n{}\n".format(self.target))
         chown_to_user(inventory_file)
         return inventory_file
-
-    def _write_extra_vars_file(self, tempdir, playbookname):
-        extra_vars_file = os.path.join(tempdir,
-                                       "extra_vars_{}".format(playbookname))
-        with open(extra_vars_file, encoding='utf-8', mode='w') as f:
-            extra_vars = self.config.get_playbook_dictionary(self.environment,
-                                                             playbookname)
-            f.write(yaml.dump(extra_vars))
-
-        return extra_vars_file

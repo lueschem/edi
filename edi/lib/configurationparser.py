@@ -77,9 +77,21 @@ class ConfigurationParser():
     def get_compression(self):
         return self._get_general_item("edi_compression", "xz")
 
-    def get_playbooks(self):
+    def get_playbooks(self, environment):
         playbooks = self._get_config().get("playbooks", {})
-        return collections.OrderedDict(sorted(playbooks.items()))
+        ordered_playbooks = collections.OrderedDict(sorted(playbooks.items()))
+        playbook_list = []
+        for name, content in ordered_playbooks.items():
+            path = content.get("path", None)
+            if not path:
+                print_error_and_exit(("Missing path value in playbook '{}'."
+                                      ).format(path))
+            resolved_path = self._resolve_path(path)
+            extra_vars = self._get_playbook_extra_vars(content,
+                                                       environment)
+            playbook_list.append((name, resolved_path, extra_vars))
+
+        return playbook_list
 
     def get_edi_plugin_directory(self):
         return abspath(join(dirname(__file__), "../plugins"))
@@ -92,6 +104,9 @@ class ConfigurationParser():
         self.config_directory = dirname(abspath(base_config_file.name))
         self.config_id = splitext(basename(base_config_file.name))[0]
         if not ConfigurationParser._configurations.get(self.config_id):
+            logging.info(("Load time dictionary:\n{}"
+                          ).format(yaml.dump(self._get_load_time_dictionary(),
+                                             default_flow_style=False)))
             logging.info(("Using base configuration file '{0}'"
                           ).format(base_config_file.name))
             base_config = self._get_base_config(base_config_file)
@@ -193,20 +208,17 @@ class ConfigurationParser():
         load_dict["edi_current_user_uid"] = get_user_uid()
         load_dict["edi_current_user_gid"] = get_user_gid()
         load_dict["edi_host_hostname"] = get_hostname()
-        load_dict["edi_running_in_chroot"] = str(self.running_in_chroot)
+        load_dict["edi_running_in_chroot"] = self.running_in_chroot
         load_dict["edi_work_directory"] = self.get_workdir()
         load_dict["edi_config_directory"] = self.config_directory
         load_dict["edi_edi_plugin_directory"
                   ] = self.get_edi_plugin_directory()
         load_dict["edi_project_plugin_directory"
                   ] = self.get_project_plugin_directory()
-        logging.info("Load time dictionary:\n{}".format(load_dict))
         return load_dict
 
-    def get_playbook_dictionary(self, environment, playbook):
-        # TODO: return the playbook stuff as a list of tuples:
-        # (tool, path, dict)
-        playbook_dict = self._get_load_time_dictionary()
+    def _get_playbook_extra_vars(self, playbook_node, environment):
+        extra_vars = self._get_load_time_dictionary()
         if self.get_use_case() not in _supported_use_cases:
             print_error_and_exit(("Use case '{0}' is not supported.\n"
                                   "Choose from: {1}."
@@ -217,21 +229,38 @@ class ConfigurationParser():
 
         for env in _supported_environments:
             if env == environment:
-                playbook_dict[env] = True
+                extra_vars[env] = True
             else:
-                playbook_dict[env] = False
+                extra_vars[env] = False
 
         for uc in _supported_use_cases:
             if uc == self.get_use_case():
-                playbook_dict[uc] = True
+                extra_vars[uc] = True
             else:
-                playbook_dict[uc] = False
+                extra_vars[uc] = False
 
-        parameters = self._get_config().get("playbooks", {}
-                                            ).get(playbook, {}
-                                                  ).get("parameters", None)
+        parameters = playbook_node.get("parameters", None)
 
         if parameters:
-            return dict(playbook_dict, **parameters)
+            return dict(extra_vars, **parameters)
 
-        return playbook_dict
+        return extra_vars
+
+    def _resolve_path(self, path):
+        if os.path.isabs(path):
+            if not os.path.isfile(path):
+                print_error_and_exit(("'{}' does not exist."
+                                      ).format(path))
+            return path
+        else:
+            locations = [self.get_project_plugin_directory(),
+                         self.get_edi_plugin_directory()]
+
+            for location in locations:
+                abspath = os.path.join(location, path)
+                if os.path.isfile(abspath):
+                    return abspath
+
+            print_error_and_exit(("'{0}' not found in the "
+                                  "following locations:\n{1}"
+                                  ).format(path, "\n".join(locations)))
