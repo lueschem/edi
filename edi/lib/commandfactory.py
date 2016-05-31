@@ -18,6 +18,7 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
+from edi.lib.helpers import print_error_and_exit
 
 _command_anchor = "edicommand"
 
@@ -46,5 +47,10 @@ class CommandFactory(type):
         new_class = super(CommandFactory, cls).__new__(cls, clsname,
                                                        bases, attrs)
         if clsname.lower() != _command_anchor:
-            _command_registry[new_class._get_command_name()] = new_class
+            new_key = new_class._get_command_name()
+            if _command_registry.get(new_key):
+                print_error_and_exit(("A command named '{}' has "
+                                      "already been registered"
+                                      ).format(new_key))
+            _command_registry[new_key] = new_class
         return new_class
