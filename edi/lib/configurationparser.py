@@ -29,7 +29,7 @@ from aptsources.sourceslist import SourceEntry
 from edi.lib.helpers import (get_user, get_user_gid, get_user_uid,
                              get_hostname, print_error_and_exit)
 
-_supported_environments = ["edi_env_lxc", "edi_env_bare_metal"]
+_supported_environments = ["edi_env_lxc", "edi_env_baremetal"]
 
 _supported_use_cases = ["edi_uc_run", "edi_uc_build",
                         "edi_uc_test", "edi_uc_develop"]
@@ -72,10 +72,10 @@ class ConfigurationParser():
         return SourceEntry(repository).comps
 
     def get_use_case(self):
-        return self._get_global_configuration_item("use_case", "edi_uc_run")
+        return self._get_general_item("edi_use_case", "edi_uc_run")
 
     def get_compression(self):
-        return self._get_global_configuration_item("compression", "xz")
+        return self._get_general_item("edi_compression", "xz")
 
     def get_playbooks(self):
         playbooks = self._get_config().get("playbooks", {})
@@ -95,14 +95,15 @@ class ConfigurationParser():
             logging.info(("Using base configuration file '{0}'"
                           ).format(base_config_file.name))
             base_config = self._get_base_config(base_config_file)
-            all_config = self._get_overlay_config(base_config_file, "all")
-            host_config = self._get_overlay_config(base_config_file,
-                                                   get_hostname())
+            global_config = self._get_overlay_config(base_config_file,
+                                                     "global")
+            system_config = self._get_overlay_config(base_config_file,
+                                                     get_hostname())
             user_config = self._get_overlay_config(base_config_file,
                                                    get_user())
 
-            merge_1 = self._merge_configurations(base_config, all_config)
-            merge_2 = self._merge_configurations(merge_1, host_config)
+            merge_1 = self._merge_configurations(base_config, global_config)
+            merge_2 = self._merge_configurations(merge_1, system_config)
             merged_config = self._merge_configurations(merge_2, user_config)
 
             ConfigurationParser._configurations[self.config_id] = merged_config
@@ -132,7 +133,7 @@ class ConfigurationParser():
     def _merge_configurations(self, base, overlay):
         merged_config = {}
 
-        elements = ["global_configuration", "bootstrap"]
+        elements = ["general", "bootstrap"]
         for element in elements:
             merged_config[element
                           ] = self._merge_key_value_node(base, overlay,
@@ -182,8 +183,8 @@ class ConfigurationParser():
         return self._get_config().get("bootstrap", {}
                                       ).get(item, default)
 
-    def _get_global_configuration_item(self, item, default):
-        return self._get_config().get("global_configuration", {}
+    def _get_general_item(self, item, default):
+        return self._get_config().get("general", {}
                                       ).get(item, default)
 
     def _get_load_time_dictionary(self):

@@ -25,14 +25,14 @@ from edi.lib.configurationparser import ConfigurationParser
 
 sample_file = """
 ---
-global_configuration:
-    use_case:           edi_uc_run
-    compression:        gz
+general:
+    edi_use_case:           edi_uc_run
+    edi_compression:        gz
 
 bootstrap:
-    tool:               debootstrap
-    architecture:       amd64
-    repository:         deb http://ftp.ch.debian.org/debian/ jessie main
+    tool:                   debootstrap
+    architecture:           amd64
+    repository:             deb http://ftp.ch.debian.org/debian/ jessie main
 
 playbooks:
     10_base_system:
@@ -46,22 +46,22 @@ playbooks:
         path:               debian/networking/main.yml
 """
 
-sample_all_file = """
-global_configuration:
+sample_global_file = """
+general:
     # change the use case:
-    use_case:           edi_uc_develop
+    edi_use_case:           edi_uc_develop
 
 bootstrap:
     repository_key:     https://ftp-master.debian.org/keys/archive-key-8.asc
 """
 
-sample_host_file = """
-global_configuration:
+sample_system_file = """
+general:
     # change the use case:
-    use_case:           edi_uc_build
+    edi_use_case:           edi_uc_build
 
 bootstrap:
-    architecture:       i386
+    architecture:           i386
 
 playbooks:
     30_foo:
@@ -70,9 +70,9 @@ playbooks:
 
 sample_user_file = """
 ---
-global_configuration:
+general:
     # change the use case again:
-    use_case:           edi_uc_test
+    edi_use_case:           edi_uc_test
 
 # apply no changes to bootstrap section
 
@@ -93,15 +93,15 @@ def config_files(tmpdir_factory):
     main_file = "{0}.yml".format(config_name)
     with open(str(dir_name.join(main_file)), "w") as file:
         file.write(sample_file)
-    all_file = "{0}.{1}.yml".format(config_name, "all")
-    with open(str(dir_name.join(all_file)), "w") as file:
-        file.write(sample_all_file)
+    global_file = "{0}.{1}.yml".format(config_name, "global")
+    with open(str(dir_name.join(global_file)), "w") as file:
+        file.write(sample_global_file)
     user_file = "{0}.{1}.yml".format(config_name, get_user())
     with open(str(dir_name.join(user_file)), "w") as file:
         file.write(sample_user_file)
     host_file = "{0}.{1}.yml".format(config_name, get_hostname())
     with open(str(dir_name.join(host_file)), "w") as file:
-        file.write(sample_host_file)
+        file.write(sample_system_file)
     return str(dir_name.join(main_file))
 
 
