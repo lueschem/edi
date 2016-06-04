@@ -77,21 +77,21 @@ class ConfigurationParser():
     def get_compression(self):
         return self._get_general_item("edi_compression", "xz")
 
-    def get_playbooks(self, environment):
-        playbooks = self._get_config().get("playbooks", {})
-        ordered_playbooks = collections.OrderedDict(sorted(playbooks.items()))
-        playbook_list = []
-        for name, content in ordered_playbooks.items():
+    def get_ordered_items(self, section, environment):
+        citems = self._get_config().get(section, {})
+        ordered_items = collections.OrderedDict(sorted(citems.items()))
+        item_list = []
+        for name, content in ordered_items.items():
             path = content.get("path", None)
             if not path:
                 print_error_and_exit(("Missing path value in playbook '{}'."
                                       ).format(path))
             resolved_path = self._resolve_path(path)
-            extra_vars = self._get_playbook_extra_vars(content,
-                                                       environment)
-            playbook_list.append((name, resolved_path, extra_vars))
+            node_dict = self._get_node_dictionary(content,
+                                                  environment)
+            item_list.append((name, resolved_path, node_dict))
 
-        return playbook_list
+        return item_list
 
     def get_edi_plugin_directory(self):
         return abspath(join(dirname(__file__), "../plugins"))
@@ -154,7 +154,8 @@ class ConfigurationParser():
                           ] = self._merge_key_value_node(base, overlay,
                                                          element)
 
-        nested_elements = ["playbooks", "keys"]
+        nested_elements = ["playbooks", "keys", "lxc_templates",
+                           "lxc_profiles"]
         for element in nested_elements:
             merged_config[element
                           ] = self._merge_nested_node(base, overlay,
@@ -217,8 +218,8 @@ class ConfigurationParser():
                   ] = self.get_project_plugin_directory()
         return load_dict
 
-    def _get_playbook_extra_vars(self, playbook_node, environment):
-        extra_vars = self._get_load_time_dictionary()
+    def _get_node_dictionary(self, node, environment):
+        node_dict = self._get_load_time_dictionary()
         if self.get_use_case() not in _supported_use_cases:
             print_error_and_exit(("Use case '{0}' is not supported.\n"
                                   "Choose from: {1}."
@@ -229,22 +230,22 @@ class ConfigurationParser():
 
         for env in _supported_environments:
             if env == environment:
-                extra_vars[env] = True
+                node_dict[env] = True
             else:
-                extra_vars[env] = False
+                node_dict[env] = False
 
         for uc in _supported_use_cases:
             if uc == self.get_use_case():
-                extra_vars[uc] = True
+                node_dict[uc] = True
             else:
-                extra_vars[uc] = False
+                node_dict[uc] = False
 
-        parameters = playbook_node.get("parameters", None)
+        parameters = node.get("parameters", None)
 
         if parameters:
-            return dict(extra_vars, **parameters)
+            return dict(node_dict, **parameters)
 
-        return extra_vars
+        return node_dict
 
     def _resolve_path(self, path):
         if os.path.isabs(path):

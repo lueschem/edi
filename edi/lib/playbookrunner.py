@@ -46,7 +46,8 @@ class PlaybookRunner():
             chown_to_user(tempdir)
             inventory = self._write_inventory_file(tempdir)
 
-            playbook_list = self.config.get_playbooks(self.environment)
+            playbook_list = self.config.get_ordered_items("playbooks",
+                                                          self.environment)
             for name, path, extra_vars in playbook_list:
                 logging.info(("Running playbook {} located in "
                               "{} with extra vars:\n{}"

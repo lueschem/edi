@@ -18,6 +18,16 @@ playbooks:
 #    20_networking:
 #        path:               playbooks/debian/networking/main.yml
 
+lxc_templates:
+    10_etc_hostname:
+        path:               lxc_templates/debian/hostname/hostname.yml
+    20_etc_hosts:
+        path:               lxc_templates/debian/hosts/hosts.yml
+
+lxc_profiles:
+    10_lxcif:
+        path:               lxc_profiles/debian/lxcif/lxcif.yml
+
 keys:
     {{ edi_current_user_name }}:
         type:               ssh

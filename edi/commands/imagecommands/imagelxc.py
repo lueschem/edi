@@ -26,6 +26,8 @@ import time
 import calendar
 import yaml
 import shutil
+import glob
+from jinja2 import Template
 from codecs import open
 from edi.commands.image import Image
 from edi.commands.imagecommands.bootstrap import Bootstrap
@@ -100,6 +102,37 @@ class Lxc(Image):
         metadata = {}
         metadata["architecture"] = self.config.get_architecture()
         metadata["creation_date"] = calendar.timegm(time.gmtime())
+
+        template_node = {}
+        template_list = self.config.get_ordered_items("lxc_templates",
+                                                      "edi_env_lxc")
+
+        if template_list:
+            templates_dest = os.path.join(imagedir, "templates")
+            os.mkdir(templates_dest)
+
+        for name, path, dictionary in template_list:
+            logging.info(("Loading template {} located in "
+                          "{} with dictionary:\n{}"
+                          ).format(name, path,
+                                   yaml.dump(dictionary,
+                                             default_flow_style=False)))
+
+            with open(path, encoding="UTF-8", mode="r") as template_file:
+                template = Template(template_file.read())
+                sub_node = yaml.load(template.render(dictionary))
+
+            template_node = dict(template_node, **sub_node)
+
+            templates_src = os.path.dirname(path)
+
+            tpl_files = glob.iglob(os.path.join(templates_src, "*.tpl"))
+            for tpl_file in tpl_files:
+                if os.path.isfile(tpl_file):
+                    shutil.copy(tpl_file, templates_dest)
+
+        if template_node:
+            metadata["templates"] = template_node
 
         metadatafile = os.path.join(imagedir, "metadata.yaml")
 
