@@ -25,8 +25,8 @@ lxc_templates:
         path:               lxc_templates/debian/hosts/hosts.yml
 
 lxc_profiles:
-    10_lxcif:
-        path:               lxc_profiles/debian/lxcif/lxcif.yml
+    10_lxcif0:
+        path:               lxc_profiles/general/lxcif0/lxcif0.yml
 
 keys:
     {{ edi_current_user_name }}:

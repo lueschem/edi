@@ -23,6 +23,7 @@ import logging
 import subprocess
 from edi.commands.lxc import Lxc
 from edi.commands.lxccommands.importcmd import Import
+from edi.commands.lxccommands.profile import Profile
 from edi.lib.helpers import print_error_and_exit
 from edi.lib.shellhelpers import run
 from edi.lib.networkhelpers import is_valid_hostname
@@ -57,11 +58,10 @@ class Launch(Lxc):
             logging.info(("Container {0} is already existing. "
                           "Destroy it to regenerate it or reconfigure it."
                           ).format(self._result()))
-            return self._result()
-
-        image = Import().run(config_file)
-
-        self._launch_container(image)
+        else:
+            image = Import().run(config_file)
+            profiles = Profile().run(config_file)
+            self._launch_container(image, profiles)
 
         return self._result()
 
@@ -76,10 +76,12 @@ class Launch(Lxc):
         result = run(cmd, check=False, stderr=subprocess.PIPE)
         return result.returncode == 0
 
-    def _launch_container(self, image):
+    def _launch_container(self, image, profiles):
         cmd = []
         cmd.append("lxc")
         cmd.append("launch")
         cmd.append("local:{}".format(image))
         cmd.append(self._result())
+        for profile in profiles:
+            cmd.extend(["-p", profile])
         run(cmd)
