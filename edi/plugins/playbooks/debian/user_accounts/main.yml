@@ -1,0 +1,13 @@
+- hosts: edi
+  roles:
+    - role: current_user
+      become: True
+      become_user: root
+      # do not add the current user on a production system (edi_uc_run and edi_env_baremetal).
+      when: edi_uc_test or edi_uc_build or edi_uc_develop or edi_env_lxc
+    - role: ansible_user
+      become: True
+      become_user: root
+      # do not add the ansible user on a production system (edi_uc_run and edi_env_baremetal).
+      when: edi_uc_test or edi_uc_build or edi_uc_develop or edi_env_lxc
+

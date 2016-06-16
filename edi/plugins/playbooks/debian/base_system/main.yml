@@ -1,8 +1,6 @@
 - hosts: edi
-  vars:
-       message: "Hello world!"
   roles:
-    - role: apt
+    - role: apt_setup
       become: True
       become_user: root
 
