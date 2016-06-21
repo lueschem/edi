@@ -92,16 +92,19 @@ def config_files(tmpdir_factory):
     main_file = "{0}.yml".format(config_name)
     with open(str(dir_name.join(main_file)), "w") as file:
         file.write(sample_file)
-    global_file = "{0}.{1}.yml".format(config_name, "global")
-    with open(str(dir_name.join(global_file)), "w") as file:
-        file.write(sample_global_file)
-    user_file = "{0}.{1}.yml".format(config_name, get_user())
-    with open(str(dir_name.join(user_file)), "w") as file:
-        file.write(sample_user_file)
-    host_file = "{0}.{1}.yml".format(config_name, get_hostname())
-    with open(str(dir_name.join(host_file)), "w") as file:
-        file.write(sample_system_file)
-    playbook_dir = dir_name.join("plugins/playbooks")
+
+    overlay_dir = dir_name.join("configuration", "overlay")
+    os.makedirs(str(overlay_dir))
+    overlays = [("global", sample_global_file),
+                (get_user(), sample_user_file),
+                (get_hostname(), sample_system_file)]
+    for overlay in overlays:
+        o_type, o_content = overlay
+        o_file_name = "{0}.{1}.yml".format(config_name, o_type)
+        with open(str(overlay_dir.join(o_file_name)), "w") as o_file:
+            o_file.write(o_content)
+
+    playbook_dir = dir_name.join("plugins", "playbooks")
     os.makedirs(str(playbook_dir))
     with open(str(playbook_dir.join("foo.yml")), "w") as file:
         file.write("baz")

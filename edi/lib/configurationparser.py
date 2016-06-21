@@ -135,10 +135,14 @@ class ConfigurationParser():
         return yaml.load(self._parse_jina2_file(config_file))
 
     def _get_overlay_config(self, base_config_file, overlay_name):
-        filename, file_extension = splitext(base_config_file.name)
-        fn = "{0}.{1}{2}".format(filename, overlay_name, file_extension)
-        if isfile(fn) and os.access(fn, os.R_OK):
-            with open(fn, encoding="UTF-8", mode="r") as config_file:
+        fname, extension = splitext(basename(base_config_file.name))
+        directory = dirname(base_config_file.name)
+        overlay_file = "{0}.{1}{2}".format(fname, overlay_name,
+                                           extension)
+        overlay = join(directory, "configuration", "overlay",
+                       overlay_file)
+        if isfile(overlay) and os.access(overlay, os.R_OK):
+            with open(overlay, encoding="UTF-8", mode="r") as config_file:
                 logging.info(("Using overlay configuration file '{0}'"
                               ).format(config_file.name))
                 return yaml.load(self._parse_jina2_file(config_file))
