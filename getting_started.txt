@@ -1,0 +1,11 @@
+git clone https://gitlab.com/lueschem/edi.git
+cd edi
+sudo apt install git-buildpackage python3-setuptools python3-setuptools-scm python3-sphinx python3-argcomplete python3-pytest pep8 python3-pip python3-gnupg python3-yaml ansible lxd debootstrap
+---> Todo: add python3-pip python3-gnupg python3-yaml
+sudo lxd init
+---> default settings are ok, 
+---> use the storage backend dir if there is no zfs setup
+debuild -us -uc
+source local_setup
+cd examples/advanced/
+sudo edi lxc launch my-first-edi-container advanced_test.yml
