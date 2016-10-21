@@ -66,9 +66,11 @@ def run(popenargs, sudo=False, input=None, timeout=None,
     return result
 
 
-def _get_umount_cmd(mountpoint):
+def _get_umount_cmd(mountpoint, lazy=False):
     umount_cmd = []
     umount_cmd.append("umount")
+    if lazy:
+        umount_cmd.append("--lazy")
     umount_cmd.append(mountpoint)
     return umount_cmd
 
@@ -128,7 +130,7 @@ def _mount_dev_ro(rootfs):
 
         yield
     finally:
-        run(_get_umount_cmd(mountpoint), sudo=True)
+        run(_get_umount_cmd(mountpoint, lazy=True), sudo=True)
 
 
 @contextmanager
