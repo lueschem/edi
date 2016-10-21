@@ -147,3 +147,9 @@ class Lxc(Image):
             clean_cmd.append("apt-get")
             clean_cmd.append("clean")
             run(clean_cmd, sudo=True)
+
+            apt_list_cmd = get_chroot_cmd(rootfs)
+            apt_list_cmd.append("rm")
+            apt_list_cmd.append("-rf")
+            apt_list_cmd.append("/var/lib/apt/lists/")
+            run(apt_list_cmd, sudo=True)
