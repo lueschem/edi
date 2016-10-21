@@ -33,6 +33,7 @@ from edi.commands.image import Image
 from edi.commands.imagecommands.bootstrap import Bootstrap
 from edi.lib.helpers import chown_to_user
 from edi.lib.playbookrunner import PlaybookRunner
+from edi.lib.shellhelpers import run, mount_proc_sys_dev, get_chroot_cmd
 
 
 class Lxc(Image):
@@ -78,6 +79,7 @@ class Lxc(Image):
                                              "edi_env_lxc",
                                              running_in_chroot=True)
             playbook_runner.run_all()
+            self._postprocess_rootfs(rootfsdir)
             archive = self._pack_image(tempdir, lxcimagedir)
             chown_to_user(archive)
             shutil.move(archive, self._result())
@@ -138,3 +140,10 @@ class Lxc(Image):
 
         with open(metadatafile, encoding='utf-8', mode='w') as f:
             f.write(yaml.dump(metadata))
+
+    def _postprocess_rootfs(self, rootfs):
+        with mount_proc_sys_dev(rootfs):
+            clean_cmd = get_chroot_cmd(rootfs)
+            clean_cmd.append("apt-get")
+            clean_cmd.append("clean")
+            run(clean_cmd, sudo=True)
