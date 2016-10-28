@@ -23,7 +23,6 @@ from edi.commands.imagecommands.bootstrap import Bootstrap
 from tests.fixtures.configfiles import config_files
 import os
 import subprocess
-import shutil
 
 
 _ADAPTIVE = -42
@@ -31,9 +30,9 @@ _ADAPTIVE = -42
 
 def test_bootstrap(config_files, monkeypatch):
     with open(config_files, "r") as main_file:
-        def fakeroot():
+        def fakegetuid():
             return 0
-        monkeypatch.setattr(os, 'getuid', fakeroot)
+        monkeypatch.setattr(os, 'getuid', fakegetuid)
 
         def fakerun(*popenargs, **kwargs):
             print(popenargs)
