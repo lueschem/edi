@@ -85,7 +85,7 @@ playbooks:
 config_name = "sample"
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope='function')
 def config_files(tmpdir_factory):
     dir_name = tmpdir_factory.mktemp('configuration')
     main_file = "{0}.yml".format(config_name)

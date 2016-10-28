@@ -49,8 +49,4 @@ def test_bootstrap(config_files, monkeypatch):
 
         monkeypatch.chdir(os.path.dirname(config_files))
 
-        #def fakelistdir(*args, **kwargs):
-        #    return ["foo", "bar"]
-        #monkeypatch.setattr(os, 'listdir', fakelistdir)
-
         Bootstrap().run(main_file)
