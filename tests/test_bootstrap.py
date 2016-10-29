@@ -42,10 +42,22 @@ def test_bootstrap(config_files, monkeypatch):
                     os.mkdir(rootfspath)
             elif popenargs[0][0] == "tar":
                 archive = popenargs[0][-1]
-                open(archive, mode="w").close()
+                with open(archive, mode="w") as fakearchive:
+                    fakearchive.write("fake archive")
             return subprocess.CompletedProcess("fakerun", 0)
         monkeypatch.setattr(subprocess, 'run', fakerun)
 
         monkeypatch.chdir(os.path.dirname(config_files))
 
-        Bootstrap().run(main_file)
+        bootstrap_cmd = Bootstrap()
+        bootstrap_cmd.run(main_file)
+        expected_result = bootstrap_cmd._result()
+        assert os.path.exists(expected_result)
+
+        previous_result_text = "previous result"
+        with open(expected_result, mode="w") as previous_result:
+            previous_result.write(previous_result_text)
+        bootstrap_cmd2 = Bootstrap()
+        bootstrap_cmd2.run(main_file)
+        with open(expected_result, mode="r") as same_result:
+            assert same_result.read() == previous_result_text
