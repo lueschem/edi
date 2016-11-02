@@ -19,8 +19,24 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
-from edi.commands.imagecommands import *
-from edi.commands.lxccommands import *
-from edi.commands.configcommands import *
+from edi.commands.config import Config
 
-__all__ = ["config", "image", "lxc", "version", "clean"]
+
+class Clean(Config):
+    @classmethod
+    def advertise(cls, subparsers):
+        help_text = "clean all intermediate configuration items"
+        description_text = "Clean all intermediate configuration items."
+        parser = subparsers.add_parser(cls._get_short_command_name(),
+                                       help=help_text,
+                                       description=description_text)
+        cls._require_config_file(parser)
+
+    def run_cli(self, cli_args):
+        self.run(cli_args.config_file)
+
+    def run(self, config_file):
+        self.clean(config_file)
+
+    def clean(self, config_file):
+        self._clean_siblings_and_sub_commands(config_file)
