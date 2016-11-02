@@ -17,6 +17,8 @@ playbooks:
             kernel_package: linux-image-amd64
     20_user_accounts:
         path:               playbooks/debian/user_accounts/main.yml
+    30_base_networking:
+        path:               playbooks/debian/base_networking/main.yml
 
 lxc_templates:
     10_etc_hostname:

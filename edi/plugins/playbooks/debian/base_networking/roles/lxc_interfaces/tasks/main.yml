@@ -1,0 +1,5 @@
+- name: Add resolvconf to container.
+  apt: name=resolvconf state=installed install_recommends=no
+
+- name: Add lxcif0 interface to container.
+  copy: src=lxcif0 dest=/etc/network/interfaces.d/
