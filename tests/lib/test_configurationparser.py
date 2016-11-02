@@ -20,7 +20,7 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 from edi.lib.configurationparser import ConfigurationParser
-from tests.fixtures.configfiles import config_files, config_name
+from tests.libtesting.fixtures.configfiles import config_files, config_name
 
 
 def test_project_name(config_files):
