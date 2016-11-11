@@ -5,11 +5,16 @@ Project description goes here.
 
 ----
 
-Usage, ...
+Getting Started
++++++++++++++++
+
+See chapter `getting started`_.
+
+.. _getting started:  docs/getting_started.rst
 
 Reference List
 ++++++++++++++
 
-See `reference list`_.
+See chapter `reference list`_.
 
 .. _reference list: docs/reference_list.rst

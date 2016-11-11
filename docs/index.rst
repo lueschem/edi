@@ -11,6 +11,7 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+   getting_started
    reference_list
    command_cheat_sheet
 
