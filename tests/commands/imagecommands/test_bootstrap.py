@@ -22,6 +22,7 @@
 from edi.commands.imagecommands.bootstrap import Bootstrap
 from tests.libtesting.fixtures.configfiles import config_files
 import os
+import shutil
 import subprocess
 
 
@@ -33,6 +34,11 @@ def test_bootstrap(config_files, monkeypatch):
         def fakegetuid():
             return 0
         monkeypatch.setattr(os, 'getuid', fakegetuid)
+
+        def fakechown(*_):
+            pass
+
+        monkeypatch.setattr(shutil, 'chown', fakechown)
 
         def fakerun(*popenargs, **kwargs):
             print(popenargs)
