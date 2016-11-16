@@ -27,7 +27,7 @@ from codecs import open
 from edi.lib.helpers import chown_to_user
 from docutils.parsers.rst.directives import path
 from edi.lib.helpers import require_executable
-from edi.lib.shellhelpers import run, resolv_conf
+from edi.lib.shellhelpers import run, host_resolv_conf
 
 
 class PlaybookRunner():
@@ -75,7 +75,7 @@ class PlaybookRunner():
             cmd.append("-vvvv")
 
         if self.running_in_chroot:
-            with resolv_conf(self.target):
+            with host_resolv_conf(self.target):
                 run(cmd, sudo=self.running_in_chroot)
         else:
             # TODO: implement non chroot version

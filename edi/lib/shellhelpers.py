@@ -134,22 +134,18 @@ def _mount_dev_ro(rootfs):
 
 
 @contextmanager
-def resolv_conf(rootfs):
+def host_resolv_conf(rootfs):
     resolv_conf = "etc/resolv.conf"
     resolv_conf_backup = "etc/resolv.conf.edibackup"
     src = os.path.join("/", resolv_conf)
     dest = os.path.join(rootfs, resolv_conf)
     backup = os.path.join(rootfs, resolv_conf_backup)
-    file_copied = False
-    recover_link = False
-    if os.path.islink(dest):
-        file_copied = True
-        recover_link = True
+    has_backup = False
+    if os.path.islink(dest) or os.path.isfile(dest):
+        has_backup = True
         shutil.move(dest, backup)
-        shutil.copy(src, dest)
-    elif not os.path.isfile(dest):
-        file_copied = True
-        shutil.copy(src, dest)
+
+    shutil.copy(src, dest)
 
     assert os.path.isfile(dest)
     file_date_1 = os.path.getmtime(dest)
@@ -160,10 +156,11 @@ def resolv_conf(rootfs):
         if os.path.isfile(dest):
             file_date_2 = os.path.getmtime(dest)
             if file_date_1 == file_date_2:  # resolv.conf has not been modified
-                if file_copied:
-                    os.remove(dest)
-                if recover_link:
+                os.remove(dest)
+                if has_backup:
                     shutil.move(backup, dest)
+            elif has_backup:
+                os.remove(backup)
 
 
 @contextmanager
