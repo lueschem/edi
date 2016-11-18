@@ -26,7 +26,7 @@ import yaml
 from codecs import open
 from edi.lib.helpers import chown_to_user
 from docutils.parsers.rst.directives import path
-from edi.lib.helpers import require_executable
+from edi.lib.helpers import require_executable, get_user
 from edi.lib.shellhelpers import run, host_resolv_conf
 
 
@@ -74,9 +74,12 @@ class PlaybookRunner():
         if logging.getLogger().isEnabledFor(logging.DEBUG):
             cmd.append("-vvvv")
 
+        ansible_env = os.environ.copy()
+        ansible_env['ANSIBLE_REMOTE_TEMP'] = '/tmp/ansible-{}'.format(get_user())
+
         if self.running_in_chroot:
             with host_resolv_conf(self.target):
-                run(cmd, sudo=self.running_in_chroot)
+                run(cmd, sudo=self.running_in_chroot, env=ansible_env)
         else:
             # TODO: implement non chroot version
             assert False
