@@ -53,6 +53,13 @@ edi is still a very young project and therefore interfaces might change quickly 
 Documentation
 +++++++++++++
 
-Please check here if you need additional `documentation`_.
+Please check here if you need additional documentation:
 
-.. _documentation: docs/index.rst
+- `Getting started`_
+- `Command cheat sheet`_
+- `Reference list`_
+
+.. _Getting started: docs/getting_started.rst
+.. _Command cheat sheet: docs/command_cheat_sheet.rst
+.. _Reference list: docs/reference_list.rst
+
