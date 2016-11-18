@@ -24,6 +24,7 @@ from tests.libtesting.fixtures.configfiles import config_files
 import os
 import shutil
 import subprocess
+import requests_mock
 
 
 _ADAPTIVE = -42
@@ -56,7 +57,10 @@ def test_bootstrap(config_files, monkeypatch):
         monkeypatch.chdir(os.path.dirname(config_files))
 
         bootstrap_cmd = Bootstrap()
-        bootstrap_cmd.run(main_file)
+        with requests_mock.Mocker() as m:
+            m.get('https://ftp-master.debian.org/keys/archive-key-8.asc', text='key file mockup')
+            bootstrap_cmd.run(main_file)
+
         expected_result = bootstrap_cmd._result()
         assert os.path.exists(expected_result)
 
