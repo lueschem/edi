@@ -17,8 +17,8 @@ playbooks:
         path:               playbooks/debian/base_system/main.yml
         parameters:
             kernel_package: linux-image-amd64
-    030_user_accounts:
-        path:               playbooks/debian/user_accounts/main.yml
+    030_development_user_facilities:
+        path:               playbooks/debian/development_user_facilities/main.yml
 
 lxc_templates:
     010_etc_hostname:
@@ -33,5 +33,5 @@ lxc_profiles:
 keys:
     {{ edi_current_user_name }}:
         type:               ssh
-    ansible:
+    edicfgmgmt:
         type:               ssh

@@ -1,0 +1,8 @@
+- hosts: edi
+  roles:
+    - role: host_user_as_target_user
+      become: True
+      become_user: root
+      # do not add the current user on a production system (edi_uc_run).
+      when: not edi_uc_run
+
