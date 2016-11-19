@@ -10,7 +10,7 @@ Prerequisites
 
    ::
 
-     sudo apt install git-buildpackage python3-setuptools python3-setuptools-scm python3-sphinx python3-argcomplete python3-pytest pep8 python3-pip python3-gnupg python3-yaml lxd debootstrap debhelper
+     sudo apt install git-buildpackage python3-setuptools python3-setuptools-scm python3-sphinx python3-argcomplete python3-pytest python3-pytest-cov pep8 python3-pip python3-gnupg python3-yaml lxd debootstrap debhelper
 
 #. Install Ansible with a version >= 2.1. On Ubuntu 16.04 you have to enable xenial-backports and then install Ansible as follows:
 
