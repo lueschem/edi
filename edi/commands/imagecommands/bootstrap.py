@@ -153,7 +153,3 @@ class Bootstrap(Image):
         apt_list_cmd.append("-rf")
         apt_list_cmd.append("/var/lib/apt/lists/")
         run(apt_list_cmd, sudo=True)
-
-        resolv_conf = os.path.join(rootfs, "etc/resolv.conf")
-        if os.path.isfile(resolv_conf):
-            os.remove(resolv_conf)
