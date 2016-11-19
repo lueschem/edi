@@ -136,25 +136,24 @@ class Bootstrap(Image):
         return rootfs
 
     def _postprocess_rootfs(self, rootfs, key_data):
-        with mount_proc_sys_dev(rootfs):
-            if key_data:
-                key_cmd = get_chroot_cmd(rootfs)
-                key_cmd.append("apt-key")
-                key_cmd.append("add")
-                key_cmd.append("-")
-                run(key_cmd, input=key_data, sudo=True)
+        if key_data:
+            key_cmd = get_chroot_cmd(rootfs)
+            key_cmd.append("apt-key")
+            key_cmd.append("add")
+            key_cmd.append("-")
+            run(key_cmd, input=key_data, sudo=True)
 
-            clean_cmd = get_chroot_cmd(rootfs)
-            clean_cmd.append("apt-get")
-            clean_cmd.append("clean")
-            run(clean_cmd, sudo=True)
+        clean_cmd = get_chroot_cmd(rootfs)
+        clean_cmd.append("apt-get")
+        clean_cmd.append("clean")
+        run(clean_cmd, sudo=True)
 
-            apt_list_cmd = get_chroot_cmd(rootfs)
-            apt_list_cmd.append("rm")
-            apt_list_cmd.append("-rf")
-            apt_list_cmd.append("/var/lib/apt/lists/")
-            run(apt_list_cmd, sudo=True)
+        apt_list_cmd = get_chroot_cmd(rootfs)
+        apt_list_cmd.append("rm")
+        apt_list_cmd.append("-rf")
+        apt_list_cmd.append("/var/lib/apt/lists/")
+        run(apt_list_cmd, sudo=True)
 
-            resolv_conf = os.path.join(rootfs, "etc/resolv.conf")
-            if os.path.isfile(resolv_conf):
-                os.remove(resolv_conf)
+        resolv_conf = os.path.join(rootfs, "etc/resolv.conf")
+        if os.path.isfile(resolv_conf):
+            os.remove(resolv_conf)
