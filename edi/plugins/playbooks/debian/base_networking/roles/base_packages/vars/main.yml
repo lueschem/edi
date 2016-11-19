@@ -1,2 +1,0 @@
----
-networking_packages: [netbase, net-tools, iputils-ping, ifupdown, isc-dhcp-client]

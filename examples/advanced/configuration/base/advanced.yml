@@ -11,23 +11,23 @@ bootstrap:
     repository_key:         https://ftp-master.debian.org/keys/archive-key-8.asc
 
 playbooks:
-    10_base_system:
+    010_lxc_networking:
+        path:               playbooks/debian/lxc_networking/main.yml
+    020_base_system:
         path:               playbooks/debian/base_system/main.yml
         parameters:
             kernel_package: linux-image-amd64
-    20_user_accounts:
+    030_user_accounts:
         path:               playbooks/debian/user_accounts/main.yml
-    30_base_networking:
-        path:               playbooks/debian/base_networking/main.yml
 
 lxc_templates:
-    10_etc_hostname:
+    010_etc_hostname:
         path:               lxc_templates/debian/hostname/hostname.yml
-    20_etc_hosts:
+    020_etc_hosts:
         path:               lxc_templates/debian/hosts/hosts.yml
 
 lxc_profiles:
-    10_lxcif0:
+    010_lxcif0:
         path:               lxc_profiles/general/lxcif0/lxcif0.yml
 
 keys:

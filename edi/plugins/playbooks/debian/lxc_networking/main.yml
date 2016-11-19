@@ -1,8 +1,5 @@
 - hosts: edi
   roles:
-    - role: base_packages
-      become: True
-      become_user: root
     - role: lxc_interfaces
       become: True
       become_user: root

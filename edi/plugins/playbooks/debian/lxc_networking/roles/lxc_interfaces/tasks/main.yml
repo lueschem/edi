@@ -1,0 +1,7 @@
+- name: Add lxcif0 interface to container.
+  copy: src=lxcif0 dest=/etc/network/interfaces.d/
+  register: lxcif0_result
+
+- name: Bring up lxcif0.
+  command: ifup lxcif0
+  when: lxcif0_result.changed
