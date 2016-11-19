@@ -8,7 +8,6 @@ __pycache__/
 *.so
 *~
 .eggs/
-.idea/
 
 # pytest
 .cache
@@ -32,3 +31,9 @@ debian/files
 
 # edi results
 *.tar.*
+
+# Ansible
+*.retry
+
+# development IDEs
+.idea/
