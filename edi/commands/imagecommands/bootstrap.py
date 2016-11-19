@@ -28,7 +28,7 @@ import logging
 from edi.commands.image import Image
 from edi.lib.helpers import (require_executable, print_error_and_exit,
                              chown_to_user)
-from edi.lib.shellhelpers import run, mount_proc_sys_dev, get_chroot_cmd
+from edi.lib.shellhelpers import run, get_chroot_cmd
 
 
 class Bootstrap(Image):
@@ -47,7 +47,7 @@ class Bootstrap(Image):
         print("Generated {0}.".format(result))
 
     def run(self, config_file):
-        self._setup_parser(config_file, running_in_chroot=True)
+        self._setup_parser(config_file)
 
         if os.path.isfile(self._result()):
             logging.info(("{0} is already there. "
@@ -78,7 +78,7 @@ class Bootstrap(Image):
         return self._result()
 
     def clean(self, config_file):
-        self._setup_parser(config_file, running_in_chroot=True)
+        self._setup_parser(config_file)
 
         if os.path.isfile(self._result()):
             logging.info("Removing '{}'.".format(self._result()))

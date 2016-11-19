@@ -99,8 +99,7 @@ class ConfigurationParser():
     def get_project_plugin_directory(self):
         return join(self.config_directory, "plugins")
 
-    def __init__(self, base_config_file, running_in_chroot=False):
-        self.running_in_chroot = running_in_chroot
+    def __init__(self, base_config_file):
         self.config_directory = dirname(abspath(base_config_file.name))
         self.config_id = splitext(basename(base_config_file.name))[0]
         if not ConfigurationParser._configurations.get(self.config_id):
@@ -213,7 +212,6 @@ class ConfigurationParser():
         load_dict["edi_current_user_uid"] = get_user_uid()
         load_dict["edi_current_user_gid"] = get_user_gid()
         load_dict["edi_host_hostname"] = get_hostname()
-        load_dict["edi_running_in_chroot"] = self.running_in_chroot
         load_dict["edi_work_directory"] = self.get_workdir()
         load_dict["edi_config_directory"] = self.config_directory
         load_dict["edi_edi_plugin_directory"

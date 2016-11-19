@@ -27,7 +27,7 @@ from codecs import open
 from edi.lib.helpers import chown_to_user
 from docutils.parsers.rst.directives import path
 from edi.lib.helpers import require_executable, get_user
-from edi.lib.shellhelpers import run, host_resolv_conf
+from edi.lib.shellhelpers import run
 
 
 class PlaybookRunner():

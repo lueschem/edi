@@ -22,7 +22,6 @@
 from edi.commands.lxc import Lxc
 from edi.commands.lxccommands.launch import Launch
 from edi.lib.playbookrunner import PlaybookRunner
-from edi.lib.shellhelpers import run, mount_proc_sys_dev, get_chroot_cmd
 
 
 class Configure(Lxc):
