@@ -32,8 +32,6 @@ from codecs import open
 from edi.commands.image import Image
 from edi.commands.imagecommands.bootstrap import Bootstrap
 from edi.lib.helpers import chown_to_user
-from edi.lib.playbookrunner import PlaybookRunner
-from edi.lib.shellhelpers import run, mount_proc_sys_dev, get_chroot_cmd
 
 
 class Lxc(Image):
