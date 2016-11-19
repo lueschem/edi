@@ -32,12 +32,11 @@ from edi.lib.shellhelpers import run, host_resolv_conf
 
 class PlaybookRunner():
 
-    def __init__(self, config, target, environment,
-                 running_in_chroot=False):
+    def __init__(self, config, target, environment, connection):
         self.config = config
         self.target = target
         self.environment = environment
-        self.running_in_chroot = running_in_chroot
+        self.connection = connection
 
     def run_all(self):
         workdir = self.config.get_workdir()
@@ -67,7 +66,7 @@ class PlaybookRunner():
 
         cmd = []
         cmd.append("ansible-playbook")
-        cmd.extend(["-c", "chroot"])
+        cmd.extend(["-c", self.connection])
         cmd.append(playbook)
         cmd.extend(["--inventory", inventory])
         cmd.extend(["--extra-vars", "@{}".format(extra_vars)])
@@ -77,12 +76,7 @@ class PlaybookRunner():
         ansible_env = os.environ.copy()
         ansible_env['ANSIBLE_REMOTE_TEMP'] = '/tmp/ansible-{}'.format(get_user())
 
-        if self.running_in_chroot:
-            with host_resolv_conf(self.target):
-                run(cmd, sudo=self.running_in_chroot, env=ansible_env)
-        else:
-            # TODO: implement non chroot version
-            assert False
+        run(cmd, env=ansible_env)
 
     def _write_inventory_file(self, tempdir):
         inventory_file = os.path.join(tempdir, "inventory")
