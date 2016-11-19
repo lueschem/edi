@@ -3,5 +3,5 @@
   register: lxcif0_result
 
 - name: Bring up lxcif0.
-  command: ifup lxcif0
+  command: bash -c "ifup lxcif0 || sleep 30 && ifup lxcif0" # try twice to avoid timing issue on jessie
   when: lxcif0_result.changed
