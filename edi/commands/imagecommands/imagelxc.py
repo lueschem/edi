@@ -74,12 +74,6 @@ class Lxc(Image):
             lxcimagedir = os.path.join(tempdir, "lxcimage")
             rootfsdir = self._unpack_image(bootstrap_result, lxcimagedir)
             self._write_container_metadata(lxcimagedir)
-            playbook_runner = PlaybookRunner(self.config,
-                                             rootfsdir,
-                                             "edi_env_lxc",
-                                             running_in_chroot=True)
-            playbook_runner.run_all()
-            self._postprocess_rootfs(rootfsdir)
             archive = self._pack_image(tempdir, lxcimagedir)
             chown_to_user(archive)
             shutil.move(archive, self._result())
@@ -140,15 +134,3 @@ class Lxc(Image):
 
         with open(metadatafile, encoding='utf-8', mode='w') as f:
             f.write(yaml.dump(metadata))
-
-    def _postprocess_rootfs(self, rootfs):
-        clean_cmd = get_chroot_cmd(rootfs)
-        clean_cmd.append("apt-get")
-        clean_cmd.append("clean")
-        run(clean_cmd, sudo=True)
-
-        apt_list_cmd = get_chroot_cmd(rootfs)
-        apt_list_cmd.append("rm")
-        apt_list_cmd.append("-rf")
-        apt_list_cmd.append("/var/lib/apt/lists/")
-        run(apt_list_cmd, sudo=True)
