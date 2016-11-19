@@ -1,2 +1,0 @@
----
-systemd_packages: [systemd,systemd-sysv]

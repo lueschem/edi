@@ -3,7 +3,4 @@
     - role: apt_setup
       become: True
       become_user: root
-    - role: base_packages
-      become: True
-      become_user: root
 
