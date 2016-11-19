@@ -21,6 +21,7 @@
 
 import logging
 import subprocess
+import yaml
 from edi.commands.lxc import Lxc
 from edi.commands.lxccommands.importcmd import Import
 from edi.commands.lxccommands.profile import Profile
@@ -58,6 +59,10 @@ class Launch(Lxc):
             logging.info(("Container {0} is already existing. "
                           "Destroy it to regenerate it or reconfigure it."
                           ).format(self._result()))
+            if not self._is_container_running():
+                logging.info(("Starting existing container {0}."
+                              ).format(self._result()))
+                self._start_container()
         else:
             image = Import().run(config_file)
             profiles = Profile().run(config_file)
@@ -76,6 +81,27 @@ class Launch(Lxc):
         result = run(cmd, check=False, stderr=subprocess.PIPE)
         return result.returncode == 0
 
+    def _is_container_running(self):
+        cmd = []
+        cmd.append("lxc")
+        cmd.append("list")
+        cmd.append("--format=json")
+        cmd.append("^{}$".format(self._result()))
+        result = run(cmd, stdout=subprocess.PIPE)
+
+        try:
+            parsed_result = yaml.load(result.stdout)
+            if len(parsed_result) != 1:
+                return False
+            else:
+                status = parsed_result[0].get("status", "")
+                if status == "Running":
+                    return True
+                else:
+                    return False
+        except yaml.YAMLError as exc:
+            print_error_and_exit("Unable to parse lxc output ({}).".format(exc))
+
     def _launch_container(self, image, profiles):
         cmd = []
         cmd.append("lxc")
@@ -84,4 +110,12 @@ class Launch(Lxc):
         cmd.append(self._result())
         for profile in profiles:
             cmd.extend(["-p", profile])
+        run(cmd)
+
+    def _start_container(self):
+        cmd = []
+        cmd.append("lxc")
+        cmd.append("start")
+        cmd.append(self._result())
+
         run(cmd)
