@@ -32,10 +32,9 @@ from edi.lib.shellhelpers import run
 
 class PlaybookRunner():
 
-    def __init__(self, config, target, environment, connection):
+    def __init__(self, config, target, connection):
         self.config = config
         self.target = target
-        self.environment = environment
         self.connection = connection
 
     def run_all(self):
@@ -45,8 +44,7 @@ class PlaybookRunner():
             chown_to_user(tempdir)
             inventory = self._write_inventory_file(tempdir)
 
-            playbook_list = self.config.get_ordered_items("playbooks",
-                                                          self.environment)
+            playbook_list = self.config.get_ordered_items("playbooks")
             for name, path, extra_vars in playbook_list:
                 logging.info(("Running playbook {} located in "
                               "{} with extra vars:\n{}"

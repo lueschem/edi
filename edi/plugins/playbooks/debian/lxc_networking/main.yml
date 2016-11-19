@@ -3,4 +3,3 @@
     - role: lxc_interfaces
       become: True
       become_user: root
-      when: edi_env_lxc

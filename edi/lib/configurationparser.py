@@ -29,8 +29,6 @@ from aptsources.sourceslist import SourceEntry
 from edi.lib.helpers import (get_user, get_user_gid, get_user_uid,
                              get_hostname, print_error_and_exit)
 
-_supported_environments = ["edi_env_lxc", "edi_env_baremetal"]
-
 _supported_use_cases = ["edi_uc_run", "edi_uc_build",
                         "edi_uc_test", "edi_uc_develop"]
 
@@ -77,7 +75,7 @@ class ConfigurationParser():
     def get_compression(self):
         return self._get_general_item("edi_compression", "xz")
 
-    def get_ordered_items(self, section, environment):
+    def get_ordered_items(self, section):
         citems = self._get_config().get(section, {})
         ordered_items = collections.OrderedDict(sorted(citems.items()))
         item_list = []
@@ -87,8 +85,7 @@ class ConfigurationParser():
                 print_error_and_exit(("Missing path value in playbook '{}'."
                                       ).format(path))
             resolved_path = self._resolve_path(path)
-            node_dict = self._get_node_dictionary(content,
-                                                  environment)
+            node_dict = self._get_node_dictionary(content)
             item_list.append((name, resolved_path, node_dict))
 
         return item_list
@@ -220,21 +217,13 @@ class ConfigurationParser():
                   ] = self.get_project_plugin_directory()
         return load_dict
 
-    def _get_node_dictionary(self, node, environment):
+    def _get_node_dictionary(self, node):
         node_dict = self._get_load_time_dictionary()
         if self.get_use_case() not in _supported_use_cases:
             print_error_and_exit(("Use case '{0}' is not supported.\n"
                                   "Choose from: {1}."
                                   ).format(self.get_use_case(),
                                            ", ".join(_supported_use_cases)))
-        # environment is implicit
-        assert environment in _supported_environments
-
-        for env in _supported_environments:
-            if env == environment:
-                node_dict[env] = True
-            else:
-                node_dict[env] = False
 
         for uc in _supported_use_cases:
             if uc == self.get_use_case():

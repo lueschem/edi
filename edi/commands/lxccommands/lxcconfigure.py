@@ -46,8 +46,7 @@ class Configure(Lxc):
 
         Launch().run(container_name, config_file)
 
-        playbook_runner = PlaybookRunner(self.config, self.container_name,
-                                         "edi_env_lxc", "lxd")
+        playbook_runner = PlaybookRunner(self.config, self.container_name, "lxd")
         playbook_runner.run_all()
 
         return self._result()

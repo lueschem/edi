@@ -54,8 +54,7 @@ def test_bootstrap_overlay(config_files):
 def test_playbooks_overlay(config_files):
     with open(config_files, "r") as main_file:
         parser = ConfigurationParser(main_file)
-        playbooks = parser.get_ordered_items("playbooks",
-                                             "edi_env_baremetal")
+        playbooks = parser.get_ordered_items("playbooks")
         assert len(playbooks) == 3
         expected_playbooks = ["10_base_system",
                               "20_networking",
