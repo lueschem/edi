@@ -116,7 +116,7 @@ class Bootstrap(Image):
     def _run_debootstrap(self, tempdir, keyring_file):
         # Ansible uses python on the target system
         # sudo is needed for privilege escalation
-        additional_packages = "python,sudo"
+        additional_packages = "python,sudo,netbase,net-tools,iputils-ping,ifupdown,isc-dhcp-client,resolvconf"
         rootfs = os.path.join(tempdir, "rootfs")
         components = ",".join(self.config.get_bootstrap_components())
 
