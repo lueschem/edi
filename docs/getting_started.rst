@@ -15,6 +15,7 @@ Prerequisites
 #. Install Ansible with a version >= 2.1. On Ubuntu 16.04 you have to enable xenial-backports and then install Ansible as follows:
 
    ::
+
      sudo apt install ansible/xenial-backports
 
 #. Initialize lxd:
