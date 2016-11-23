@@ -1,3 +1,176 @@
+edi (0.2.0) xenial; urgency=medium
+
+  [ Matthias Luescher ]
+  * Added initial setup.py based on setuptools.
+  * Added reference list.
+  * Added configuration for Debian package build.
+  * Fix lintian errors and warnings.
+  * Updated references.
+  * Added sphinx documentation.
+  * Added sphinx documentation.
+  * Updated gitignore.
+  * Use setuptools_scm version for sphinx.
+  * Added basic argument parsing.
+  * Print program version.
+  * Setup log level handling.
+  * Moved playbooks to plugins folder.
+  * Added subcommand parser.
+  * Initial command factory framework.
+  * Argument parsing cleanup.
+  * Reworked command factory.
+  * Further simplified class factory.
+  * Enable autocompletion.
+  * Added a command cheat sheet.
+  * Added missing python dependencies.
+  * Reference list cleanup.
+  * Single source of truth for python requirements.
+  * Re-enabled man page generation.
+  * Update command cheat sheet.
+  * Fixed name in changelog.
+  * A first sample configuration.
+  * Updated python grammar to 3.x.
+  * Added simple error handling.
+  * Added configuration parser skeleton.
+  * Added method require_sudo to edi_cmd.
+  * Added additional helper functions.
+  * Avoid non ascii characters.
+  * Implemented configuration parser.
+  * Refined configuration parser.
+  * Added a host specific overlay configuration.
+  * Make config parser more robust.
+  * Improved local development setup.
+  * Improved the sample configuration.
+  * Simplified configuration parser interface.
+  * Updated command cheat sheet.
+  * Added requests library to reference list.
+  * Started to write bootstrapimage command.
+  * Class names according to pep8.
+  * A small test for subprocess.run().
+  * Some subprocess run experiments.
+  * Added first pytest tests.
+  * Fix tests if they are run within a debuild.
+  * Added small command line helper utility.
+  * Added adaptive subprocess stdout handling.
+  * Implemented bootstrap command.
+  * Added cleanup step to bootstrapimage command.
+  * Added hint for bootstrapimage command.
+  * Added a fourth configuration level (all).
+  * Modified command handling for future direct calls.
+  * Added run indirection for direct calls.
+  * Make compression algo configurable.
+  * Renamed command lxcimage to lxdimage.
+  * Added ansible and lxd as dependencies.
+  * Refactored configuration - added debootstrap_tool.
+  * Made bootstrap command a little bit more verbose.
+  * First implementation of lxdimage command.
+  * Made lxcimage command more verbose.
+  * Marked item as internal.
+  * Added debootstrap dependency.
+  * Refactored command line interface.
+  * Prepared lxc import command.
+  * Finished lxc import command.
+  * Added a note about python3-pylxd.
+  * Implemented launch command.
+  * Renamed examples.
+  * Implemented version as command.
+  * Fixed gnupg requirement.
+  * Fix edi version command for installed edi.
+  * Reworked playbook configuration section.
+  * Rewrote merging of playbook node.
+  * Added playbook overlay testing.
+  * Added keys section in config, using jinja2.
+
+  [ Eric Keller ]
+  * add zsh completion support
+
+  [ Matthias Luescher ]
+  * Added additional items to jinja2 dictionary.
+  * Prepared infrastructure for cleanup.
+  * Implemented clean methods.
+  * Prepared proper resolv.conf handling.
+  * Fixed py.test within debuild context.
+  * Added jinja2 to reference list.
+  * Include plugins into Debian package.
+  * Added plugin directories to configuration parser.
+  * Added ansible requirements to bootstrap image.
+  * Added playbook runner.
+  * Prepare dictionary for extra_vars.
+  * Pass the extra vars file to ansible.
+  * Small example fixup.
+  * Changed license to LGPL.
+  * Fix version command for installed edi.
+  * Print error in case of command naming conflicts.
+  * Refactored configurations according to input from Lars.
+  * Check if container name is a valid host name.
+  * Improved error message.
+  * Refactored playbook config handling.
+  * Added templates section to container metadata.
+  * Added first logo.
+  * Logo v2.
+  * Logo v3.
+  * Logo v4.
+  * Added command that creates LXC profiles.
+  * Add user accounts for current user and ansible user.
+  * Refactored configuration handling.
+  * Added some getting started notes.
+  * Ignore pycharm directory.
+  * Fix bootstrapping for Debian stretch.
+  * Switch user lueschm1 to gz compression.
+  * Added Debian stretch example.
+  * Shrink lxc image by applying "apt-get clean".
+  * Shrink the images even more.
+  * Do lazy umount for dev.
+  * Refactored config_files fixture.
+  * Added missing copyright.
+  * Added py.test test for bootstrap command.
+  * Reduced scope of config_files fixture.
+  * Minor test cleanup.
+  * Improved coverage for bootstrap command.
+  * Reorganized testing folder structure.
+  * Added structure for configuration commands.
+  * Added basic networking playbook.
+
+  [ Matthias Lüscher ]
+  * Transformed "getting started" into restructured text.
+  * Partially fixed bootstrap test within debootstrap environment.
+
+  [ Matthias Luescher ]
+  * Fix resolv.conf handling if it is a (dangling) symlink.
+
+  [ Matthias Lüscher ]
+  * Refined resolv.conf handling.
+  * Mock archive key request in order to fix tests within debuild environment.
+  * Move the ansible remote temp folder out of the user directory.
+  * Added some content to readme.
+  * Another update to the readme.
+  * Simplified rootfs postprocessing within bootstrap lxc image commands.
+  * Add basic networking packages during bootstrapping.
+  * Remove ansible playbook runner from lxc image command.
+  * Launch now starts eventually already existing container.
+  * Do not remove resolv.conf from bootstrap image anymore.
+  * Remove unused imports from lxc image command.
+  * Added lxc configure command.
+  * Updated .gitignore.
+  * Adapted networking playbook to lxd provider.
+  * Upgrade required Ansible version to 2.1.
+  * Updated getting started guide.
+  * Fix rst formatting.
+  * Removed now unused code.
+  * Fix stretch based container.
+  * Removed obsolete code from base_system playbook.
+  * Added workaround for Debian jessie timing issue.
+  * Refactored user_accounts role.
+  * Removed environment parameter.
+  * Updated getting started guide.
+
+  [ Matthias Luescher ]
+  * Updated getting started.
+  * Added a simple release script.
+
+  [ Matthias Lüscher (Launchpad) ]
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Wed, 23 Nov 2016 13:18:32 +0100
+
 edi (0.1.0) xenial; urgency=medium
 
   * Initial release.
