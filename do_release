@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# Create a new edi release that can be uploaded to a repository.
+#
+# usage: do_release 0.2.0
+
+set -e
+set -o errexit
+set -o pipefail
+set -o nounset
+
+NEW_VERSION=${1}
+gbp dch --new-version ${NEW_VERSION} --release --debian-tag v%\(version\)s
+git add debian/changelog
+git commit -m "New version ${NEW_VERSION}."
+git tag -a v${NEW_VERSION} -m "New version ${NEW_VERSION}."
+gbp buildpackage
+
