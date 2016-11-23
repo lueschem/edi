@@ -14,5 +14,7 @@ gbp dch --new-version ${NEW_VERSION} --release --debian-tag v%\(version\)s
 git add debian/changelog
 git commit -m "New version ${NEW_VERSION}."
 git tag -a v${NEW_VERSION} -m "New version ${NEW_VERSION}."
+# verify that the binary package can be built:
 gbp buildpackage
-
+debuild -S
+dput ppa:m-luescher/edi-snapshots ../edi_${NEW_VERSION}_source.changes
