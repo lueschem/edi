@@ -1,3 +1,12 @@
+edi (0.2.4) xenial; urgency=medium
+
+  [ Matthias Luescher ]
+  * Added python3-gnupg dependency.
+
+  [ Matthias Lüscher (Launchpad) ]
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Thu, 24 Nov 2016 10:12:14 +0100
+
 edi (0.2.3) xenial; urgency=medium
 
   [ Matthias Luescher ]
