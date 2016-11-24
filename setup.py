@@ -43,7 +43,7 @@ def get_install_requires():
 setup(
     name='edi',
 
-    version='0.2.4',
+    version='0.2.5',
 
     description='Embedded Development Infrastructure - edi',
     long_description=long_description,
