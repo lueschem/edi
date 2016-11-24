@@ -9,12 +9,39 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
+SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd ${SCRIPTDIR}
+
+if ! git diff --exit-code --quiet
+then
+    >&2 echo "Error: there are unstaged changes!"
+    exit 1
+fi
+
+if ! git diff --cached --exit-code --quiet
+then
+    >&2 echo "Error: there are uncommitted changes!"
+    exit 1
+fi
+
 NEW_VERSION=${1}
+
+SETUP_PY="setup.py"
+sed -i "s/^    version=.*/    version='${NEW_VERSION}',/g" ${SETUP_PY}
+git add ${SETUP_PY}
+
+SPHINX_CONFIG="docs/conf.py"
+sed -i "s/^version =.*/version = '${NEW_VERSION}'/g" ${SPHINX_CONFIG}
+sed -i "s/^release =.*/release = '${NEW_VERSION}'/g" ${SPHINX_CONFIG}
+git add ${SPHINX_CONFIG}
+
 gbp dch --new-version ${NEW_VERSION} --release --debian-tag v%\(version\)s
 git add debian/changelog
 git commit -m "New version ${NEW_VERSION}."
 git tag -a v${NEW_VERSION} -m "New version ${NEW_VERSION}."
-# verify that the binary package can be built:
-gbp buildpackage
+
+# verify that the package can be built:
+debuild -us -uc
+
 debuild -S
 dput ppa:m-luescher/edi-snapshots ../edi_${NEW_VERSION}_source.changes
