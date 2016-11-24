@@ -1,3 +1,12 @@
+edi (0.2.6) xenial; urgency=medium
+
+  [ Matthias Luescher ]
+  * Added yet other build dependencies.
+
+  [ Matthias Lüscher (Launchpad) ]
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Thu, 24 Nov 2016 10:32:24 +0100
+
 edi (0.2.5) xenial; urgency=medium
 
   [ Matthias Luescher ]
