@@ -43,8 +43,7 @@ def get_install_requires():
 setup(
     name='edi',
 
-    use_scm_version=True,
-    setup_requires=['setuptools_scm'],
+    version='0.2.2',
 
     description='Embedded Development Infrastructure - edi',
     long_description=long_description,
