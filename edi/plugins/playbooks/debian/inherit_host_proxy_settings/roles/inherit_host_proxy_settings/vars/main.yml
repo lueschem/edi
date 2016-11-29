@@ -1,0 +1,6 @@
+---
+proxy_configs: [{ key: 'http_proxy', value: "{{ edi_host_http_proxy }}" },
+                { key: 'https_proxy', value: "{{ edi_host_https_proxy }}" },
+                { key: 'ftp_proxy', value: "{{ edi_host_ftp_proxy }}" },
+                { key: 'socks_proxy', value: "{{ edi_host_socks_proxy }}" },
+                { key: 'no_proxy', value: "{{ edi_host_no_proxy }}" }]

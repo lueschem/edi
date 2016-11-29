@@ -1,0 +1,20 @@
+---
+- name: Setup /etc/environment (set proxies).
+  lineinfile: dest=/etc/environment regexp='^{{ item.key }}=.*' line='{{ item.key }}="{{ item.value }}"' create=yes mode=0644
+  with_items: "{{ proxy_configs }}"
+  when: item.value != ""
+
+- name: Setup /etc/environment (unset proxies).
+  lineinfile: dest=/etc/environment regexp='^{{ item.key }}=.*' state=absent
+  with_items: "{{ proxy_configs }}"
+  when: item.value == ""
+
+- name: Setup /root/.bashrc (set proxies).
+  lineinfile: dest=/root/.bashrc regexp='^export {{ item.key }}=.*' line='export {{ item.key }}="{{ item.value }}"' create=yes mode=0644
+  with_items: "{{ proxy_configs }}"
+  when: item.value != ""
+
+- name: Setup /root/.bashrc (unset proxies).
+  lineinfile: dest=/root/.bashrc regexp='^export {{ item.key }}=.*' state=absent
+  with_items: "{{ proxy_configs }}"
+  when: item.value == ""

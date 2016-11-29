@@ -215,6 +215,11 @@ class ConfigurationParser():
                   ] = self.get_edi_plugin_directory()
         load_dict["edi_project_plugin_directory"
                   ] = self.get_project_plugin_directory()
+        load_dict["edi_host_http_proxy"] = os.environ.get('http_proxy', '')
+        load_dict["edi_host_https_proxy"] = os.environ.get('https_proxy', '')
+        load_dict["edi_host_ftp_proxy"] = os.environ.get('ftp_proxy', '')
+        load_dict["edi_host_socks_proxy"] = os.environ.get('socks_proxy', '')
+        load_dict["edi_host_no_proxy"] = os.environ.get('no_proxy', '')
         return load_dict
 
     def _get_node_dictionary(self, node):
