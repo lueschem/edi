@@ -11,13 +11,15 @@ bootstrap:
     repository_key:         https://ftp-master.debian.org/keys/archive-key-8.asc
 
 playbooks:
-    010_lxc_networking:
+    010_inherit_host_proxy_settings:
+        path:               playbooks/debian/inherit_host_proxy_settings/main.yml
+    020_lxc_networking:
         path:               playbooks/debian/lxc_networking/main.yml
-    020_base_system:
+    030_base_system:
         path:               playbooks/debian/base_system/main.yml
         parameters:
             kernel_package: linux-image-amd64
-    030_development_user_facilities:
+    040_development_user_facilities:
         path:               playbooks/debian/development_user_facilities/main.yml
 
 lxc_templates:
