@@ -1,3 +1,15 @@
+edi (0.2.9) xenial; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Handle keyboard interrupt.
+  * Catch the CalledProcessError exceptions.
+  * Made commands a bit more verbose.
+  * Clean everything before doing a release.
+
+  [ Matthias Lüscher (Launchpad) ]
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Thu, 08 Dec 2016 23:45:34 +0100
+
 edi (0.2.8) xenial; urgency=medium
 
   [ Matthias Lüscher ]
