@@ -27,6 +27,7 @@ import subprocess
 from jinja2 import Template
 from edi.commands.lxc import Lxc
 from edi.lib.shellhelpers import run
+from edi.lib.helpers import print_success
 
 
 class Profile(Lxc):
@@ -42,11 +43,6 @@ class Profile(Lxc):
 
     def run_cli(self, cli_args):
         result = self.run(cli_args.config_file)
-        if result:
-            print(("Generated the following LXC profiles: {}."
-                   ).format(", ".join(result)))
-        else:
-            print("Generated zero LXC profiles.")
 
     def run(self, config_file):
         self._setup_parser(config_file)
@@ -95,6 +91,7 @@ class Profile(Lxc):
             create_cmd.append("create")
             create_cmd.append(name)
             run(create_cmd)
+            print_success("Created lxc profile {}.".format(name))
 
         edit_cmd = []
         edit_cmd.append("lxc")

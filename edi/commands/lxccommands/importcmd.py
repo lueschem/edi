@@ -24,6 +24,7 @@ import subprocess
 from edi.commands.lxc import Lxc
 from edi.commands.imagecommands.imagelxc import Lxc as LxcImageCommand
 from edi.lib.shellhelpers import run
+from edi.lib.helpers import print_success
 
 
 class Import(Lxc):
@@ -39,7 +40,6 @@ class Import(Lxc):
 
     def run_cli(self, cli_args):
         result = self.run(cli_args.config_file)
-        print("Imported edi image as {}.".format(result))
 
     def run(self, config_file):
         self._setup_parser(config_file)
@@ -52,7 +52,11 @@ class Import(Lxc):
 
         image = LxcImageCommand().run(config_file)
 
+        print("Going to import lxc image into image store.")
+
         self._import_image(image)
+
+        print_success("Imported lxc image into image store as {}.".format(self._result()))
 
         return self._result()
 
@@ -63,6 +67,7 @@ class Import(Lxc):
             logging.info(("Removing '{}' from image store."
                           ).format(self._result()))
             self._delete_image()
+            print_success("Removed {} from image store.".format(self._result()))
 
     def _result(self):
         return "{}_{}".format(self.config.get_project_name(),

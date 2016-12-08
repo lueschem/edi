@@ -35,6 +35,13 @@ def print_error_and_exit(*args, **kwargs):
     sys.exit(1)
 
 
+def print_success(*args, **kwargs):
+    print('\033[92m', end="")
+    print('Success: ', end="")
+    print(*args, end="", **kwargs)
+    print('\033[0m')
+
+
 def get_user():
     try:
         if 'SUDO_USER' in os.environ:

@@ -27,7 +27,7 @@ import shutil
 import logging
 from edi.commands.image import Image
 from edi.lib.helpers import (require_executable, print_error_and_exit,
-                             chown_to_user)
+                             chown_to_user, print_success)
 from edi.lib.shellhelpers import run, get_chroot_cmd
 
 
@@ -44,7 +44,6 @@ class Bootstrap(Image):
 
     def run_cli(self, cli_args):
         result = self.run(cli_args.config_file)
-        print("Generated {0}.".format(result))
 
     def run(self, config_file):
         self._setup_parser(config_file)
@@ -54,6 +53,8 @@ class Bootstrap(Image):
                           "Delete it to regenerate it."
                           ).format(self._result()))
             return self._result()
+
+        print("Going to bootstrap initial image - be patient.")
 
         self._require_sudo()
 
@@ -75,6 +76,8 @@ class Bootstrap(Image):
             chown_to_user(archive)
             shutil.move(archive, self._result())
 
+        print_success("Bootstrapped initial image {}.".format(self._result()))
+
         return self._result()
 
     def clean(self, config_file):
@@ -83,6 +86,7 @@ class Bootstrap(Image):
         if os.path.isfile(self._result()):
             logging.info("Removing '{}'.".format(self._result()))
             os.remove(self._result())
+            print_success("Removed bootstrap image {}.".format(self._result()))
 
     def _result(self):
         archive_name = ("{0}_{1}.tar.{2}"

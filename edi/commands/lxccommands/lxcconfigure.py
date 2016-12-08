@@ -22,6 +22,7 @@
 from edi.commands.lxc import Lxc
 from edi.commands.lxccommands.launch import Launch
 from edi.lib.playbookrunner import PlaybookRunner
+from edi.lib.helpers import print_success
 
 
 class Configure(Lxc):
@@ -38,7 +39,6 @@ class Configure(Lxc):
 
     def run_cli(self, cli_args):
         result = self.run(cli_args.container_name, cli_args.config_file)
-        print("Configured container {}.".format(result))
 
     def run(self, container_name, config_file):
         self._setup_parser(config_file)
@@ -46,9 +46,12 @@ class Configure(Lxc):
 
         Launch().run(container_name, config_file)
 
+        print("Going to configure container {} - be patient.".format(self._result()))
+
         playbook_runner = PlaybookRunner(self.config, self.container_name, "lxd")
         playbook_runner.run_all()
 
+        print_success("Configured container {}.".format(self._result()))
         return self._result()
 
     def _result(self):

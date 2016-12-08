@@ -31,7 +31,7 @@ from jinja2 import Template
 from codecs import open
 from edi.commands.image import Image
 from edi.commands.imagecommands.bootstrap import Bootstrap
-from edi.lib.helpers import chown_to_user
+from edi.lib.helpers import chown_to_user, print_success
 
 
 class Lxc(Image):
@@ -47,7 +47,6 @@ class Lxc(Image):
 
     def run_cli(self, cli_args):
         result = self.run(cli_args.config_file)
-        print("Generated {0}.".format(result))
 
     def run(self, config_file):
         self._setup_parser(config_file)
@@ -67,6 +66,8 @@ class Lxc(Image):
 
         workdir = self.config.get_workdir()
 
+        print("Going to upgrade the bootstrap image to a lxc image.")
+
         with tempfile.TemporaryDirectory(dir=workdir) as tempdir:
             chown_to_user(tempdir)
             lxcimagedir = os.path.join(tempdir, "lxcimage")
@@ -76,6 +77,8 @@ class Lxc(Image):
             chown_to_user(archive)
             shutil.move(archive, self._result())
 
+        print_success("Created lxc image {}.".format(self._result()))
+
         return self._result()
 
     def clean(self, config_file):
@@ -84,6 +87,7 @@ class Lxc(Image):
         if os.path.isfile(self._result()):
             logging.info("Removing '{}'.".format(self._result()))
             os.remove(self._result())
+            print_success("Removed lxc image {}.".format(self._result()))
 
     def _result(self):
         archive_name = ("{0}_{1}.tar.{2}"

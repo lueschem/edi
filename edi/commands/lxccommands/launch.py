@@ -25,7 +25,7 @@ import yaml
 from edi.commands.lxc import Lxc
 from edi.commands.lxccommands.importcmd import Import
 from edi.commands.lxccommands.profile import Profile
-from edi.lib.helpers import print_error_and_exit
+from edi.lib.helpers import print_error_and_exit, print_success
 from edi.lib.shellhelpers import run
 from edi.lib.networkhelpers import is_valid_hostname
 
@@ -44,7 +44,6 @@ class Launch(Lxc):
 
     def run_cli(self, cli_args):
         result = self.run(cli_args.container_name, cli_args.config_file)
-        print("Launched container {}.".format(result))
 
     def run(self, container_name, config_file):
         self._setup_parser(config_file)
@@ -63,10 +62,13 @@ class Launch(Lxc):
                 logging.info(("Starting existing container {0}."
                               ).format(self._result()))
                 self._start_container()
+                print_success("Started container {}.".format(self._result()))
         else:
             image = Import().run(config_file)
             profiles = Profile().run(config_file)
+            print("Going to launch container.")
             self._launch_container(image, profiles)
+            print_success("Launched container {}.".format(self._result()))
 
         return self._result()
 
