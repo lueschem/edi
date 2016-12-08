@@ -24,6 +24,8 @@ then
     exit 1
 fi
 
+git clean -dxf
+
 NEW_VERSION=${1}
 
 SETUP_PY="setup.py"
