@@ -27,6 +27,7 @@ from edi.commands import *
 from edi.lib.commandfactory import get_sub_commands, get_command
 from edi.lib.helpers import print_error_and_exit
 from edi.lib.edicommand import EdiCommand
+from subprocess import CalledProcessError
 
 
 def _setup_logging(cli_args):
@@ -75,3 +76,5 @@ def main():
         get_command(command_name)().run_cli(cli_args)
     except KeyboardInterrupt:
         print_error_and_exit("Command interrupted by user.")
+    except CalledProcessError as subprocess_error:
+        print_error_and_exit("{}\nFor more information increase the log level.".format(subprocess_error))

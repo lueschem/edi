@@ -28,8 +28,10 @@ import shutil
 
 
 def print_error_and_exit(*args, **kwargs):
+    print('\033[91m', end="", file=sys.stderr)
     print('Error: ', end="", file=sys.stderr)
-    print(*args, file=sys.stderr, **kwargs)
+    print(*args, end="", file=sys.stderr, **kwargs)
+    print('\033[0m', file=sys.stderr)
     sys.exit(1)
 
 
