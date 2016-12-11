@@ -1,5 +1,0 @@
----
-general:
-    # use faster compression during development:
-    edi_compression:        gz
-
