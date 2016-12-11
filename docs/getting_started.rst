@@ -34,7 +34,7 @@ Working with the edi Source Code
 
    ::
 
-     git clone https://gitlab.com/lueschem/edi.git
+     git clone https://github.com/lueschem/edi.git
 
 #. Change into the edi subfolder:
 
@@ -54,11 +54,13 @@ Working with the edi Source Code
 
      source local_setup
 
-#. Change into the examples directory:
+#. Clone the edi-examples repository:
 
    ::
 
-     cd examples/advanced/
+     cd ..
+     git clone https://github.com/lueschem/edi-examples.git
+     cd edi-examples/advanced/
 
 #. Build your first lxd container using edi:
 

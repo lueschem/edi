@@ -48,7 +48,7 @@ setup(
     description='Embedded Development Infrastructure - edi',
     long_description=long_description,
 
-    url='https://gitlab.com/lueschem/edi',
+    url='https://github.com/lueschem/edi',
 
     # Author details
     author='Matthias Luescher',

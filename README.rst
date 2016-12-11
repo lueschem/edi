@@ -33,11 +33,7 @@ See chapter `getting started`_.
 License
 +++++++
 
-edi uses the following licenses:
-
-- LGPL for the source files written in Python.
-- MIT license for the yaml files.
-
+edi is licensed under the LGPL license.
 
 Contributions
 +++++++++++++
