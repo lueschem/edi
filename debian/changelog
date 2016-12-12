@@ -1,3 +1,19 @@
+edi (0.2.10) xenial; urgency=medium
+
+  [ Matthias Luescher ]
+  * Added transparent logo.
+  * Moved examples into separate repository.
+  * Switched to github.
+  * Added empty requirements.txt for read the docs.
+  * Switched the sphinx theme to default.
+  * Added logo to sphinx documentation.
+  * Do not overwrite customized password or customized groups for development user.
+  * Updated "getting started".
+
+  [ Matthias Lüscher (Launchpad) ]
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Mon, 12 Dec 2016 14:08:10 +0100
+
 edi (0.2.9) xenial; urgency=medium
 
   [ Matthias Lüscher ]
