@@ -66,4 +66,4 @@ Working with the edi Source Code
 
    ::
 
-     sudo edi -v lxc launch my-first-edi-container advanced_test.yml
+     sudo edi -v lxc configure my-first-edi-container advanced_test.yml
