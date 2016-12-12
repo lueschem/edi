@@ -3,5 +3,5 @@
   group: name={{ edi_current_user_name }} gid={{ edi_current_user_gid }} state=present
 
 - name: Add the current user with a uid corresponding to the host uid (password=ChangeMe!).
-  user: name={{ edi_current_user_name }} group={{ edi_current_user_name }} uid={{ edi_current_user_uid }} shell=/bin/bash groups=adm,sudo password="$6$nqXAG09MHYE$MZ6kZGJyVcU6ETl.YjCs0fX9y0BOA3qzTkjgoYYUceT4tTgaVbVs0Aeh4kBZqLqLRlSrzhLKLOCEV/uUagm351"
+  user: name={{ edi_current_user_name }} group={{ edi_current_user_name }} uid={{ edi_current_user_uid }} shell=/bin/bash groups=adm,sudo password="$6$nqXAG09MHYE$MZ6kZGJyVcU6ETl.YjCs0fX9y0BOA3qzTkjgoYYUceT4tTgaVbVs0Aeh4kBZqLqLRlSrzhLKLOCEV/uUagm351" append=yes update_password=on_create
 
