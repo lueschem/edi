@@ -1,0 +1,9 @@
+name: "{{ edi_lxc_network_interface_name }}"
+config: {}
+description: Default edi container interface
+devices:
+  {{ edi_lxc_network_interface_name }}:
+    name: "{{ edi_lxc_network_interface_name }}"
+    nictype: bridged
+    parent: lxdbr0
+    type: nic

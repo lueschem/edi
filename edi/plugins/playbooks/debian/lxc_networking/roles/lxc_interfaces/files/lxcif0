@@ -1,3 +1,0 @@
-auto lxcif0
-allow-hotplug lxcif0
-iface lxcif0 inet dhcp

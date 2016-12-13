@@ -1,7 +1,7 @@
-- name: Add lxcif0 interface to container.
-  copy: src=lxcif0 dest=/etc/network/interfaces.d/
-  register: lxcif0_result
+- name: Add default interface to container.
+  template: src=default_interface.j2 dest=/etc/network/interfaces.d/{{ edi_lxc_network_interface_name }}
+  register: default_interface_result
 
-- name: Bring up lxcif0.
-  command: bash -c "ifup lxcif0 || sleep 30 && ifup lxcif0" # try twice to avoid timing issue on jessie
-  when: lxcif0_result.changed
+- name: Bring up default interface.
+  command: bash -c "ifup {{ edi_lxc_network_interface_name }} || sleep 30 && ifup {{ edi_lxc_network_interface_name }}" # try twice to avoid timing issue on jessie
+  when: default_interface_result.changed

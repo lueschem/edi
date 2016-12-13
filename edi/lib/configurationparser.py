@@ -230,6 +230,9 @@ class ConfigurationParser():
                                   ).format(self.get_use_case(),
                                            ", ".join(_supported_use_cases)))
 
+        node_dict["edi_lxc_network_interface_name"] = self._get_general_item("edi_lxc_network_interface_name",
+                                                                             "lxcif0")
+
         for uc in _supported_use_cases:
             if uc == self.get_use_case():
                 node_dict[uc] = True
