@@ -57,7 +57,7 @@ class PlaybookRunner():
                 with open(extra_vars_file, encoding='utf-8', mode='w') as f:
                     f.write(yaml.dump(extra_vars))
 
-                ansible_user = extra_vars.get("edi_config_management_user")
+                ansible_user = extra_vars.get("edi_config_management_user_name")
                 self._run_playbook(path, inventory, extra_vars_file, ansible_user)
 
     def _run_playbook(self, playbook, inventory, extra_vars, ansible_user):
