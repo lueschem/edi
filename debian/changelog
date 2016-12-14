@@ -1,3 +1,13 @@
+edi (0.2.12) xenial; urgency=medium
+
+  [ Matthias Luescher ]
+  * Extended playbook runner for ssh connections.
+  * Renamed config management user key.
+
+  [ Matthias Lüscher (Launchpad) ]
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Wed, 14 Dec 2016 20:18:36 +0100
+
 edi (0.2.11) xenial; urgency=medium
 
   [ Matthias Luescher ]
