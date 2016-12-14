@@ -19,40 +19,37 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
-from edi.commands.lxc import Lxc
-from edi.commands.lxccommands.launch import Launch
+from edi.commands.target import Target
 from edi.lib.playbookrunner import PlaybookRunner
 from edi.lib.helpers import print_success
 
 
-class Configure(Lxc):
+class Configure(Target):
 
     @classmethod
     def advertise(cls, subparsers):
-        help_text = "configure an edi LXC container"
-        description_text = "Configure an edi LXC container."
+        help_text = "(re)configure an edi target system"
+        description_text = "(Re)configure an edi target system."
         parser = subparsers.add_parser(cls._get_short_command_name(),
                                        help=help_text,
                                        description=description_text)
-        parser.add_argument('container_name')
+        parser.add_argument('ip_address')
         cls._require_config_file(parser)
 
     def run_cli(self, cli_args):
-        result = self.run(cli_args.container_name, cli_args.config_file)
+        result = self.run(cli_args.ip_address, cli_args.config_file)
 
-    def run(self, container_name, config_file):
+    def run(self, ip_address, config_file):
         self._setup_parser(config_file)
-        self.container_name = container_name
+        self.ip_address = ip_address
 
-        Launch().run(container_name, config_file)
+        print("Going to configure target system ({}) - be patient.".format(self._result()))
 
-        print("Going to configure container {} - be patient.".format(self._result()))
-
-        playbook_runner = PlaybookRunner(self.config, self._result(), "lxd")
+        playbook_runner = PlaybookRunner(self.config, self._result(), "ssh")
         playbook_runner.run_all()
 
-        print_success("Configured container {}.".format(self._result()))
+        print_success("Configured target system ({}).".format(self._result()))
         return self._result()
 
     def _result(self):
-        return self.container_name
+        return self.ip_address

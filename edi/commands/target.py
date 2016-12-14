@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-# Copyright (C) 2016 Matthias Luescher
-#
-# Authors:
-#  Matthias Luescher
-#
-# This file is part of edi.
 #
 # edi is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
@@ -19,9 +12,20 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
-from edi.commands.imagecommands import *
-from edi.commands.lxccommands import *
-from edi.commands.configcommands import *
-from edi.commands.targetcommands import *
+from edi.lib.edicommand import EdiCommand
 
-__all__ = ["config", "image", "lxc", "version", "clean", "target"]
+
+class Target(EdiCommand):
+
+    @classmethod
+    def advertise(cls, subparsers):
+        help_text = "run target related operations"
+        description_text = "Run operations on target system."
+        parser = subparsers.add_parser(cls._get_short_command_name(),
+                                       help=help_text,
+                                       description=description_text)
+
+        cls._add_sub_commands(parser)
+
+    def run_cli(self, cli_args):
+        self._run_sub_command_cli(cli_args)

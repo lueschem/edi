@@ -232,6 +232,8 @@ class ConfigurationParser():
 
         node_dict["edi_lxc_network_interface_name"] = self._get_general_item("edi_lxc_network_interface_name",
                                                                              "lxcif0")
+        node_dict["edi_config_management_user"] = self._get_general_item("edi_config_management_user",
+                                                                         "edicfgmgmt")
 
         for uc in _supported_use_cases:
             if uc == self.get_use_case():

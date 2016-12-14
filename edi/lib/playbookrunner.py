@@ -57,17 +57,20 @@ class PlaybookRunner():
                 with open(extra_vars_file, encoding='utf-8', mode='w') as f:
                     f.write(yaml.dump(extra_vars))
 
-                self._run_playbook(path, inventory, extra_vars_file)
+                ansible_user = extra_vars.get("edi_config_management_user")
+                self._run_playbook(path, inventory, extra_vars_file, ansible_user)
 
-    def _run_playbook(self, playbook, inventory, extra_vars):
+    def _run_playbook(self, playbook, inventory, extra_vars, ansible_user):
         require_executable("ansible-playbook", "sudo apt install ansible")
 
         cmd = []
         cmd.append("ansible-playbook")
-        cmd.extend(["-c", self.connection])
-        cmd.append(playbook)
+        cmd.extend(["--connection", self.connection])
         cmd.extend(["--inventory", inventory])
         cmd.extend(["--extra-vars", "@{}".format(extra_vars)])
+        if self.connection == "ssh":
+            cmd.extend(["--user", ansible_user])
+        cmd.append(playbook)
         if logging.getLogger().isEnabledFor(logging.DEBUG):
             cmd.append("-vvvv")
 
