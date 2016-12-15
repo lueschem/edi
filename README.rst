@@ -22,14 +22,6 @@ goal, edi leverages top-notch open source technologies:
 
 ----
 
-
-Getting Started
-+++++++++++++++
-
-See chapter `getting started`_.
-
-.. _getting started:  docs/getting_started.rst
-
 License
 +++++++
 
@@ -46,16 +38,9 @@ Warning
 edi is still a very young project and therefore interfaces might change quickly and without notice.
 
 
-Documentation
-+++++++++++++
+More Information
+++++++++++++++++
 
-Please check here if you need additional documentation:
+For more information please visit `http://www.get-edi.io`_.
 
-- `Getting started`_
-- `Command cheat sheet`_
-- `Reference list`_
-
-.. _Getting started: docs/getting_started.rst
-.. _Command cheat sheet: docs/command_cheat_sheet.rst
-.. _Reference list: docs/reference_list.rst
-
+.. _`http://www.get-edi.io`: http://www.get-edi.io

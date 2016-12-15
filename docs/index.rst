@@ -11,14 +11,8 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+   introduction
    getting_started
    reference_list
    command_cheat_sheet
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
 
