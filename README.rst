@@ -36,6 +36,7 @@ Warning
 +++++++
 
 edi is still a very young project and therefore interfaces might change quickly and without notice.
+Many edi features are yet undocumented.
 
 
 More Information
