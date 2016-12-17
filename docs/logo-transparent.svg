@@ -56,7 +56,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.56"
-     inkscape:cx="478.65013"
+     inkscape:cx="280.79857"
      inkscape:cy="760.12026"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -98,7 +98,7 @@
      id="layer1">
     <g
        id="g4240"
-       style="fill:#000000;filter:url(#filter4541);opacity:0.1"
+       style="fill:#000000;filter:url(#filter4541);opacity:0.07"
        transform="translate(24.5,134.5)">
       <path
          sodipodi:nodetypes="zzczcczcz"
@@ -206,7 +206,7 @@
     <g
        transform="translate(19.5,129.5)"
        id="g4240-9"
-       style="opacity:0.5;filter:url(#filter4573)">
+       style="opacity:0.35;filter:url(#filter4573);fill:#0000ff;fill-opacity:1">
       <path
          sodipodi:nodetypes="zzczcczcz"
          inkscape:connector-curvature="0"
@@ -254,43 +254,43 @@
          inkscape:connector-curvature="0"
          id="path4153-77"
          d="m 320,162.3622 c 0,10 10,10 10,10 l 10,0 c 0,0 10,0 10,-10 0,-10 10,-10 10,-10 l 50,0 c 10,0 10,-10 10,-10 l 0,-10 c 0,0 0,-10 -10,-10 l -50,0 c -40,0 -40,30 -40,40 z"
-         style="fill:#0000ff;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+         style="fill:#0000ff;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1" />
       <path
          sodipodi:nodetypes="zcczczcczzz"
          inkscape:connector-curvature="0"
          id="path4153-7-2"
          d="m 120,271.8622 c 0,-10 10,-10 10,-10 l 10,0 c 0,0 10,0 10,10 0,10 10,10 10,10 l 40,0.5 c 10,0 10,10 10,10 l 0,10 c 0,0 0,10 -10,10 l -40,-0.5 c -40,0 -40,-30 -40,-40 z"
-         style="fill:#0000ff;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+         style="fill:#0000ff;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1" />
       <path
          sodipodi:nodetypes="zcczczcczzz"
          inkscape:connector-curvature="0"
          id="path4153-7-2-5-3"
          d="m 120.5,161.8622 c 0,10 10,10 10,10 l 10,0 c 0,0 10,0 10,-10 0,-10 10,-10 10,-10 l 0.5,0.50001 c 10,0 10,-10 10,-10 l 0,-10 c 0,0 0,-10 -10,-10 l -0.5,-0.50001 c -40,0 -40,30 -40,40 z"
-         style="fill:#0000ff;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+         style="fill:#0000ff;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1" />
       <path
          sodipodi:nodetypes="zcczczcczzz"
          inkscape:connector-curvature="0"
          id="path4153-7-2-5-5-2"
          d="m 310.5,161.86219 c 0,10 -10,10 -10,10 l -10,0 c 0,0 -10,0 -10,-10 0,-10 -10,-10 -10,-10 l -0.5,0.50001 c -10,0 -10,-10 -10,-10 l 0,-10 c 0,0 0,-10 10,-10 l 0.5,-0.50001 c 40,0 40,30 40,40 z"
-         style="fill:#0000ff;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+         style="fill:#0000ff;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1" />
       <path
          sodipodi:nodetypes="zcczzcczz"
          inkscape:connector-curvature="0"
          id="path4215-9"
          d="m 190,202.3622 c -10,0 -10,10 -10,10 l 0,10 c 0,0 0,10 10,10 l 70,0 c 10,0 10,-10 10,-10 l 0,-10 c 0,0 0,-10 -10,-10 z"
-         style="fill:#0000ff;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+         style="fill:#0000ff;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1" />
       <path
          sodipodi:nodetypes="zcczzcczz"
          inkscape:connector-curvature="0"
          id="path4215-3-7"
          d="m 480,192.3622 c 0,-10 -10,-10 -10,-10 l -10,0 c 0,0 -10,0 -10,10 0,10 0,40 0,50 0,10 10,10 10,10 l 10,0 c 0,0 10,0 10,-10 0,-10 0,-40 0,-50 z"
-         style="fill:#0000ff;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+         style="fill:#0000ff;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1" />
       <path
          sodipodi:nodetypes="zcczzcczz"
          inkscape:connector-curvature="0"
          id="path4215-3-3-3"
          d="m 480,72.362205 c 0,-10 -10,-10 -10,-10 l -10,0 c 0,0 -10,0 -10,10 l 0.5,10.500001 c 0,10.000004 10,10.000004 10,10.000004 l 10,0 c 0,0 10,0 10,-10.000004 z"
-         style="fill:#0000ff;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+         style="fill:#0000ff;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1" />
       <circle
          r="45"
          cy="47.362206"
@@ -302,13 +302,13 @@
          inkscape:connector-curvature="0"
          id="path4153-7-7-8"
          d="m 320,271.8622 c 0,-10 10,-10 10,-10 l 10,0 c 0,0 10,0 10,10 0,10 10,10 10,10 l 50,0.5 c 10,0 10,10 10,10 l 0,10 c 0,0 0,10 -10,10 l -50,-0.5 c -40,0 -40,-30 -40,-40 z"
-         style="fill:#0000ff;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+         style="fill:#0000ff;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1" />
       <path
          sodipodi:nodetypes="zcczzcczzcczzcczz"
          inkscape:connector-curvature="0"
          id="path4168-3"
          d="m 520,322.3622 c 0,10 10,10 10,10 l 10,0 c 0,0 10,0 10,-10 l 0,-30 c 0,-10 10,-10 10,-10 l 10,0 c 0,0 10,0 10,10 l 0,30 c 0,10 10,10 10,10 l 10,0 c 0,0 10,0 10,-10 l 0,-180 c 0,-40 -40,-40 -40,-40 l -10,0 c 0,0 -40,0 -40,40 z"
-         style="fill:#0000ff;fill-rule:evenodd" />
+         style="fill:#0000ff;fill-rule:evenodd;fill-opacity:1" />
     </g>
     <flowRoot
        xml:space="preserve"
