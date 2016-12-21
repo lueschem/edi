@@ -1,3 +1,24 @@
+edi (0.2.13) xenial; urgency=medium
+
+  [ Matthias Luescher ]
+  * Updated documentation.
+
+  [ Matthias Lüscher ]
+  * Updated documentation.
+  * Updated read the docs logo.
+  * Updated logo again.
+  * Yet another logo update.
+  * Get rid of sphinx warning.
+  * Added development cycle drawing.
+
+  [ Matthias Luescher ]
+  * Updated documentation.
+  * Fixed docutils import failure - removed wrong import.
+
+  [ Matthias Lüscher (Launchpad) ]
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Wed, 21 Dec 2016 18:19:03 +0100
+
 edi (0.2.12) xenial; urgency=medium
 
   [ Matthias Luescher ]
