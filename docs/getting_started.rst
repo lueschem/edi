@@ -12,6 +12,14 @@ Prerequisites
 
      sudo apt install ansible/xenial-backports
 
+#. Install lxd:
+
+   ::
+
+     sudo apt install lxd
+
+#. Close and re-open your user session to apply the new group membership (this guide assumes that you are either member of the group sudoers or admin, for details please read `the linux containers documentation`_).
+
 #. Initialize lxd:
 
    ::
@@ -20,6 +28,8 @@ Prerequisites
 
    The default settings are ok.
    Use the storage backend "dir" if there is no zfs setup on your computer.
+
+.. _`the linux containers documentation`: https://linuxcontainers.org/lxd/getting-started-cli/
 
 Install edi from the PPA
 ++++++++++++++++++++++++
