@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Matthias Luescher
+# Copyright (C) 2017 Matthias Luescher
 #
 # Authors:
 #  Matthias Luescher
@@ -19,10 +19,20 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
-from edi.commands.imagecommands import *
-from edi.commands.lxccommands import *
-from edi.commands.configcommands import *
-from edi.commands.targetcommands import *
-from edi.commands.qemucommands import *
+from edi.lib.edicommand import EdiCommand
 
-__all__ = ["config", "image", "lxc", "version", "clean", "target", "qemu"]
+
+class Qemu(EdiCommand):
+
+    @classmethod
+    def advertise(cls, subparsers):
+        help_text = "run qemu related operations"
+        description_text = "Run operations that are qemu related."
+        parser = subparsers.add_parser(cls._get_short_command_name(),
+                                       help=help_text,
+                                       description=description_text)
+
+        cls._add_sub_commands(parser)
+
+    def run_cli(self, cli_args):
+        self._run_sub_command_cli(cli_args)
