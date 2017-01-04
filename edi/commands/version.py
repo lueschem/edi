@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+# Copyright (C) 2017 Matthias Luescher
+#
+# Authors:
+#  Matthias Luescher
+#
+# This file is part of edi.
 #
 # edi is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by

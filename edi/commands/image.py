@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Matthias Luescher
+# Copyright (C) 2017 Matthias Luescher
 #
 # Authors:
 #  Matthias Luescher
