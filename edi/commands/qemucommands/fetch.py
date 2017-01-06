@@ -20,7 +20,11 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 from edi.commands.qemu import Qemu
-from edi.lib.helpers import print_success
+from edi.lib.helpers import (print_success, chown_to_user)
+import apt
+import apt_inst
+import tempfile
+import os
 
 
 class Fetch(Qemu):
@@ -40,7 +44,41 @@ class Fetch(Qemu):
     def run(self, config_file):
         self._setup_parser(config_file)
 
-        print("Going to fetch qemu binary")
+        qemu_package = self.config.get_qemu_package_name()
+        print("Going to fetch qemu Debian package ({}).".format(qemu_package))
+
+        workdir = self.config.get_workdir()
+
+        with tempfile.TemporaryDirectory(dir=workdir) as tempdir:
+            chown_to_user(tempdir)
+
+            apt_path = os.path.join(tempdir, 'etc', 'apt')
+            os.makedirs(apt_path)
+
+            sources_list_path = os.path.join(apt_path, 'sources.list')
+            qemu_repository = self.config.get_qemu_repository()
+
+            with open(sources_list_path, encoding='utf-8', mode='w') as f:
+                if qemu_repository:
+                    f.write(qemu_repository)
+                else:
+                    f.write(self.config.get_bootstrap_repository())
+
+            cache = apt.Cache(rootdir=tempdir, memonly=True)
+            cache.update()
+            cache.open()
+
+            pkg = cache[qemu_package]
+            # TODO:
+            # - Error handling
+            # - Proxy handling
+            # - Binary extraction
+            # - Trust check
+            # - Keyring handling
+            print('{0} is trusted: {1}'.format(qemu_package, pkg.candidate.origins[0].trusted))
+            print(pkg.candidate.uri)
+            package_file = pkg.candidate.fetch_binary(destdir=workdir)
+            apt_inst.DebFile(package_file).data.extractall(workdir)
 
         print_success("Fetched qemu binary {}.".format(self._result()))
         return self._result()

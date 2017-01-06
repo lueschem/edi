@@ -48,6 +48,9 @@ class ConfigurationParser():
         # we might want to overwrite it by a config setting
         return os.getcwd()
 
+    def get_bootstrap_repository(self):
+        return self._get_bootstrap_item("repository", None)
+
     def get_distribution(self):
         repository = self._get_bootstrap_item("repository", "")
         return SourceEntry(repository).dist
@@ -68,6 +71,15 @@ class ConfigurationParser():
     def get_bootstrap_components(self):
         repository = self._get_bootstrap_item("repository", "")
         return SourceEntry(repository).comps
+
+    def get_qemu_repository(self):
+        return self._get_qemu_item("repository", None)
+
+    def get_qemu_package_name(self):
+        return self._get_qemu_item("package", "qemu-user-static")
+
+    def get_qemu_repository_key(self):
+        return self._get_qemu_item("repository_key", None)
 
     def get_use_case(self):
         return self._get_general_item("edi_use_case", "edi_uc_run")
@@ -148,7 +160,7 @@ class ConfigurationParser():
     def _merge_configurations(self, base, overlay):
         merged_config = {}
 
-        elements = ["general", "bootstrap"]
+        elements = ["general", "bootstrap", "qemu"]
         for element in elements:
             merged_config[element
                           ] = self._merge_key_value_node(base, overlay,
@@ -197,6 +209,10 @@ class ConfigurationParser():
 
     def _get_bootstrap_item(self, item, default):
         return self._get_config().get("bootstrap", {}
+                                      ).get(item, default)
+
+    def _get_qemu_item(self, item, default):
+        return self._get_config().get("qemu", {}
                                       ).get(item, default)
 
     def _get_general_item(self, item, default):
