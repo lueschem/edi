@@ -21,6 +21,7 @@
 
 from edi.lib.configurationparser import ConfigurationParser
 from tests.libtesting.fixtures.configfiles import config_files, config_name
+import subprocess
 
 
 def test_project_name(config_files):
@@ -51,7 +52,12 @@ def test_bootstrap_overlay(config_files):
         assert parser.get_bootstrap_tool() == "debootstrap"
 
 
-def test_playbooks_overlay(config_files):
+def test_playbooks_overlay(config_files, monkeypatch):
+    def fakerun(*popenargs, **kwargs):
+        return subprocess.CompletedProcess("fakerun", 0, '')
+
+    monkeypatch.setattr(subprocess, 'run', fakerun)
+
     with open(config_files, "r") as main_file:
         parser = ConfigurationParser(main_file)
         playbooks = parser.get_ordered_items("playbooks")
