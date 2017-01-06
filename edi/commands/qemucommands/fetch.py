@@ -21,6 +21,7 @@
 
 from edi.commands.qemu import Qemu
 from edi.lib.helpers import (print_success, chown_to_user)
+from edi.lib.shellhelpers import get_user_environment_variable
 import apt
 import apt_inst
 import tempfile
@@ -58,11 +59,22 @@ class Fetch(Qemu):
             sources_list_path = os.path.join(apt_path, 'sources.list')
             qemu_repository = self.config.get_qemu_repository()
 
-            with open(sources_list_path, encoding='utf-8', mode='w') as f:
+            with open(sources_list_path, encoding='utf-8', mode='w') as sources:
                 if qemu_repository:
-                    f.write(qemu_repository)
+                    sources.write(qemu_repository)
                 else:
-                    f.write(self.config.get_bootstrap_repository())
+                    sources.write(self.config.get_bootstrap_repository())
+
+            apt_conf_path = os.path.join(apt_path, "apt.conf")
+            proxy_settings = {'http_proxy': 'Acquire::http::proxy',
+                              'https_proxy': 'Acquire::https::proxy',
+                              'ftp_proxy': 'Acquire::ftp::proxy',
+                              'socks_proxy': 'Acquire::socks::proxy'}
+            with open(apt_conf_path, encoding='utf-8', mode='w') as aptconf:
+                for setting in proxy_settings:
+                    env_value = get_user_environment_variable(setting)
+                    if env_value:
+                        aptconf.write('{0} "{1}";\n'.format(proxy_settings[setting],env_value))
 
             cache = apt.Cache(rootdir=tempdir, memonly=True)
             cache.update()
@@ -71,7 +83,6 @@ class Fetch(Qemu):
             pkg = cache[qemu_package]
             # TODO:
             # - Error handling
-            # - Proxy handling
             # - Binary extraction
             # - Trust check
             # - Keyring handling
