@@ -28,6 +28,7 @@ import logging
 from aptsources.sourceslist import SourceEntry
 from edi.lib.helpers import (get_user, get_user_gid, get_user_uid,
                              get_hostname, print_error_and_exit)
+from edi.lib.shellhelpers import get_user_environment_variable
 
 _supported_use_cases = ["edi_uc_run", "edi_uc_build",
                         "edi_uc_test", "edi_uc_develop"]
@@ -231,11 +232,11 @@ class ConfigurationParser():
                   ] = self.get_edi_plugin_directory()
         load_dict["edi_project_plugin_directory"
                   ] = self.get_project_plugin_directory()
-        load_dict["edi_host_http_proxy"] = os.environ.get('http_proxy', '')
-        load_dict["edi_host_https_proxy"] = os.environ.get('https_proxy', '')
-        load_dict["edi_host_ftp_proxy"] = os.environ.get('ftp_proxy', '')
-        load_dict["edi_host_socks_proxy"] = os.environ.get('socks_proxy', '')
-        load_dict["edi_host_no_proxy"] = os.environ.get('no_proxy', '')
+        load_dict["edi_host_http_proxy"] = get_user_environment_variable('http_proxy', '')
+        load_dict["edi_host_https_proxy"] = get_user_environment_variable('https_proxy', '')
+        load_dict["edi_host_ftp_proxy"] = get_user_environment_variable('ftp_proxy', '')
+        load_dict["edi_host_socks_proxy"] = get_user_environment_variable('socks_proxy', '')
+        load_dict["edi_host_no_proxy"] = get_user_environment_variable('no_proxy', '')
         return load_dict
 
     def _get_node_dictionary(self, node):

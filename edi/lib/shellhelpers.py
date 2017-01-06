@@ -71,3 +71,13 @@ def get_chroot_cmd(rootfs):
     cmd.append("chroot")
     cmd.append(rootfs)
     return cmd
+
+
+def get_user_environment_variable(name, default=None):
+    # get the variable from the user, not from root if edi is called using sudo
+    cmd = ["printenv", name]
+    result = run(cmd, stdout=subprocess.PIPE, check=False)
+    if result.returncode == 0:
+        return result.stdout.strip('\n')
+    else:
+        return default

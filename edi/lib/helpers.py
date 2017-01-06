@@ -50,7 +50,7 @@ def get_user():
             return os.environ['USER']
     except KeyError:
         # Hint: there is no $USER during debuild
-        logging.warn("Unable to get user from environment variable.")
+        logging.warning("Unable to get user from environment variable.")
         return "root"
 
 
