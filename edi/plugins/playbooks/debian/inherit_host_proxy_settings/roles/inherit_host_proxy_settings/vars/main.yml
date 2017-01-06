@@ -2,5 +2,5 @@
 proxy_configs: [{ key: 'http_proxy', apt_key: 'Acquire::http::proxy', value: "{{ edi_host_http_proxy }}" },
                 { key: 'https_proxy', apt_key: 'Acquire::https::proxy', value: "{{ edi_host_https_proxy }}" },
                 { key: 'ftp_proxy', apt_key: 'Acquire::ftp::proxy', value: "{{ edi_host_ftp_proxy }}" },
-                { key: 'socks_proxy', apt_key: 'Acquire::socks::proxy', value: "{{ edi_host_socks_proxy }}" },
+                { key: 'all_proxy', apt_key: 'Acquire::socks::proxy', value: "{{ edi_host_socks_proxy }}" },
                 { key: 'no_proxy', apt_key: '', value: "{{ edi_host_no_proxy }}" }]

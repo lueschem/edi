@@ -235,7 +235,7 @@ class ConfigurationParser():
         load_dict["edi_host_http_proxy"] = get_user_environment_variable('http_proxy', '')
         load_dict["edi_host_https_proxy"] = get_user_environment_variable('https_proxy', '')
         load_dict["edi_host_ftp_proxy"] = get_user_environment_variable('ftp_proxy', '')
-        load_dict["edi_host_socks_proxy"] = get_user_environment_variable('socks_proxy', '')
+        load_dict["edi_host_socks_proxy"] = get_user_environment_variable('all_proxy', '')
         load_dict["edi_host_no_proxy"] = get_user_environment_variable('no_proxy', '')
         return load_dict
 
