@@ -20,30 +20,41 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 from edi.commands.qemu import Qemu
-from edi.lib.helpers import (print_success, chown_to_user)
-from edi.lib.shellhelpers import get_user_environment_variable
+from edi.lib.helpers import (print_success, chown_to_user, print_error_and_exit)
+from edi.lib.shellhelpers import (get_user_environment_variable, get_debian_architecture)
 import apt
 import apt_inst
 import tempfile
 import os
+import logging
+import shutil
 
 
 class Fetch(Qemu):
 
     @classmethod
     def advertise(cls, subparsers):
-        help_text = "fetch a qemu binary"
-        description_text = "Fetch a qemu binary."
+        help_text = "fetch a QEMU binary"
+        description_text = "Fetch a QEMU binary."
         parser = subparsers.add_parser(cls._get_short_command_name(),
                                        help=help_text,
                                        description=description_text)
         cls._require_config_file(parser)
 
     def run_cli(self, cli_args):
-        result = self.run(cli_args.config_file)
+        self.run(cli_args.config_file)
 
     def run(self, config_file):
         self._setup_parser(config_file)
+
+        if not self._needs_qemu():
+            return None
+
+        if os.path.isfile(self._result()):
+            logging.info(("{0} is already there. "
+                          "Delete it to re-fetch it."
+                          ).format(self._result()))
+            return self._result()
 
         qemu_package = self.config.get_qemu_package_name()
         print("Going to fetch qemu Debian package ({}).".format(qemu_package))
@@ -83,16 +94,58 @@ class Fetch(Qemu):
             pkg = cache[qemu_package]
             # TODO:
             # - Error handling
-            # - Binary extraction
             # - Trust check
             # - Keyring handling
-            print('{0} is trusted: {1}'.format(qemu_package, pkg.candidate.origins[0].trusted))
-            print(pkg.candidate.uri)
-            package_file = pkg.candidate.fetch_binary(destdir=workdir)
-            apt_inst.DebFile(package_file).data.extractall(workdir)
+            package_file = pkg.candidate.fetch_binary(destdir=tempdir)
+            apt_inst.DebFile(package_file).data.extractall(tempdir)
+            qemu_binary = os.path.join(tempdir, 'usr', 'bin', self._get_qemu_binary_name())
+            chown_to_user(qemu_binary)
+            shutil.move(qemu_binary, self._result())
 
         print_success("Fetched qemu binary {}.".format(self._result()))
         return self._result()
 
+    def clean(self, config_file):
+        self._setup_parser(config_file)
+
+        result = self._result()
+        if not result:
+            return
+        elif os.path.isfile(result):
+            logging.info("Removing '{}'.".format(result))
+            os.remove(result)
+            print_success("Removed QEMU binary {}.".format(result))
+
     def _result(self):
-        return "None"
+        if not self._needs_qemu():
+            return None
+        else:
+            return os.path.join(self.config.get_workdir(), self._get_qemu_binary_name())
+
+    def _get_qemu_binary_name(self):
+        arch_dict = {'amd64': 'x86_64',
+                     'arm64': 'aarch64',
+                     'armel': 'arm',
+                     'armhf': 'arm',
+                     'i386': 'i386',
+                     'mips': 'mips',
+                     'mipsel': 'mipsel',
+                     'powerpc': 'ppc',
+                     'ppc64el': 'ppc64le',
+                     's390x': 's390x'}
+        debian_arch = self.config.get_architecture()
+        qemu_arch = arch_dict.get(debian_arch)
+        if not qemu_arch:
+            print_error_and_exit('Unable to derive QEMU architecture form Debian architecture ({}).'.format(debian_arch))
+
+        return 'qemu-{}-static'.format(qemu_arch)
+
+    def _needs_qemu(self):
+        host_architecture = get_debian_architecture()
+        container_architecture = self.config.get_architecture()
+        if host_architecture == container_architecture:
+            return False
+        elif host_architecture == 'amd64' and container_architecture == 'i386':
+            return False
+        else:
+            return True

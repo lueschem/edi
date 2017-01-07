@@ -22,8 +22,6 @@
 import logging
 import subprocess
 import os
-import shutil
-from contextlib import contextmanager
 from edi.lib.helpers import get_user
 
 _ADAPTIVE = -42
@@ -81,3 +79,8 @@ def get_user_environment_variable(name, default=None):
         return result.stdout.strip('\n')
     else:
         return default
+
+
+def get_debian_architecture():
+    cmd = ['dpkg', '--print-architecture']
+    return run(cmd, stdout=subprocess.PIPE).stdout.strip('\n')
