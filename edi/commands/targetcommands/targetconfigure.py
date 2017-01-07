@@ -37,7 +37,7 @@ class Configure(Target):
         cls._require_config_file(parser)
 
     def run_cli(self, cli_args):
-        result = self.run(cli_args.ip_address, cli_args.config_file)
+        self.run(cli_args.ip_address, cli_args.config_file)
 
     def run(self, ip_address, config_file):
         self._setup_parser(config_file)

@@ -43,7 +43,7 @@ class Launch(Lxc):
         cls._require_config_file(parser)
 
     def run_cli(self, cli_args):
-        result = self.run(cli_args.container_name, cli_args.config_file)
+        self.run(cli_args.container_name, cli_args.config_file)
 
     def run(self, container_name, config_file):
         self._setup_parser(config_file)

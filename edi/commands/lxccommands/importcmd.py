@@ -39,7 +39,7 @@ class Import(Lxc):
         cls._require_config_file(parser)
 
     def run_cli(self, cli_args):
-        result = self.run(cli_args.config_file)
+        self.run(cli_args.config_file)
 
     def run(self, config_file):
         self._setup_parser(config_file)
