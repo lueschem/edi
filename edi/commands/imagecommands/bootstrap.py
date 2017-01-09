@@ -26,6 +26,7 @@ import gnupg
 import shutil
 import logging
 from edi.commands.image import Image
+from edi.commands.qemucommands.fetch import Fetch
 from edi.lib.helpers import (require_executable, print_error_and_exit,
                              chown_to_user, print_success)
 from edi.lib.shellhelpers import run, get_chroot_cmd
@@ -54,9 +55,11 @@ class Bootstrap(Image):
                           ).format(self._result()))
             return self._result()
 
-        print("Going to bootstrap initial image - be patient.")
-
         self._require_sudo()
+
+        qemu_executable = Fetch().run(config_file)
+
+        print("Going to bootstrap initial image - be patient.")
 
         if self.config.get_bootstrap_tool() != "debootstrap":
             print_error_and_exit(("At the moment only debootstrap "
@@ -70,7 +73,7 @@ class Bootstrap(Image):
             chown_to_user(tempdir)
             key_data = self._fetch_bootstrap_repository_key(tempdir)
             keyring_file = self._build_keyring(tempdir, key_data)
-            rootfs = self._run_debootstrap(tempdir, keyring_file)
+            rootfs = self._run_debootstrap(tempdir, keyring_file, qemu_executable)
             self._postprocess_rootfs(rootfs, key_data)
             archive = self._pack_image(tempdir, rootfs)
             chown_to_user(archive)
@@ -117,7 +120,7 @@ class Bootstrap(Image):
         else:
             return None
 
-    def _run_debootstrap(self, tempdir, keyring_file):
+    def _run_debootstrap(self, tempdir, keyring_file, qemu_executable):
         # Ansible uses python on the target system
         # sudo is needed for privilege escalation
         additional_packages = ("python,sudo,netbase,net-tools,iputils-ping,ifupdown,isc-dhcp-client,"
@@ -128,6 +131,8 @@ class Bootstrap(Image):
         cmd = []
         cmd.append("debootstrap")
         cmd.append("--arch={0}".format(self.config.get_architecture()))
+        if qemu_executable:
+            cmd.append("--foreign")
         cmd.append("--variant=minbase")
         cmd.append("--include={0}".format(additional_packages))
         cmd.append("--components={0}".format(components))
@@ -138,9 +143,19 @@ class Bootstrap(Image):
         cmd.append(rootfs)
         cmd.append(self.config.get_bootstrap_uri())
         run(cmd, sudo=True)
+
+        if qemu_executable:
+            qemu_target_path = os.path.join(rootfs, "usr", "bin")
+            shutil.copy(qemu_executable, qemu_target_path)
+            second_stage_cmd = get_chroot_cmd(rootfs)
+            second_stage_cmd.append("/debootstrap/debootstrap")
+            second_stage_cmd.append("--second-stage")
+            run(second_stage_cmd, sudo=True)
+
         return rootfs
 
-    def _postprocess_rootfs(self, rootfs, key_data):
+    @staticmethod
+    def _postprocess_rootfs(rootfs, key_data):
         if key_data:
             key_cmd = get_chroot_cmd(rootfs)
             key_cmd.append("apt-key")

@@ -32,6 +32,7 @@ from codecs import open
 from edi.commands.image import Image
 from edi.commands.imagecommands.bootstrap import Bootstrap
 from edi.lib.helpers import chown_to_user, print_success
+from edi.lib.shellhelpers import get_debian_architecture
 
 
 class Lxc(Image):
@@ -71,7 +72,7 @@ class Lxc(Image):
         with tempfile.TemporaryDirectory(dir=workdir) as tempdir:
             chown_to_user(tempdir)
             lxcimagedir = os.path.join(tempdir, "lxcimage")
-            rootfsdir = self._unpack_image(bootstrap_result, lxcimagedir)
+            self._unpack_image(bootstrap_result, lxcimagedir)
             self._write_container_metadata(lxcimagedir)
             archive = self._pack_image(tempdir, lxcimagedir)
             chown_to_user(archive)
@@ -98,7 +99,9 @@ class Lxc(Image):
 
     def _write_container_metadata(self, imagedir):
         metadata = {}
-        metadata["architecture"] = self.config.get_architecture()
+        # we build this container for the host architecture
+        # (QEMU makes sure that the binaries of a foreign architecture can also run)
+        metadata["architecture"] = get_debian_architecture()
         metadata["creation_date"] = calendar.timegm(time.gmtime())
 
         template_node = {}
