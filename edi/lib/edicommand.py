@@ -73,10 +73,6 @@ class EdiCommand(metaclass=CommandFactory):
         return cls.__name__.lower()
 
     @classmethod
-    def _get_cli_command_string(cls):
-        return cls._get_command_name().replace(".", " ")
-
-    @classmethod
     def _get_command_file_name_prefix(cls):
         return cls._get_command_name().replace(".", "_")
 
@@ -106,9 +102,8 @@ class EdiCommand(metaclass=CommandFactory):
         if os.getuid() != 0:
             print_error_and_exit(("The subcommand '{0}' requires superuser "
                                   "privileges.\n"
-                                  "Use 'sudo edi {1} ...'."
-                                  ).format(self._get_short_command_name(),
-                                           self._get_cli_command_string()))
+                                  "Use 'sudo edi ...'."
+                                  ).format(self._get_short_command_name()))
 
     def _pack_image(self, tempdir, datadir, name="result"):
         # advanced options such as numeric-owner are not supported by
