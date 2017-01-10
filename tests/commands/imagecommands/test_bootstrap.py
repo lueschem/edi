@@ -51,6 +51,8 @@ def test_bootstrap(config_files, monkeypatch):
                 archive = popenargs[0][-1]
                 with open(archive, mode="w") as fakearchive:
                     fakearchive.write("fake archive")
+            elif popenargs[0][-2] == "dpkg" and popenargs[0][-1] == "--print-architecture":
+                return subprocess.CompletedProcess("fakerun", 0, 'amd64')
             return subprocess.CompletedProcess("fakerun", 0, '')
         monkeypatch.setattr(subprocess, 'run', fakerun)
 
