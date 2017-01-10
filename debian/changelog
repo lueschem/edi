@@ -1,3 +1,28 @@
+edi (0.3.0) xenial; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Added cross compilation drawing.
+  * Added drawing for self contained workflow.
+  * Fixed copyright notice in multiple source files.
+  * Added empty qemu fetch command.
+  * Added first prototype of qemu fetch command.
+  * Get proxy settings from user and not from root.
+  * Handle proxy in qemu fetch command.
+  * Fixed socks proxy handling.
+  * Fixed unit tests.
+  * Finalized qemu fetch prototype implementation.
+  * Removed unused result variables.
+  * Make bootstrap command aware of foreign architecture.
+
+  [ Matthias Luescher ]
+  * Fixed superuser hint.
+  * Enforce a recent python3-apt package.
+  * Fix test for bootstrap command.
+
+  [ Matthias Lüscher (Launchpad) ]
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Tue, 10 Jan 2017 12:12:16 +0100
+
 edi (0.2.13) xenial; urgency=medium
 
   [ Matthias Luescher ]
