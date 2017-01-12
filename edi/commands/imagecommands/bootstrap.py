@@ -20,9 +20,7 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 import tempfile
-import requests
 import os
-import gnupg
 import shutil
 import logging
 from edi.commands.image import Image
@@ -30,6 +28,7 @@ from edi.commands.qemucommands.fetch import Fetch
 from edi.lib.helpers import (require_executable, print_error_and_exit,
                              chown_to_user, print_success)
 from edi.lib.shellhelpers import run, get_chroot_cmd
+from edi.lib.keyhelpers import fetch_repository_key, build_keyring
 
 
 class Bootstrap(Image):
@@ -71,8 +70,8 @@ class Bootstrap(Image):
 
         with tempfile.TemporaryDirectory(dir=workdir) as tempdir:
             chown_to_user(tempdir)
-            key_data = self._fetch_bootstrap_repository_key(tempdir)
-            keyring_file = self._build_keyring(tempdir, key_data)
+            key_data = fetch_repository_key(self.config.get_bootstrap_repository_key())
+            keyring_file = build_keyring(tempdir, "temp_keyring.gpg", key_data)
             rootfs = self._run_debootstrap(tempdir, keyring_file, qemu_executable)
             self._postprocess_rootfs(rootfs, key_data)
             archive = self._pack_image(tempdir, rootfs)
@@ -97,28 +96,6 @@ class Bootstrap(Image):
                                  self._get_command_file_name_prefix(),
                                  self.config.get_compression())
         return os.path.join(self.config.get_workdir(), archive_name)
-
-    def _fetch_bootstrap_repository_key(self, tempdir):
-        key_url = self.config.get_bootstrap_repository_key()
-        if key_url:
-            key_req = requests.get(key_url)
-            if key_req.status_code != 200:
-                print_error_and_exit(("Unable to fetch repository key '{0}'"
-                                      ).format(key_url))
-
-            return key_req.text
-        else:
-            return None
-
-    def _build_keyring(self, tempdir, key_data):
-        if key_data:
-            keyring_file = os.path.join(tempdir, "temp_pubring.gpg")
-            gpg = gnupg.GPG(gnupghome=tempdir, keyring=keyring_file)
-            gpg.encoding = 'utf-8'
-            gpg.import_keys(key_data)
-            return keyring_file
-        else:
-            return None
 
     def _run_debootstrap(self, tempdir, keyring_file, qemu_executable):
         # Ansible uses python on the target system
