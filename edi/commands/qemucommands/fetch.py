@@ -20,8 +20,9 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 from edi.commands.qemu import Qemu
-from edi.lib.helpers import (print_success, chown_to_user, print_error_and_exit)
-from edi.lib.shellhelpers import (get_user_environment_variable, get_debian_architecture)
+from edi.lib.helpers import print_success, chown_to_user, print_error_and_exit
+from edi.lib.shellhelpers import get_user_environment_variable, get_debian_architecture
+from edi.lib.keyhelpers import fetch_repository_key, build_keyring
 import apt
 import apt_inst
 import tempfile
@@ -73,8 +74,13 @@ class Fetch(Qemu):
             with open(sources_list_path, encoding='utf-8', mode='w') as sources:
                 if qemu_repository:
                     sources.write(qemu_repository)
+                    key_url = self.config.get_qemu_repository_key()
                 else:
                     sources.write(self.config.get_bootstrap_repository())
+                    key_url = self.config.get_bootstrap_repository_key()
+
+            key_data = fetch_repository_key(key_url)
+            build_keyring(apt_path, "trusted.gpg", key_data)
 
             apt_conf_path = os.path.join(apt_path, "apt.conf")
             proxy_settings = {'http_proxy': 'Acquire::http::proxy',
@@ -86,12 +92,17 @@ class Fetch(Qemu):
                     env_value = get_user_environment_variable(setting)
                     if env_value:
                         aptconf.write('{0} "{1}";\n'.format(proxy_settings[setting],env_value))
+                aptconf.write('Debug::Acquire::gpgv "1";\n')
 
             cache = apt.Cache(rootdir=tempdir, memonly=True)
             cache.update()
             cache.open()
 
             pkg = cache[qemu_package]
+            if key_url and not pkg.candidate.origins[0].trusted:
+                logging.warning(('The trustworthiness of the package {} can not be '
+                                 'verified with the key {}.'
+                                 ).format(pkg.candidate.uri, key_url))
             # TODO:
             # - Error handling
             # - Trust check
