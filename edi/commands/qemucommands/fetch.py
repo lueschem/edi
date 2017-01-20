@@ -144,7 +144,7 @@ class Fetch(Qemu):
                      'powerpc': 'ppc',
                      'ppc64el': 'ppc64le',
                      's390x': 's390x'}
-        debian_arch = self.config.get_architecture()
+        debian_arch = self.config.get_bootstrap_architecture()
         qemu_arch = arch_dict.get(debian_arch)
         if not qemu_arch:
             print_error_and_exit('Unable to derive QEMU architecture form Debian architecture ({}).'.format(debian_arch))
@@ -153,7 +153,7 @@ class Fetch(Qemu):
 
     def _needs_qemu(self):
         host_architecture = get_debian_architecture()
-        container_architecture = self.config.get_architecture()
+        container_architecture = self.config.get_bootstrap_architecture()
         if host_architecture == container_architecture:
             return False
         elif host_architecture == 'amd64' and container_architecture == 'i386':

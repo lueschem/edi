@@ -23,6 +23,7 @@ import tempfile
 import os
 import shutil
 import logging
+from aptsources.sourceslist import SourceEntry
 from edi.commands.image import Image
 from edi.commands.qemucommands.fetch import Fetch
 from edi.lib.helpers import (require_executable, print_error_and_exit,
@@ -103,11 +104,12 @@ class Bootstrap(Image):
         additional_packages = ("python,sudo,netbase,net-tools,iputils-ping,ifupdown,isc-dhcp-client,"
                                "resolvconf,systemd,systemd-sysv")
         rootfs = os.path.join(tempdir, "rootfs")
-        components = ",".join(self.config.get_bootstrap_components())
+        bootstrap_source = SourceEntry(self.config.get_bootstrap_repository())
+        components = ",".join(bootstrap_source.comps)
 
         cmd = []
         cmd.append("debootstrap")
-        cmd.append("--arch={0}".format(self.config.get_architecture()))
+        cmd.append("--arch={0}".format(self.config.get_bootstrap_architecture()))
         if qemu_executable:
             cmd.append("--foreign")
         cmd.append("--variant=minbase")
@@ -116,9 +118,9 @@ class Bootstrap(Image):
         if keyring_file:
             cmd.append("--force-check-gpg")
             cmd.append("--keyring={0}".format(keyring_file))
-        cmd.append(self.config.get_distribution())
+        cmd.append(bootstrap_source.dist)
         cmd.append(rootfs)
-        cmd.append(self.config.get_bootstrap_uri())
+        cmd.append(bootstrap_source.uri)
         run(cmd, sudo=True)
 
         if qemu_executable:

@@ -19,6 +19,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
+from aptsources.sourceslist import SourceEntry
 from edi.lib.configurationparser import ConfigurationParser
 from tests.libtesting.fixtures.configfiles import config_files, config_name
 import subprocess
@@ -42,13 +43,14 @@ def test_bootstrap_overlay(config_files):
     with open(config_files, "r") as main_file:
         parser = ConfigurationParser(main_file)
         # the host file shall win
-        assert parser.get_architecture() == "i386"
-        assert "main" in parser.get_bootstrap_components()
-        assert parser.get_bootstrap_uri() == "http://ftp.ch.debian.org/debian/"
+        boostrap_source = SourceEntry(parser.get_bootstrap_repository())
+        assert parser.get_bootstrap_architecture() == "i386"
+        assert "main" in boostrap_source.comps
+        assert boostrap_source.uri == "http://ftp.ch.debian.org/debian/"
         # the all file shall provide this key
         expected_key = "https://ftp-master.debian.org/keys/archive-key-8.asc"
         assert parser.get_bootstrap_repository_key() == expected_key
-        assert parser.get_distribution() == "jessie"
+        assert boostrap_source.dist == "jessie"
         assert parser.get_bootstrap_tool() == "debootstrap"
 
 

@@ -25,7 +25,6 @@ from jinja2 import Template
 import os
 from os.path import dirname, abspath, basename, splitext, isfile, join
 import logging
-from aptsources.sourceslist import SourceEntry
 from edi.lib.helpers import (get_user, get_user_gid, get_user_uid,
                              get_hostname, print_error_and_exit)
 from edi.lib.shellhelpers import get_user_environment_variable
@@ -52,26 +51,14 @@ class ConfigurationParser():
     def get_bootstrap_repository(self):
         return self._get_bootstrap_item("repository", None)
 
-    def get_distribution(self):
-        repository = self._get_bootstrap_item("repository", "")
-        return SourceEntry(repository).dist
-
-    def get_architecture(self):
+    def get_bootstrap_architecture(self):
         return self._get_bootstrap_item("architecture", None)
 
     def get_bootstrap_tool(self):
         return self._get_bootstrap_item("tool", "debootstrap")
 
-    def get_bootstrap_uri(self):
-        repository = self._get_bootstrap_item("repository", "")
-        return SourceEntry(repository).uri
-
     def get_bootstrap_repository_key(self):
         return self._get_bootstrap_item("repository_key", None)
-
-    def get_bootstrap_components(self):
-        repository = self._get_bootstrap_item("repository", "")
-        return SourceEntry(repository).comps
 
     def get_qemu_repository(self):
         return self._get_qemu_item("repository", None)
