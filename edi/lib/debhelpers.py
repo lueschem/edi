@@ -24,6 +24,7 @@ import os
 import subprocess
 import tempfile
 import re
+from debian import deb822
 from aptsources.sourceslist import SourceEntry
 from edi.lib.helpers import print_error_and_exit, chown_to_user
 from edi.lib.shellhelpers import run
@@ -53,6 +54,27 @@ def _fetch_archive_element(url, tempdir, prefix='', check=True):
         result_file.write(req.content)
 
     return file_path
+
+
+def _parse_release_file(release_file, architectures, components, compressions):
+    with open(release_file) as file:
+        main_content = next(deb822.Release.iter_paragraphs(file))
+        section = main_content.get('SHA512')
+        if not section:
+            section = main_content.get('SHA256')
+
+        if not section:
+            # TODO: Improve hints within error handling.
+            print_error_and_exit('Neither SHA512 nor SHA256 section found in release file.')
+
+        packages_filter = ['{}/binary-{}/Packages.{}'.format(component, architecture, compression)
+                           for component in components
+                           for architecture in architectures
+                           for compression in compressions]
+
+        packages = [ element for element in section if element.get('name') in packages_filter ]
+
+        return packages
 
 
 def verify_signature(homedir, keyring, signed_file, detached_signature=None):
@@ -85,7 +107,10 @@ def verify_signature(homedir, keyring, signed_file, detached_signature=None):
 def runtest():
     repository = 'deb http://ftp.ch.debian.org/debian/ jessie main'
     repository_key = 'https://ftp-master.debian.org/keys/archive-key-8.asc'
+    package_name = 'qemu-user-static'
     workdir = os.path.join(os.sep, 'home', 'lueschem', 'workspace', 'edi')
+    architectures = ['all', 'amd64']
+    compressions = ['gz', 'bz2', 'xz']
     source = SourceEntry(repository)
 
     with tempfile.TemporaryDirectory(dir=workdir) as tempdir:
@@ -104,5 +129,9 @@ def runtest():
             keyring = build_keyring(tempdir, 'trusted.gpg', key_data)
             if not verify_signature(tempdir, keyring, release_file, signature_file):
                 print_error_and_exit('Signature check failed!')
+
+        packages = _parse_release_file(release_file, architectures, source.comps, compressions)
+        print(packages)
+        #_download_package(package_name, packages, compressions)
 
 # gpg --homedir /home/lueschem/workspace/edi --weak-digest SHA1 --weak-digest RIPEMD160 --no-default-keyring --status-fd 1 --keyring /home/lueschem/workspace/edi/trusted.gpg --verify /home/lueschem/workspace/edi/Release.gpg /home/lueschem/workspace/edi/Release
