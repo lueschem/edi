@@ -104,6 +104,23 @@ def verify_signature(homedir, keyring, signed_file, detached_signature=None):
         return False
 
 
+def _download_package(uri, distribution, workdir, package_name, packages):
+    downloaded_package_prefix = []
+    for package in packages:
+        match = re.match('^(.*)Packages\.*([a-z2]{1,3})$', package['name'])
+        if not match or not len(match.groups()) <= 2:
+            print_error_and_exit('Error parsing package name string {}.'.format(package['name']))
+
+        prefix = match.group(1).replace('/', '_')
+
+        if not prefix in downloaded_package_prefix:
+            package_url = '{}/dists/{}/{}'.format(uri, distribution, package['name'])
+            package_file = try_fetch_archive_element(package_url, workdir, prefix=prefix)
+            if package_file:
+                downloaded_package_prefix.append(prefix)
+                print('Downloaded package {} to {}.'.format(package_url, package_file))
+
+
 def runtest():
     repository = 'deb http://ftp.ch.debian.org/debian/ jessie main'
     repository_key = 'https://ftp-master.debian.org/keys/archive-key-8.asc'
@@ -132,6 +149,6 @@ def runtest():
 
         packages = _parse_release_file(release_file, architectures, source.comps, compressions)
         print(packages)
-        #_download_package(package_name, packages, compressions)
+        _download_package(source.uri, source.dist, tempdir, package_name, packages)
 
 # gpg --homedir /home/lueschem/workspace/edi --weak-digest SHA1 --weak-digest RIPEMD160 --no-default-keyring --status-fd 1 --keyring /home/lueschem/workspace/edi/trusted.gpg --verify /home/lueschem/workspace/edi/Release.gpg /home/lueschem/workspace/edi/Release
