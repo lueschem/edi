@@ -19,20 +19,26 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
-magic_dict = {
-    "gz": b'\x1f\x8b\x08',
-    "bz2": b'\x42\x5a\x68',
-    "xz": b'\xfd\x37\x7a\x58\x5a\x00'
-    }
+import zlib
+import bz2
+import lzma
+from functools import partial
+from edi.lib.helpers import print_error_and_exit
 
-max_len = max(len(magic) for _, magic in magic_dict.items())
 
-def compression_type(filename):
-    with open(filename, mode='rb') as f:
-        file_start = f.read(max_len)
-    for filetype, magic in magic_dict.items():
-        print(file_start)
-        print(magic)
-        if file_start.startswith(magic):
-            return filetype
-    return "no match"
+def _gz_decompress(data):
+    return zlib.decompress(data, 16+zlib.MAX_WBITS)
+
+
+decompressor_from_magic = [
+    (b'\x1f\x8b\x08', partial(_gz_decompress)), # gz
+    (b'\x42\x5a\x68', partial(bz2.decompress)), # bz2
+    (b'\xfd\x37\x7a\x58\x5a\x00', partial(lzma.decompress)), # xz
+    ]
+
+
+def decompress(data):
+    for item in decompressor_from_magic:
+        if data.startswith(item[0]):
+            return item[1](data)
+    print_error_and_exit("Unknown compression type!")
