@@ -176,6 +176,9 @@ def runtest():
 
         package_files = _parse_release_file(release_file, architectures, source.comps, ['gz', 'bz2', 'xz'])
         requested_package = _find_package_in_package_files(source.uri, source.dist, package_name, package_files)
-        result = _download_package(source.uri, requested_package, workdir)
-        print('Downloaded {}.'.format(result))
-        print('SHA256 checksum should be {}.'.format(requested_package['SHA256']))
+        if not requested_package:
+            print('Package {} not found.'.format(package_name))
+        else:
+            result = _download_package(source.uri, requested_package, workdir)
+            print('Downloaded {}.'.format(result))
+            print('SHA256 checksum should be {}.'.format(requested_package['SHA256']))
