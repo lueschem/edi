@@ -24,22 +24,23 @@ import os
 import subprocess
 import tempfile
 import re
-from debian import deb822
+import debian.deb822
 from aptsources.sourceslist import SourceEntry
 from edi.lib.helpers import print_error_and_exit, chown_to_user
 from edi.lib.shellhelpers import run
+from edi.lib.archivehelpers import decompress
 import logging
 
 
-def fetch_archive_element(url, tempdir, prefix=''):
-    return _fetch_archive_element(url, tempdir, prefix=prefix, check=True)
+def fetch_archive_element(url):
+    return _fetch_archive_element(url, check=True)
 
 
-def try_fetch_archive_element(url, tempdir, prefix=''):
-    return _fetch_archive_element(url, tempdir, prefix=prefix, check=False)
+def try_fetch_archive_element(url):
+    return _fetch_archive_element(url, check=False)
 
 
-def _fetch_archive_element(url, tempdir, prefix='', check=True):
+def _fetch_archive_element(url, check=True):
     req = requests.get(url)
     if req.status_code != 200:
         if check:
@@ -48,17 +49,12 @@ def _fetch_archive_element(url, tempdir, prefix='', check=True):
         else:
             return None
 
-    file_path = os.path.join(tempdir, '{0}{1}'.format(prefix, url.rsplit('/', 1)[-1]))
-
-    with open(file_path, mode='w+b') as result_file:
-        result_file.write(req.content)
-
-    return file_path
+    return req.content
 
 
 def _parse_release_file(release_file, architectures, components, compressions):
     with open(release_file) as file:
-        main_content = next(deb822.Release.iter_paragraphs(file))
+        main_content = next(debian.deb822.Release.iter_paragraphs(file))
         section = main_content.get('SHA512')
         if not section:
             section = main_content.get('SHA256')
@@ -72,9 +68,9 @@ def _parse_release_file(release_file, architectures, components, compressions):
                            for architecture in architectures
                            for compression in compressions]
 
-        packages = [ element for element in section if element.get('name') in packages_filter ]
+        package_files = [ element for element in section if element.get('name') in packages_filter ]
 
-        return packages
+        return package_files
 
 
 def verify_signature(homedir, keyring, signed_file, detached_signature=None):
@@ -104,41 +100,72 @@ def verify_signature(homedir, keyring, signed_file, detached_signature=None):
         return False
 
 
-def _download_package(uri, distribution, workdir, package_name, packages):
+def _find_package_in_package_files(uri, distribution, package_name, package_files):
     downloaded_package_prefix = []
-    for package in packages:
-        match = re.match('^(.*)Packages\.*([a-z2]{1,3})$', package['name'])
+    for package_file in package_files:
+        match = re.match('^(.*)Packages\.*([a-z2]{1,3})$', package_file['name'])
         if not match or not len(match.groups()) <= 2:
-            print_error_and_exit('Error parsing package name string {}.'.format(package['name']))
+            print_error_and_exit('Error parsing package name string {}.'.format(package_file['name']))
 
         prefix = match.group(1).replace('/', '_')
 
-        if not prefix in downloaded_package_prefix:
-            package_url = '{}/dists/{}/{}'.format(uri, distribution, package['name'])
-            package_file = try_fetch_archive_element(package_url, workdir, prefix=prefix)
-            if package_file:
-                downloaded_package_prefix.append(prefix)
-                print('Downloaded package {} to {}.'.format(package_url, package_file))
+        if prefix in downloaded_package_prefix:
+            continue
 
+        package_url = '{}/dists/{}/{}'.format(uri, distribution, package_file['name'])
+        package_file_data = try_fetch_archive_element(package_url)
+        if package_file_data:
+            downloaded_package_prefix.append(prefix)
+            decompressed_package_data = decompress(package_file_data)
+
+            with tempfile.SpooledTemporaryFile() as f:
+                f.write(decompressed_package_data)
+                f.seek(0)
+                for section in debian.deb822.Packages.iter_paragraphs(f):
+                    if section['Package'] == package_name:
+                        return section
+
+    return None
+
+
+def _download_package(uri, package, directory):
+    full_name = package['Filename']
+    package_name = re.match('.*/(.*deb)', full_name).group(1)
+    deb_url = '{}/{}'.format(uri, full_name)
+    package_data = fetch_archive_element(deb_url)
+    package_file = os.path.join(directory, package_name)
+    with open(package_file, mode='wb') as f:
+        f.write(package_data)
+    return package_file
 
 def runtest():
-    repository = 'deb http://ftp.ch.debian.org/debian/ jessie main'
+    repository = 'deb http://ftp.ch.debian.org/debian/ jessie main contrib'
     repository_key = 'https://ftp-master.debian.org/keys/archive-key-8.asc'
     package_name = 'qemu-user-static'
     workdir = os.path.join(os.sep, 'home', 'lueschem', 'workspace', 'edi')
     architectures = ['all', 'amd64']
-    compressions = ['gz', 'bz2', 'xz']
     source = SourceEntry(repository)
 
     with tempfile.TemporaryDirectory(dir=workdir) as tempdir:
         chown_to_user(tempdir)
         base_url = '{}/dists/{}'.format(source.uri, source.dist)
-        release_file = try_fetch_archive_element('{}/InRelease'.format(base_url), tempdir)
+        inrelease_data = try_fetch_archive_element('{}/InRelease'.format(base_url))
+        release_file = os.path.join(tempdir, 'InRelease')
         signature_file = None
 
-        if not release_file:
-            release_file = fetch_archive_element('{}/Release'.format(base_url), tempdir)
-            signature_file = fetch_archive_element('{}/Release.gpg'.format(base_url), tempdir)
+        if inrelease_data:
+            with open(release_file, mode='wb') as f:
+                f.write(inrelease_data)
+        else:
+            release_file = os.path.join(tempdir, 'Release')
+            signature_file = os.path.join(tempdir, 'Release.gpg')
+
+            release_data = fetch_archive_element('{}/Release'.format(base_url))
+            with open(release_file, mode='wb') as f:
+                f.write(release_data)
+            signature_data = fetch_archive_element('{}/Release.gpg'.format(base_url))
+            with open(signature_file, mode='wb') as f:
+                f.write(signature_data)
 
         if repository_key:
             from edi.lib.keyhelpers import fetch_repository_key, build_keyring
@@ -147,8 +174,8 @@ def runtest():
             if not verify_signature(tempdir, keyring, release_file, signature_file):
                 print_error_and_exit('Signature check failed!')
 
-        packages = _parse_release_file(release_file, architectures, source.comps, compressions)
-        print(packages)
-        _download_package(source.uri, source.dist, tempdir, package_name, packages)
-
-# gpg --homedir /home/lueschem/workspace/edi --weak-digest SHA1 --weak-digest RIPEMD160 --no-default-keyring --status-fd 1 --keyring /home/lueschem/workspace/edi/trusted.gpg --verify /home/lueschem/workspace/edi/Release.gpg /home/lueschem/workspace/edi/Release
+        package_files = _parse_release_file(release_file, architectures, source.comps, ['gz', 'bz2', 'xz'])
+        requested_package = _find_package_in_package_files(source.uri, source.dist, package_name, package_files)
+        result = _download_package(source.uri, requested_package, workdir)
+        print('Downloaded {}.'.format(result))
+        print('SHA256 checksum should be {}.'.format(requested_package['SHA256']))
