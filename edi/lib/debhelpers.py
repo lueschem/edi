@@ -25,6 +25,7 @@ import subprocess
 import tempfile
 import re
 import debian.deb822
+import hashlib
 from aptsources.sourceslist import SourceEntry
 from edi.lib.helpers import print_error_and_exit, chown_to_user
 from edi.lib.shellhelpers import run
@@ -100,6 +101,20 @@ def verify_signature(homedir, keyring, signed_file, detached_signature=None):
         return False
 
 
+def _verify_checksum(data, item, checksum_algorithms):
+    for algorithm in checksum_algorithms:
+        checksum = item.get(algorithm, None)
+        if checksum:
+            h = hashlib.new(algorithm.lower())
+            h.update(data)
+            if h.hexdigest() != checksum:
+                print_error_and_exit('Checksum mismatch on repository item.')
+            else:
+                return
+
+    print_error_and_exit('No checksum found for {}.'.format(package_item['name']))
+
+
 def _find_package_in_package_files(uri, distribution, package_name, package_files):
     downloaded_package_prefix = []
     for package_file in package_files:
@@ -115,6 +130,7 @@ def _find_package_in_package_files(uri, distribution, package_name, package_file
         package_url = '{}/dists/{}/{}'.format(uri, distribution, package_file['name'])
         package_file_data = try_fetch_archive_element(package_url)
         if package_file_data:
+            _verify_checksum(package_file_data, package_file, ['sha512', 'sha256'])
             downloaded_package_prefix.append(prefix)
             decompressed_package_data = decompress(package_file_data)
 
@@ -133,6 +149,7 @@ def _download_package(uri, package, directory):
     package_name = re.match('.*/(.*deb)', full_name).group(1)
     deb_url = '{}/{}'.format(uri, full_name)
     package_data = fetch_archive_element(deb_url)
+    _verify_checksum(package_data, package, ['SHA512', 'SHA256'])
     package_file = os.path.join(directory, package_name)
     with open(package_file, mode='wb') as f:
         f.write(package_data)
@@ -181,4 +198,3 @@ def runtest():
         else:
             result = _download_package(source.uri, requested_package, workdir)
             print('Downloaded {}.'.format(result))
-            print('SHA256 checksum should be {}.'.format(requested_package['SHA256']))
