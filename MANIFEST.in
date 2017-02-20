@@ -3,3 +3,5 @@ include COPYING
 include requirements.txt
 
 recursive-include edi/plugins *
+
+recursive-include tests/data *
