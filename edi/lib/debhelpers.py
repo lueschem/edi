@@ -155,12 +155,9 @@ def _download_package(uri, package, directory):
         f.write(package_data)
     return package_file
 
-def runtest():
-    repository = 'deb http://ftp.ch.debian.org/debian/ jessie main contrib'
-    repository_key = 'https://ftp-master.debian.org/keys/archive-key-8.asc'
-    package_name = 'qemu-user-static'
-    workdir = os.path.join(os.sep, 'home', 'lueschem', 'workspace', 'edi')
-    architectures = ['all', 'amd64']
+
+def download_package(package_name='', repository='', repository_key=None,
+                     architectures=[], workdir='/tmp'):
     source = SourceEntry(repository)
 
     with tempfile.TemporaryDirectory(dir=workdir) as tempdir:
@@ -194,7 +191,19 @@ def runtest():
         package_files = _parse_release_file(release_file, architectures, source.comps, ['gz', 'bz2', 'xz'])
         requested_package = _find_package_in_package_files(source.uri, source.dist, package_name, package_files)
         if not requested_package:
-            print('Package {} not found.'.format(package_name))
+            print_error_and_exit('Package {} not found.'.format(package_name))
         else:
             result = _download_package(source.uri, requested_package, workdir)
-            print('Downloaded {}.'.format(result))
+            return result
+
+
+def runtest():
+    repository = 'deb http://ftp.ch.debian.org/debian/ jessie main contrib'
+    repository_key = 'https://ftp-master.debian.org/keys/archive-key-8.asc'
+    package_name = 'qemu-user-static'
+    workdir = os.path.join(os.sep, 'home', 'lueschem', 'workspace', 'edi')
+    architectures = ['all', 'amd64']
+    result = download_package(package_name=package_name, repository=repository,
+                              repository_key=repository_key,
+                              architectures=architectures, workdir=workdir)
+    print('Downloaded {}.'.format(result))
