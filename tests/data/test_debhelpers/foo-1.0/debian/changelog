@@ -1,0 +1,5 @@
+foo (1.0) xenial; urgency=medium
+
+  * Initial Release.
+
+ -- Matthias Lüscher <lueschem@gmail.com>  Tue, 21 Feb 2017 21:30:47 +0100
