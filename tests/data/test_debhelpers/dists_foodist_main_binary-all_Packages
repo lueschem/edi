@@ -1,0 +1,18 @@
+Package: bar
+Version: 1.0.0
+Installed-Size: 123
+Maintainer: Someone
+Architecture: all
+Pre-Depends: dpkg (>= 1.15.6~)
+Suggests: baz
+Description: Sample package
+Homepage: http://www.get-edi.io/
+Description-md5: 36581e685027d5ae84824362a4ba59ee
+Tag: role::app-data
+Section: devel
+Priority: optional
+Filename: pool/main/bar_1.0.0_all.deb
+Size: 566073422
+MD5sum: b82e30c2927ed595cabbe8000ebb93b0
+SHA1: 08e4a649d2f2f7d9ae5ec4835fcd44ff58b0d3c2
+SHA256: 84ee024e2f19f0ffd732b419da2e594e57f615f45341926a3fb427746b7dc82b

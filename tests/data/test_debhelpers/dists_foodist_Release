@@ -1,0 +1,49 @@
+Origin: Foodist
+Label: Foodist
+Suite: stable
+Version: 8.7
+Codename: foodist
+Date: Tue, 21 Feb 2017 11:03:32 UTC
+Architectures: amd64
+Components: main contrib
+Description: Repository test data
+MD5Sum:
+ deadbeefdeadbeefdeadbeefdeadbeef    84184 contrib/binary-all/Packages
+ deadbeefdeadbeefdeadbeefdeadbeef    27124 contrib/binary-all/Packages.gz
+ deadbeefdeadbeefdeadbeefdeadbeef    24000 contrib/binary-all/Packages.xz
+ deadbeefdeadbeefdeadbeefdeadbeef   197960 contrib/binary-amd64/Packages
+ deadbeefdeadbeefdeadbeefdeadbeef    59500 contrib/binary-amd64/Packages.gz
+ deadbeefdeadbeefdeadbeefdeadbeef    50168 contrib/binary-amd64/Packages.xz
+ deadbeefdeadbeefdeadbeefdeadbeef 14116035 main/binary-all/Packages
+ deadbeefdeadbeefdeadbeefdeadbeef  3927273 main/binary-all/Packages.gz
+ deadbeefdeadbeefdeadbeefdeadbeef  2996384 main/binary-all/Packages.xz
+ deadbeefdeadbeefdeadbeefdeadbeef 33899150 main/binary-amd64/Packages
+ deadbeefdeadbeefdeadbeefdeadbeef  9049024 main/binary-amd64/Packages.gz
+ deadbeefdeadbeefdeadbeefdeadbeef  6776408 main/binary-amd64/Packages.xz
+SHA1:
+ deadbeefdeadbeefdeadbeefdeadbeefdeadbeef    84184 contrib/binary-all/Packages
+ deadbeefdeadbeefdeadbeefdeadbeefdeadbeef    27124 contrib/binary-all/Packages.gz
+ deadbeefdeadbeefdeadbeefdeadbeefdeadbeef    24000 contrib/binary-all/Packages.xz
+ deadbeefdeadbeefdeadbeefdeadbeefdeadbeef   197960 contrib/binary-amd64/Packages
+ deadbeefdeadbeefdeadbeefdeadbeefdeadbeef    59500 contrib/binary-amd64/Packages.gz
+ deadbeefdeadbeefdeadbeefdeadbeefdeadbeef    50168 contrib/binary-amd64/Packages.xz
+ deadbeefdeadbeefdeadbeefdeadbeefdeadbeef 14116035 main/binary-all/Packages
+ deadbeefdeadbeefdeadbeefdeadbeefdeadbeef  3927273 main/binary-all/Packages.gz
+ deadbeefdeadbeefdeadbeefdeadbeefdeadbeef  2996384 main/binary-all/Packages.xz
+ deadbeefdeadbeefdeadbeefdeadbeefdeadbeef 33899150 main/binary-amd64/Packages
+ deadbeefdeadbeefdeadbeefdeadbeefdeadbeef  9049024 main/binary-amd64/Packages.gz
+ deadbeefdeadbeefdeadbeefdeadbeefdeadbeef  6776408 main/binary-amd64/Packages.xz
+SHA256:
+ deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef    84184 contrib/binary-all/Packages
+ deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef    27124 contrib/binary-all/Packages.gz
+ deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef    24000 contrib/binary-all/Packages.xz
+ deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef   197960 contrib/binary-amd64/Packages
+ deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef    59500 contrib/binary-amd64/Packages.gz
+ deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef    50168 contrib/binary-amd64/Packages.xz
+ deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef 14116035 main/binary-all/Packages
+ deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef  3927273 main/binary-all/Packages.gz
+ deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef  2996384 main/binary-all/Packages.xz
+ deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef 33899150 main/binary-amd64/Packages
+ deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef  9049024 main/binary-amd64/Packages.gz
+ deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef  6776408 main/binary-amd64/Packages.xz
+
