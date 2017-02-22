@@ -177,9 +177,10 @@ def download_package(package_name='', repository='', repository_key=None,
             release_data = fetch_archive_element('{}/Release'.format(base_url))
             with open(release_file, mode='wb') as f:
                 f.write(release_data)
-            signature_data = fetch_archive_element('{}/Release.gpg'.format(base_url))
-            with open(signature_file, mode='wb') as f:
-                f.write(signature_data)
+            if repository_key:
+                signature_data = fetch_archive_element('{}/Release.gpg'.format(base_url))
+                with open(signature_file, mode='wb') as f:
+                    f.write(signature_data)
 
         if repository_key:
             from edi.lib.keyhelpers import fetch_repository_key, build_keyring
@@ -187,6 +188,8 @@ def download_package(package_name='', repository='', repository_key=None,
             keyring = build_keyring(tempdir, 'trusted.gpg', key_data)
             if not verify_signature(tempdir, keyring, release_file, signature_file):
                 print_error_and_exit('Signature check failed!')
+        else:
+            logging.warning('Warning: Package {} will get downloaded without verification!'.format(package_name))
 
         package_files = _parse_release_file(release_file, architectures, source.comps, ['gz', 'bz2', 'xz'])
         requested_package = _find_package_in_package_files(source.uri, source.dist, package_name, package_files)
