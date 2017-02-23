@@ -198,15 +198,3 @@ def download_package(package_name='', repository='', repository_key=None,
         else:
             result = _download_package(source.uri, requested_package, workdir)
             return result
-
-
-def runtest():
-    repository = 'deb http://ftp.ch.debian.org/debian/ jessie main contrib'
-    repository_key = 'https://ftp-master.debian.org/keys/archive-key-8.asc'
-    package_name = 'qemu-user-static'
-    workdir = os.path.join(os.sep, 'home', 'lueschem', 'workspace', 'edi')
-    architectures = ['all', 'amd64']
-    result = download_package(package_name=package_name, repository=repository,
-                              repository_key=repository_key,
-                              architectures=architectures, workdir=workdir)
-    print('Downloaded {}.'.format(result))

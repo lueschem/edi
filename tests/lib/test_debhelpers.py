@@ -29,34 +29,41 @@ from edi.lib.debhelpers import download_package
 class RepositoryMock():
     def __init__(self, datadir):
         self.datadir = datadir
+        self.repository_items = { # TODO: remove double slash
+            '/foodist//dists/stable/Release': 'Release',
+            '/foodist//dists/stable/main/binary-amd64/Packages.gz': 'binary-amd64_Packages.gz',
+            '/foodist//dists/stable/main/binary-all/Packages.gz': 'binary-all_Packages.gz',
+            '/foodist//pool/main/foo_1.0.0_amd64.deb': 'foo_1.0_amd64.deb'
+        }
 
     def repository_matcher(self, request):
-        if request.path_url == '/debian//dists/jessie/Release': #TODO: remove double slash
-            return requests_mock.create_response(request, text='foo_response')
-        elif request.path_url == '/pool/bar':
-            return requests_mock.create_response(request, text='bar_response')
-        else:
-            return requests_mock.create_response(request, status_code=404)
+        print('Requesting {}.'.format(request.path_url))
+        for key, value in self.repository_items.items():
+            if request.path_url == key:
+                print('Sending {}.'.format(value))
+                return self._send_response(request, value)
+
+        print('Sending 404.')
+        return requests_mock.create_response(request, status_code=404)
+
+    def _send_response(self, request, filename):
+        file_path = os.path.join(str(self.datadir), filename)
+        with open(file_path, mode='rb') as f:
+            return requests_mock.create_response(request, content=f.read())
 
 
 def test_package_download_without_key(datadir):
-
     with requests_mock.Mocker() as repository_request_mock:
         repository_mock = RepositoryMock(datadir)
         repository_request_mock.add_matcher(repository_mock.repository_matcher)
 
-        repository = 'deb http://www.example.com/debian/ jessie main contrib'
+        repository = 'deb http://www.example.com/foodist/ stable main contrib'
         repository_key = None  # 'https://www.example.com/keys/archive-key-8.asc'
         package_name = 'foo'
         workdir = os.path.join(str(datadir), 'workdir')
         os.mkdir(workdir)
         architectures = ['all', 'amd64']
-        #result = download_package(package_name=package_name, repository=repository,
-        #                          repository_key=repository_key,
-        #                          architectures=architectures, workdir=workdir)
-        #print('Downloaded {}.'.format(result))
-
-        assert requests.get('http://example.com/debian//dists/jessie/Release').text == 'foo_response'
-        assert requests.get('http://example.com/pool/bar').text == 'bar_response'
-        assert requests.get('http://example.com/pool/baz').status_code == 404
-
+        result = download_package(package_name=package_name, repository=repository,
+                                  repository_key=repository_key,
+                                  architectures=architectures, workdir=workdir)
+        print('Downloaded {}.'.format(result))
