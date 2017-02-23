@@ -161,7 +161,6 @@ def download_package(package_name='', repository='', repository_key=None,
     source = SourceEntry(repository)
 
     with tempfile.TemporaryDirectory(dir=workdir) as tempdir:
-        chown_to_user(tempdir)
         base_url = '{}/dists/{}'.format(source.uri, source.dist)
         inrelease_data = try_fetch_archive_element('{}/InRelease'.format(base_url))
         release_file = os.path.join(tempdir, 'InRelease')
