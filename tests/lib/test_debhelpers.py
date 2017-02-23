@@ -29,11 +29,11 @@ from edi.lib.debhelpers import download_package
 class RepositoryMock():
     def __init__(self, datadir):
         self.datadir = datadir
-        self.repository_items = { # TODO: remove double slash
-            '/foodist//dists/stable/Release': 'Release',
-            '/foodist//dists/stable/main/binary-amd64/Packages.gz': 'binary-amd64_Packages.gz',
-            '/foodist//dists/stable/main/binary-all/Packages.gz': 'binary-all_Packages.gz',
-            '/foodist//pool/main/foo_1.0.0_amd64.deb': 'foo_1.0_amd64.deb'
+        self.repository_items = {
+            '/foodist/dists/stable/Release': 'Release',
+            '/foodist/dists/stable/main/binary-amd64/Packages.gz': 'binary-amd64_Packages.gz',
+            '/foodist/dists/stable/main/binary-all/Packages.gz': 'binary-all_Packages.gz',
+            '/foodist/pool/main/foo_1.0.0_amd64.deb': 'foo_1.0_amd64.deb'
         }
 
     def repository_matcher(self, request):

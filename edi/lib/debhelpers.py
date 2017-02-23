@@ -159,6 +159,7 @@ def _download_package(uri, package, directory):
 def download_package(package_name='', repository='', repository_key=None,
                      architectures=[], workdir='/tmp'):
     source = SourceEntry(repository)
+    source.uri = source.uri.rstrip('/')
 
     with tempfile.TemporaryDirectory(dir=workdir) as tempdir:
         base_url = '{}/dists/{}'.format(source.uri, source.dist)
