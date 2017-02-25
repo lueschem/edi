@@ -1,17 +1,17 @@
 Package: foo
-Version: 1.0.0
+Version: 1.0
 Installed-Size: 123
 Maintainer: Someone
 Architecture: amd64
 Depends: bar
 Description: Sample package
 Built-Using:
-Description-md5: 585427068050df8db0fa5d43537509b8
+Description-md5: deadbeefdeadbeefdeadbeefdeadbeef
 Tag: role::program
 Section: devel
 Priority: optional
-Filename: pool/main/foo_1.0.0_amd64.deb
+Filename: pool/main/foo_1.0_amd64.deb
 Size: 123
-MD5sum: 43dde0a5d6058170cd2ae83cd642dec9
-SHA1: dab3fad9b9727ee3109454589bfc505cac5b45e0
-SHA256: 05002ef0b63a9483d93c6a3ea34cc132cc95b328e99df683e3030fdcc0588fc4
+MD5sum: __foo_1.0_amd64.deb_md5__
+SHA1: __foo_1.0_amd64.deb_sha1__
+SHA256: __foo_1.0_amd64.deb_sha256__
