@@ -25,6 +25,7 @@ import os
 import hashlib
 import codecs
 import gzip
+from edi.lib.shellhelpers import run
 from tests.libtesting.fixtures.datadir import datadir
 from edi.lib.debhelpers import download_package
 
@@ -34,6 +35,8 @@ class RepositoryMock():
         self.datadir = datadir
         self.repository_items = {
             '/foodist/dists/stable/Release': 'Release',
+            '/foodist/dists/stable/Release.gpg': 'Release.gpg',
+            '/keys/test-archive-key.asc': 'test-archive-key.asc',
             '/foodist/dists/stable/main/binary-amd64/Packages.gz': 'binary-amd64_Packages.gz',
             '/foodist/dists/stable/main/binary-all/Packages.gz': 'binary-all_Packages.gz',
             '/foodist/pool/main/foo_1.0_amd64.deb': 'foo_1.0_amd64.deb'
@@ -90,6 +93,18 @@ class RepositoryMock():
         with codecs.open(release_file_path, mode='w', encoding='utf-8') as f:
             f.write(data)
 
+    def sign_release(self):
+        cmd = ['gpg']
+        cmd.extend(['--batch', '--yes',
+                    '--homedir', str(self.datadir),
+                    '--no-default-keyring',
+                    '--secret-keyring', os.path.join(str(self.datadir), 'test-secring.gpg'),
+                    '--keyring', os.path.join(str(self.datadir), 'test-pubring.gpg'),
+                    '--digest-algo', 'SHA256',
+                    '-abs',
+                    '-o', os.path.join(str(self.datadir), 'Release.gpg'),
+                    os.path.join(str(self.datadir), 'Release')])
+        run(cmd)
 
     def repository_matcher(self, request):
         print('Requesting {}.'.format(request.path_url))
@@ -114,7 +129,32 @@ def test_package_download_without_key(datadir):
         repository_request_mock.add_matcher(repository_mock.repository_matcher)
 
         repository = 'deb http://www.example.com/foodist/ stable main contrib'
-        repository_key = None  # 'https://www.example.com/keys/archive-key-8.asc'
+        repository_key = None
+        package_name = 'foo'
+        architectures = ['all', 'amd64']
+
+        workdir = os.path.join(str(datadir), 'workdir')
+        os.mkdir(workdir)
+        expected_file = os.path.join(workdir, 'foo_1.0_amd64.deb')
+        assert not os.path.isfile(expected_file)
+
+        result = download_package(package_name=package_name, repository=repository,
+                                  repository_key=repository_key,
+                                  architectures=architectures, workdir=workdir)
+
+        assert os.path.isfile(expected_file)
+        assert result == expected_file
+
+
+def test_package_download_with_key(datadir):
+    with requests_mock.Mocker() as repository_request_mock:
+        repository_mock = RepositoryMock(datadir)
+        repository_mock.update_checksums()
+        repository_mock.sign_release()
+        repository_request_mock.add_matcher(repository_mock.repository_matcher)
+
+        repository = 'deb http://www.example.com/foodist/ stable main contrib'
+        repository_key = 'https://www.example.com/keys/test-archive-key.asc'
         package_name = 'foo'
         architectures = ['all', 'amd64']
 
