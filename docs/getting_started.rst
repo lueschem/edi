@@ -57,17 +57,17 @@ Working with the edi Source Code
 
 Hint: You can skip this section if you just want to use edi without having a look at the source code.
 
-#. Install various packages that are required for the development of this project:
-
-   ::
-
-     sudo apt install git-buildpackage python3-setuptools python3-setuptools-scm python3-sphinx python3-argcomplete python3-pytest python3-pytest-cov pep8 python3-pip python3-gnupg python3-yaml lxd debootstrap debhelper python3-requests-mock binfmt-support
-
 #. Clone the source code:
 
    ::
 
      git clone https://github.com/lueschem/edi.git
+
+#. Install various packages that are required for the development of this project:
+
+   ::
+
+     sudo apt install -y git-buildpackage dh-make equivs && sudo mk-build-deps -i debian/control
 
 #. Change into the edi subfolder:
 
