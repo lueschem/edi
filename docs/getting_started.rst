@@ -63,17 +63,17 @@ Hint: You can skip this section if you just want to use edi without having a loo
 
      git clone https://github.com/lueschem/edi.git
 
-#. Install various packages that are required for the development of this project:
-
-   ::
-
-     sudo apt install -y git-buildpackage dh-make equivs && sudo mk-build-deps -i debian/control
-
 #. Change into the edi subfolder:
 
    ::
 
      cd edi
+
+#. Install various packages that are required for the development of this project:
+
+   ::
+
+     sudo apt install -y git-buildpackage dh-make equivs && sudo mk-build-deps -i debian/control
 
 #. Build the edi Debian package (just to verify that everything works):
 
