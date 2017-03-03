@@ -29,7 +29,6 @@ import hashlib
 import logging
 from aptsources.sourceslist import SourceEntry
 from edi.lib.helpers import print_error_and_exit
-from edi.lib.shellhelpers import run
 from edi.lib.archivehelpers import decompress
 from edi.lib.keyhelpers import fetch_repository_key, build_keyring
 
@@ -104,7 +103,9 @@ class PackageDownloader():
             cmd.append(detached_signature)
         cmd.append(signed_file)
 
-        output = run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
+        output = subprocess.run(cmd, input=None, timeout=None, check=False,
+                                universal_newlines=True, stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE)
 
         logging.info(output.stdout)
 
