@@ -19,7 +19,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
-import requests
 import requests_mock
 import os
 import hashlib
@@ -27,7 +26,7 @@ import codecs
 import gzip
 from edi.lib.shellhelpers import run
 from tests.libtesting.fixtures.datadir import datadir
-from edi.lib.debhelpers import download_package
+from edi.lib.debhelpers import PackageDownloader
 
 
 class RepositoryMock():
@@ -138,9 +137,10 @@ def test_package_download_without_key(datadir):
         expected_file = os.path.join(workdir, 'foo_1.0_amd64.deb')
         assert not os.path.isfile(expected_file)
 
-        result = download_package(package_name=package_name, repository=repository,
-                                  repository_key=repository_key,
-                                  architectures=architectures, workdir=workdir)
+        d = PackageDownloader(repository=repository,
+                              repository_key=repository_key,
+                              architectures=architectures)
+        result = d.download(package_name=package_name, dest=workdir)
 
         assert os.path.isfile(expected_file)
         assert result == expected_file
@@ -163,9 +163,10 @@ def test_package_download_with_key(datadir):
         expected_file = os.path.join(workdir, 'foo_1.0_amd64.deb')
         assert not os.path.isfile(expected_file)
 
-        result = download_package(package_name=package_name, repository=repository,
-                                  repository_key=repository_key,
-                                  architectures=architectures, workdir=workdir)
+        d = PackageDownloader(repository=repository,
+                              repository_key=repository_key,
+                              architectures=architectures)
+        result = d.download(package_name=package_name, dest=workdir)
 
         assert os.path.isfile(expected_file)
         assert result == expected_file
