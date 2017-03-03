@@ -52,13 +52,13 @@ class PackageDownloader():
         return '{}/dists/{}/{}'.format(self._source.uri, self._source.dist, filename)
 
     def _fetch_archive_element(self, url):
-        return self._fetch_archive_element(url, check=True)
+        return self._fetch_archive_element_impl(url, check=True)
 
     def _try_fetch_archive_element(self, url):
-        return self._fetch_archive_element(url, check=False)
+        return self._fetch_archive_element_impl(url, check=False)
 
     @staticmethod
-    def _fetch_archive_element(url, check=True):
+    def _fetch_archive_element_impl(url, check=True):
         req = requests.get(url)
         if req.status_code != 200:
             if check:
@@ -79,8 +79,9 @@ class PackageDownloader():
                     break
 
             if not section:
-                # TODO: Improve hints within error handling.
-                print_error_and_exit('Neither SHA512 nor SHA256 section found in release file.')
+                print_error_and_exit(("No valid section ({}) found in release file downloaded from '{}'."
+                                      ).format(' or '.join(a for a in self._checksum_algorithms),
+                                               self._get_release_file_url('')))
 
             packages_filter = ['{}/binary-{}/Packages.{}'.format(component, architecture, compression)
                                for component in self._source.comps
