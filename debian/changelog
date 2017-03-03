@@ -1,3 +1,53 @@
+edi (0.3.1) xenial; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Refactored bootstrap command.
+  * First attempt to check trustworthiness of qemu package.
+  * Refactored configuration parser.
+  * Added some Debian repository helpers.
+  * Added repository release file parser.
+  * Download package file from repository.
+  * Added archive type detection.
+  * Implemented decompression for xz, gz and bz2.
+  * Implemented package download from Debian repository (yet without checksum checks).
+  * Improved error handling.
+  * Verify checksum of downloaded archive items.
+  * Added test for archivehelpers.
+  * Copy test data to build directory.
+  * Added datadir fixture.
+  * Added sample package for testing.
+  * Added sample repository data for testing.
+  * Refactored debhelpers main method.
+  * Added checksums to sample release file.
+  * Added warning if package gets downloaded without signature verification.
+  * First steps towards testing of debhelpers.
+  * First debhelper test passing.
+  * Fix debhelpers test within debuild environment.
+  * Fix double slash issue in url path.
+  * Automated checksum updates.
+  * Added gpg keys for repository testing.
+  * Added test with signature verification.
+
+  [ Eric Keller ]
+  * use the build dependencies defined in the debian/control
+
+  [ Matthias Lüscher ]
+  * Fix order of getting started steps.
+  * Refactored package download from repository.
+  * Additional debhelper refactorings.
+  * Improved checksum error message.
+  * Improve yet another failure message during package download.
+  * Improved checksum error message.
+  * Improved error message if package was not found.
+  * Use custom package downloader within qemu fetch command.
+  * Fix sudo handling within debuild.
+  * Fix package downloader when run as sudo.
+  * Updated package dependencies.
+
+  [ Matthias Lüscher (Launchpad) ]
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Fri, 03 Mar 2017 22:38:07 +0100
+
 edi (0.3.0) xenial; urgency=medium
 
   [ Matthias Lüscher ]
