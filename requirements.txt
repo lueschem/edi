@@ -1,6 +1,7 @@
 argcomplete
 pyyaml
 python-apt
+python-debian
 requests
 python-gnupg
 jinja2

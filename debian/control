@@ -15,12 +15,14 @@ Build-Depends: debhelper (>= 9),
                python3-yaml,
                python3-requests-mock,
                python3-apt (>= 1),
+               python3-debian,
                python3-jinja2,
                pep8,
                ansible,
                lxd,
                debootstrap,
-               binfmt-support
+               binfmt-support,
+               liblzma5
 Maintainer: Matthias Luescher <lueschem@gmail.com>
 Standards-Version: 3.9.7
 X-Python3-Version: >= 3.5
@@ -32,6 +34,7 @@ Depends: ${misc:Depends},
          ansible (>=2.1),
          lxd,
          debootstrap,
+         liblzma5
 Description: Embedded Development Infrastructure - edi
  Details go here...
 
