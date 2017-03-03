@@ -28,7 +28,7 @@ import debian.deb822
 import hashlib
 import logging
 from aptsources.sourceslist import SourceEntry
-from edi.lib.helpers import print_error_and_exit, chown_to_user
+from edi.lib.helpers import print_error_and_exit
 from edi.lib.shellhelpers import run
 from edi.lib.archivehelpers import decompress
 from edi.lib.keyhelpers import fetch_repository_key, build_keyring
@@ -215,7 +215,8 @@ class PackageDownloader():
             package_files = self._parse_release_file(release_file)
             requested_package = self._find_package_in_package_files(package_name, package_files)
             if not requested_package:
-                print_error_and_exit('Package {} not found.'.format(package_name))
+                print_error_and_exit(("Package '{}' not found in repository '{}'."
+                                      ).format(package_name, self._source.uri))
             else:
                 result = self._download_package(requested_package, dest)
                 return result
