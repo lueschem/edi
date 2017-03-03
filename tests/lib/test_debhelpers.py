@@ -121,14 +121,16 @@ class RepositoryMock():
             return requests_mock.create_response(request, content=f.read())
 
 
-def test_package_download_without_key(datadir):
+def do_package_download(datadir, key):
     with requests_mock.Mocker() as repository_request_mock:
         repository_mock = RepositoryMock(datadir)
         repository_mock.update_checksums()
+        if key:
+            repository_mock.sign_release()
         repository_request_mock.add_matcher(repository_mock.repository_matcher)
 
         repository = 'deb http://www.example.com/foodist/ stable main contrib'
-        repository_key = None
+        repository_key = key
         package_name = 'foo'
         architectures = ['all', 'amd64']
 
@@ -145,28 +147,9 @@ def test_package_download_without_key(datadir):
         assert os.path.isfile(expected_file)
         assert result == expected_file
 
+
+def test_package_download_without_key(datadir):
+    do_package_download(datadir, None)
 
 def test_package_download_with_key(datadir):
-    with requests_mock.Mocker() as repository_request_mock:
-        repository_mock = RepositoryMock(datadir)
-        repository_mock.update_checksums()
-        repository_mock.sign_release()
-        repository_request_mock.add_matcher(repository_mock.repository_matcher)
-
-        repository = 'deb http://www.example.com/foodist/ stable main contrib'
-        repository_key = 'https://www.example.com/keys/test-archive-key.asc'
-        package_name = 'foo'
-        architectures = ['all', 'amd64']
-
-        workdir = os.path.join(str(datadir), 'workdir')
-        os.mkdir(workdir)
-        expected_file = os.path.join(workdir, 'foo_1.0_amd64.deb')
-        assert not os.path.isfile(expected_file)
-
-        d = PackageDownloader(repository=repository,
-                              repository_key=repository_key,
-                              architectures=architectures)
-        result = d.download(package_name=package_name, dest=workdir)
-
-        assert os.path.isfile(expected_file)
-        assert result == expected_file
+    do_package_download(datadir, 'https://www.example.com/keys/test-archive-key.asc')

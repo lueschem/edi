@@ -48,6 +48,9 @@ class PackageDownloader():
         self._compressions = ['gz', 'bz2', 'xz']
         self._checksum_algorithms = ['SHA512', 'SHA256'] # strongest first
 
+    def _get_release_file_url(self, filename):
+        return '{}/dists/{}/{}'.format(self._source.uri, self._source.dist, filename)
+
     def _fetch_archive_element(self, url):
         return self._fetch_archive_element(url, check=True)
 
@@ -69,10 +72,11 @@ class PackageDownloader():
     def _parse_release_file(self, release_file):
         with open(release_file) as file:
             main_content = next(debian.deb822.Release.iter_paragraphs(file))
-            # TODO: loop over self._checksum_algorithms
-            section = main_content.get('SHA512')
-            if not section:
-                section = main_content.get('SHA256')
+            section = None
+            for algoritm in self._checksum_algorithms:
+                section = main_content.get(algoritm)
+                if section:
+                    break
 
             if not section:
                 # TODO: Improve hints within error handling.
@@ -108,11 +112,12 @@ class PackageDownloader():
 
         if goodsig and validsig:
             logging.info('Signature check ok!')
-            return True
         else:
-            # TODO: Improve logging.
-            logging.info('Signature check failed!')
-            return False
+            if detached_signature:
+                release_file_url = self._get_release_file_url('Release')
+            else:
+                release_file_url = self._get_release_file_url('InRelease')
+            print_error_and_exit("Signature check for '{}' failed!".format(release_file_url))
 
     def _verify_checksum(self, data, item):
         for algorithm in self._checksum_algorithms:
@@ -176,8 +181,7 @@ class PackageDownloader():
             print_error_and_exit('Missing argument package_name!')
 
         with tempfile.TemporaryDirectory() as tempdir:
-            base_url = '{}/dists/{}'.format(self._source.uri, self._source.dist)
-            inrelease_data = self._try_fetch_archive_element('{}/InRelease'.format(base_url))
+            inrelease_data = self._try_fetch_archive_element(self._get_release_file_url('InRelease'))
             release_file = os.path.join(tempdir, 'InRelease')
             signature_file = None
 
@@ -188,20 +192,18 @@ class PackageDownloader():
                 release_file = os.path.join(tempdir, 'Release')
                 signature_file = os.path.join(tempdir, 'Release.gpg')
 
-                release_data = self._fetch_archive_element('{}/Release'.format(base_url))
+                release_data = self._fetch_archive_element(self._get_release_file_url('Release'))
                 with open(release_file, mode='wb') as f:
                     f.write(release_data)
                 if self._repository_key:
-                    signature_data = self._fetch_archive_element('{}/Release.gpg'.format(base_url))
+                    signature_data = self._fetch_archive_element(self._get_release_file_url('Release.gpg'))
                     with open(signature_file, mode='wb') as f:
                         f.write(signature_data)
 
             if self._repository_key:
                 key_data = fetch_repository_key(self._repository_key)
                 keyring = build_keyring(tempdir, 'trusted.gpg', key_data)
-                if not self._verify_signature(tempdir, keyring, release_file, signature_file):
-                    # TODO: Improve error message.
-                    print_error_and_exit('Signature check failed!')
+                self._verify_signature(tempdir, keyring, release_file, signature_file)
             else:
                 logging.warning('Warning: Package {} will get downloaded without verification!'.format(package_name))
 
