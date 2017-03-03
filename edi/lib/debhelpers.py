@@ -129,8 +129,8 @@ class PackageDownloader():
                 h = hashlib.new(algorithm.lower())
                 h.update(data)
                 if h.hexdigest() != checksum:
-                    # TODO: Improve error message.
-                    print_error_and_exit('Checksum mismatch on repository item.')
+                    print_error_and_exit(("Checksum mismatch on repository item '\n{}' downloaded from '{}'."
+                                          ).format(item, self._source.uri))
                 else:
                     return
 
