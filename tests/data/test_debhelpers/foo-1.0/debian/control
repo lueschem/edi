@@ -1,0 +1,13 @@
+Source: foo
+Section: devel
+Priority: optional
+Maintainer: Matthias Lüscher <lueschem@gmail.com>
+Build-Depends: debhelper (>=9)
+Standards-Version: 3.9.7
+Homepage: http://www.get-edi.io
+
+Package: foo
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Sample package
+ Sample package for edi tests.

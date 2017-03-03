@@ -68,7 +68,7 @@ setup(
 
     keywords='embedded Linux container toolchain lxd lxc Ansible Debian',
 
-    packages=find_packages(exclude=['docs', 'debian', 'bin', '.git', 'tests']),
+    packages=find_packages(exclude=['docs', 'debian', 'bin', '.git']),
 
     install_requires=get_install_requires(),
 
@@ -81,6 +81,9 @@ setup(
         'edi': [f[len('edi/'):] for f in glob.iglob('edi/plugins/**',
                                                     recursive=True)
                 if os.path.isfile(f)],
+        'tests': [f[len('tests/'):] for f in glob.iglob('tests/data/**',
+                                                        recursive=True)
+                  if os.path.isfile(f)],
     },
 
     # data_files=[('my_data', ['data/data_file'])],

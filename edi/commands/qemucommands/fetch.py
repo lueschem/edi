@@ -22,14 +22,12 @@
 from edi.commands.qemu import Qemu
 from edi.lib.helpers import print_success, chown_to_user, print_error_and_exit
 from edi.lib.shellhelpers import get_user_environment_variable, get_debian_architecture
-from edi.lib.keyhelpers import fetch_repository_key, build_keyring
-import apt
 import apt_inst
 import tempfile
 import os
 import logging
 import shutil
-
+from edi.lib.debhelpers import PackageDownloader
 
 class Fetch(Qemu):
 
@@ -65,49 +63,18 @@ class Fetch(Qemu):
         with tempfile.TemporaryDirectory(dir=workdir) as tempdir:
             chown_to_user(tempdir)
 
-            apt_path = os.path.join(tempdir, 'etc', 'apt')
-            os.makedirs(apt_path)
-
-            sources_list_path = os.path.join(apt_path, 'sources.list')
             qemu_repository = self.config.get_qemu_repository()
 
-            with open(sources_list_path, encoding='utf-8', mode='w') as sources:
-                if qemu_repository:
-                    sources.write(qemu_repository)
-                    key_url = self.config.get_qemu_repository_key()
-                else:
-                    sources.write(self.config.get_bootstrap_repository())
-                    key_url = self.config.get_bootstrap_repository_key()
+            if qemu_repository:
+                key_url = self.config.get_qemu_repository_key()
+            else:
+                qemu_repository = self.config.get_bootstrap_repository()
+                key_url = self.config.get_bootstrap_repository_key()
 
-            key_data = fetch_repository_key(key_url)
-            build_keyring(apt_path, "trusted.gpg", key_data)
+            d = PackageDownloader(repository=qemu_repository, repository_key=key_url,
+                                  architectures=[get_debian_architecture()])
+            package_file = d.download(package_name=qemu_package, dest=tempdir)
 
-            apt_conf_path = os.path.join(apt_path, "apt.conf")
-            proxy_settings = {'http_proxy': 'Acquire::http::proxy',
-                              'https_proxy': 'Acquire::https::proxy',
-                              'ftp_proxy': 'Acquire::ftp::proxy',
-                              'socks_proxy': 'Acquire::socks::proxy'}
-            with open(apt_conf_path, encoding='utf-8', mode='w') as aptconf:
-                for setting in proxy_settings:
-                    env_value = get_user_environment_variable(setting)
-                    if env_value:
-                        aptconf.write('{0} "{1}";\n'.format(proxy_settings[setting],env_value))
-                aptconf.write('Debug::Acquire::gpgv "1";\n')
-
-            cache = apt.Cache(rootdir=tempdir, memonly=True)
-            cache.update()
-            cache.open()
-
-            pkg = cache[qemu_package]
-            if key_url and not pkg.candidate.origins[0].trusted:
-                logging.warning(('The trustworthiness of the package {} can not be '
-                                 'verified with the key {}.'
-                                 ).format(pkg.candidate.uri, key_url))
-            # TODO:
-            # - Error handling
-            # - Trust check
-            # - Keyring handling
-            package_file = pkg.candidate.fetch_binary(destdir=tempdir)
             apt_inst.DebFile(package_file).data.extractall(tempdir)
             qemu_binary = os.path.join(tempdir, 'usr', 'bin', self._get_qemu_binary_name())
             chown_to_user(qemu_binary)

@@ -47,7 +47,9 @@ def run(popenargs, sudo=False, input=None, timeout=None,
     myargs = popenargs.copy()
 
     if not sudo:
-        myargs = ["sudo", "-u", get_user()] + myargs
+        current_user = get_user()
+        if current_user != 'root':
+            myargs = ["sudo", "-u", current_user] + myargs
     elif sudo and os.getuid() != 0:
         myargs.insert(0, "sudo")
 

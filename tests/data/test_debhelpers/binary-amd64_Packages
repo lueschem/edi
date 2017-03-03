@@ -1,0 +1,17 @@
+Package: foo
+Version: 1.0
+Installed-Size: 123
+Maintainer: Someone
+Architecture: amd64
+Depends: bar
+Description: Sample package
+Built-Using:
+Description-md5: deadbeefdeadbeefdeadbeefdeadbeef
+Tag: role::program
+Section: devel
+Priority: optional
+Filename: pool/main/foo_1.0_amd64.deb
+Size: 123
+MD5sum: __foo_1.0_amd64.deb_md5__
+SHA1: __foo_1.0_amd64.deb_sha1__
+SHA256: __foo_1.0_amd64.deb_sha256__
