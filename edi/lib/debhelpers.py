@@ -121,10 +121,13 @@ class PackageDownloader():
             print_error_and_exit("Signature check for '{}' failed!".format(release_file_url))
 
     def _verify_checksum(self, data, item):
+        all_algorithms = []
         for algorithm in self._checksum_algorithms:
             checksum = item.get(algorithm, None)
+            all_algorithms.append(algorithm)
             if not checksum:
                 checksum = item.get(algorithm.lower(), None)
+                all_algorithms.append(algorithm.lower())
 
             if checksum:
                 h = hashlib.new(algorithm.lower())
@@ -135,8 +138,9 @@ class PackageDownloader():
                 else:
                     return
 
-        # TODO: Improve error message.
-        print_error_and_exit('No checksum found for {}.'.format(package_item['name']))
+        print_error_and_exit(("No checksum ({}) found for '\n{}' downloaded from '{}'."
+                              ).format(' or '.join(a for a in all_algorithms),
+                                       item, self._source.uri))
 
     def _find_package_in_package_files(self, package_name, package_files):
         downloaded_package_prefix = []
