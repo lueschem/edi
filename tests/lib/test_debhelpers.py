@@ -24,7 +24,7 @@ import os
 import hashlib
 import codecs
 import gzip
-from edi.lib.shellhelpers import run
+import subprocess
 from tests.libtesting.fixtures.datadir import datadir
 from edi.lib.debhelpers import PackageDownloader
 
@@ -103,7 +103,7 @@ class RepositoryMock():
                     '-abs',
                     '-o', os.path.join(str(self.datadir), 'Release.gpg'),
                     os.path.join(str(self.datadir), 'Release')])
-        run(cmd)
+        subprocess.run(cmd, input=None, timeout=None, check=True)
 
     def repository_matcher(self, request):
         print('Requesting {}.'.format(request.path_url))
