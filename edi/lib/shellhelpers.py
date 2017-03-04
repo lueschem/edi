@@ -46,9 +46,10 @@ def run(popenargs, sudo=False, input=None, timeout=None,
 
     myargs = popenargs.copy()
 
-    if not sudo:
+    if not sudo and os.getuid() == 0:
         current_user = get_user()
         if current_user != 'root':
+            # drop privileges
             myargs = ["sudo", "-u", current_user] + myargs
     elif sudo and os.getuid() != 0:
         myargs.insert(0, "sudo")
