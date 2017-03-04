@@ -23,7 +23,7 @@ import zlib
 import bz2
 import lzma
 from functools import partial
-from edi.lib.helpers import print_error_and_exit
+from edi.lib.helpers import FatalError
 
 
 def _gz_decompress(data):
@@ -41,4 +41,4 @@ def decompress(data):
     for item in decompressor_from_magic:
         if data.startswith(item[0]):
             return item[1](data)
-    print_error_and_exit("Unknown compression type!")
+    raise FatalError("Unknown compression type!")

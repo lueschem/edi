@@ -26,7 +26,7 @@ import logging
 from aptsources.sourceslist import SourceEntry
 from edi.commands.image import Image
 from edi.commands.qemucommands.fetch import Fetch
-from edi.lib.helpers import (require_executable, print_error_and_exit,
+from edi.lib.helpers import (require_executable, FatalError,
                              chown_to_user, print_success)
 from edi.lib.shellhelpers import run, get_chroot_cmd
 from edi.lib.keyhelpers import fetch_repository_key, build_keyring
@@ -62,8 +62,8 @@ class Bootstrap(Image):
         print("Going to bootstrap initial image - be patient.")
 
         if self.config.get_bootstrap_tool() != "debootstrap":
-            print_error_and_exit(("At the moment only debootstrap "
-                                  "is supported for bootstrapping!"))
+            raise FatalError(("At the moment only debootstrap "
+                              "is supported for bootstrapping!"))
 
         require_executable("debootstrap", "sudo apt install debootstrap")
 

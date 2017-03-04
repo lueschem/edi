@@ -27,6 +27,22 @@ import logging
 import shutil
 
 
+class Error(Exception):
+    """Base class for edi exceptions."""
+    pass
+
+
+class FatalError(Error):
+    """Exception raised for fatal errors needing corrective actions from user.
+
+    Attributes:
+        message -- explanation of the error
+    """
+
+    def __init__(self, message):
+        self.message = message
+
+
 def print_error_and_exit(*args, **kwargs):
     print('\033[91m', end="", file=sys.stderr)
     print('Error: ', end="", file=sys.stderr)
@@ -86,9 +102,9 @@ def which(executable):
 
 def require_executable(executable, hint):
     if which(executable) is None:
-        print_error_and_exit(("Missing executable '{0}'.\n"
-                              "Use '{1}' to install it.").format(executable,
-                                                                 hint))
+        raise FatalError(("Missing executable '{0}'.\n"
+                          "Use '{1}' to install it.").format(executable,
+                                                             hint))
 
 
 def chown_to_user(path):

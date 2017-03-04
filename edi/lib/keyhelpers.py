@@ -22,15 +22,15 @@
 import requests
 import gnupg
 import os
-from edi.lib.helpers import print_error_and_exit
+from edi.lib.helpers import FatalError
 
 
 def fetch_repository_key(key_url):
     if key_url:
         key_req = requests.get(key_url)
         if key_req.status_code != 200:
-            print_error_and_exit(("Unable to fetch repository key '{0}'"
-                                  ).format(key_url))
+            raise FatalError(("Unable to fetch repository key '{0}'"
+                              ).format(key_url))
 
         return key_req.text
     else:

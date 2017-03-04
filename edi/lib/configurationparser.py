@@ -26,7 +26,7 @@ import os
 from os.path import dirname, abspath, basename, splitext, isfile, join
 import logging
 from edi.lib.helpers import (get_user, get_user_gid, get_user_uid,
-                             get_hostname, print_error_and_exit)
+                             get_hostname, FatalError)
 from edi.lib.shellhelpers import get_user_environment_variable
 
 _supported_use_cases = ["edi_uc_run", "edi_uc_build",
@@ -82,8 +82,8 @@ class ConfigurationParser():
         for name, content in ordered_items.items():
             path = content.get("path", None)
             if not path:
-                print_error_and_exit(("Missing path value in playbook '{}'."
-                                      ).format(path))
+                raise FatalError(("Missing path value in playbook '{}'."
+                                  ).format(path))
             resolved_path = self._resolve_path(path)
             node_dict = self._get_node_dictionary(content)
             item_list.append((name, resolved_path, node_dict))
@@ -229,10 +229,10 @@ class ConfigurationParser():
     def _get_node_dictionary(self, node):
         node_dict = self._get_load_time_dictionary()
         if self.get_use_case() not in _supported_use_cases:
-            print_error_and_exit(("Use case '{0}' is not supported.\n"
-                                  "Choose from: {1}."
-                                  ).format(self.get_use_case(),
-                                           ", ".join(_supported_use_cases)))
+            raise FatalError(("Use case '{0}' is not supported.\n"
+                              "Choose from: {1}."
+                              ).format(self.get_use_case(),
+                                       ", ".join(_supported_use_cases)))
 
         node_dict["edi_lxc_network_interface_name"] = self._get_general_item("edi_lxc_network_interface_name",
                                                                              "lxcif0")
@@ -255,8 +255,8 @@ class ConfigurationParser():
     def _resolve_path(self, path):
         if os.path.isabs(path):
             if not os.path.isfile(path):
-                print_error_and_exit(("'{}' does not exist."
-                                      ).format(path))
+                raise FatalError(("'{}' does not exist."
+                                  ).format(path))
             return path
         else:
             locations = [self.get_project_plugin_directory(),
@@ -267,6 +267,6 @@ class ConfigurationParser():
                 if os.path.isfile(abspath):
                     return abspath
 
-            print_error_and_exit(("'{0}' not found in the "
-                                  "following locations:\n{1}"
-                                  ).format(path, "\n".join(locations)))
+            raise FatalError(("'{0}' not found in the "
+                              "following locations:\n{1}"
+                              ).format(path, "\n".join(locations)))

@@ -20,7 +20,7 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 from edi.commands.qemu import Qemu
-from edi.lib.helpers import print_success, chown_to_user, print_error_and_exit
+from edi.lib.helpers import print_success, chown_to_user, FatalError
 from edi.lib.shellhelpers import get_user_environment_variable, get_debian_architecture
 import apt_inst
 import tempfile
@@ -114,7 +114,7 @@ class Fetch(Qemu):
         debian_arch = self.config.get_bootstrap_architecture()
         qemu_arch = arch_dict.get(debian_arch)
         if not qemu_arch:
-            print_error_and_exit('Unable to derive QEMU architecture form Debian architecture ({}).'.format(debian_arch))
+            raise FatalError('Unable to derive QEMU architecture form Debian architecture ({}).'.format(debian_arch))
 
         return 'qemu-{}-static'.format(qemu_arch)
 

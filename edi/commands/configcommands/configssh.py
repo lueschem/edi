@@ -20,7 +20,6 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 from edi.commands.config import Config
-from edi.lib.helpers import (print_error_and_exit)
 
 
 class Ssh(Config):

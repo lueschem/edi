@@ -25,7 +25,7 @@ import yaml
 from edi.commands.lxc import Lxc
 from edi.commands.lxccommands.importcmd import Import
 from edi.commands.lxccommands.profile import Profile
-from edi.lib.helpers import print_error_and_exit, print_success
+from edi.lib.helpers import FatalError, print_success
 from edi.lib.shellhelpers import run
 from edi.lib.networkhelpers import is_valid_hostname
 
@@ -50,9 +50,9 @@ class Launch(Lxc):
         self.container_name = container_name
 
         if not is_valid_hostname(container_name):
-            print_error_and_exit(("The provided container name '{}' "
-                                  "is not a valid host name."
-                                  ).format(container_name))
+            raise FatalError(("The provided container name '{}' "
+                              "is not a valid host name."
+                              ).format(container_name))
 
         if self._is_container_existing():
             logging.info(("Container {0} is already existing. "
@@ -102,7 +102,7 @@ class Launch(Lxc):
                 else:
                     return False
         except yaml.YAMLError as exc:
-            print_error_and_exit("Unable to parse lxc output ({}).".format(exc))
+            raise FatalError("Unable to parse lxc output ({}).".format(exc))
 
     def _launch_container(self, image, profiles):
         cmd = []

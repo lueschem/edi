@@ -25,7 +25,7 @@ import argcomplete
 import logging
 from edi.commands import *
 from edi.lib.commandfactory import get_sub_commands, get_command
-from edi.lib.helpers import print_error_and_exit
+from edi.lib.helpers import print_error_and_exit, FatalError
 from edi.lib.edicommand import EdiCommand
 from subprocess import CalledProcessError
 
@@ -69,11 +69,13 @@ def main():
         _setup_logging(cli_args)
 
         if cli_args.command_name is None:
-            print_error_and_exit("Missing subcommand. Use 'edi --help' for help.")
+            raise FatalError("Missing subcommand. Use 'edi --help' for help.")
 
         command_name = "{0}.{1}".format(EdiCommand._get_command_name(),
                                         cli_args.command_name)
         get_command(command_name)().run_cli(cli_args)
+    except FatalError as fatal_error:
+        print_error_and_exit(fatal_error.message)
     except KeyboardInterrupt:
         print_error_and_exit("Command interrupted by user.")
     except CalledProcessError as subprocess_error:

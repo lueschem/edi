@@ -18,7 +18,7 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
-from edi.lib.helpers import print_error_and_exit
+from edi.lib.helpers import FatalError
 
 _command_anchor = "edicommand"
 
@@ -49,8 +49,8 @@ class CommandFactory(type):
         if clsname.lower() != _command_anchor:
             new_key = new_class._get_command_name()
             if _command_registry.get(new_key):
-                print_error_and_exit(("A command named '{}' has "
-                                      "already been registered"
-                                      ).format(new_key))
+                raise FatalError(("A command named '{}' has "
+                                  "already been registered"
+                                  ).format(new_key))
             _command_registry[new_key] = new_class
         return new_class

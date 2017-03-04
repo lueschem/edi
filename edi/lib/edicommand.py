@@ -23,7 +23,7 @@ from edi.lib.commandfactory import CommandFactory
 from edi.lib.configurationparser import ConfigurationParser
 import argparse
 import os
-from edi.lib.helpers import print_error_and_exit
+from edi.lib.helpers import FatalError
 from edi.lib.shellhelpers import run
 from edi.lib.commandfactory import get_sub_commands, get_command
 
@@ -100,10 +100,10 @@ class EdiCommand(metaclass=CommandFactory):
 
     def _require_sudo(self):
         if os.getuid() != 0:
-            print_error_and_exit(("The subcommand '{0}' requires superuser "
-                                  "privileges.\n"
-                                  "Use 'sudo edi ...'."
-                                  ).format(self._get_short_command_name()))
+            raise FatalError(("The subcommand '{0}' requires superuser "
+                              "privileges.\n"
+                              "Use 'sudo edi ...'."
+                              ).format(self._get_short_command_name()))
 
     def _pack_image(self, tempdir, datadir, name="result"):
         # advanced options such as numeric-owner are not supported by

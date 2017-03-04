@@ -28,7 +28,7 @@ import debian.deb822
 import hashlib
 import logging
 from aptsources.sourceslist import SourceEntry
-from edi.lib.helpers import print_error_and_exit
+from edi.lib.helpers import FatalError
 from edi.lib.archivehelpers import decompress
 from edi.lib.keyhelpers import fetch_repository_key, build_keyring
 
@@ -36,9 +36,9 @@ from edi.lib.keyhelpers import fetch_repository_key, build_keyring
 class PackageDownloader():
     def __init__(self, repository=None, repository_key=None, architectures=None):
         if not repository:
-            print_error_and_exit('''Missing argument 'repository'.''')
+            raise FatalError('''Missing argument 'repository'.''')
         if not architectures:
-            print_error_and_exit('''Missing (non empty) list 'architectures'.''')
+            raise FatalError('''Missing (non empty) list 'architectures'.''')
         self._repository = repository
         self._repository_key = repository_key
         self._architectures = architectures
@@ -61,8 +61,8 @@ class PackageDownloader():
         req = requests.get(url)
         if req.status_code != 200:
             if check:
-                print_error_and_exit(("Unable to fetch archive element '{0}'."
-                                      ).format(url))
+                raise FatalError(("Unable to fetch archive element '{0}'."
+                                  ).format(url))
             else:
                 return None
 
@@ -78,9 +78,9 @@ class PackageDownloader():
                     break
 
             if not section:
-                print_error_and_exit(("No valid section ({}) found in release file downloaded from '{}'."
-                                      ).format(' or '.join(a for a in self._checksum_algorithms),
-                                               self._get_release_file_url('')))
+                raise FatalError(("No valid section ({}) found in release file downloaded from '{}'."
+                                  ).format(' or '.join(a for a in self._checksum_algorithms),
+                                           self._get_release_file_url('')))
 
             packages_filter = ['{}/binary-{}/Packages.{}'.format(component, architecture, compression)
                                for component in self._source.comps
@@ -121,10 +121,10 @@ class PackageDownloader():
                 release_file_url = self._get_release_file_url('InRelease')
 
             if output.stderr:
-                print_error_and_exit(("Signature check for '{}' failed with error message '{}'!"
-                                      ).format(release_file_url, output.stderr))
+                raise FatalError(("Signature check for '{}' failed with error message '{}'!"
+                                  ).format(release_file_url, output.stderr))
             else:
-                print_error_and_exit("Signature check for '{}' failed!".format(release_file_url))
+                raise FatalError("Signature check for '{}' failed!".format(release_file_url))
 
     def _verify_checksum(self, data, item):
         all_algorithms = []
@@ -139,21 +139,21 @@ class PackageDownloader():
                 h = hashlib.new(algorithm.lower())
                 h.update(data)
                 if h.hexdigest() != checksum:
-                    print_error_and_exit(("Checksum mismatch on repository item '\n{}' downloaded from '{}'."
-                                          ).format(item, self._source.uri))
+                    raise FatalError(("Checksum mismatch on repository item '\n{}' downloaded from '{}'."
+                                      ).format(item, self._source.uri))
                 else:
                     return
 
-        print_error_and_exit(("No checksum ({}) found for '\n{}' downloaded from '{}'."
-                              ).format(' or '.join(a for a in all_algorithms),
-                                       item, self._source.uri))
+        raise FatalError(("No checksum ({}) found for '\n{}' downloaded from '{}'."
+                          ).format(' or '.join(a for a in all_algorithms),
+                                   item, self._source.uri))
 
     def _find_package_in_package_files(self, package_name, package_files):
         downloaded_package_prefix = []
         for package_file in package_files:
             match = re.match('^(.*)Packages\.*([a-z2]{1,3})$', package_file['name'])
             if not match or not len(match.groups()) <= 2:
-                print_error_and_exit('Error parsing package name string {}.'.format(package_file['name']))
+                raise FatalError('Error parsing package name string {}.'.format(package_file['name']))
 
             prefix = match.group(1).replace('/', '_')
 
@@ -189,7 +189,7 @@ class PackageDownloader():
 
     def download(self, package_name=None, dest='/tmp'):
         if not package_name:
-            print_error_and_exit('Missing argument package_name!')
+            raise FatalError('Missing argument package_name!')
 
         with tempfile.TemporaryDirectory() as tempdir:
             inrelease_data = self._try_fetch_archive_element(self._get_release_file_url('InRelease'))
@@ -221,8 +221,8 @@ class PackageDownloader():
             package_files = self._parse_release_file(release_file)
             requested_package = self._find_package_in_package_files(package_name, package_files)
             if not requested_package:
-                print_error_and_exit(("Package '{}' not found in repository '{}'."
-                                      ).format(package_name, self._source.uri))
+                raise FatalError(("Package '{}' not found in repository '{}'."
+                                  ).format(package_name, self._source.uri))
             else:
                 result = self._download_package(requested_package, dest)
                 return result
