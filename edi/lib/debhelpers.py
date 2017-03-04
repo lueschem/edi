@@ -119,7 +119,12 @@ class PackageDownloader():
                 release_file_url = self._get_release_file_url('Release')
             else:
                 release_file_url = self._get_release_file_url('InRelease')
-            print_error_and_exit("Signature check for '{}' failed!".format(release_file_url))
+
+            if output.stderr:
+                print_error_and_exit(("Signature check for '{}' failed with error message '{}'!"
+                                      ).format(release_file_url, output.stderr))
+            else:
+                print_error_and_exit("Signature check for '{}' failed!".format(release_file_url))
 
     def _verify_checksum(self, data, item):
         all_algorithms = []
