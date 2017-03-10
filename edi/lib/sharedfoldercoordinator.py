@@ -19,3 +19,37 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
+
+class SharedFolderCoordinator():
+
+    def __init__(self, config):
+        self.config = config
+
+    def create_host_folders(self):
+        """
+        Make sure that all configured shared folders exist on the host system.
+        If a folder is missing, create it!
+        """
+        pass
+
+    def verify_target_mountpoints(self):
+        """
+        Verify that all mount points exist within the target system.
+        If a target mount point is missing, raise a fatal error.
+        Hint: It is assumed that the mount points within the target get created during the configuration phase.
+        """
+        pass
+
+    def create_pre_config_profiles(self):
+        """
+        Creates all profiles that can be applied prior to the configuration of the target.
+        :return: list of profile names
+        """
+        pass
+
+    def create_post_config_profiles(self):
+        """
+        Creates all profiles that can be applied after the configuration of the target.
+        :return: list of profile names
+        """
+        pass
