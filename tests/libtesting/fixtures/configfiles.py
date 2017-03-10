@@ -29,6 +29,11 @@ general:
     edi_use_case:           edi_uc_run
     edi_compression:        gz
 
+shared_folders:
+    workspace:
+        folder:             work
+        mountpoint:         mywork
+
 bootstrap:
     tool:                   debootstrap
     architecture:           amd64
@@ -49,6 +54,11 @@ general:
     # change the use case:
     edi_use_case:           edi_uc_develop
 
+shared_folders:
+    other_folder:
+        folder:             invalid_folder
+        mountpoint:         target_mountpoint
+
 bootstrap:
     repository_key:     https://ftp-master.debian.org/keys/archive-key-8.asc
 """
@@ -57,6 +67,10 @@ sample_system_file = """
 general:
     # change the use case:
     edi_use_case:           edi_uc_build
+
+shared_folders:
+    other_folder:
+        folder:             valid_folder
 
 bootstrap:
     architecture:           i386

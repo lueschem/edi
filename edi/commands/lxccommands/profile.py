@@ -47,7 +47,7 @@ class Profile(Lxc):
     def run(self, config_file):
         self._setup_parser(config_file)
 
-        profile_list = self.config.get_ordered_items("lxc_profiles")
+        profile_list = self.config.get_ordered_path_items("lxc_profiles")
         profile_name_list = []
         for name, path, dictionary in profile_list:
             logging.info(("Creating profile {} located in "

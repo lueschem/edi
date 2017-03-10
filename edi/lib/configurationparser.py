@@ -75,18 +75,27 @@ class ConfigurationParser():
     def get_compression(self):
         return self._get_general_item("edi_compression", "xz")
 
-    def get_ordered_items(self, section):
+    def get_ordered_path_items(self, section):
         citems = self._get_config().get(section, {})
         ordered_items = collections.OrderedDict(sorted(citems.items()))
         item_list = []
         for name, content in ordered_items.items():
             path = content.get("path", None)
             if not path:
-                raise FatalError(("Missing path value in playbook '{}'."
-                                  ).format(path))
+                raise FatalError(("Missing path item in section '{}' for '{}'."
+                                  ).format(section, name))
             resolved_path = self._resolve_path(path)
             node_dict = self._get_node_dictionary(content)
             item_list.append((name, resolved_path, node_dict))
+
+        return item_list
+
+    def get_ordered_items(self, section):
+        citems = self._get_config().get(section, {})
+        ordered_items = collections.OrderedDict(sorted(citems.items()))
+        item_list = []
+        for name, content in ordered_items.items():
+            item_list.append((name, content))
 
         return item_list
 
@@ -155,7 +164,7 @@ class ConfigurationParser():
                                                          element)
 
         nested_elements = ["playbooks", "keys", "lxc_templates",
-                           "lxc_profiles"]
+                           "lxc_profiles", "shared_folders"]
         for element in nested_elements:
             merged_config[element
                           ] = self._merge_nested_node(base, overlay,

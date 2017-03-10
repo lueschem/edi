@@ -105,7 +105,7 @@ class Lxc(Image):
         metadata["creation_date"] = calendar.timegm(time.gmtime())
 
         template_node = {}
-        template_list = self.config.get_ordered_items("lxc_templates")
+        template_list = self.config.get_ordered_path_items("lxc_templates")
 
         if template_list:
             templates_dest = os.path.join(imagedir, "templates")

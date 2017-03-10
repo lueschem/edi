@@ -62,7 +62,7 @@ def test_playbooks_overlay(config_files, monkeypatch):
 
     with open(config_files, "r") as main_file:
         parser = ConfigurationParser(main_file)
-        playbooks = parser.get_ordered_items("playbooks")
+        playbooks = parser.get_ordered_path_items("playbooks")
         assert len(playbooks) == 3
         expected_playbooks = ["10_base_system",
                               "20_networking",
@@ -77,3 +77,15 @@ def test_playbooks_overlay(config_files, monkeypatch):
                 assert value == "some message"
             if name == "20_networking":
                 assert path.endswith("playbooks/foo.yml")
+
+
+def test_shared_folders(config_files):
+    with open(config_files, "r") as main_file:
+        parser = ConfigurationParser(main_file)
+        shared_folders = parser.get_ordered_items('shared_folders')
+        assert shared_folders[0][0] == 'other_folder'
+        assert shared_folders[0][1].get('mountpoint') == 'target_mountpoint'
+        assert shared_folders[0][1].get('folder') == 'valid_folder' # merge result
+        assert shared_folders[1][0] == 'workspace'
+        assert shared_folders[1][1].get('mountpoint') == 'mywork'
+        assert shared_folders[1][1].get('folder') == 'work'
