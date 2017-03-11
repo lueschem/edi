@@ -86,13 +86,16 @@ def test_shared_folders(config_files):
 
         # first element
         name, content, dict = shared_folders[0]
-        assert dict.get('edi_current_user_host_home_directory')
         assert name == 'other_folder'
         assert content.get('mountpoint') == 'target_mountpoint'
         assert content.get('folder') == 'valid_folder' # merge result
+        assert dict.get('edi_current_user_host_home_directory')
+        assert dict.get('edi_current_user_target_home_directory') == '/foo/bar'
 
         # second element
         name, content, dict = shared_folders[1]
         assert name == 'workspace'
         assert content.get('mountpoint') == 'mywork'
         assert content.get('folder') == 'work'
+        assert dict.get('edi_current_user_target_home_directory').startswith('/home/')
+

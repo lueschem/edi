@@ -19,6 +19,26 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
+profile_privileged = """
+name: privileged
+description: Privileged edi lxc container
+config:
+  security.privileged: "true"
+devices: {}
+"""
+
+
+profile_shared_folder = """
+name: shared_folder
+config: {}
+description: Shared folder for edi lxc container
+devices:
+  shared_folder_{{ shared_folder_name }}_for_{{ "edi_current_user_name" }}:
+    path: {{ edi_current_user_target_home_directory }}/{{ shared_folder_mountpoint }}
+    source: {{ edi_current_user_host_home_directory }}/{{ shared_folder_folder }}
+    type: disk
+"""
+
 
 class SharedFolderCoordinator():
 
@@ -40,16 +60,16 @@ class SharedFolderCoordinator():
         """
         pass
 
-    def create_pre_config_profiles(self):
+    def get_pre_config_profiles(self):
         """
         Creates all profiles that can be applied prior to the configuration of the target.
-        :return: list of profile names
+        :return: list of profiles
         """
         pass
 
-    def create_post_config_profiles(self):
+    def get_post_config_profiles(self):
         """
         Creates all profiles that can be applied after the configuration of the target.
-        :return: list of profile names
+        :return: list of profiles
         """
         pass

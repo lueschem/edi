@@ -58,6 +58,8 @@ shared_folders:
     other_folder:
         folder:             invalid_folder
         mountpoint:         target_mountpoint
+        parameters:
+            edi_current_user_target_home_directory: /foo/bar
 
 bootstrap:
     repository_key:     https://ftp-master.debian.org/keys/archive-key-8.asc

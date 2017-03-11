@@ -219,10 +219,12 @@ class ConfigurationParser():
 
     def _get_load_time_dictionary(self):
         load_dict = {}
-        load_dict["edi_current_user_name"] = get_user()
+        current_user_name = get_user()
+        load_dict["edi_current_user_name"] = current_user_name
         load_dict["edi_current_user_uid"] = get_user_uid()
         load_dict["edi_current_user_gid"] = get_user_gid()
         load_dict["edi_current_user_host_home_directory"] = get_user_environment_variable("HOME")
+        load_dict["edi_current_user_target_home_directory"] = "/home/{}".format(current_user_name)
 
         load_dict["edi_host_hostname"] = get_hostname()
         load_dict["edi_work_directory"] = self.get_workdir()
