@@ -90,12 +90,13 @@ class ConfigurationParser():
 
         return item_list
 
-    def get_ordered_items(self, section):
+    def get_ordered_raw_items(self, section):
         citems = self._get_config().get(section, {})
         ordered_items = collections.OrderedDict(sorted(citems.items()))
         item_list = []
         for name, content in ordered_items.items():
-            item_list.append((name, content))
+            node_dict = self._get_node_dictionary(content)
+            item_list.append((name, content, node_dict))
 
         return item_list
 
@@ -221,6 +222,8 @@ class ConfigurationParser():
         load_dict["edi_current_user_name"] = get_user()
         load_dict["edi_current_user_uid"] = get_user_uid()
         load_dict["edi_current_user_gid"] = get_user_gid()
+        load_dict["edi_current_user_host_home_directory"] = get_user_environment_variable("HOME")
+
         load_dict["edi_host_hostname"] = get_hostname()
         load_dict["edi_work_directory"] = self.get_workdir()
         load_dict["edi_config_directory"] = self.config_directory

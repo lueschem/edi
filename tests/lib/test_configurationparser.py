@@ -82,10 +82,17 @@ def test_playbooks_overlay(config_files, monkeypatch):
 def test_shared_folders(config_files):
     with open(config_files, "r") as main_file:
         parser = ConfigurationParser(main_file)
-        shared_folders = parser.get_ordered_items('shared_folders')
-        assert shared_folders[0][0] == 'other_folder'
-        assert shared_folders[0][1].get('mountpoint') == 'target_mountpoint'
-        assert shared_folders[0][1].get('folder') == 'valid_folder' # merge result
-        assert shared_folders[1][0] == 'workspace'
-        assert shared_folders[1][1].get('mountpoint') == 'mywork'
-        assert shared_folders[1][1].get('folder') == 'work'
+        shared_folders = parser.get_ordered_raw_items('shared_folders')
+
+        # first element
+        name, content, dict = shared_folders[0]
+        assert dict.get('edi_current_user_host_home_directory')
+        assert name == 'other_folder'
+        assert content.get('mountpoint') == 'target_mountpoint'
+        assert content.get('folder') == 'valid_folder' # merge result
+
+        # second element
+        name, content, dict = shared_folders[1]
+        assert name == 'workspace'
+        assert content.get('mountpoint') == 'mywork'
+        assert content.get('folder') == 'work'
