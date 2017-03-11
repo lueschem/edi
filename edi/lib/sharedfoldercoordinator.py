@@ -19,6 +19,11 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
+
+from jinja2 import Template
+from edi.lib.helpers import FatalError
+
+
 profile_privileged = """
 name: privileged
 description: Privileged edi lxc container
@@ -33,7 +38,7 @@ name: shared_folder
 config: {}
 description: Shared folder for edi lxc container
 devices:
-  shared_folder_{{ shared_folder_name }}_for_{{ "edi_current_user_name" }}:
+  shared_folder_{{ shared_folder_name }}_for_{{ edi_current_user_name }}:
     path: {{ edi_current_user_target_home_directory }}/{{ shared_folder_mountpoint }}
     source: {{ edi_current_user_host_home_directory }}/{{ shared_folder_folder }}
     type: disk
@@ -43,7 +48,7 @@ devices:
 class SharedFolderCoordinator():
 
     def __init__(self, config):
-        self.config = config
+        self._config = config
 
     def create_host_folders(self):
         """
@@ -65,11 +70,33 @@ class SharedFolderCoordinator():
         Creates all profiles that can be applied prior to the configuration of the target.
         :return: list of profiles
         """
-        pass
+        if self._config.get_ordered_raw_items('shared_folders'):
+            return [Template(profile_privileged).render({})]
+        else:
+            return []
 
     def get_post_config_profiles(self):
         """
         Creates all profiles that can be applied after the configuration of the target.
         :return: list of profiles
         """
-        pass
+        shared_folders = self._config.get_ordered_raw_items('shared_folders')
+        if shared_folders:
+            profiles = [Template(profile_privileged).render({})]
+            template = Template(profile_shared_folder)
+            for name, content, dict in shared_folders:
+                for item in ['folder', 'mountpoint']:
+                    dict['shared_folder_{}'.format(item)] = self._get_mandatory_item(name, content, item)
+                dict['shared_folder_name'] = name
+                profiles.append(template.render(dict))
+
+            return profiles
+        else:
+            return []
+
+    @staticmethod
+    def _get_mandatory_item(folder_name, folder_config, item):
+        result = folder_config.get(item, None)
+        if not result:
+            raise FatalError('''Missing mandatory item '{}' in shared folder '{}'.'''.format(item, folder_name))
+        return result
