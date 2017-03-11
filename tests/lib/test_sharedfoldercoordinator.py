@@ -49,14 +49,14 @@ from edi.lib.sharedfoldercoordinator import SharedFolderCoordinator
 from tests.libtesting.fixtures.configfiles import config_files
 
 expected_profile_boilerplates = [
-"""
+    """
 name: privileged
 description: Privileged edi lxc container
 config:
   security.privileged: "true"
 devices: {}
 """,
-"""
+    """
 name: shared_folder
 config: {}
 description: Shared folder for edi lxc container
@@ -66,7 +66,7 @@ devices:
     source: {{ home }}/valid_folder
     type: disk
 """,
-"""
+    """
 name: shared_folder
 config: {}
 description: Shared folder for edi lxc container
