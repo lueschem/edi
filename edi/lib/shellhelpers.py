@@ -23,6 +23,7 @@ import logging
 import subprocess
 import os
 from edi.lib.helpers import get_user
+from edi.lib import mockablerun
 
 _ADAPTIVE = -42
 
@@ -56,9 +57,9 @@ def run(popenargs, sudo=False, input=None, timeout=None,
 
     logging.info("Running command: {0}".format(myargs))
 
-    result = subprocess.run(myargs, input=input, timeout=timeout, check=check,
-                            universal_newlines=universal_newlines,
-                            stdout=subprocess_stdout, **kwargs)
+    result = mockablerun.run_mockable(myargs, input=input, timeout=timeout, check=check,
+                                      universal_newlines=universal_newlines,
+                                      stdout=subprocess_stdout, **kwargs)
 
     if (logging.getLogger().isEnabledFor(logging.INFO) and
             subprocess_stdout is subprocess.PIPE):
