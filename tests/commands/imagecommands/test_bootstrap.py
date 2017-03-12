@@ -25,6 +25,7 @@ import os
 import shutil
 import subprocess
 import requests_mock
+from edi.lib import mockablerun
 
 
 _ADAPTIVE = -42
@@ -34,6 +35,7 @@ def test_bootstrap(config_files, monkeypatch):
     with open(config_files, "r") as main_file:
         def fakegetuid():
             return 0
+
         monkeypatch.setattr(os, 'getuid', fakegetuid)
 
         def fakechown(*_):
@@ -47,14 +49,21 @@ def test_bootstrap(config_files, monkeypatch):
                 rootfspath = popenargs[0][1]
                 if not os.path.exists(rootfspath):
                     os.mkdir(rootfspath)
+            elif popenargs[0][0] == "debootstrap":
+                pass
             elif popenargs[0][0] == "tar":
                 archive = popenargs[0][-1]
                 with open(archive, mode="w") as fakearchive:
                     fakearchive.write("fake archive")
             elif popenargs[0][-2] == "dpkg" and popenargs[0][-1] == "--print-architecture":
                 return subprocess.CompletedProcess("fakerun", 0, 'amd64')
+            else:
+                print('Passthrough: {}'.format(popenargs[0]))
+                return subprocess.run(*popenargs, **kwargs)
+
             return subprocess.CompletedProcess("fakerun", 0, '')
-        monkeypatch.setattr(subprocess, 'run', fakerun)
+
+        monkeypatch.setattr(mockablerun, 'run_mockable', fakerun)
 
         monkeypatch.chdir(os.path.dirname(config_files))
 
