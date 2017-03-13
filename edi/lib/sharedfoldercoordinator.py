@@ -65,6 +65,13 @@ class SharedFolderCoordinator():
         """
         pass
 
+    def get_mountpoints(self):
+        """
+        Get a list of mount points.
+        :return: a list of mountpoints
+        """
+        return self._get_folder_list('edi_current_user_target_home_directory', 'mountpoint')
+
     def get_pre_config_profiles(self):
         """
         Creates all profiles that can be applied prior to the configuration of the target.
@@ -97,6 +104,18 @@ class SharedFolderCoordinator():
     @staticmethod
     def _get_mandatory_item(folder_name, folder_config, item):
         result = folder_config.get(item, None)
+        if '/' in result:
+            raise FatalError(('''The item '{}' in shared folder '{}' must not contain sub folders.'''
+                              ).format(item, folder_name))
         if not result:
             raise FatalError('''Missing mandatory item '{}' in shared folder '{}'.'''.format(item, folder_name))
+        return result
+
+    def _get_folder_list(self, homedir, item):
+        shared_folders = self._config.get_ordered_raw_items('shared_folders')
+        result = []
+        for name, content, dict in shared_folders:
+            folder = '{}/{}'.format(dict[homedir],
+                                    self._get_mandatory_item(name, content, item))
+            result.append(folder)
         return result

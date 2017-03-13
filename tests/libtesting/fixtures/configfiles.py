@@ -99,6 +99,7 @@ playbooks:
 """
 
 config_name = "sample"
+empty_config_name = "empty"
 
 
 @pytest.fixture(scope='function')
@@ -123,4 +124,14 @@ def config_files(tmpdir_factory):
     os.makedirs(str(playbook_dir))
     with open(str(playbook_dir.join("foo.yml")), "w") as file:
         file.write("baz")
+    return str(dir_name.join(main_file))
+
+
+@pytest.fixture(scope='function')
+def empty_config_file(tmpdir_factory):
+    dir_name = tmpdir_factory.mktemp('configuration')
+    main_file = "{0}.yml".format(empty_config_name)
+    with open(str(dir_name.join(main_file)), "w") as file:
+        file.write("general:")
+
     return str(dir_name.join(main_file))

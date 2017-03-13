@@ -46,7 +46,7 @@ from edi.lib.helpers import get_user
 from edi.lib.shellhelpers import get_user_environment_variable
 from edi.lib.configurationparser import ConfigurationParser
 from edi.lib.sharedfoldercoordinator import SharedFolderCoordinator
-from tests.libtesting.fixtures.configfiles import config_files
+from tests.libtesting.fixtures.configfiles import config_files, empty_config_file
 
 expected_profile_boilerplates = [
     """
@@ -117,3 +117,30 @@ def test_post_config_profiles(config_files):
 
         for i in range(0, 3):
             assert profiles[i] == expected_profiles[i]
+
+def test_get_mountpoints(config_files):
+    with open(config_files, "r") as main_file:
+        parser = ConfigurationParser(main_file)
+
+        coordinator = SharedFolderCoordinator(parser)
+        mountpoints = coordinator.get_mountpoints()
+        assert mountpoints[0] == '/foo/bar/target_mountpoint'
+        assert len(mountpoints) == 2
+
+
+def test_without_shared_folders(empty_config_file):
+    with open(empty_config_file, "r") as main_file:
+        parser = ConfigurationParser(main_file)
+
+        coordinator = SharedFolderCoordinator(parser)
+        mountpoints = coordinator.get_mountpoints()
+        assert isinstance(mountpoints, list)
+        assert len(mountpoints) == 0
+        pre = coordinator.get_pre_config_profiles()
+        assert isinstance(pre, list)
+        assert len(pre) == 0
+        post = coordinator.get_post_config_profiles()
+        assert isinstance(post, list)
+        assert len(post) == 0
+
+

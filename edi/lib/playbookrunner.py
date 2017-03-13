@@ -27,6 +27,7 @@ from codecs import open
 from edi.lib.helpers import chown_to_user
 from edi.lib.helpers import require_executable, get_user
 from edi.lib.shellhelpers import run
+from edi.lib.sharedfoldercoordinator import SharedFolderCoordinator
 
 
 class PlaybookRunner():
@@ -45,6 +46,8 @@ class PlaybookRunner():
 
             playbook_list = self.config.get_ordered_path_items("playbooks")
             for name, path, extra_vars in playbook_list:
+                sfc = SharedFolderCoordinator(self.config)
+                extra_vars['edi_shared_folder_mountpoints'] = sfc.get_mountpoints()
                 logging.info(("Running playbook {} located in "
                               "{} with extra vars:\n{}"
                               ).format(name, path,

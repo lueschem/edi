@@ -25,15 +25,38 @@ from tests.libtesting.fixtures.configfiles import config_files
 from edi.lib import mockablerun
 import shutil
 import subprocess
+from codecs import open
+import yaml
+
+
+def get_parameter(command, option):
+    option_index = command.index(option)
+    return command[option_index + 1]
+
+
+def verify_inventory(file):
+    with open(file, encoding='utf-8') as f:
+        assert 'fake-container' in f.read()
+
+
+def verify_extra_vars(file):
+    print(file)
+    with open(file, encoding='utf-8') as f:
+        extra_vars = yaml.load(f)
+        assert extra_vars['edi_config_management_user_name'] == 'edicfgmgmt'
+        mountpoints = extra_vars['edi_shared_folder_mountpoints']
+        assert len(mountpoints) == 2
+        assert mountpoints[0] == '/foo/bar/target_mountpoint'
 
 
 def test_lxd_connection(config_files, monkeypatch):
     def fake_ansible_playbook_run(*popenargs, **kwargs):
         command = popenargs[0]
         if command[0] == 'ansible-playbook':
-            connection_option = command.index('--connection')
-            assert 'lxd' == command[connection_option + 1]
-            # TODO: verify --inventory and --extra-vars (and --user for ssh connection)
+            assert 'lxd' == get_parameter(command, '--connection')
+            verify_inventory(get_parameter(command, '--inventory'))
+            verify_extra_vars(get_parameter(command, '--extra-vars').lstrip('@'))
+            # TODO: verify --user for ssh connection
             return subprocess.CompletedProcess("fakerun", 0, '')
         else:
             return subprocess.run(*popenargs, **kwargs)
