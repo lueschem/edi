@@ -138,7 +138,7 @@ class ConfigurationParser():
         return template.render(self._get_load_time_dictionary())
 
     def _get_base_config(self, config_file):
-        return yaml.load(self._parse_jina2_file(config_file))
+        return yaml.load(self._parse_jina2_file(config_file)) or {}
 
     def _get_overlay_config(self, base_config_file, overlay_name):
         fname, extension = splitext(basename(base_config_file.name))
