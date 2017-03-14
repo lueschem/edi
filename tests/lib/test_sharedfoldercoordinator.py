@@ -50,6 +50,7 @@ from tests.libtesting.fixtures.configfiles import config_files, empty_config_fil
 import subprocess
 from edi.lib import mockablerun
 import pytest
+import os
 
 expected_profile_boilerplates = [
     """
@@ -154,6 +155,7 @@ def test_verify_container_mountpoints_connection_failure(config_files, monkeypat
             command = popenargs[0]
             if command[0] == 'lxc' and command[1] == 'exec':
                 if command[command.index('--') + 1] == 'true':
+                    assert kwargs['stderr'] == subprocess.PIPE
                     return subprocess.CompletedProcess("failure", 1, '')
                 else:
                     return subprocess.CompletedProcess("fakerun", 0, '')
@@ -176,7 +178,7 @@ def test_verify_container_mountpoints_failure(config_files, monkeypatch):
             command = popenargs[0]
             if command[0] == 'lxc' and command[1] == 'exec':
                 if command[command.index('--') + 1] == 'test':
-                    return subprocess.CompletedProcess("failure", 1, '')
+                    return subprocess.CompletedProcess("failure", 1, 'failure')
                 else:
                     return subprocess.CompletedProcess("fakerun", 0, '')
             else:
@@ -221,3 +223,104 @@ def test_without_shared_folders(empty_config_file):
         assert len(post) == 0
 
 
+def test_create_host_folders_folder_exists(config_files, monkeypatch):
+    with open(config_files, "r") as main_file:
+        parser = ConfigurationParser(main_file)
+
+        coordinator = SharedFolderCoordinator(parser)
+
+        def fake_os_path_isdir(*_):
+            return True
+
+        monkeypatch.setattr(os.path, 'isdir', fake_os_path_isdir)
+
+        def fake_os_path_exists(*_):
+            return True
+
+        monkeypatch.setattr(os.path, 'exists', fake_os_path_exists)
+
+        coordinator.create_host_folders() # nothing to do
+
+
+def test_create_host_folders_not_a_folder(config_files, monkeypatch):
+    with open(config_files, "r") as main_file:
+        parser = ConfigurationParser(main_file)
+
+        coordinator = SharedFolderCoordinator(parser)
+
+        def fake_os_path_isdir(*_):
+            return False
+
+        monkeypatch.setattr(os.path, 'isdir', fake_os_path_isdir)
+
+        def fake_os_path_exists(*_):
+            return True
+
+        monkeypatch.setattr(os.path, 'exists', fake_os_path_exists)
+
+        with pytest.raises(FatalError) as error:
+            coordinator.create_host_folders() # exists but not a folder
+
+        assert 'valid_folder' in error.value.message
+
+
+def test_create_host_folders_successful_create(config_files, monkeypatch):
+    with open(config_files, "r") as main_file:
+        parser = ConfigurationParser(main_file)
+
+        coordinator = SharedFolderCoordinator(parser)
+
+        def fake_os_path_isdir(*_):
+            return False
+
+        monkeypatch.setattr(os.path, 'isdir', fake_os_path_isdir)
+
+        def fake_os_path_exists(*_):
+            return False
+
+        monkeypatch.setattr(os.path, 'exists', fake_os_path_exists)
+
+        def fake_mkdir_command(*popenargs, **kwargs):
+            command = popenargs[0]
+            if command[0] == 'mkdir' and command[1] == '-p':
+                folder = command[-1]
+                assert 'valid_folder' in folder or 'work' in folder
+                return subprocess.CompletedProcess("fakerun", 0, '')
+            else:
+                return subprocess.run(*popenargs, **kwargs)
+
+        monkeypatch.setattr(mockablerun, 'run_mockable', fake_mkdir_command)
+
+        coordinator.create_host_folders() # successful mkdir
+
+
+def test_create_host_folders_failed_create(config_files, monkeypatch):
+    with open(config_files, "r") as main_file:
+        parser = ConfigurationParser(main_file)
+
+        coordinator = SharedFolderCoordinator(parser)
+
+        def fake_os_path_isdir(*_):
+            return False
+
+        monkeypatch.setattr(os.path, 'isdir', fake_os_path_isdir)
+
+        def fake_os_path_exists(*_):
+            return False
+
+        monkeypatch.setattr(os.path, 'exists', fake_os_path_exists)
+
+        def fake_mkdir_command(*popenargs, **kwargs):
+            command = popenargs[0]
+            if command[0] == 'mkdir' and command[1] == '-p':
+                assert kwargs['stderr'] == subprocess.PIPE
+                return subprocess.CompletedProcess("fakerun", 1, 'no permission')
+            else:
+                return subprocess.run(*popenargs, **kwargs)
+
+        monkeypatch.setattr(mockablerun, 'run_mockable', fake_mkdir_command)
+
+        with pytest.raises(FatalError) as error:
+            coordinator.create_host_folders() # failed mkdir
+
+        assert 'valid_folder' in error.value.message

@@ -23,6 +23,9 @@
 from jinja2 import Template
 from edi.lib.helpers import FatalError
 from edi.lib.shellhelpers import run
+import os
+import logging
+import subprocess
 
 
 profile_privileged = """
@@ -56,7 +59,27 @@ class SharedFolderCoordinator():
         Make sure that all configured shared folders exist on the host system.
         If a folder is missing, create it!
         """
-        pass
+        host_folders = self._get_folder_list('edi_current_user_host_home_directory', 'folder')
+        for folder in host_folders:
+            if os.path.exists(folder):
+                if not os.path.isdir(folder):
+                    raise FatalError('''The location '{}' does '''
+                                     '''exist on the host system but it is not a folder that '''
+                                     '''can be shared to a container.'''.format(folder))
+
+                else:
+                    logging.debug(('''The shared folder '{}' on the host system has already been created.'''
+                                   ).format(folder))
+            else:
+                cmd = ['mkdir', '-p', folder]
+                # Use the current user (not root) to create the folder!
+                result = run(cmd, check=False, stderr=subprocess.PIPE)
+                if result.returncode != 0:
+                    raise FatalError(('''The creation of the folder '{}' failed with the message '{}'.'''
+                                      ).format(folder, result.stderr))
+                else:
+                    logging.debug(('''Successfully created the shared folder '{}' on the host system.'''
+                                   ).format(folder))
 
     def verify_container_mountpoints(self, container_name):
         """
@@ -65,8 +88,10 @@ class SharedFolderCoordinator():
         Hint: It is assumed that the mount points within the target get created during the configuration phase.
         """
         test_cmd = ['lxc', 'exec', container_name, '--', 'true']
-        if run(test_cmd, check=False).returncode != 0:
-            raise FatalError('''Failed to communicate with container '{}'.'''.format(container_name))
+        result = run(test_cmd, check=False, stderr=subprocess.PIPE)
+        if result.returncode != 0:
+            raise FatalError(('''The communicate with the container '{}' failed with the message '{}'.'''
+                              ).format(container_name, result.stderr))
 
         mountpoints = self.get_mountpoints()
         for mountpoint in mountpoints:
@@ -123,7 +148,7 @@ class SharedFolderCoordinator():
         if '/' in result:
             raise FatalError(('''The item '{}' in shared folder '{}' must not contain sub folders.'''
                               ).format(item, folder_name))
-        
+
         return result
 
     def _get_folder_list(self, homedir, item):
