@@ -42,11 +42,14 @@
 
 
 from jinja2 import Template
-from edi.lib.helpers import get_user
+from edi.lib.helpers import get_user, FatalError
 from edi.lib.shellhelpers import get_user_environment_variable
 from edi.lib.configurationparser import ConfigurationParser
 from edi.lib.sharedfoldercoordinator import SharedFolderCoordinator
 from tests.libtesting.fixtures.configfiles import config_files, empty_config_file
+import subprocess
+from edi.lib import mockablerun
+import pytest
 
 expected_profile_boilerplates = [
     """
@@ -126,6 +129,68 @@ def test_get_mountpoints(config_files):
         mountpoints = coordinator.get_mountpoints()
         assert mountpoints[0] == '/foo/bar/target_mountpoint'
         assert len(mountpoints) == 2
+
+
+def test_verify_container_mountpoints(config_files, monkeypatch):
+    with open(config_files, "r") as main_file:
+        def fake_lxc_exec_command(*popenargs, **kwargs):
+            command = popenargs[0]
+            if command[0] == 'lxc' and command[1] == 'exec':
+                return subprocess.CompletedProcess("fakerun", 0, '')
+            else:
+                return subprocess.run(*popenargs, **kwargs)
+
+        monkeypatch.setattr(mockablerun, 'run_mockable', fake_lxc_exec_command)
+
+        parser = ConfigurationParser(main_file)
+
+        coordinator = SharedFolderCoordinator(parser)
+        coordinator.verify_container_mountpoints('fake-container')
+
+
+def test_verify_container_mountpoints_connection_failure(config_files, monkeypatch):
+    with open(config_files, "r") as main_file:
+        def fake_lxc_exec_command(*popenargs, **kwargs):
+            command = popenargs[0]
+            if command[0] == 'lxc' and command[1] == 'exec':
+                if command[command.index('--') + 1] == 'true':
+                    return subprocess.CompletedProcess("failure", 1, '')
+                else:
+                    return subprocess.CompletedProcess("fakerun", 0, '')
+            else:
+                return subprocess.run(*popenargs, **kwargs)
+
+        monkeypatch.setattr(mockablerun, 'run_mockable', fake_lxc_exec_command)
+
+        parser = ConfigurationParser(main_file)
+
+        coordinator = SharedFolderCoordinator(parser)
+        with pytest.raises(FatalError) as error:
+            coordinator.verify_container_mountpoints('fake-container')
+        assert 'fake-container' in error.value.message
+
+
+def test_verify_container_mountpoints_failure(config_files, monkeypatch):
+    with open(config_files, "r") as main_file:
+        def fake_lxc_exec_command(*popenargs, **kwargs):
+            command = popenargs[0]
+            if command[0] == 'lxc' and command[1] == 'exec':
+                if command[command.index('--') + 1] == 'test':
+                    return subprocess.CompletedProcess("failure", 1, '')
+                else:
+                    return subprocess.CompletedProcess("fakerun", 0, '')
+            else:
+                return subprocess.run(*popenargs, **kwargs)
+
+        monkeypatch.setattr(mockablerun, 'run_mockable', fake_lxc_exec_command)
+
+        parser = ConfigurationParser(main_file)
+
+        coordinator = SharedFolderCoordinator(parser)
+        with pytest.raises(FatalError) as error:
+            coordinator.verify_container_mountpoints('fake-container')
+        assert 'fake-container' in error.value.message
+        assert '/foo/bar/target_mountpoint' in error.value.message
 
 
 def test_without_shared_folders(empty_config_file):

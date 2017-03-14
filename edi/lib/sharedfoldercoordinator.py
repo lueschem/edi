@@ -22,6 +22,7 @@
 
 from jinja2 import Template
 from edi.lib.helpers import FatalError
+from edi.lib.shellhelpers import run
 
 
 profile_privileged = """
@@ -57,13 +58,22 @@ class SharedFolderCoordinator():
         """
         pass
 
-    def verify_target_mountpoints(self):
+    def verify_container_mountpoints(self, container_name):
         """
         Verify that all mount points exist within the target system.
         If a target mount point is missing, raise a fatal error.
         Hint: It is assumed that the mount points within the target get created during the configuration phase.
         """
-        pass
+        test_cmd = ['lxc', 'exec', container_name, '--', 'true']
+        if run(test_cmd, check=False).returncode != 0:
+            raise FatalError('''Failed to communicate with container '{}'.'''.format(container_name))
+
+        mountpoints = self.get_mountpoints()
+        for mountpoint in mountpoints:
+            cmd = ['lxc', 'exec', container_name, '--', 'test', '-d', mountpoint]
+            if run(cmd, check=False).returncode != 0:
+                raise FatalError(('''Please make sure that '{}' is valid mount point in the container '{}'.''')
+                                 .format(mountpoint, container_name))
 
     def get_mountpoints(self):
         """
