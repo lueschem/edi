@@ -155,8 +155,7 @@ def test_verify_container_mountpoints_connection_failure(config_files, monkeypat
             command = popenargs[0]
             if command[0] == 'lxc' and command[1] == 'exec':
                 if command[command.index('--') + 1] == 'true':
-                    assert kwargs['stderr'] == subprocess.PIPE
-                    return subprocess.CompletedProcess("failure", 1, '')
+                    return subprocess.CompletedProcess("failure", 1, '', stderr='lxc command failed')
                 else:
                     return subprocess.CompletedProcess("fakerun", 0, '')
             else:
@@ -170,6 +169,7 @@ def test_verify_container_mountpoints_connection_failure(config_files, monkeypat
         with pytest.raises(FatalError) as error:
             coordinator.verify_container_mountpoints('fake-container')
         assert 'fake-container' in error.value.message
+        assert 'lxc command failed' in error.value.message
 
 
 def test_verify_container_mountpoints_failure(config_files, monkeypatch):
@@ -313,8 +313,7 @@ def test_create_host_folders_failed_create(config_files, monkeypatch):
         def fake_mkdir_command(*popenargs, **kwargs):
             command = popenargs[0]
             if command[0] == 'mkdir' and command[1] == '-p':
-                assert kwargs['stderr'] == subprocess.PIPE
-                return subprocess.CompletedProcess("fakerun", 1, 'no permission')
+                return subprocess.CompletedProcess("fakerun", 1, stderr='no permission')
             else:
                 return subprocess.run(*popenargs, **kwargs)
 
@@ -324,3 +323,4 @@ def test_create_host_folders_failed_create(config_files, monkeypatch):
             coordinator.create_host_folders() # failed mkdir
 
         assert 'valid_folder' in error.value.message
+        assert 'no permission' in error.value.message
