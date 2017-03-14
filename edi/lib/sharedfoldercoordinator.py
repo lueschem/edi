@@ -72,7 +72,9 @@ class SharedFolderCoordinator():
         for mountpoint in mountpoints:
             cmd = ['lxc', 'exec', container_name, '--', 'test', '-d', mountpoint]
             if run(cmd, check=False).returncode != 0:
-                raise FatalError(('''Please make sure that '{}' is valid mount point in the container '{}'.''')
+                raise FatalError(('''Please make sure that '{}' is valid mount point in the container '{}'.\n'''
+                                  '''Hint: Use an appropriate playbook that generates those mount points\n'''
+                                  '''      by using the variable 'edi_shared_folder_mountpoints'.''')
                                  .format(mountpoint, container_name))
 
     def get_mountpoints(self):
