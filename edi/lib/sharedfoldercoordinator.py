@@ -116,11 +116,14 @@ class SharedFolderCoordinator():
     @staticmethod
     def _get_mandatory_item(folder_name, folder_config, item):
         result = folder_config.get(item, None)
+
+        if not result:
+            raise FatalError('''Missing mandatory item '{}' in shared folder '{}'.'''.format(item, folder_name))
+
         if '/' in result:
             raise FatalError(('''The item '{}' in shared folder '{}' must not contain sub folders.'''
                               ).format(item, folder_name))
-        if not result:
-            raise FatalError('''Missing mandatory item '{}' in shared folder '{}'.'''.format(item, folder_name))
+        
         return result
 
     def _get_folder_list(self, homedir, item):

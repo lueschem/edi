@@ -193,6 +193,18 @@ def test_verify_container_mountpoints_failure(config_files, monkeypatch):
         assert '/foo/bar/target_mountpoint' in error.value.message
 
 
+def test_get_mandatory_item():
+    with pytest.raises(FatalError) as missing:
+        SharedFolderCoordinator._get_mandatory_item('some_folder', {}, 'mountpoint')
+    assert 'some_folder' in missing.value.message
+    assert 'mountpoint' in missing.value.message
+
+    with pytest.raises(FatalError) as subfolder:
+        SharedFolderCoordinator._get_mandatory_item('some_folder', {'mountpoint': 'mount/point' }, 'mountpoint')
+    assert 'some_folder' in subfolder.value.message
+    assert 'mountpoint' in subfolder.value.message
+
+
 def test_without_shared_folders(empty_config_file):
     with open(empty_config_file, "r") as main_file:
         parser = ConfigurationParser(main_file)
