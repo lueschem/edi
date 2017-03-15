@@ -28,6 +28,7 @@ from jinja2 import Template
 from edi.commands.lxc import Lxc
 from edi.lib.shellhelpers import run
 from edi.lib.helpers import print_success
+from edi.lib.sharedfoldercoordinator import SharedFolderCoordinator
 
 
 class Profile(Lxc):
@@ -44,7 +45,7 @@ class Profile(Lxc):
     def run_cli(self, cli_args):
         self.run(cli_args.config_file)
 
-    def run(self, config_file):
+    def run(self, config_file, include_post_config_profiles=False):
         self._setup_parser(config_file)
 
         profile_list = self.config.get_ordered_path_items("lxc_profiles")
@@ -59,19 +60,20 @@ class Profile(Lxc):
             with open(path, encoding="UTF-8", mode="r") as profile_file:
                 profile = Template(profile_file.read())
                 profile_text = profile.render(dictionary)
-                profile_yaml = yaml.load(profile_text)
-                profile_hash = hashlib.sha256(profile_text.encode()
-                                              ).hexdigest()[:20]
-                profile_name = profile_yaml.get("name", "anonymous")
-                ext_profile_name = "{}_{}".format(profile_name,
-                                                  profile_hash)
-                profile_name_list.append(ext_profile_name)
-                profile_yaml["name"] = ext_profile_name
-                profile_content = yaml.dump(profile_yaml,
-                                            default_flow_style=False)
-                self._write_lxc_profile(ext_profile_name,
-                                        profile_content)
+                name = self._write_lxc_profile(profile_text)
+                profile_name_list.append(name)
 
+        sfc = SharedFolderCoordinator(self.config)
+        if include_post_config_profiles:
+            sfc_profiles = sfc.get_post_config_profiles()
+        else:
+            sfc_profiles = sfc.get_pre_config_profiles()
+
+        for profile in sfc_profiles:
+            name = self._write_lxc_profile(profile)
+            profile_name_list.append(name)
+
+        print_success('The following profiles are now available: {}'.format(', '.join(profile_name_list)))
         return profile_name_list
 
     def _is_profile_existing(self, name):
@@ -83,19 +85,23 @@ class Profile(Lxc):
         result = run(cmd, check=False, stderr=subprocess.PIPE)
         return result.returncode == 0
 
-    def _write_lxc_profile(self, name, content):
-        if not self._is_profile_existing(name):
-            create_cmd = []
-            create_cmd.append("lxc")
-            create_cmd.append("profile")
-            create_cmd.append("create")
-            create_cmd.append(name)
-            run(create_cmd)
-            print_success("Created lxc profile {}.".format(name))
+    def _write_lxc_profile(self, profile_text):
+        profile_yaml = yaml.load(profile_text)
+        profile_hash = hashlib.sha256(profile_text.encode()
+                                      ).hexdigest()[:20]
+        profile_name = profile_yaml.get("name", "anonymous")
+        ext_profile_name = "{}_{}".format(profile_name,
+                                          profile_hash)
+        profile_yaml["name"] = ext_profile_name
+        profile_content = yaml.dump(profile_yaml,
+                                    default_flow_style=False)
 
-        edit_cmd = []
-        edit_cmd.append("lxc")
-        edit_cmd.append("profile")
-        edit_cmd.append("edit")
-        edit_cmd.append(name)
-        run(edit_cmd, input=content)
+        if not self._is_profile_existing(ext_profile_name):
+            create_cmd = ["lxc", "profile", "create", ext_profile_name]
+            run(create_cmd)
+            print_success("Created lxc profile {}.".format(ext_profile_name))
+
+        edit_cmd = ["lxc", "profile", "edit", ext_profile_name]
+        run(edit_cmd, input=profile_content)
+
+        return ext_profile_name

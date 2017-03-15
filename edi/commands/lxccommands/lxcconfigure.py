@@ -20,9 +20,12 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 from edi.commands.lxc import Lxc
+from edi.commands.lxccommands.profile import Profile
 from edi.commands.lxccommands.launch import Launch
 from edi.lib.playbookrunner import PlaybookRunner
 from edi.lib.helpers import print_success
+from edi.lib.shellhelpers import run
+from edi.lib.sharedfoldercoordinator import SharedFolderCoordinator
 
 
 class Configure(Lxc):
@@ -51,8 +54,22 @@ class Configure(Lxc):
         playbook_runner = PlaybookRunner(self.config, self._result(), "lxd")
         playbook_runner.run_all()
 
+        sfc = SharedFolderCoordinator(self.config)
+        sfc.create_host_folders()
+        sfc.verify_container_mountpoints(container_name)
+
+        profiles = Profile().run(config_file, include_post_config_profiles=True)
+        # TODO: stop container if profiles need to be updated
+        self._apply_lxc_profiles(container_name, profiles)
+        # TODO: restart container if needed
+
         print_success("Configured container {}.".format(self._result()))
         return self._result()
 
     def _result(self):
         return self.container_name
+
+    @staticmethod
+    def _apply_lxc_profiles(container_name, profiles):
+        cmd = ['lxc', 'profile', 'apply', container_name, ','.join(profiles)]
+        run(cmd)

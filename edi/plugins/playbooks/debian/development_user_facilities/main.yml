@@ -3,6 +3,8 @@
     - role: host_user_as_target_user
       become: True
       become_user: root
-      # do not add the current user on a production system (edi_uc_run).
-      when: not edi_uc_run
+
+    - role: shared_folder_mountpoints
+      become: True
+      become_user: "{{ edi_current_user_name }}"
 
