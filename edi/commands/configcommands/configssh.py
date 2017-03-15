@@ -19,6 +19,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
+from edi.lib.helpers import FatalError
 from edi.commands.config import Config
 
 
@@ -39,7 +40,7 @@ class Ssh(Config):
 
     def run(self, config_file):
         self._setup_parser(config_file)
-        return []
+        raise FatalError('The command to generate ssh keys is not yet implemented.')
 
     def clean(self, config_file):
         self._setup_parser(config_file)
