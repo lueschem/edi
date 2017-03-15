@@ -155,7 +155,8 @@ def test_verify_container_mountpoints_connection_failure(config_files, monkeypat
             command = popenargs[0]
             if command[0] == 'lxc' and command[1] == 'exec':
                 if command[command.index('--') + 1] == 'true':
-                    return subprocess.CompletedProcess("failure", 1, '', stderr='lxc command failed')
+                    cmd = ['bash', '-c', '>&2 echo -e "lxc command failed" ; exit 1']
+                    return subprocess.run(cmd, **kwargs)
                 else:
                     return subprocess.CompletedProcess("fakerun", 0, '')
             else:
@@ -313,7 +314,8 @@ def test_create_host_folders_failed_create(config_files, monkeypatch):
         def fake_mkdir_command(*popenargs, **kwargs):
             command = popenargs[0]
             if command[0] == 'mkdir' and command[1] == '-p':
-                return subprocess.CompletedProcess("fakerun", 1, stderr='no permission')
+                cmd = ['bash', '-c', '>&2 echo -e "no permission" ; exit 1']
+                return subprocess.run(cmd, **kwargs)
             else:
                 return subprocess.run(*popenargs, **kwargs)
 
