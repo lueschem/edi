@@ -34,8 +34,6 @@ def test_project_name(config_files):
 def test_global_configuration_overlay(config_files):
     with open(config_files, "r") as main_file:
         parser = ConfigurationParser(main_file)
-        # the user file shall win:
-        assert parser.get_use_case() == "edi_uc_test"
         assert parser.get_compression() == "gz"
 
 

@@ -26,7 +26,6 @@ from edi.lib.helpers import get_user, get_hostname
 sample_file = """
 ---
 general:
-    edi_use_case:           edi_uc_run
     edi_compression:        gz
 
 shared_folders:
@@ -50,10 +49,6 @@ playbooks:
 """
 
 sample_global_file = """
-general:
-    # change the use case:
-    edi_use_case:           edi_uc_develop
-
 shared_folders:
     other_folder:
         folder:             invalid_folder
@@ -66,10 +61,6 @@ bootstrap:
 """
 
 sample_system_file = """
-general:
-    # change the use case:
-    edi_use_case:           edi_uc_build
-
 shared_folders:
     other_folder:
         folder:             valid_folder
@@ -84,10 +75,6 @@ playbooks:
 
 sample_user_file = """
 ---
-general:
-    # change the use case again:
-    edi_use_case:           edi_uc_test
-
 # apply no changes to bootstrap section
 
 playbooks:

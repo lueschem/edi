@@ -29,9 +29,6 @@ from edi.lib.helpers import (get_user, get_user_gid, get_user_uid,
                              get_hostname, FatalError)
 from edi.lib.shellhelpers import get_user_environment_variable
 
-_supported_use_cases = ["edi_uc_run", "edi_uc_build",
-                        "edi_uc_test", "edi_uc_develop"]
-
 
 class ConfigurationParser():
 
@@ -68,9 +65,6 @@ class ConfigurationParser():
 
     def get_qemu_repository_key(self):
         return self._get_qemu_item("repository_key", None)
-
-    def get_use_case(self):
-        return self._get_general_item("edi_use_case", "edi_uc_run")
 
     def get_compression(self):
         return self._get_general_item("edi_compression", "xz")
@@ -242,22 +236,11 @@ class ConfigurationParser():
 
     def _get_node_dictionary(self, node):
         node_dict = self._get_load_time_dictionary()
-        if self.get_use_case() not in _supported_use_cases:
-            raise FatalError(("Use case '{0}' is not supported.\n"
-                              "Choose from: {1}."
-                              ).format(self.get_use_case(),
-                                       ", ".join(_supported_use_cases)))
 
         node_dict["edi_lxc_network_interface_name"] = self._get_general_item("edi_lxc_network_interface_name",
                                                                              "lxcif0")
         node_dict["edi_config_management_user_name"] = self._get_general_item("edi_config_management_user_name",
                                                                               "edicfgmgmt")
-
-        for uc in _supported_use_cases:
-            if uc == self.get_use_case():
-                node_dict[uc] = True
-            else:
-                node_dict[uc] = False
 
         parameters = node.get("parameters", None)
 
