@@ -29,6 +29,9 @@ general:
     edi_compression:        gz
 
 shared_folders:
+    skip_me:
+        folder:             skip
+        mountpoint:         me
     workspace:
         folder:             work
         mountpoint:         mywork
@@ -64,6 +67,8 @@ sample_system_file = """
 shared_folders:
     other_folder:
         folder:             valid_folder
+    skip_me:
+        skip:               True
 
 bootstrap:
     architecture:           i386
@@ -71,6 +76,8 @@ bootstrap:
 playbooks:
     30_foo:
         path:               playbooks/foo.yml
+    40_bar:
+        path:               playbooks/bar.yml
 """
 
 sample_user_file = """
@@ -83,6 +90,8 @@ playbooks:
             kernel_package: linux-image-amd64-rt
     20_networking:
         path:               playbooks/foo.yml
+    40_bar:
+        skip: True
 """
 
 config_name = "sample"

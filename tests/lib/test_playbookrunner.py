@@ -72,4 +72,7 @@ def test_lxd_connection(config_files, monkeypatch):
         parser = ConfigurationParser(main_file)
         runner = PlaybookRunner(parser, "fake-container", "lxd")
 
-        runner.run_all()
+        playbooks = runner.run_all()
+
+        expected_playbooks = ['10_base_system', '20_networking', '30_foo']
+        assert playbooks == expected_playbooks

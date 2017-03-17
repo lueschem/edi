@@ -40,6 +40,7 @@ class PlaybookRunner():
     def run_all(self):
         workdir = self.config.get_workdir()
 
+        applied_playbooks = []
         with tempfile.TemporaryDirectory(dir=workdir) as tempdir:
             chown_to_user(tempdir)
             inventory = self._write_inventory_file(tempdir)
@@ -61,6 +62,9 @@ class PlaybookRunner():
 
                 ansible_user = extra_vars.get("edi_config_management_user_name")
                 self._run_playbook(path, inventory, extra_vars_file, ansible_user)
+                applied_playbooks.append(name)
+
+        return applied_playbooks
 
     def _run_playbook(self, playbook, inventory, extra_vars, ansible_user):
         require_executable("ansible-playbook", "sudo apt install ansible")
