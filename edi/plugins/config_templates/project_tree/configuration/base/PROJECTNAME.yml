@@ -1,10 +1,18 @@
-general:
-    edi_compression: gz
-
 bootstrap:
+{% if edi_bootstrap_architecture %}
     architecture: {{ edi_bootstrap_architecture }}
+{% else %}
+    architecture: amd64
+{% endif %}
+{% if edi_bootstrap_repository %}
     repository: {{ edi_bootstrap_repository }}
+{% if edi_bootstrap_repository_key %}
     repository_key: {{ edi_bootstrap_repository_key }}
+{% endif %}
+{% else %}
+    repository: deb http://ftp.ch.debian.org/debian/ jessie main
+    repository_key: https://ftp-master.debian.org/keys/archive-key-8.asc
+{% endif %}
     tool: debootstrap
 
 lxc_profiles:
@@ -26,6 +34,8 @@ playbooks:
         path: playbooks/debian/base_system/main.yml
     040_development_user_facilities:
         path: playbooks/debian/development_user_facilities/main.yml
+    050_sample_playbook:
+        path: playbooks/sample_playbook/main.yml
 
 {% if edi_qemu_repository %}
 qemu:
