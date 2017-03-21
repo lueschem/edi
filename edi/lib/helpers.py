@@ -82,6 +82,10 @@ def get_hostname():
     return socket.gethostname()
 
 
+def get_edi_plugin_directory():
+    return os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "plugins"))
+
+
 def which(executable):
     def is_exe(fpath):
         return os.path.isfile(fpath) and os.access(fpath, os.X_OK)

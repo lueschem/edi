@@ -26,7 +26,7 @@ import os
 from os.path import dirname, abspath, basename, splitext, isfile, join
 import logging
 from edi.lib.helpers import (get_user, get_user_gid, get_user_uid,
-                             get_hostname, FatalError)
+                             get_hostname, get_edi_plugin_directory, FatalError)
 from edi.lib.shellhelpers import get_user_environment_variable
 
 
@@ -99,9 +99,6 @@ class ConfigurationParser():
                 logging.debug("Skipping named item '{}' from section '{}'.".format(name, section))
 
         return item_list
-
-    def get_edi_plugin_directory(self):
-        return abspath(join(dirname(__file__), "../plugins"))
 
     def get_project_plugin_directory(self):
         return join(self.config_directory, "plugins")
@@ -229,8 +226,7 @@ class ConfigurationParser():
         load_dict["edi_host_hostname"] = get_hostname()
         load_dict["edi_work_directory"] = self.get_workdir()
         load_dict["edi_config_directory"] = self.config_directory
-        load_dict["edi_edi_plugin_directory"
-                  ] = self.get_edi_plugin_directory()
+        load_dict["edi_edi_plugin_directory"] = get_edi_plugin_directory()
         load_dict["edi_project_plugin_directory"
                   ] = self.get_project_plugin_directory()
         load_dict["edi_host_http_proxy"] = get_user_environment_variable('http_proxy', '')
@@ -262,8 +258,7 @@ class ConfigurationParser():
                                   ).format(path))
             return path
         else:
-            locations = [self.get_project_plugin_directory(),
-                         self.get_edi_plugin_directory()]
+            locations = [self.get_project_plugin_directory(), get_edi_plugin_directory()]
 
             for location in locations:
                 abspath = os.path.join(location, path)
