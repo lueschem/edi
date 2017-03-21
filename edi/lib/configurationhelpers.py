@@ -20,6 +20,9 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import jinja2
+from codecs import open
+from edi.lib.helpers import FatalError
 
 
 class ConfigurationTemplate():
@@ -31,21 +34,17 @@ class ConfigurationTemplate():
         """
         :param folder: The folder that contains a *copy* of the configuration template files.
         """
-        self._folder = folder
+        self._folder = os.path.abspath(folder)
 
     def render(self, dictionary):
         """
         Renders the configuration template "in place".
         :param dictionary: the dictionary that gets applied during the rendering operations
         """
-        print('Files:')
-        self._walk_over_files(self._print, dictionary, self._is_real_file)
-        print('Directories:')
-        self._walk_over_files(self._print, dictionary, os.path.isdir)
-        print('Links:')
-        self._walk_over_files(self._print, dictionary, os.path.islink)
-        print('All:')
-        self._walk_over_files(self._print)
+        if not dictionary.get('edi_project_name'):
+            raise FatalError('''Missing or empty dictionary entry 'edi_project_name'!''')
+
+        self._walk_over_files(self._render_jinja2, dictionary, self._is_real_file)
 
     def _walk_over_files(self, operation, dictionary=None, custom_filter=None):
         def _filter_it(path, custom_filter):
@@ -66,6 +65,12 @@ class ConfigurationTemplate():
         return os.path.isfile(path) and not os.path.islink(path)
 
     @staticmethod
-    def _print(path, dictionary):
-        print('path={}, dict={}.'.format(path, dictionary))
+    def _render_jinja2(path, dictionary):
+        with open(path, encoding="UTF-8", mode="r") as template_file:
+            template = jinja2.Template(template_file.read())
+            result = template.render(dictionary)
+
+        with open(path, encoding="UTF-8", mode="w") as result_file:
+            result_file.write(result)
+
 
