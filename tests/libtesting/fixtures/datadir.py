@@ -21,17 +21,7 @@
 
 from pytest import fixture
 import os
-import shutil
-
-
-def copytree(src, dst):
-    for item in os.listdir(src):
-        s = os.path.join(src, item)
-        d = os.path.join(dst, item)
-        if os.path.isdir(s):
-            shutil.copytree(s, d)
-        else:
-            shutil.copy2(s, d)
+from edi.lib.helpers import copy_tree
 
 
 @fixture
@@ -45,6 +35,6 @@ def datadir(tmpdir, request):
                                              '..', '..', 'data', test_subdir))
 
     if os.path.isdir(test_data):
-        copytree(str(test_data), str(tmpdir))
+        copy_tree(str(test_data), str(tmpdir))
 
     return tmpdir

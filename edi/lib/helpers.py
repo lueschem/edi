@@ -86,6 +86,21 @@ def get_edi_plugin_directory():
     return os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "plugins"))
 
 
+def copy_tree(src, dst):
+    for item in os.listdir(src):
+        s = os.path.join(src, item)
+        d = os.path.join(dst, item)
+        if os.path.islink(s):
+            linkto = os.readlink(s)
+            os.symlink(linkto, d)
+        elif os.path.isdir(s):
+            shutil.copytree(s, d, symlinks=True)
+        else:
+            shutil.copy2(s, d)
+
+    return dst
+
+
 def which(executable):
     def is_exe(fpath):
         return os.path.isfile(fpath) and os.access(fpath, os.X_OK)

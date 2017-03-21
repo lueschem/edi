@@ -25,6 +25,9 @@ from codecs import open
 from edi.lib.helpers import FatalError
 
 
+placeholder = 'PROJECTNAME'
+
+
 class ConfigurationTemplate():
     """
     Transforms a configuration template into a working configuration
@@ -40,37 +43,71 @@ class ConfigurationTemplate():
         """
         Renders the configuration template "in place".
         :param dictionary: the dictionary that gets applied during the rendering operations
+        :return: list: returns a list of the resulting files
         """
         if not dictionary.get('edi_project_name'):
             raise FatalError('''Missing or empty dictionary entry 'edi_project_name'!''')
 
         self._walk_over_files(self._render_jinja2, dictionary, self._is_real_file)
+        self._walk_over_files(self._rename_file, dictionary, os.path.isfile)
+        self._walk_over_files(self._rename_file, dictionary, os.path.islink) # dangling links!
+        self._walk_over_files(self._relink_file, dictionary, os.path.islink)
+        return self._walk_over_files(self._no_operation)
 
-    def _walk_over_files(self, operation, dictionary=None, custom_filter=None):
-        def _filter_it(path, custom_filter):
+    def _walk_over_files(self, operation, dictionary={}, custom_filter=None):
+        def _filter_it(path):
             return not custom_filter or custom_filter and custom_filter(path)
 
+        touched_files = []
         for root, dirs, files in os.walk(self._folder, topdown=False):
             for name in files:
                 path = os.path.join(root, name)
-                if _filter_it(path, custom_filter=custom_filter):
-                    operation(path, dictionary)
+                if _filter_it(path):
+                    touched_files.append(operation(path, **dictionary))
             for name in dirs:
                 path = os.path.join(root, name)
-                if _filter_it(path, custom_filter=custom_filter):
-                    operation(path, dictionary)
+                if _filter_it(path):
+                    touched_files.append(operation(path, **dictionary))
+
+        return touched_files
 
     @staticmethod
     def _is_real_file(path):
         return os.path.isfile(path) and not os.path.islink(path)
 
     @staticmethod
-    def _render_jinja2(path, dictionary):
+    def _render_jinja2(path, **kwargs):
+        dictionary = kwargs
         with open(path, encoding="UTF-8", mode="r") as template_file:
-            template = jinja2.Template(template_file.read())
+            template = jinja2.Template(template_file.read(), trim_blocks=True, lstrip_blocks=True)
             result = template.render(dictionary)
 
         with open(path, encoding="UTF-8", mode="w") as result_file:
             result_file.write(result)
 
+        return path
 
+    @staticmethod
+    def _rename_file(path, edi_project_name=None, **_):
+        directory = os.path.dirname(path)
+        filename = os.path.basename(path)
+        if placeholder in filename:
+            newpath = os.path.join(directory, filename.replace(placeholder, edi_project_name))
+            os.rename(path, newpath)
+            return newpath
+        else:
+            return path
+
+    @staticmethod
+    def _relink_file(path, edi_project_name=None, **_):
+        link = os.readlink(path)
+        if placeholder in link:
+            newlink = link.replace(placeholder, edi_project_name)
+            os.remove(path)
+            os.symlink(newlink, path)
+
+        return path
+
+    @staticmethod
+    def _no_operation(path, **kwargs):
+        return path
