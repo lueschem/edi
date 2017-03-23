@@ -21,8 +21,12 @@
 
 
 import os
+import pytest
 from edi.lib.helpers import get_edi_plugin_directory, copy_tree
 from edi.lib.configurationhelpers import ConfigurationTemplate
+from edi.lib.configurationparser import ConfigurationParser
+from edi.lib.helpers import FatalError
+from codecs import open
 
 
 def test_configuration_rendering(tmpdir):
@@ -37,6 +41,23 @@ def test_configuration_rendering(tmpdir):
 
     template = ConfigurationTemplate(str(tmpdir))
     result = template.render({'edi_project_name': 'test-project'})
-    print('\n'.join(result))
+    assert 'PROJECTNAME' not in ''.join(result)
+    assert 'plugins/playbooks/sample_playbook/roles/sample_role/tasks/main.yml' in ''.join(result)
 
-    assert False
+    assert not os.path.isfile(template_link)
+
+    test_project_dev = os.path.join(str(tmpdir), 'test-project-develop.yml')
+    assert os.path.isfile(test_project_dev)
+    assert os.path.islink(test_project_dev)
+
+    with open(test_project_dev, mode='r', encoding='UTF-8') as config_file:
+        cp = ConfigurationParser(config_file)
+        assert cp.get_bootstrap_architecture() == 'amd64'
+
+
+def test_configuration_rendering_failure(tmpdir):
+    template = ConfigurationTemplate(str(tmpdir))
+    with pytest.raises(FatalError) as error:
+        template.render({})
+
+    assert 'edi_project_name' in error.value.message
