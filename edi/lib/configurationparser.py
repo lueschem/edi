@@ -30,6 +30,24 @@ from edi.lib.helpers import (get_user, get_user_gid, get_user_uid,
 from edi.lib.shellhelpers import get_user_environment_variable
 
 
+def get_base_dictionary():
+    base_dict = {}
+    current_user_name = get_user()
+    base_dict["edi_current_user_name"] = current_user_name
+    base_dict["edi_current_user_uid"] = get_user_uid()
+    base_dict["edi_current_user_gid"] = get_user_gid()
+    base_dict["edi_current_user_host_home_directory"] = get_user_environment_variable("HOME")
+    base_dict["edi_current_user_target_home_directory"] = "/home/{}".format(current_user_name)
+    base_dict["edi_host_hostname"] = get_hostname()
+    base_dict["edi_edi_plugin_directory"] = get_edi_plugin_directory()
+    base_dict["edi_host_http_proxy"] = get_user_environment_variable('http_proxy', '')
+    base_dict["edi_host_https_proxy"] = get_user_environment_variable('https_proxy', '')
+    base_dict["edi_host_ftp_proxy"] = get_user_environment_variable('ftp_proxy', '')
+    base_dict["edi_host_socks_proxy"] = get_user_environment_variable('all_proxy', '')
+    base_dict["edi_host_no_proxy"] = get_user_environment_variable('no_proxy', '')
+    return base_dict
+
+
 class ConfigurationParser():
 
     # shared data for all configuration parsers
@@ -215,25 +233,10 @@ class ConfigurationParser():
                                       ).get(item, default)
 
     def _get_load_time_dictionary(self):
-        load_dict = {}
-        current_user_name = get_user()
-        load_dict["edi_current_user_name"] = current_user_name
-        load_dict["edi_current_user_uid"] = get_user_uid()
-        load_dict["edi_current_user_gid"] = get_user_gid()
-        load_dict["edi_current_user_host_home_directory"] = get_user_environment_variable("HOME")
-        load_dict["edi_current_user_target_home_directory"] = "/home/{}".format(current_user_name)
-
-        load_dict["edi_host_hostname"] = get_hostname()
+        load_dict = get_base_dictionary()
         load_dict["edi_work_directory"] = self.get_workdir()
         load_dict["edi_config_directory"] = self.config_directory
-        load_dict["edi_edi_plugin_directory"] = get_edi_plugin_directory()
-        load_dict["edi_project_plugin_directory"
-                  ] = self.get_project_plugin_directory()
-        load_dict["edi_host_http_proxy"] = get_user_environment_variable('http_proxy', '')
-        load_dict["edi_host_https_proxy"] = get_user_environment_variable('https_proxy', '')
-        load_dict["edi_host_ftp_proxy"] = get_user_environment_variable('ftp_proxy', '')
-        load_dict["edi_host_socks_proxy"] = get_user_environment_variable('all_proxy', '')
-        load_dict["edi_host_no_proxy"] = get_user_environment_variable('no_proxy', '')
+        load_dict["edi_project_plugin_directory"] = self.get_project_plugin_directory()
         return load_dict
 
     def _get_node_dictionary(self, node):

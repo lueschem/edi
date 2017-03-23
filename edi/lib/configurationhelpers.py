@@ -22,10 +22,30 @@
 import os
 import jinja2
 from codecs import open
-from edi.lib.helpers import FatalError
+from edi.lib.helpers import FatalError, get_edi_plugin_directory
 
 
 placeholder = 'PROJECTNAME'
+
+
+def get_available_templates():
+    template_dir = os.path.join(get_edi_plugin_directory(), 'config_templates')
+    all_items = os.listdir(template_dir)
+    templates = []
+    for item in all_items:
+        name, extension = os.path.splitext(item)
+        if extension == '.yml':
+            templates.append(name)
+
+    return templates
+
+
+def get_template(name):
+    return os.path.join(get_edi_plugin_directory(), 'config_templates', '{}.yml'.format(name))
+
+
+def get_project_tree():
+    return os.path.join(get_edi_plugin_directory(), 'config_templates', 'project_tree')
 
 
 class ConfigurationTemplate():

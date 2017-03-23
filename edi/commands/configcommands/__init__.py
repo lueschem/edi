@@ -1,1 +1,1 @@
-__all__ = ["configclean", "configssh", "configmerge"]
+__all__ = ["configclean", "configssh", "configmerge", "configinit"]
