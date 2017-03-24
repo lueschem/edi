@@ -102,7 +102,7 @@ class Bootstrap(Image):
         # Ansible uses python on the target system
         # sudo is needed for privilege escalation
         additional_packages = ("python,sudo,netbase,net-tools,iputils-ping,ifupdown,isc-dhcp-client,"
-                               "resolvconf,systemd,systemd-sysv")
+                               "resolvconf,systemd,systemd-sysv,gnupg")
         rootfs = os.path.join(tempdir, "rootfs")
         bootstrap_source = SourceEntry(self.config.get_bootstrap_repository())
         components = ",".join(bootstrap_source.comps)
