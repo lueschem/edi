@@ -35,9 +35,8 @@ def test_configuration_rendering(tmpdir):
     assert not os.listdir(str(tmpdir)) # target should be empty
 
     copy_tree(source, str(tmpdir))
-    template_link = os.path.join(str(tmpdir), 'PROJECTNAME-develop.yml')
+    template_link = os.path.join(str(tmpdir), 'PROJECTNAME-develop.yml.edilink')
     assert os.path.isfile(template_link)
-    assert os.path.islink(template_link)
 
     template = ConfigurationTemplate(str(tmpdir))
     result = template.render({'edi_project_name': 'test-project'})

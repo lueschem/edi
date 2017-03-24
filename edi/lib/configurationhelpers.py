@@ -21,6 +21,7 @@
 
 import os
 import jinja2
+import yaml
 from codecs import open
 from edi.lib.helpers import FatalError, get_edi_plugin_directory
 
@@ -70,8 +71,7 @@ class ConfigurationTemplate():
 
         self._walk_over_files(self._render_jinja2, dictionary, self._is_real_file)
         self._walk_over_files(self._rename_file, dictionary, os.path.isfile)
-        self._walk_over_files(self._rename_file, dictionary, os.path.islink) # dangling links!
-        self._walk_over_files(self._relink_file, dictionary, os.path.islink)
+        self._walk_over_files(self._replace_edilink, dictionary, self._is_edilink)
         return self._walk_over_files(self._no_operation)
 
     def _walk_over_files(self, operation, dictionary={}, custom_filter=None):
@@ -94,6 +94,11 @@ class ConfigurationTemplate():
     @staticmethod
     def _is_real_file(path):
         return os.path.isfile(path) and not os.path.islink(path)
+
+    @staticmethod
+    def _is_edilink(path):
+        _, extension = os.path.splitext(path)
+        return extension == '.edilink'
 
     @staticmethod
     def _render_jinja2(path, **kwargs):
@@ -119,14 +124,14 @@ class ConfigurationTemplate():
             return path
 
     @staticmethod
-    def _relink_file(path, edi_project_name=None, **_):
-        link = os.readlink(path)
-        if placeholder in link:
-            newlink = link.replace(placeholder, edi_project_name)
-            os.remove(path)
-            os.symlink(newlink, path)
+    def _replace_edilink(path, edi_project_name=None, **_):
+        with open(path, mode='r', encoding='utf-8') as link_file:
+            link_target = yaml.load(link_file.read()).get('link')
 
-        return path
+        new_link, _ = os.path.splitext(path)
+        os.remove(path)
+        os.symlink(link_target, new_link)
+        return new_link
 
     @staticmethod
     def _no_operation(path, **kwargs):
