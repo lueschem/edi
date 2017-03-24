@@ -22,16 +22,12 @@
 from edi.lib.configurationparser import ConfigurationParser
 from edi.lib.playbookrunner import PlaybookRunner
 from tests.libtesting.fixtures.configfiles import config_files
+from tests.libtesting.helpers import get_command_parameter
 from edi.lib import mockablerun
 import shutil
 import subprocess
 from codecs import open
 import yaml
-
-
-def get_parameter(command, option):
-    option_index = command.index(option)
-    return command[option_index + 1]
 
 
 def verify_inventory(file):
@@ -53,9 +49,9 @@ def test_lxd_connection(config_files, monkeypatch):
     def fake_ansible_playbook_run(*popenargs, **kwargs):
         command = popenargs[0]
         if command[0] == 'ansible-playbook':
-            assert 'lxd' == get_parameter(command, '--connection')
-            verify_inventory(get_parameter(command, '--inventory'))
-            verify_extra_vars(get_parameter(command, '--extra-vars').lstrip('@'))
+            assert 'lxd' == get_command_parameter(command, '--connection')
+            verify_inventory(get_command_parameter(command, '--inventory'))
+            verify_extra_vars(get_command_parameter(command, '--extra-vars').lstrip('@'))
             # TODO: verify --user for ssh connection
             return subprocess.CompletedProcess("fakerun", 0, '')
         else:

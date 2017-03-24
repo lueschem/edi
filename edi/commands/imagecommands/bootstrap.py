@@ -23,6 +23,7 @@ import tempfile
 import os
 import shutil
 import logging
+from codecs import open
 from aptsources.sourceslist import SourceEntry
 from edi.commands.image import Image
 from edi.commands.qemucommands.fetch import Fetch
@@ -133,8 +134,7 @@ class Bootstrap(Image):
 
         return rootfs
 
-    @staticmethod
-    def _postprocess_rootfs(rootfs, key_data):
+    def _postprocess_rootfs(self, rootfs, key_data):
         if key_data:
             key_cmd = get_chroot_cmd(rootfs)
             key_cmd.append("apt-key")
@@ -152,3 +152,10 @@ class Bootstrap(Image):
         apt_list_cmd.append("-rf")
         apt_list_cmd.append("/var/lib/apt/lists/")
         run(apt_list_cmd, sudo=True)
+
+        # after a cross debootstrap /etc/apt/sources.list points
+        # to the wrong repository
+        sources_list = os.path.join(rootfs, 'etc', 'apt', 'sources.list')
+        with open(sources_list, mode='w', encoding='utf-8') as f:
+            f.write(('# edi bootstrap repository\n{}\n'
+                     ).format(self.config.get_bootstrap_repository()))
