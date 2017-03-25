@@ -88,8 +88,8 @@ Hint: You can skip this section if you just want to use edi without having a loo
      source local_setup
 
 
-Build a First Example
-+++++++++++++++++++++
+Build a First Container
++++++++++++++++++++++++
 
 #. Create an empty project folder:
 
@@ -105,8 +105,56 @@ Build a First Example
 
      edi config init my-project debian-stretch-amd64
 
-#. Build your first (development) lxd container using edi:
+#. Build your first (development) lxc container named *my-first-edi-container*:
 
    ::
 
      sudo edi -v lxc configure my-first-edi-container my-project-develop.yml
+
+
+Exploring the Container
++++++++++++++++++++++++
+
+#. Log into the container using your current user name (Note: This user is only available
+within a development container.) Use the password *ChangeMe!*:
+
+   ::
+
+     lxc exec my-first-edi-container -- login ${USER}
+
+#. Change the password for your container user:
+
+   ::
+
+     passwd
+
+#. Install an test a package within the container:
+
+   ::
+
+     sudo apt install cowsay
+     cowsay moo
+
+#. Share a file with the host (Note: The folder ~/edi-workspace is shared with your host.):
+
+   ::
+
+     cowsay "Hello world!" > ~/edi-workspace/hello
+
+#. Leave the container:
+
+   ::
+
+     exit
+
+#. Read the file previously created within the container:
+
+   ::
+
+     cat ~/edi-workspace/hello
+
+#. Enter the container as root (Note: This is useful if you have a container without your personal user.):
+
+   ::
+
+     lxc exec my-first-edi-container -- bash
