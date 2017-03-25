@@ -91,16 +91,22 @@ Hint: You can skip this section if you just want to use edi without having a loo
 Build a First Example
 +++++++++++++++++++++
 
-#. Clone the edi-examples repository:
+#. Create an empty project folder:
 
    ::
 
      cd ..
-     git clone https://github.com/lueschem/edi-examples.git
-     cd edi-examples/advanced/
+     mkdir my-first-edi-project
+     cd my-first-edi-project
 
-#. Build your first lxd container using edi:
+#. Generate a configuration for your project:
 
    ::
 
-     sudo edi -v lxc configure my-first-edi-container advanced_test.yml
+     edi config init my-project debian-stretch-amd64
+
+#. Build your first (development) lxd container using edi:
+
+   ::
+
+     sudo edi -v lxc configure my-first-edi-container my-project-develop.yml
