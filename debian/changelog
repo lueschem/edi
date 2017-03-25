@@ -1,3 +1,13 @@
+edi (0.4.3) xenial; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Allow sudo without password for the development user.
+  * Updated getting started documentation.
+
+  [ Matthias Lüscher (Launchpad) ]
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Sat, 25 Mar 2017 23:08:52 +0100
+
 edi (0.4.2) xenial; urgency=medium
 
   [ Matthias Lüscher ]
