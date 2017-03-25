@@ -1,4 +1,5 @@
-edi_bootstrap_architecture: amd64
-edi_bootstrap_repository: deb http://ftp.ch.debian.org/debian/ stretch main
-edi_bootstrap_repository_key: https://ftp-master.debian.org/keys/archive-key-8.asc
+parameters:
+    edi_bootstrap_architecture: amd64
+    edi_bootstrap_repository: deb http://ftp.ch.debian.org/debian/ stretch main
+    edi_bootstrap_repository_key: https://ftp-master.debian.org/keys/archive-key-8.asc
 

@@ -61,7 +61,7 @@ class Init(Config):
         template = ConfigurationTemplate(workdir)
         with open(get_template(config_template), encoding="UTF-8", mode="r") as template_file:
             t = Template(template_file.read())
-            template_dict = yaml.load(t.render(get_base_dictionary()))
+            template_dict = yaml.load(t.render(get_base_dictionary())).get('parameters', {})
 
         template_dict['edi_project_name'] = project_name
         template.render(template_dict)
