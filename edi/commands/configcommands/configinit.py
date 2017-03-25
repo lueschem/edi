@@ -20,7 +20,7 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-from edi.lib.helpers import FatalError, copy_tree
+from edi.lib.helpers import FatalError, copy_tree, print_success
 from jinja2 import Template
 import yaml
 from edi.commands.config import Config
@@ -65,3 +65,5 @@ class Init(Config):
 
         template_dict['edi_project_name'] = project_name
         template.render(template_dict)
+
+        print_success('''Configuration for project '{}' generated in folder '{}'.'''.format(project_name, workdir))
