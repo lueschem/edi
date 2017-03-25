@@ -116,7 +116,7 @@ Exploring the Container
 +++++++++++++++++++++++
 
 #. Log into the container using your current user name (Note: This user is only available
-within a development container.) Use the password *ChangeMe!*:
+   within a development container.) Use the password *ChangeMe!*:
 
    ::
 
@@ -128,12 +128,11 @@ within a development container.) Use the password *ChangeMe!*:
 
      passwd
 
-#. Install an test a package within the container:
+#. Install a package within the container:
 
    ::
 
      sudo apt install cowsay
-     cowsay moo
 
 #. Share a file with the host (Note: The folder ~/edi-workspace is shared with your host.):
 
@@ -158,3 +157,9 @@ within a development container.) Use the password *ChangeMe!*:
    ::
 
      lxc exec my-first-edi-container -- bash
+
+#. And leave it again:
+
+   ::
+
+     exit
