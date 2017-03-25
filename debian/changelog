@@ -1,3 +1,50 @@
+edi (0.4.0) xenial; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Avoid useless additions of "sudo -u" to shell commands.
+  * Show error message of gpg.
+  * Raise fatal errors as exceptions.
+  * Added shared_folders section to configuration parser.
+  * Added boilerplate for shared folder coordinator.
+  * Add dictionary to ordered raw items.
+  * Added profile boilerplates to shared folder configurator.
+  * Render profiles for shared folders.
+  * PEP8 fixup.
+  * Added test for playbook runner.
+  * Intercept subprocess run commands selectively during testing.
+  * Added shared folder mountpoints to extra vars.
+  * Accept empty configuration file.
+  * Implemented container mountpoint verification method.
+  * Improved error message in case of missing mount points.
+  * Fixed shared folder coordinator error message.
+  * Implemented the create host folders method.
+  * Improved error message checks.
+  * Improved stderr handling within tests.
+  * Mark the ssh command as not yet implemented.
+  * Added command that dumps the merged configuration.
+  * Added command line interface test.
+  * Added test for new config merge command.
+  * Include shared folder pieces into command chain.
+  * Removed unused feature edi_use_case.
+  * Added option to lxc profile command.
+  * Allow skipping of named items.
+  * Added first config items for template based configuration.
+  * Added additional config items for template based configuration.
+  * Implemented class that walks over configuration template items.
+  * Do jinja2 rendering.
+  * Refactored get_edi_plugin_directory.
+  * Completed ConfigurationTemplate implementation.
+  * Completed configuration template tests.
+  * Added a command that initializes a configuration.
+  * Added config templates for raspbian and debian stretch.
+  * Make sure that gpg is installed.
+  * Fix /etc/apt/sources.list during cross bootstrapping.
+  * Fixed link handling during debian packaging.
+
+  [ Matthias Lüscher (Launchpad) ]
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Sat, 25 Mar 2017 10:48:23 +0100
+
 edi (0.3.2) xenial; urgency=medium
 
   [ Matthias Lüscher ]
