@@ -72,6 +72,7 @@ class ConfigurationTemplate():
         self._walk_over_files(self._render_jinja2, dictionary, self._is_real_file)
         self._walk_over_files(self._rename_file, dictionary, os.path.isfile)
         self._walk_over_files(self._replace_edilink, dictionary, self._is_edilink)
+        self._walk_over_files(self._hide_edihidden, dictionary, self._is_edihidden)
         return self._walk_over_files(self._no_operation)
 
     def _walk_over_files(self, operation, dictionary={}, custom_filter=None):
@@ -101,6 +102,11 @@ class ConfigurationTemplate():
         return extension == '.edilink'
 
     @staticmethod
+    def _is_edihidden(path):
+        _, extension = os.path.splitext(path)
+        return extension == '.edihidden'
+
+    @staticmethod
     def _render_jinja2(path, **kwargs):
         dictionary = kwargs
         with open(path, encoding="UTF-8", mode="r") as template_file:
@@ -124,7 +130,7 @@ class ConfigurationTemplate():
             return path
 
     @staticmethod
-    def _replace_edilink(path, edi_project_name=None, **_):
+    def _replace_edilink(path, **_):
         with open(path, mode='r', encoding='utf-8') as link_file:
             link_target = yaml.load(link_file.read()).get('link')
 
@@ -132,6 +138,14 @@ class ConfigurationTemplate():
         os.remove(path)
         os.symlink(link_target, new_link)
         return new_link
+
+    @staticmethod
+    def _hide_edihidden(path, **_):
+        directory = os.path.dirname(path)
+        filename, _ = os.path.splitext(os.path.basename(path))
+        new_file = os.path.join(directory, '.{}'.format(filename))
+        os.rename(path, new_file)
+        return new_file
 
     @staticmethod
     def _no_operation(path, **kwargs):

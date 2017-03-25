@@ -48,6 +48,8 @@ def test_configuration_rendering(tmpdir):
     test_project_dev = os.path.join(str(tmpdir), 'test-project-develop.yml')
     assert os.path.isfile(test_project_dev)
     assert os.path.islink(test_project_dev)
+    gitignore = os.path.join(str(tmpdir), '.gitignore')
+    assert os.path.isfile(gitignore)
 
     with open(test_project_dev, mode='r', encoding='UTF-8') as config_file:
         cp = ConfigurationParser(config_file)
