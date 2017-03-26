@@ -1,7 +1,8 @@
 argcomplete
-pyyaml
+jinja2
+packaging
 python-apt
 python-debian
-requests
 python-gnupg
-jinja2
+pyyaml
+requests
