@@ -1,3 +1,12 @@
+edi (0.4.4) xenial; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Updated project dependencies.
+
+  [ Matthias Lüscher (Launchpad) ]
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Sun, 26 Mar 2017 16:23:30 +0200
+
 edi (0.4.3) xenial; urgency=medium
 
   [ Matthias Lüscher ]
