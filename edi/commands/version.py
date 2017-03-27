@@ -20,8 +20,7 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 from edi.lib.edicommand import EdiCommand
-from os.path import abspath, join, dirname, isdir
-import pkg_resources
+from edi.lib.helpers import get_edi_version
 
 
 class Version(EdiCommand):
@@ -39,10 +38,4 @@ class Version(EdiCommand):
         print(version)
 
     def run(self):
-        project_root = abspath(join(dirname(__file__), "../.."))
-        git_dir = join(project_root, ".git")
-        if isdir(git_dir):
-            from setuptools_scm import get_version
-            return get_version(root=project_root)
-        else:
-            return pkg_resources.get_distribution('edi').version
+        return get_edi_version()

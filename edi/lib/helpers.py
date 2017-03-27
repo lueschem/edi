@@ -25,6 +25,7 @@ from pwd import getpwnam
 import socket
 import logging
 import shutil
+import pkg_resources
 
 
 class Error(Exception):
@@ -128,3 +129,14 @@ def require_executable(executable, hint):
 
 def chown_to_user(path):
     shutil.chown(path, get_user_uid(), get_user_gid())
+
+
+def get_edi_version():
+    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+    git_dir = os.path.join(project_root, ".git")
+    if os.path.isdir(git_dir):
+        # do import locally so that we do not depend on setuptools_scm for the released version
+        from setuptools_scm import get_version
+        return get_version(root=project_root)
+    else:
+        return pkg_resources.get_distribution('edi').version
