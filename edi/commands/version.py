@@ -20,7 +20,7 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 from edi.lib.edicommand import EdiCommand
-from edi.lib.helpers import get_edi_version
+from edi.lib.helpers import get_edi_version_string
 
 
 class Version(EdiCommand):
@@ -38,4 +38,4 @@ class Version(EdiCommand):
         print(version)
 
     def run(self):
-        return get_edi_version()
+        return get_edi_version_string()

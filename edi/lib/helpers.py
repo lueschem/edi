@@ -26,6 +26,8 @@ import socket
 import logging
 import shutil
 import pkg_resources
+import re
+from packaging.version import Version
 
 
 class Error(Exception):
@@ -131,7 +133,7 @@ def chown_to_user(path):
     shutil.chown(path, get_user_uid(), get_user_gid())
 
 
-def get_edi_version():
+def get_edi_version_string():
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
     git_dir = os.path.join(project_root, ".git")
     if os.path.isdir(git_dir):
@@ -140,3 +142,19 @@ def get_edi_version():
         return get_version(root=project_root)
     else:
         return pkg_resources.get_distribution('edi').version
+
+
+def parse_version(version_string):
+    """
+    Strips the suffixes from the version string and returns a PEP 440 compliant version object.
+
+    :param version_string: String that needs to be parsed
+    :return: packaging.version.Version(MAJOR.MINOR.PATCH)
+    """
+    result = re.match('\d+(\.\d+){0,2}', version_string)
+    if result:
+        version_string = result.group(0)
+    else:
+        raise FatalError('''Unable to parse version string '{}'.'''.format(version_string))
+
+    return Version(version_string)
