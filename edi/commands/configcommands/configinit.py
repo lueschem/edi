@@ -20,7 +20,7 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-from edi.lib.helpers import FatalError, copy_tree, print_success
+from edi.lib.helpers import FatalError, copy_tree, print_success, get_edi_version, get_stripped_version
 from jinja2 import Template
 import yaml
 from edi.commands.config import Config
@@ -64,6 +64,7 @@ class Init(Config):
             template_dict = yaml.load(t.render(get_base_dictionary())).get('parameters', {})
 
         template_dict['edi_project_name'] = project_name
+        template_dict["edi_edi_version"] = get_stripped_version(get_edi_version())
         template.render(template_dict)
 
         print_success('''Configuration for project '{}' generated in folder '{}'.'''.format(project_name, workdir))

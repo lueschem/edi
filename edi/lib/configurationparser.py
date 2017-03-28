@@ -25,9 +25,10 @@ from jinja2 import Template
 import os
 from os.path import dirname, abspath, basename, splitext, isfile, join
 import logging
-from edi.lib.helpers import (get_user, get_user_gid, get_user_uid, get_edi_version_string,
-                             parse_version, get_hostname, get_edi_plugin_directory, FatalError)
+from edi.lib.helpers import (get_user, get_user_gid, get_user_uid, get_edi_version,
+                             get_stripped_version, get_hostname, get_edi_plugin_directory, FatalError)
 from edi.lib.shellhelpers import get_user_environment_variable
+from packaging.version import Version
 
 
 def get_base_dictionary():
@@ -148,12 +149,12 @@ class ConfigurationParser():
             self._verify_version_compatibility()
 
     def _verify_version_compatibility(self):
-        current_version = get_edi_version_string()
+        current_version = get_edi_version()
         required_version = str(self._get_general_item('edi_required_minimal_edi_version', current_version))
-        if parse_version(current_version) < parse_version(required_version):
+        if Version(get_stripped_version(current_version)) < Version(get_stripped_version(required_version)):
             raise FatalError(('The current configuration requires a newer version of edi (>={}).\n'
                               'Please update your edi installation!'
-                              ).format(parse_version(required_version)))
+                              ).format(get_stripped_version(required_version)))
 
     def _get_config(self):
         return ConfigurationParser._configurations.get(self.config_id, {})
