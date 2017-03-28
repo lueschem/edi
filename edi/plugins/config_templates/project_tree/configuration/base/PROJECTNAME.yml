@@ -1,3 +1,8 @@
+general:
+{% if edi_edi_version %}
+    edi_required_minimal_edi_version: {{ edi_edi_version }}
+{% endif %}
+
 bootstrap:
 {% if edi_bootstrap_architecture %}
     architecture: {{ edi_bootstrap_architecture }}
