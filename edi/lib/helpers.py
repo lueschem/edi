@@ -25,8 +25,6 @@ from pwd import getpwnam
 import socket
 import logging
 import shutil
-import pkg_resources
-import re
 
 
 class Error(Exception):
@@ -130,33 +128,3 @@ def require_executable(executable, hint):
 
 def chown_to_user(path):
     shutil.chown(path, get_user_uid(), get_user_gid())
-
-
-def get_edi_version():
-    """
-    Get the version of the current edi installation or the version derived from git.
-
-    :return: full edi version string
-    """
-    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
-    git_dir = os.path.join(project_root, ".git")
-    if os.path.isdir(git_dir):
-        # do import locally so that we do not depend on setuptools_scm for the released version
-        from setuptools_scm import get_version
-        return get_version(root=project_root)
-    else:
-        return pkg_resources.get_distribution('edi').version
-
-
-def get_stripped_version(version):
-    """
-    Strips the suffixes from the version string.
-
-    :param version: Version string that needs to be parsed
-    :return: a stripped version string of the format MAJOR[.MINOR[.PATCH]]
-    """
-    result = re.match('\d+(\.\d+){0,2}', version)
-    if result:
-        return result.group(0)
-    else:
-        raise FatalError('''Unable to parse version '{}'.'''.format(version))

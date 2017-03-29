@@ -7,6 +7,13 @@
 set -e
 set -o errexit
 set -o pipefail
+
+if [ -z ${1} ]
+then
+    >&2 echo "Error: Usage: ${0} VERSION"
+    exit 1
+fi
+
 set -o nounset
 
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -36,6 +43,10 @@ SPHINX_CONFIG="docs/conf.py"
 sed -i "s/^version =.*/version = '${NEW_VERSION}'/g" ${SPHINX_CONFIG}
 sed -i "s/^release =.*/release = '${NEW_VERSION}'/g" ${SPHINX_CONFIG}
 git add ${SPHINX_CONFIG}
+
+VERSION_HELPERS="edi/lib/versionhelpers.py"
+sed -i "s/^edi_fallback_version =.*/edi_fallback_version = '${NEW_VERSION}'/g" ${VERSION_HELPERS}
+git add ${VERSION_HELPERS}
 
 gbp dch --new-version ${NEW_VERSION} --release --debian-tag v%\(version\)s
 git add debian/changelog
