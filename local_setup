@@ -49,7 +49,7 @@ fi
 # load additional completion wrapper when SHELL == zsh
 if [[ "$(basename "${SHELL}")" == "zsh" ]]
 then
-    autoload bashcompinit
+    autoload -U bashcompinit
     bashcompinit
     autoload compinit
     compinit

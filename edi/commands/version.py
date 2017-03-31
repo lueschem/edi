@@ -20,7 +20,7 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 from edi.lib.edicommand import EdiCommand
-from edi.lib.helpers import get_edi_version
+from edi.lib.versionhelpers import get_edi_version
 
 
 class Version(EdiCommand):

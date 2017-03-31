@@ -25,8 +25,9 @@ from jinja2 import Template
 import os
 from os.path import dirname, abspath, basename, splitext, isfile, join
 import logging
-from edi.lib.helpers import (get_user, get_user_gid, get_user_uid, get_edi_version,
-                             get_stripped_version, get_hostname, get_edi_plugin_directory, FatalError)
+from edi.lib.helpers import (get_user, get_user_gid, get_user_uid,
+                             get_hostname, get_edi_plugin_directory, FatalError)
+from edi.lib.versionhelpers import get_edi_version, get_stripped_version
 from edi.lib.shellhelpers import get_user_environment_variable
 from packaging.version import Version
 

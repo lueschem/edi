@@ -20,7 +20,8 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-from edi.lib.helpers import FatalError, copy_tree, print_success, get_edi_version, get_stripped_version
+from edi.lib.helpers import FatalError, copy_tree, print_success
+from edi.lib.versionhelpers import get_edi_version, get_stripped_version
 from jinja2 import Template
 import yaml
 from edi.commands.config import Config
