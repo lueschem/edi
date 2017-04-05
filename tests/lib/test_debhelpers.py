@@ -27,6 +27,7 @@ import gzip
 import subprocess
 from tests.libtesting.fixtures.datadir import datadir
 from edi.lib.debhelpers import PackageDownloader
+from edi.lib.helpers import which
 
 
 class RepositoryMock():
@@ -93,7 +94,15 @@ class RepositoryMock():
             f.write(data)
 
     def sign_release(self):
-        cmd = ['gpg']
+        # on ubuntu <= 16.04: gpg is gpg v1, gpg2 is gpg v2
+        # on ubuntu > 16.04: gpg1 is gpg v1, gpg is gpg v2
+        # here we want to use gpg v1 since the key handling for gpg v2 has changed
+        if which('gpg1'):
+            executable = 'gpg1'
+        else:
+            executable = 'gpg'
+
+        cmd = [executable]
         cmd.extend(['--batch', '--yes',
                     '--homedir', str(self.datadir),
                     '--no-default-keyring',

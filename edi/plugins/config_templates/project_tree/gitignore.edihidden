@@ -1,6 +1,6 @@
 # edi build artifacts
 
-*bootstrap.tar.xz
-*lxc.tar.gz
+*bootstrap.tar.*
+*lxc.tar.*
 qemu-*-static
 

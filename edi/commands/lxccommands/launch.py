@@ -112,7 +112,18 @@ class Launch(Lxc):
         cmd.append(self._result())
         for profile in profiles:
             cmd.extend(["-p", profile])
-        run(cmd)
+        result = run(cmd, check=False, stderr=subprocess.PIPE)
+        if result != 0:
+            if 'Missing parent' in result.stderr and 'lxdbr0' in result.stderr:
+                raise FatalError(('''Launching image '{}' failed with the following message:\n{}'''
+                                  'Please make sure that lxdbr0 is available. Use one of the following commands to '
+                                  'create lxdbr0:\n'
+                                  'lxd init\n'
+                                  'or (for lxd >= 2.3)\n'
+                                  'lxc network create lxdbr0').format(image, result.stderr))
+            else:
+                raise FatalError(('''Launching image '{}' failed with the following message:\n{}'''
+                                  ).format(image, result.stderr))
 
     def _start_container(self):
         cmd = []
