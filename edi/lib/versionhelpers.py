@@ -26,7 +26,7 @@ import logging
 from edi.lib.helpers import FatalError
 
 # The do_release script will update this version!
-# During debuild neither the git version nor the package version is available.
+# During launchpad debuild neither the git version nor the package version is available.
 edi_fallback_version = '0.5.0'
 
 
@@ -46,7 +46,6 @@ def get_edi_version():
         try:
             return pkg_resources.get_distribution('edi').version
         except pkg_resources.DistributionNotFound:
-            logging.warning('Using fallback version {}.'.format(edi_fallback_version))
             return edi_fallback_version
 
 
