@@ -113,7 +113,7 @@ class Launch(Lxc):
         for profile in profiles:
             cmd.extend(["-p", profile])
         result = run(cmd, check=False, stderr=subprocess.PIPE)
-        if result != 0:
+        if result.returncode != 0:
             if 'Missing parent' in result.stderr and 'lxdbr0' in result.stderr:
                 raise FatalError(('''Launching image '{}' failed with the following message:\n{}'''
                                   'Please make sure that lxdbr0 is available. Use one of the following commands to '
