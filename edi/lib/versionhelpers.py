@@ -27,7 +27,7 @@ from edi.lib.helpers import FatalError
 
 # The do_release script will update this version!
 # During debuild neither the git version nor the package version is available.
-edi_fallback_version = '0.4.5'
+edi_fallback_version = '0.5.0'
 
 
 def get_edi_version():
