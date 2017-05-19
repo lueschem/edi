@@ -37,6 +37,7 @@ Depends: ${misc:Depends},
          debootstrap,
          liblzma5,
          lxd,
+         python3-apt (>= 1),
          qemu-user-static,
 Description: Embedded Development Infrastructure - edi
  Driven by the DevOps mindset edi helps you to streamline your embedded

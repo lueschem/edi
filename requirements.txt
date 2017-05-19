@@ -1,7 +1,6 @@
 argcomplete
 jinja2
 packaging
-python-apt
 python-debian
 python-gnupg
 pyyaml
