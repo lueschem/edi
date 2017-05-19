@@ -1,12 +1,8 @@
-dist: precise
+sudo: required 
 language: python
-python:
-  - "3.5"
-  - "3.6"
-  - "nightly"
+services:
+  - docker
 before_install:
-  - sudo apt-get -qq update
-  - sudo apt-get install -y python3-apt
-install:
-  - "pip3 install -r requirements.txt"
-script: pytest
+  - docker pull ubuntu:16.04 
+script: 
+  - pytest
