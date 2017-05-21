@@ -1,0 +1,68 @@
+#!/bin/bash
+
+# Run tests on Travis CI within a virgin Ubuntu container.
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+. /etc/lsb-release
+
+SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd ${SCRIPTDIR}/..
+
+apt-get update
+apt-get --no-install-recommends -y install sudo 
+
+TESTUSER=ediuser
+TESTUSERHOME=/home/${TESTUSER}
+adduser --disabled-password --gecos "" ${TESTUSER}
+addgroup  ${TESTUSER} adm
+
+apt-get --no-install-recommends -y install git
+
+if ! git diff --exit-code --quiet
+then
+    >&2 echo "Error: there are unstaged changes!"
+    exit 1
+fi
+
+if ! git diff --cached --exit-code --quiet
+then
+    >&2 echo "Error: there are uncommitted changes!"
+    exit 1
+fi
+
+git clone .git ${TESTUSERHOME}/edi
+chown -R ${TESTUSER}:${TESTUSER} ${TESTUSERHOME}/edi
+
+apt-get -y --no-install-recommends install git-buildpackage dh-make equivs lintian
+if [ "${DISTRIB_CODENAME}" == "xenial" ]
+then
+    # Ansible >= 2.1 is required
+    apt-get -y --no-install-recommends install ansible/xenial-backports
+fi
+
+cd ${TESTUSERHOME}/edi
+
+mk-build-deps -i debian/control -t "apt-get -y"
+
+sudo -u ${TESTUSER} py.test-3
+
+sudo -u ${TESTUSER} debuild -us -uc
+
+dpkg -i ../edi_*_all.deb || true
+apt-get -y --no-install-recommends install -f
+
+EDIVERSION=$(edi version)
+CHANGELOGVERSION=$(dpkg-parsechangelog --show-field Version)
+
+if [ "${EDIVERSION}" != "${CHANGELOGVERSION}" ]
+then
+    >&2 echo -e "\nError: edi version does not match changelog version (${EDIVERSION} != ${CHANGELOGVERSION})."
+    exit 1
+fi
+
+echo "========"
+echo "Success!"
+echo "========"
