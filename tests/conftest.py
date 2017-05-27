@@ -21,6 +21,8 @@
 
 
 def pytest_addoption(parser):
+    parser.addoption("--all", action="store_true",
+                     help="include all tests - even those that rely on lxc, ansible, ...")
     parser.addoption("--lxc", action="store_true",
                      help="include tests that rely on lxc availability")
     parser.addoption("--ansible", action="store_true",

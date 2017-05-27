@@ -24,18 +24,18 @@ import pytest
 
 
 require_lxc = pytest.mark.skipif(
-    not pytest.config.getoption("--lxc"),
+    not (pytest.config.getoption("--lxc") or pytest.config.getoption("--all")),
     reason="requires --lxc option to run"
 )
 
 
 require_ansible = pytest.mark.skipif(
-    not pytest.config.getoption("--ansible"),
+    not (pytest.config.getoption("--ansible") or pytest.config.getoption("--all")),
     reason="requires --ansible option to run"
 )
 
 
 require_debootstrap = pytest.mark.skipif(
-    not pytest.config.getoption("--debootstrap"),
+    not (pytest.config.getoption("--debootstrap") or pytest.config.getoption("--all")),
     reason="requires --debootstrap option to run"
 )
