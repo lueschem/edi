@@ -21,7 +21,7 @@
 
 from edi.commands.imagecommands.bootstrap import Bootstrap
 from tests.libtesting.fixtures.configfiles import config_files
-from tests.libtesting.helpers import get_command_parameter
+from tests.libtesting.helpers import get_command, get_command_parameter
 import os
 import shutil
 import subprocess
@@ -45,23 +45,23 @@ def test_bootstrap(config_files, monkeypatch):
         monkeypatch.setattr(shutil, 'chown', fakechown)
 
         def fakerun(*popenargs, **kwargs):
-            if popenargs[0][0] == "chroot":
-                rootfs_path = popenargs[0][1]
+            if get_command(popenargs) == "chroot":
+                rootfs_path = get_command_parameter(popenargs, "chroot")
                 if not os.path.exists(rootfs_path):
                     os.mkdir(rootfs_path)
-            elif popenargs[0][0] == "debootstrap":
+            elif get_command(popenargs) == "debootstrap":
                 rootfs_path = popenargs[0][-2]
                 apt_dir = os.path.join(rootfs_path, 'etc', 'apt')
                 os.makedirs(apt_dir)
                 pass
-            elif popenargs[0][0] == "tar":
-                archive = get_command_parameter(popenargs[0], '-acf')
+            elif get_command(popenargs) == "tar":
+                archive = get_command_parameter(popenargs, '-acf')
                 with open(archive, mode="w") as fakearchive:
                     fakearchive.write("fake archive")
             elif popenargs[0][-2] == "dpkg" and popenargs[0][-1] == "--print-architecture":
                 return subprocess.CompletedProcess("fakerun", 0, 'amd64')
             else:
-                print('Passthrough: {}'.format(popenargs[0]))
+                print('Passthrough: {}'.format(get_command(popenargs)))
                 return subprocess.run(*popenargs, **kwargs)
 
             return subprocess.CompletedProcess("fakerun", 0, '')

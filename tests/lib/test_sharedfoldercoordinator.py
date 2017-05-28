@@ -46,6 +46,7 @@ from edi.lib.helpers import get_user, FatalError
 from edi.lib.shellhelpers import get_user_environment_variable
 from edi.lib.configurationparser import ConfigurationParser
 from edi.lib.sharedfoldercoordinator import SharedFolderCoordinator
+from tests.libtesting.helpers import get_command, get_sub_command, get_command_parameter
 from tests.libtesting.fixtures.configfiles import config_files, empty_config_file
 import subprocess
 from edi.lib import mockablerun
@@ -135,8 +136,7 @@ def test_get_mountpoints(config_files):
 def test_verify_container_mountpoints(config_files, monkeypatch):
     with open(config_files, "r") as main_file:
         def fake_lxc_exec_command(*popenargs, **kwargs):
-            command = popenargs[0]
-            if command[0] == 'lxc' and command[1] == 'exec':
+            if get_command(popenargs) == 'lxc' and get_sub_command(popenargs) == 'exec':
                 return subprocess.CompletedProcess("fakerun", 0, '')
             else:
                 return subprocess.run(*popenargs, **kwargs)
@@ -152,9 +152,8 @@ def test_verify_container_mountpoints(config_files, monkeypatch):
 def test_verify_container_mountpoints_connection_failure(config_files, monkeypatch):
     with open(config_files, "r") as main_file:
         def fake_lxc_exec_command(*popenargs, **kwargs):
-            command = popenargs[0]
-            if command[0] == 'lxc' and command[1] == 'exec':
-                if command[command.index('--') + 1] == 'true':
+            if get_command(popenargs) == 'lxc' and get_sub_command(popenargs) == 'exec':
+                if get_command_parameter(popenargs, '--') == 'true':
                     cmd = ['bash', '-c', '>&2 echo -e "lxc command failed" ; exit 1']
                     return subprocess.run(cmd, **kwargs)
                 else:
@@ -176,9 +175,8 @@ def test_verify_container_mountpoints_connection_failure(config_files, monkeypat
 def test_verify_container_mountpoints_failure(config_files, monkeypatch):
     with open(config_files, "r") as main_file:
         def fake_lxc_exec_command(*popenargs, **kwargs):
-            command = popenargs[0]
-            if command[0] == 'lxc' and command[1] == 'exec':
-                if command[command.index('--') + 1] == 'test':
+            if get_command(popenargs) == 'lxc' and get_sub_command(popenargs) == 'exec':
+                if get_command_parameter(popenargs, '--') == 'test':
                     return subprocess.CompletedProcess("failure", 1, 'failure')
                 else:
                     return subprocess.CompletedProcess("fakerun", 0, '')
@@ -282,9 +280,8 @@ def test_create_host_folders_successful_create(config_files, monkeypatch):
         monkeypatch.setattr(os.path, 'exists', fake_os_path_exists)
 
         def fake_mkdir_command(*popenargs, **kwargs):
-            command = popenargs[0]
-            if command[0] == 'mkdir' and command[1] == '-p':
-                folder = command[-1]
+            if get_command(popenargs) == 'mkdir' and get_sub_command(popenargs) == '-p':
+                folder = popenargs[0][-1]
                 assert 'valid_folder' in folder or 'work' in folder
                 return subprocess.CompletedProcess("fakerun", 0, '')
             else:
@@ -312,8 +309,7 @@ def test_create_host_folders_failed_create(config_files, monkeypatch):
         monkeypatch.setattr(os.path, 'exists', fake_os_path_exists)
 
         def fake_mkdir_command(*popenargs, **kwargs):
-            command = popenargs[0]
-            if command[0] == 'mkdir' and command[1] == '-p':
+            if get_command(popenargs) == 'mkdir' and get_sub_command(popenargs) == '-p':
                 cmd = ['bash', '-c', '>&2 echo -e "no permission" ; exit 1']
                 return subprocess.run(cmd, **kwargs)
             else:

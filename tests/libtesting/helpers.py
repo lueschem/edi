@@ -20,6 +20,22 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 
-def get_command_parameter(command, option):
-    option_index = command.index(option)
-    return command[option_index + 1]
+def get_command(popenargs):
+    command = popenargs[0]
+    if command[0] == 'sudo':
+        if command[1] == '-u':
+            return command[3]
+        else:
+            return command[1]
+    else:
+        return command[0]
+
+
+def get_sub_command(popenargs):
+    main_command = get_command(popenargs)
+    return get_command_parameter(popenargs, main_command)
+
+
+def get_command_parameter(popenargs, option):
+    option_index = popenargs[0].index(option)
+    return popenargs[0][option_index + 1]
