@@ -23,6 +23,9 @@
 from tests.libtesting.optins import requires_lxc, requires_ansible, requires_debootstrap, requires_sudo
 from tests.libtesting.contextmanagers.workspace import workspace
 import os
+from tests.libtesting.helpers import get_project_root
+from edi.lib.shellhelpers import run
+import subprocess
 
 
 @requires_lxc
@@ -32,6 +35,11 @@ import os
 def test_build_jessie_container():
     print(os.getcwd())
     with workspace() as workspace_dir:
+        executable = os.path.join(get_project_root(), 'bin', 'edi')
+        command = [executable, 'version']
+        result = run(command, stdout=subprocess.PIPE)
+        print(result.stdout)
+        print(workspace_dir)
         print(os.getcwd())
     print(os.getcwd())
     assert False
