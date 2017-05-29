@@ -20,13 +20,19 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from tests.libtesting.optins import require_lxc, require_ansible, require_debootstrap
+from tests.libtesting.optins import requires_lxc, requires_ansible, requires_debootstrap, requires_sudo
+from tests.libtesting.contextmanagers.workspace import workspace
+import os
 
 
-@require_lxc
-@require_ansible
-@require_debootstrap
+@requires_lxc
+@requires_ansible
+@requires_debootstrap
+@requires_sudo
 def test_build_jessie_container():
-    # TODO: implement test
-    assert True
+    print(os.getcwd())
+    with workspace() as workspace_dir:
+        print(os.getcwd())
+    print(os.getcwd())
+    assert False
 

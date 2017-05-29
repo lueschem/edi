@@ -20,29 +20,25 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import pytest
+from contextlib import contextmanager
+import tempfile
 import os
+from edi.lib.helpers import chown_to_user
+from tests.libtesting.helpers import get_project_root
 
 
-requires_lxc = pytest.mark.skipif(
-    not (pytest.config.getoption("--lxc") or pytest.config.getoption("--all")),
-    reason="requires --lxc option to run"
-)
+@contextmanager
+def workspace():
+    """
+    Provides a workspace folder within the project root and changes into it.
+    The workspace folder can be used to perform tests.
+    """
+    with tempfile.TemporaryDirectory(dir=get_project_root(), prefix="tmp-pytest-") as workspace_dir:
+        chown_to_user(workspace_dir)
+        current_cwd = os.getcwd()
+        os.chdir(workspace_dir)
 
-
-requires_ansible = pytest.mark.skipif(
-    not (pytest.config.getoption("--ansible") or pytest.config.getoption("--all")),
-    reason="requires --ansible option to run"
-)
-
-
-requires_debootstrap = pytest.mark.skipif(
-    not (pytest.config.getoption("--debootstrap") or pytest.config.getoption("--all")),
-    reason="requires --debootstrap option to run"
-)
-
-
-requires_sudo = pytest.mark.skipif(
-    os.getuid() != 0,
-    reason="requires sudo privileges to run"
-)
+        try:
+            yield workspace_dir
+        finally:
+            os.chdir(current_cwd)
