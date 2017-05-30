@@ -1,6 +1,9 @@
 Embedded Development Infrastructure - edi
 =========================================
 
+.. image:: https://travis-ci.org/lueschem/edi.svg?branch=master
+    :target: https://travis-ci.org/lueschem/edi
+
 Driven by the DevOps mindset edi helps you to streamline your embedded development infrastructure. To achieve this
 goal, edi leverages top-notch open source technologies:
 
