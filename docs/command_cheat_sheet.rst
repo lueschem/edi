@@ -10,11 +10,18 @@ Enable bash completion during development and add the edi bin folder to the PATH
 
   source local_setup
 
-Run the tests (including coverage):
+Run the short tests (including coverage):
 
 ::
 
   py.test-3 --cov=edi --cov-report=html
+
+
+Run all tests (including coverage):
+
+::
+
+  sudo py.test-3 --all --cov=edi --cov-report=html
 
 Debian
 ++++++

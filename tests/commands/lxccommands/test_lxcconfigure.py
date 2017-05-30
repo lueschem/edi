@@ -23,8 +23,10 @@
 from tests.libtesting.optins import requires_lxc, requires_ansible, requires_debootstrap, requires_sudo
 from tests.libtesting.contextmanagers.workspace import workspace
 import os
-from tests.libtesting.helpers import get_project_root
+from tests.libtesting.helpers import get_random_string, get_project_root
 from edi.lib.shellhelpers import run
+from edi.commands.lxccommands.lxcconfigure import Configure
+import edi
 import subprocess
 
 
@@ -32,15 +34,30 @@ import subprocess
 @requires_ansible
 @requires_debootstrap
 @requires_sudo
-def test_build_jessie_container():
+def test_build_stretch_container(capsys):
     print(os.getcwd())
     with workspace() as workspace_dir:
-        executable = os.path.join(get_project_root(), 'bin', 'edi')
-        command = [executable, 'version']
-        result = run(command, stdout=subprocess.PIPE)
-        print(result.stdout)
-        print(workspace_dir)
-        print(os.getcwd())
-    print(os.getcwd())
-    assert False
+        edi_exec = os.path.join(get_project_root(), 'bin', 'edi')
+        project_name = 'myproject'
+        config_command = [edi_exec, 'config', 'init', project_name, 'debian-stretch-amd64']
+        run(config_command)
 
+        container_name = 'pytest-{}'.format(get_random_string(6))
+        parser = edi._setup_command_line_interface()
+        cli_args = parser.parse_args(['-v', 'lxc', 'configure', container_name, '{}-develop.yml'.format(project_name)])
+
+        Configure().run_cli(cli_args)
+        out, err = capsys.readouterr()
+        print(out)
+        assert not err
+
+        verification_command = ['lxc', 'exec', container_name, '--', 'cat', '/etc/os-release']
+        result = run(verification_command, stdout=subprocess.PIPE)
+        assert '''VERSION_ID="9"''' in result.stdout
+        assert 'ID=debian' in result.stdout
+
+        stop_command = ['lxc', 'stop', container_name]
+        run(stop_command)
+
+        delete_command = ['lxc', 'delete', container_name]
+        run(delete_command)

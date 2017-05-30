@@ -19,7 +19,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
-from edi.commands.imagecommands.bootstrap import Bootstrap
 from tests.libtesting.fixtures.configfiles import config_files
 from edi.commands.configcommands.configmerge import Merge
 import edi

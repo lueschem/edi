@@ -20,6 +20,12 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import string
+import random
+
+
+def get_random_string(length):
+    return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(length))
 
 
 def get_command(popenargs):
