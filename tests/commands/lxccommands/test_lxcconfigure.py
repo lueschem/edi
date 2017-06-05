@@ -26,6 +26,7 @@ import os
 from tests.libtesting.helpers import get_random_string, get_project_root
 from edi.lib.shellhelpers import run
 from edi.commands.lxccommands.lxcconfigure import Configure
+from edi.commands.clean import Clean
 import edi
 import subprocess
 
@@ -38,7 +39,7 @@ def test_build_stretch_container(capsys):
     print(os.getcwd())
     with workspace() as workspace_dir:
         edi_exec = os.path.join(get_project_root(), 'bin', 'edi')
-        project_name = 'myproject'
+        project_name = 'pytest-{}'.format(get_random_string(6))
         config_command = [edi_exec, 'config', 'init', project_name, 'debian-stretch-amd64']
         run(config_command)
 
@@ -50,6 +51,27 @@ def test_build_stretch_container(capsys):
         out, err = capsys.readouterr()
         print(out)
         assert not err
+
+        images = [
+            '{}-develop_edicommand_image_bootstrap.tar.gz'.format(project_name),
+            '{}-develop_edicommand_image_lxc.tar.gz'.format(project_name)
+        ]
+        for image in images:
+            assert os.path.isfile(image)
+
+        lxc_image_list_cmd = ['lxc', 'image', 'list']
+        result = run(lxc_image_list_cmd, stdout=subprocess.PIPE)
+        assert project_name in result.stdout
+
+        parser = edi._setup_command_line_interface()
+        cli_args = parser.parse_args(['-v', 'clean', '{}-develop.yml'.format(project_name)])
+        Clean().run_cli(cli_args)
+
+        for image in images:
+            assert not os.path.isfile(image)
+
+        result = run(lxc_image_list_cmd, stdout=subprocess.PIPE)
+        assert project_name not in result.stdout
 
         verification_command = ['lxc', 'exec', container_name, '--', 'cat', '/etc/os-release']
         result = run(verification_command, stdout=subprocess.PIPE)
