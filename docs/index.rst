@@ -13,6 +13,7 @@ Contents:
 
    introduction
    getting_started
+   config_management/index
    reference_list
    command_cheat_sheet
 
