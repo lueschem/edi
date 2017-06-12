@@ -1,2 +1,4 @@
+.. _plugins:
+
 Plugins
 -------
