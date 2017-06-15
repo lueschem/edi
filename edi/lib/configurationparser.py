@@ -58,6 +58,9 @@ class ConfigurationParser():
     def dump(self):
         return yaml.dump(self._get_config(), default_flow_style=False)
 
+    def dump_load_time_dictionary(self):
+        return yaml.dump(self._get_load_time_dictionary(), default_flow_style=False)
+
     def get_project_name(self):
         return self.config_id
 
