@@ -128,11 +128,11 @@ class SharedFolderCoordinator():
         if shared_folders:
             profiles = [Template(profile_privileged).render({})]
             template = Template(profile_shared_folder)
-            for name, content, dict in shared_folders:
+            for name, content, node_dict in shared_folders:
                 for item in ['folder', 'mountpoint']:
-                    dict['shared_folder_{}'.format(item)] = self._get_mandatory_item(name, content, item)
-                dict['shared_folder_name'] = name
-                profiles.append(template.render(dict))
+                    node_dict['shared_folder_{}'.format(item)] = self._get_mandatory_item(name, content, item)
+                node_dict['shared_folder_name'] = name
+                profiles.append(template.render(node_dict))
 
             return profiles
         else:
@@ -154,8 +154,8 @@ class SharedFolderCoordinator():
     def _get_folder_list(self, homedir, item):
         shared_folders = self._config.get_ordered_raw_items('shared_folders')
         result = []
-        for name, content, dict in shared_folders:
-            folder = '{}/{}'.format(dict[homedir],
+        for name, content, node_dict in shared_folders:
+            folder = '{}/{}'.format(node_dict[homedir],
                                     self._get_mandatory_item(name, content, item))
             result.append(folder)
         return result
