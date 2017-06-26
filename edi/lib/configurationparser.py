@@ -28,7 +28,7 @@ import logging
 from edi.lib.helpers import (get_user, get_user_gid, get_user_uid,
                              get_hostname, get_edi_plugin_directory, FatalError)
 from edi.lib.versionhelpers import get_edi_version, get_stripped_version
-from edi.lib.shellhelpers import get_user_environment_variable
+from edi.lib.shellhelpers import get_user_environment_variable, get_lxd_version
 from packaging.version import Version
 
 
@@ -47,6 +47,7 @@ def get_base_dictionary():
     base_dict["edi_host_ftp_proxy"] = get_user_environment_variable('ftp_proxy', '')
     base_dict["edi_host_socks_proxy"] = get_user_environment_variable('all_proxy', '')
     base_dict["edi_host_no_proxy"] = get_user_environment_variable('no_proxy', '')
+    base_dict["edi_lxd_version"] = get_lxd_version()
     return base_dict
 
 
