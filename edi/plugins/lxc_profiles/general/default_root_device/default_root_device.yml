@@ -1,0 +1,9 @@
+name: default_root_device
+config: {}
+description: Default edi root device profile
+devices:
+  root:
+    path: /
+    pool: default
+    type: disk
+
