@@ -13,6 +13,7 @@ Contents:
 
    introduction
    getting_started
+   upgrade_notes
    reference_list
    command_cheat_sheet
 
