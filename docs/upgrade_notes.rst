@@ -14,7 +14,7 @@ upgrade to a newer version of lxd:
 
     ...
 
-  {% if edi_lxd_version is defined and edi_lxd_version.split('.')[0] | int >= 2 and edi_lxd_version.split('.')[1] | int >= 9 %}
+  {% if edi_lxd_version is defined and (edi_lxd_version.split('.')[0] | int >= 3 or edi_lxd_version.split('.')[1] | int >= 9) %}
     020_default_root_device:
       path: lxc_profiles/general/default_root_device/default_root_device.yml
   {% endif %}
