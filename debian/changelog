@@ -1,3 +1,42 @@
+edi (0.6.1) xenial; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Added upgrade notes for lxd >= 2.9.
+  * Fix version comparison for future lxd >= 3.0.
+
+  [ Matthias Lüscher (Launchpad) ]
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Wed, 05 Jul 2017 08:37:35 +0200
+
+edi (0.6.0) xenial; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Added opt-in for time consuming (integration) tests.
+  * Added travis file.
+  * Removed python-apt from requirements.txt since package on pypi is not official.
+  * Updated travis configuration.
+  * Switch to Docker based travis configuration.
+  * Inspect travis.
+  * Run dummy test in travis container.
+  * Added travis test script.
+  * Added py.test option --all.
+  * Prepared lxc configuration test.
+  * Fix tests if they are run as sudo.
+  * Prepared environemnt for integration testing.
+  * Run edi from within test code.
+  * Added integration test.
+  * Added build status to readme page.
+  * Added clean command to integration test.
+  * Added command that dumps the load time dictionary.
+  * Fixed warning.
+  * Added command that dumps the plugins and their dictionaries.
+  * Adapted lxc profiles for newer lxd versions (Fixes #14).
+  * Fixed integer comparison.
+
+  [ Matthias Lüscher (Launchpad) ]
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Tue, 04 Jul 2017 21:19:42 +0200
+
 edi (0.5.2) xenial; urgency=medium
 
   [ Matthias Lüscher ]

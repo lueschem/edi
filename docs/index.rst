@@ -14,6 +14,7 @@ Contents:
    introduction
    getting_started
    config_management/index
+   upgrade_notes
    reference_list
    command_cheat_sheet
 
