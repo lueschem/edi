@@ -1,4 +1,6 @@
 .. _plugins:
 
 Plugins
--------
+=======
+
+TODO

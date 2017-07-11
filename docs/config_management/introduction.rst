@@ -1,5 +1,5 @@
 Introduction
-------------
+============
 
 The management of complex embedded software product line projects is a main focal point of edi.
 Such projects may be managed by many people that are spread over the world. Maintaining a reproducible environment
