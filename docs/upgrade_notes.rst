@@ -34,3 +34,10 @@ If the above configuration is missing, :code:`edi lxc configure ...` will print 
   Creating my-project
   Error: Launching image 'my-project-test_edicommand_lxc_import' failed with the following message:
   error: No root device could be found.
+
+
+On Ubuntu 16.04 the following command can be used to upgrade the lxd installation:
+
+::
+
+  sudo apt install lxd/xenial-backports lxd-client/xenial-backports
