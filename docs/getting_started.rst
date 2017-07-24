@@ -31,8 +31,8 @@ Prerequisites
 
 .. _`the linux containers documentation`: https://linuxcontainers.org/lxd/getting-started-cli/
 
-Install edi from the PPA
-++++++++++++++++++++++++
+Installing edi from the PPA
++++++++++++++++++++++++++++
 
 For your convenience, you can directly install edi from a ppa:
 
@@ -88,8 +88,8 @@ Hint: You can skip this section if you just want to use edi without having a loo
      source local_setup
 
 
-Build a First Container
-+++++++++++++++++++++++
+Building a First Container
+++++++++++++++++++++++++++
 
 #. Create an empty project folder:
 
