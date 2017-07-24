@@ -1,3 +1,7 @@
+.. |br| raw:: html
+
+   <br />
+
 .. _yaml:
 
 Yaml Based Configuration
@@ -39,32 +43,28 @@ The general section contains the information that might affect all other section
 edi supports the following settings:
 
 .. list-table::
-   :widths: 15 15 15 55
+   :widths: 20 80
    :header-rows: 1
 
    * - key
-     - required
-     - default value
      - description
    * - edi_compression
-     - no
-     - xz
-     - The compression that will be used for edi (intermediate) artifacts. Possible values are :code:`gz` (fast but not very
-       small), :code:`bz2` or :code:`xz` (slower but minimal required space).
+     - The compression that will be used for edi (intermediate) artifacts. |br|
+       Possible values are :code:`gz` (fast but not very small), |br|
+       :code:`bz2` or :code:`xz` (slower but minimal required space). |br|
+       If not specified, edi uses :code:`xz` compression.
    * - edi_required_minimal_edi_version
-     - no
-     - *current edi version*
-     - Defines the minimal edi version that is required for the given configuration (sample value: :code:`0.5.2`). If the edi
-       executable does not meet the required minimal version, it will exit with an error.
+     - Defines the minimal edi version that is required for the given configuration.  |br|
+       If the edi executable does not meet the required minimal version, it will exit with an error. |br|
+       If not specified, edi will not enforce a certain minimal version. |br|
+       A valid version string value looks like :code:`0.5.2`.
    * - edi_lxc_network_interface_name
-     - no
-     - lxcif0
-     - The default network interface that will be used for the lxc container.
+     - The default network interface that will be used for the lxc container. |br|
+       If unspecified edi will name the container interface :code:`lxcif0`.
    * - edi_config_management_user_name
-     - no
-     - edicfgmgmt
-     - The target system user that will be used for configuration management tasks. Please note that direct lxc
-       container management uses the root user.
+     - The target system user that will be used for configuration management tasks. |br|
+       Please note that direct lxc container management uses the root user. |br|
+       If unspecified edi will name the configuration management user :code:`edicfgmgmt`.
 
 :code:`bootstrap` Section
 +++++++++++++++++++++++++
@@ -72,33 +72,29 @@ edi supports the following settings:
 This section tells edi how the initial system shall be bootstrapped. The following settings are supported:
 
 .. list-table::
-   :widths: 15 15 15 55
+   :widths: 20 80
    :header-rows: 1
 
    * - key
-     - required
-     - default value
      - description
    * - architecture
-     - yes
-     -
-     - The architecture of the target system. For Debian possible values are any supported architecture such as
+     - The architecture of the target system. |br|
+       For Debian possible values are any supported architecture such as
        :code:`amd64`, :code:`armel` or :code:`armhf`.
    * - repository
-     - yes
-     -
-     - The repository specification where the initial image will get bootstrapped from. A valid value looks like this:
-       :code:`deb http://ftp.ch.debian.org/debian/ stretch main`.
+     - The repository specification where the initial image will get bootstrapped from. |br|
+       A valid value looks like this: :code:`deb http://ftp.ch.debian.org/debian/ stretch main`.
    * - repository_key
-     - no
-     -
-     - The signature key for the repository. *Attention*: If you do not specify a key the downloaded packages
-       will not be verified during the bootstrap process. *Hint*: It is a good practice to download such a key from a
-       https server. A valid repository key value is: :code:`https://ftp-master.debian.org/keys/archive-key-8.asc`.
+     - The signature key for the repository. |br|
+       *Attention*: If you do not specify a key the downloaded packages
+       will not be verified during the bootstrap process. |br|
+       *Hint*: It is a good practice to download such a key from a
+       https server. |br|
+       A valid repository key value is: :code:`https://ftp-master.debian.org/keys/archive-key-8.asc`.
    * - tool
-     - no
-     - debootstrap
-     - The tool that will be used for the bootstrap process. Currently only debootstrap is supported.
+     - The tool that will be used for the bootstrap process. |br|
+       Currently only :code:`debootstrap` is supported. |br|
+       If unspecified, edi will choose :code:`debootstrap`.
 
 Please note that edi will automatically do cross bootstrapping if required. This means that you can for instance bootstrap
 an armhf system on an amd64 host.
@@ -169,27 +165,22 @@ A typical node looks like this:
 Such nodes accept the following settings:
 
 .. list-table::
-   :widths: 15 15 15 55
+   :widths: 20 80
    :header-rows: 1
 
    * - key
-     - required
-     - default value
      - description
    * - path
-     - yes
-     -
-     - A relative or absolute path. Relative paths are first searched within :code:`edi_project_plugin_directory` and if
-       nothing is found the search falls back to :code:`edi_edi_plugin_directory`. The values of the plugin and project
+     - A relative or absolute path. |br|
+       Relative paths are first searched within :code:`edi_project_plugin_directory` and |br|
+       if nothing is found the search falls back to :code:`edi_edi_plugin_directory`. |br|
+       The values of the plugin and project
        directory can be retrieved as follows: :code:`edi config dictionary SOME_CONFIG.yml`.
    * - parameters
-     - no
-     -
-     - A list of parameters that will be used to parametrize the given plugin.
+     - An optional list of parameters that will be used to parametrize the given plugin.
    * - skip
-     - no
-     - False
-     - :code:`True` or :code:`False`. If :code:`True` the plugin will not get applied.
+     - :code:`True` or :code:`False`. If :code:`True` the plugin will not get applied. |br|
+       If unspecified, the plugin will get applied.
 
 
 :code:`lxc_templates` Section
