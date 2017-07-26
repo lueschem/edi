@@ -129,7 +129,7 @@ you to do this. The following settings are available:
        If unspecified, edi will try to download QEMU from the repository indicated in the bootstrap section.
    * - repository_key
      - The signature key for the QEMU repository. |br|
-       *Attention*: If you do not specify a key the downloaded QEMU package will not be verified |br|
+       *Attention*: If you do not specify a key the downloaded QEMU package will not be verified. |br|
        *Hint*: It is a good practice to download such a key from a
        https server. |br|
        A valid repository key value is: :code:`https://ftp-master.debian.org/keys/archive-key-8.asc`.
@@ -211,25 +211,25 @@ To learn more about plugins please read the chapter :ref:`plugins`.
 :code:`lxc_templates` Section
 +++++++++++++++++++++++++++++
 
-The lxc_templates section is a :ref:`ordered node section <ordered_node_section>` consisting
+The lxc_templates section is an :ref:`ordered node section <ordered_node_section>` consisting
 of :ref:`plugin nodes <plugin_node>`. Please consult the LXD documentation if you want to write custom templates.
 
 :code:`lxc_profiles` Section
 ++++++++++++++++++++++++++++
 
-The lxc_profiles section is a :ref:`ordered node section <ordered_node_section>` consisting
+The lxc_profiles section is an :ref:`ordered node section <ordered_node_section>` consisting
 of :ref:`plugin nodes <plugin_node>`. Please consult the LXD documentation if you want to write custom profiles.
 
 :code:`playbooks` Section
 +++++++++++++++++++++++++
 
-The playbooks section is a :ref:`ordered node section <ordered_node_section>` consisting
+The playbooks section is an :ref:`ordered node section <ordered_node_section>` consisting
 of :ref:`plugin nodes <plugin_node>`. Please consult the Ansible documentation if you want to write custom playbooks.
 
 :code:`shared_folders` Section
 ++++++++++++++++++++++++++++++
 
-The shared_folders section is a :ref:`ordered node section <ordered_node_section>` that can be used to specify shared
+The shared_folders section is an :ref:`ordered node section <ordered_node_section>` that can be used to specify shared
 folders between LXC containers and their host.
 
 Shared folders are very convenient for development use cases. Please note that edi will automatically turn any container
