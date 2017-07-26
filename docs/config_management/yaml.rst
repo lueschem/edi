@@ -109,15 +109,38 @@ If you would like to bootstrap an image right now, you can run the following com
 :code:`qemu` Section
 ++++++++++++++++++++
 
-TODO
+If the target architecture does not match the host architecture edi uses QEMU to emulate the foreign architecture.
+edi automatically detects the necessity of an architecture emulation and takes the necessary steps to set up QEMU.
+As QEMU evolves quickly it is often desirable to point edi to a very recent version of QEMU. The QEMU section allows
+you to do this. The following settings are available:
+
+.. list-table::
+   :widths: 20 80
+   :header-rows: 1
+
+   * - key
+     - description
+   * - package
+     - The name of the qemu package that should get downloaded. |br|
+       If not specified edi assumes that the package is named :code:`qemu-user-static`.
+   * - repository
+     - The repository specification where QEMU will get downloaded from. |br|
+       A valid value looks like this: :code:`deb http://ftp.ch.debian.org/debian/ stretch main`. |br|
+       If unspecified, edi will try to download QEMU from the repository indicated in the bootstrap section.
+   * - repository_key
+     - The signature key for the QEMU repository. |br|
+       *Attention*: If you do not specify a key the downloaded QEMU package will not be verified |br|
+       *Hint*: It is a good practice to download such a key from a
+       https server. |br|
+       A valid repository key value is: :code:`https://ftp-master.debian.org/keys/archive-key-8.asc`.
 
 
-.. _ordered_node_sections:
+.. _ordered_node_section:
 
-Ordered Node Sections
-+++++++++++++++++++++
+Ordered Node Section
+++++++++++++++++++++
 
-In order to understand the following sections we have to introduce the concept of *ordered node sections*. In Unix based
+In order to understand the following sections we have to introduce the concept of an *ordered node section*. In Unix based
 systems it is quite common to split configurations into a set of small configuration files (see e.g.
 :code:`/etc/sysctl.d`). Those small configuration files are loaded and applied according to their alphanumerical order.
 edi does a very similar thing in its *ordered node sections*. Here is an example:
@@ -144,10 +167,10 @@ In both examples above the dog will first bark and then sleep because of the alp
 :code:`10_first_task` and :code:`20_second_task`. The explicit order of the nodes makes it easy to add or modify a
 certain node using :ref:`overlays`.
 
-.. _plugin_nodes:
+.. _plugin_node:
 
-Plugin Nodes
-++++++++++++
+Plugin Node
++++++++++++
 
 Most of the ordered node sections contain nodes that specify and parametrize plugins.
 
@@ -182,23 +205,68 @@ Such nodes accept the following settings:
      - :code:`True` or :code:`False`. If :code:`True` the plugin will not get applied. |br|
        If unspecified, the plugin will get applied.
 
+To learn more about plugins please read the chapter :ref:`plugins`.
+
 
 :code:`lxc_templates` Section
 +++++++++++++++++++++++++++++
 
-TODO
+The lxc_templates section is a :ref:`ordered node section <ordered_node_section>` consisting
+of :ref:`plugin nodes <plugin_node>`. Please consult the LXD documentation if you want to write custom templates.
 
 :code:`lxc_profiles` Section
 ++++++++++++++++++++++++++++
 
-TODO
+The lxc_profiles section is a :ref:`ordered node section <ordered_node_section>` consisting
+of :ref:`plugin nodes <plugin_node>`. Please consult the LXD documentation if you want to write custom profiles.
 
 :code:`playbooks` Section
 +++++++++++++++++++++++++
 
-TODO
+The playbooks section is a :ref:`ordered node section <ordered_node_section>` consisting
+of :ref:`plugin nodes <plugin_node>`. Please consult the Ansible documentation if you want to write custom playbooks.
 
 :code:`shared_folders` Section
 ++++++++++++++++++++++++++++++
 
-TODO
+The shared_folders section is a :ref:`ordered node section <ordered_node_section>` that can be used to specify shared
+folders between LXC containers and their host.
+
+Shared folders are very convenient for development use cases. Please note that edi will automatically turn any container
+that uses shared folders into a *privileged* container. This will facilitate the data exchange between the host and the target
+system. It is advisable to use shared folders together with the development_user_facilities playbook plugin.
+
+A shared folder section can look like this:
+
+.. code::
+
+  shared_folders:
+    edi_workspace:
+      folder: edi-workspace
+      mountpoint: edi-workspace
+
+Let us assume that the name of the current development user is :code:`johndoe` and that his home directory is
+:code:`/home/johndoe`. The development_user_facilities playbook plugin will automatically make sure that the user
+:code:`johndoe` will also exist within the container. The shared_folders section will then make sure that the host folder
+:code:`/home/johndoe/edi-workspace` (:code:`folder`) will be shared with the container using the container directory
+:code:`/home/johndoe/edi-workspace` (:code:`mountpoint`).
+
+The shared folder nodes accept the the following settings:
+
+.. list-table::
+   :widths: 20 80
+   :header-rows: 1
+
+   * - key
+     - description
+   * - folder
+     - The name of the host folder within the home directory of the current user. |br|
+       If the folder does not exist, edi will create it.
+   * - mountpoint
+     - The name of the mount point within the container home directory of the current user. |br|
+       If the mount point does not exist edi will display an error. |br|
+       *Hint*: It is assumed that the mount points within the container will get created using an appropriate playbook. |br|
+       The development_user_facilities playbook plugin will for instance take care of mount point creation.
+   * - skip
+     - :code:`True` or :code:`False`. If :code:`True` the folder will not be shared. |br|
+       If unspecified, the folder will get shared.
