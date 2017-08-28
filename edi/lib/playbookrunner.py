@@ -83,7 +83,7 @@ class PlaybookRunner():
         ansible_env = os.environ.copy()
         ansible_env['ANSIBLE_REMOTE_TEMP'] = '/tmp/ansible-{}'.format(get_user())
 
-        run(cmd, env=ansible_env)
+        run(cmd, env=ansible_env, log_threshold=logging.INFO)
 
     def _write_inventory_file(self, tempdir):
         inventory_file = os.path.join(tempdir, "inventory")

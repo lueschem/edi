@@ -29,7 +29,7 @@ _ADAPTIVE = -42
 
 
 def run(popenargs, sudo=False, input=None, timeout=None,
-        check=True, universal_newlines=True, stdout=_ADAPTIVE,
+        check=True, universal_newlines=True, stdout=_ADAPTIVE, log_threshold=logging.DEBUG,
         **kwargs):
     """
     Small wrapper around subprocess.run().
@@ -40,7 +40,7 @@ def run(popenargs, sudo=False, input=None, timeout=None,
     subprocess_stdout = stdout
 
     if subprocess_stdout == _ADAPTIVE:
-        if logging.getLogger().isEnabledFor(logging.INFO):
+        if logging.getLogger().isEnabledFor(log_threshold):
             subprocess_stdout = None
         else:
             subprocess_stdout = subprocess.PIPE
@@ -55,15 +55,15 @@ def run(popenargs, sudo=False, input=None, timeout=None,
     elif sudo and os.getuid() != 0:
         myargs.insert(0, "sudo")
 
-    logging.info("Running command: {0}".format(myargs))
+    logging.log(log_threshold, "Running command: {0}".format(myargs))
 
     result = mockablerun.run_mockable(myargs, input=input, timeout=timeout, check=check,
                                       universal_newlines=universal_newlines,
                                       stdout=subprocess_stdout, **kwargs)
 
-    if (logging.getLogger().isEnabledFor(logging.INFO) and
+    if (logging.getLogger().isEnabledFor(log_threshold) and
             subprocess_stdout is subprocess.PIPE):
-        logging.info(result.stdout)
+        logging.log(log_threshold, result.stdout)
 
     return result
 

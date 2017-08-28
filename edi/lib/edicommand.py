@@ -23,6 +23,7 @@ from edi.lib.commandfactory import CommandFactory
 from edi.lib.configurationparser import ConfigurationParser
 import argparse
 import os
+import logging
 from edi.lib.helpers import FatalError
 from edi.lib.shellhelpers import run
 from edi.lib.commandfactory import get_sub_commands, get_command
@@ -118,7 +119,7 @@ class EdiCommand(metaclass=CommandFactory):
         cmd.extend(["-C", datadir])
         cmd.extend(["-acf", archive_path])
         cmd.extend(os.listdir(datadir))
-        run(cmd, sudo=True)
+        run(cmd, sudo=True, log_threshold=logging.INFO)
         return archive_path
 
     def _unpack_image(self, image, tempdir, subfolder="rootfs"):
@@ -130,5 +131,5 @@ class EdiCommand(metaclass=CommandFactory):
         cmd.append("--numeric-owner")
         cmd.extend(["-C", target_folder])
         cmd.extend(["-axf", image])
-        run(cmd, sudo=True)
+        run(cmd, sudo=True, log_threshold=logging.INFO)
         return target_folder

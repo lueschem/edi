@@ -122,7 +122,7 @@ class Bootstrap(Image):
         cmd.append(bootstrap_source.dist)
         cmd.append(rootfs)
         cmd.append(bootstrap_source.uri)
-        run(cmd, sudo=True)
+        run(cmd, sudo=True, log_threshold=logging.INFO)
 
         if qemu_executable:
             qemu_target_path = os.path.join(rootfs, "usr", "bin")
@@ -130,7 +130,7 @@ class Bootstrap(Image):
             second_stage_cmd = get_chroot_cmd(rootfs)
             second_stage_cmd.append("/debootstrap/debootstrap")
             second_stage_cmd.append("--second-stage")
-            run(second_stage_cmd, sudo=True)
+            run(second_stage_cmd, sudo=True, log_threshold=logging.INFO)
 
         return rootfs
 

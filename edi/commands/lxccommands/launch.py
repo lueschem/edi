@@ -112,7 +112,7 @@ class Launch(Lxc):
         cmd.append(self._result())
         for profile in profiles:
             cmd.extend(["-p", profile])
-        result = run(cmd, check=False, stderr=subprocess.PIPE)
+        result = run(cmd, check=False, stderr=subprocess.PIPE, log_threshold=logging.INFO)
         if result.returncode != 0:
             if 'Missing parent' in result.stderr and 'lxdbr0' in result.stderr:
                 raise FatalError(('''Launching image '{}' failed with the following message:\n{}'''
@@ -131,4 +131,4 @@ class Launch(Lxc):
         cmd.append("start")
         cmd.append(self._result())
 
-        run(cmd)
+        run(cmd, log_threshold=logging.INFO)
