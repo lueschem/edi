@@ -33,6 +33,7 @@ from edi.commands.image import Image
 from edi.commands.imagecommands.bootstrap import Bootstrap
 from edi.lib.helpers import chown_to_user, print_success
 from edi.lib.shellhelpers import get_debian_architecture
+from edi.lib.configurationparser import remove_passwords
 
 
 class Lxc(Image):
@@ -115,7 +116,7 @@ class Lxc(Image):
             logging.info(("Loading template {} located in "
                           "{} with dictionary:\n{}"
                           ).format(name, path,
-                                   yaml.dump(dictionary,
+                                   yaml.dump(remove_passwords(dictionary),
                                              default_flow_style=False)))
 
             with open(path, encoding="UTF-8", mode="r") as template_file:

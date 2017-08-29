@@ -2,11 +2,13 @@
 - name: Setup /etc/environment (set proxies).
   lineinfile: dest=/etc/environment regexp='^{{ item.key }}=.*' line='{{ item.key }}="{{ item.value }}"' create=yes mode=0644
   with_items: "{{ proxy_configs }}"
+  no_log: True # do not reveal passwords
   when: item.value != ""
 
 - name: Setup /etc/environment (unset proxies).
   lineinfile: dest=/etc/environment regexp='^{{ item.key }}=.*' state=absent
   with_items: "{{ proxy_configs }}"
+  no_log: True # do not reveal passwords
   when: item.value == ""
 
 # Remark: When using ansible_connection=lxd /etc/environment does not get sourced.
@@ -14,19 +16,23 @@
 - name: Setup /root/.bashrc (set proxies).
   lineinfile: dest=/root/.bashrc regexp='^export {{ item.key }}=.*' line='export {{ item.key }}="{{ item.value }}"' create=yes mode=0644
   with_items: "{{ proxy_configs }}"
+  no_log: True # do not reveal passwords
   when: item.value != ""
 
 - name: Setup /root/.bashrc (unset proxies).
   lineinfile: dest=/root/.bashrc regexp='^export {{ item.key }}=.*' state=absent
   with_items: "{{ proxy_configs }}"
+  no_log: True # do not reveal passwords
   when: item.value == ""
 
 - name: Setup /etc/apt/apt.conf.d/50proxy (set proxies).
   lineinfile: dest=/etc/apt/apt.conf.d/50proxy regexp='^{{ item.apt_key }} ' line='{{ item.apt_key }} "{{ item.value }}";' create=yes mode=0644
   with_items: "{{ proxy_configs }}"
+  no_log: True # do not reveal passwords
   when: item.value != "" and item.apt_key != ""
 
 - name: Setup /etc/apt/apt.conf.d/50proxy (unset proxies).
   lineinfile: dest=/etc/apt/apt.conf.d/50proxy regexp='^{{ item.apt_key }} ' state=absent
   with_items: "{{ proxy_configs }}"
+  no_log: True # do not reveal passwords
   when: item.value == "" and item.apt_key != ""

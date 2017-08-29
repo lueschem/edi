@@ -28,6 +28,7 @@ from edi.lib.helpers import chown_to_user
 from edi.lib.helpers import require_executable, get_user
 from edi.lib.shellhelpers import run
 from edi.lib.sharedfoldercoordinator import SharedFolderCoordinator
+from edi.lib.configurationparser import remove_passwords
 
 
 class PlaybookRunner():
@@ -52,7 +53,7 @@ class PlaybookRunner():
                 logging.info(("Running playbook {} located in "
                               "{} with extra vars:\n{}"
                               ).format(name, path,
-                                       yaml.dump(extra_vars,
+                                       yaml.dump(remove_passwords(extra_vars),
                                                  default_flow_style=False)))
 
                 extra_vars_file = os.path.join(tempdir, ("extra_vars_{}"

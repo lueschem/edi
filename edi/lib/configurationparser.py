@@ -30,6 +30,22 @@ from edi.lib.helpers import (get_user, get_user_gid, get_user_uid,
 from edi.lib.versionhelpers import get_edi_version, get_stripped_version
 from edi.lib.shellhelpers import get_user_environment_variable, get_lxd_version
 from packaging.version import Version
+from edi.lib.urlhelpers import obfuscate_url_password
+
+
+def remove_passwords(dictionary):
+    obfuscated_dictionary = {}
+
+    url_items = ["edi_host_http_proxy", "edi_host_https_proxy",
+                 "edi_host_ftp_proxy", "edi_host_socks_proxy"]
+
+    for key, value in dictionary.items():
+        if key in url_items:
+            obfuscated_dictionary[key] = obfuscate_url_password(value)
+        else:
+            obfuscated_dictionary[key] = value
+
+    return obfuscated_dictionary
 
 
 def get_base_dictionary():
@@ -132,7 +148,7 @@ class ConfigurationParser():
         self.config_id = splitext(basename(base_config_file.name))[0]
         if not ConfigurationParser._configurations.get(self.config_id):
             logging.info(("Load time dictionary:\n{}"
-                          ).format(yaml.dump(self._get_load_time_dictionary(),
+                          ).format(yaml.dump(remove_passwords(self._get_load_time_dictionary()),
                                              default_flow_style=False)))
             logging.info(("Using base configuration file '{0}'"
                           ).format(base_config_file.name))

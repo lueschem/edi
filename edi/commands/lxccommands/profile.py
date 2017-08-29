@@ -29,6 +29,7 @@ from edi.commands.lxc import Lxc
 from edi.lib.shellhelpers import run
 from edi.lib.helpers import print_success
 from edi.lib.sharedfoldercoordinator import SharedFolderCoordinator
+from edi.lib.configurationparser import remove_passwords
 
 
 class Profile(Lxc):
@@ -56,7 +57,7 @@ class Profile(Lxc):
             logging.info(("Creating profile {} located in "
                           "{} with dictionary:\n{}"
                           ).format(name, path,
-                                   yaml.dump(dictionary,
+                                   yaml.dump(remove_passwords(dictionary),
                                              default_flow_style=False)))
 
             with open(path, encoding="UTF-8", mode="r") as profile_file:
