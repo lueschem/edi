@@ -1,3 +1,28 @@
+edi (0.6.2) xenial; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Started to document the configuration.
+  * Updated configuration management introduction.
+  * Added command that dumps the load time dictionary.
+  * Fixed warning.
+  * Added command that dumps the plugins and their dictionaries.
+  * Adapted lxc profiles for newer lxd versions.
+  * Conditionally add the default root device.
+  * Started to describe configuration sections.
+  * Extended config management docu.
+  * Added additional config docu.
+  * Added lxd upgrade command to documentation.
+  * Unified sub titles.
+  * Made table layout more responsive.
+  * Completed yaml part of config docu.
+  * Small docu fixups.
+  * Suppress logging for most of the shell commands in verbose mode.
+  * Obfuscate passwords in URLs when logging. Fixes #15
+
+  [ Matthias Lüscher (Launchpad) ]
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Wed, 30 Aug 2017 16:37:05 +0200
+
 edi (0.6.1) xenial; urgency=medium
 
   [ Matthias Lüscher ]
