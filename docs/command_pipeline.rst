@@ -13,7 +13,7 @@ necessary sub commands get executed to reach the desired state.
 
 Example:
 
-The following command will make sure - that after a successful execution - a fully
+The following command will make sure that - after a successful execution - a fully
 configured lxd container is available:
 
 .. code:: bash
