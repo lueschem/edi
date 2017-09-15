@@ -30,6 +30,9 @@ from edi.lib.lxchelpers import apply_profiles
 
 class Configure(Lxc):
 
+    def __init__(self):
+        self.container_name = ""
+
     @classmethod
     def advertise(cls, subparsers):
         help_text = "configure a LXC container"

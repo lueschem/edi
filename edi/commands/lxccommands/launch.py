@@ -30,6 +30,9 @@ from edi.lib.lxchelpers import is_container_existing, is_container_running, star
 
 class Launch(Lxc):
 
+    def __init__(self):
+        self.container_name = ""
+
     @classmethod
     def advertise(cls, subparsers):
         help_text = "launch an image using LXC"
