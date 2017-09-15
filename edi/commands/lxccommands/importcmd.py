@@ -20,19 +20,18 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-import subprocess
 from edi.commands.lxc import Lxc
 from edi.commands.imagecommands.imagelxc import Lxc as LxcImageCommand
-from edi.lib.shellhelpers import run
 from edi.lib.helpers import print_success
+from edi.lib.lxchelpers import is_in_image_store, import_image, delete_image
 
 
 class Import(Lxc):
 
     @classmethod
     def advertise(cls, subparsers):
-        help_text = "import an edi image into the LXD image store"
-        description_text = "Import an edi image into the LXD image store."
+        help_text = "import an image into the LXD image store"
+        description_text = "Import an image into the LXD image store."
         parser = subparsers.add_parser(cls._get_short_command_name(),
                                        help=help_text,
                                        description=description_text)
@@ -44,7 +43,7 @@ class Import(Lxc):
     def run(self, config_file):
         self._setup_parser(config_file)
 
-        if self._is_in_image_store():
+        if is_in_image_store(self._result()):
             logging.info(("{0} is already in image store. "
                           "Delete it to regenerate it."
                           ).format(self._result()))
@@ -54,7 +53,7 @@ class Import(Lxc):
 
         print("Going to import lxc image into image store.")
 
-        self._import_image(image)
+        import_image(image, self._result())
 
         print_success("Imported lxc image into image store as {}.".format(self._result()))
 
@@ -63,39 +62,12 @@ class Import(Lxc):
     def clean(self, config_file):
         self._setup_parser(config_file)
 
-        if self._is_in_image_store():
+        if is_in_image_store(self._result()):
             logging.info(("Removing '{}' from image store."
                           ).format(self._result()))
-            self._delete_image()
+            delete_image(self._result())
             print_success("Removed {} from image store.".format(self._result()))
 
     def _result(self):
         return "{}_{}".format(self.config.get_project_name(),
                               self._get_command_file_name_prefix())
-
-    def _is_in_image_store(self):
-        cmd = []
-        cmd.append("lxc")
-        cmd.append("image")
-        cmd.append("show")
-        cmd.append("local:{}".format(self._result()))
-        result = run(cmd, check=False, stderr=subprocess.PIPE)
-        return result.returncode == 0
-
-    def _import_image(self, image):
-        cmd = []
-        cmd.append("lxc")
-        cmd.append("image")
-        cmd.append("import")
-        cmd.append(image)
-        cmd.append("local:")
-        cmd.extend(["--alias", self._result()])
-        run(cmd)
-
-    def _delete_image(self):
-        cmd = []
-        cmd.append("lxc")
-        cmd.append("image")
-        cmd.append("delete")
-        cmd.append("local:{}".format(self._result()))
-        run(cmd)

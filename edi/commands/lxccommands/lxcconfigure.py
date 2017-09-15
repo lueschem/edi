@@ -24,16 +24,16 @@ from edi.commands.lxccommands.profile import Profile
 from edi.commands.lxccommands.launch import Launch
 from edi.lib.playbookrunner import PlaybookRunner
 from edi.lib.helpers import print_success
-from edi.lib.shellhelpers import run
 from edi.lib.sharedfoldercoordinator import SharedFolderCoordinator
+from edi.lib.lxchelpers import apply_profiles
 
 
 class Configure(Lxc):
 
     @classmethod
     def advertise(cls, subparsers):
-        help_text = "configure an edi LXC container"
-        description_text = "Configure an edi LXC container."
+        help_text = "configure a LXC container"
+        description_text = "Configure a LXC container."
         parser = subparsers.add_parser(cls._get_short_command_name(),
                                        help=help_text,
                                        description=description_text)
@@ -60,7 +60,7 @@ class Configure(Lxc):
 
         profiles = Profile().run(config_file, include_post_config_profiles=True)
         # TODO: stop container if profiles need to be updated
-        self._apply_lxc_profiles(container_name, profiles)
+        apply_profiles(container_name, profiles)
         # TODO: restart container if needed
 
         print_success("Configured container {}.".format(self._result()))
@@ -68,8 +68,3 @@ class Configure(Lxc):
 
     def _result(self):
         return self.container_name
-
-    @staticmethod
-    def _apply_lxc_profiles(container_name, profiles):
-        cmd = ['lxc', 'profile', 'apply', container_name, ','.join(profiles)]
-        run(cmd)
