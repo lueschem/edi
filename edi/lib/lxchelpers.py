@@ -38,6 +38,11 @@ def import_image(image, name):
     run(cmd)
 
 
+def publish_container(container_name, image_name):
+    cmd = ["lxc", "publish", container_name, "--alias", image_name]
+    run(cmd)
+
+
 def delete_image(name):
     cmd = ["lxc", "image", "delete", "local:{}".format(name)]
     run(cmd)
@@ -87,6 +92,19 @@ def launch_container(image, name, profiles):
 
 def start_container(name):
     cmd = ["lxc", "start", name]
+
+    run(cmd, log_threshold=logging.INFO)
+
+
+def stop_container(name):
+    cmd = ["lxc", "stop", name]
+
+    run(cmd, log_threshold=logging.INFO)
+
+
+def delete_container(name):
+    # needs to be stopped first!
+    cmd = ["lxc", "delete", name]
 
     run(cmd, log_threshold=logging.INFO)
 

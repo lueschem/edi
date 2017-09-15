@@ -19,8 +19,11 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
+import hashlib
 from edi.commands.lxc import Lxc
+from edi.commands.lxccommands.lxcconfigure import Configure
 from edi.lib.helpers import print_success
+from edi.lib.lxchelpers import stop_container, is_container_existing, is_container_running, delete_container
 
 
 class Stop(Lxc):
@@ -40,31 +43,27 @@ class Stop(Lxc):
     def run(self, config_file):
         self._setup_parser(config_file)
 
-        # if self._is_in_image_store():
-        #     logging.info(("{0} is already in image store. "
-        #                   "Delete it to regenerate it."
-        #                   ).format(self._result()))
-        #     return self._result()
-        #
-        # image = LxcImageCommand().run(config_file)
-        #
-        # print("Going to import lxc image into image store.")
-        #
-        # self._import_image(image)
-        #
-        # print_success("Imported lxc image into image store as {}.".format(self._result()))
+        # configure in any case since the container might be only partially configured
+        Configure().run(self._result(), config_file)
+
+        print("Going to stop lxc container {}.".format(self._result()))
+        stop_container(self._result())
+        print_success("Stopped lxc container {}.".format(self._result()))
 
         return self._result()
 
     def clean(self, config_file):
         self._setup_parser(config_file)
 
-        # if self._is_in_image_store():
-        #     logging.info(("Removing '{}' from image store."
-        #                   ).format(self._result()))
-        #     self._delete_image()
-        #     print_success("Removed {} from image store.".format(self._result()))
+        if is_container_existing(self._result()):
+            if is_container_running(self._result()):
+                stop_container(self._result())
+
+            delete_container(self._result())
+
+            print_success("Deleted lxc container {}.".format(self._result()))
 
     def _result(self):
-        return "{}_{}".format(self.config.get_project_name(),
-                              self._get_command_file_name_prefix())
+        # a generated container name
+        return 'edi-tmp-{}'.format(hashlib.sha256(self.config.get_project_name().encode()
+                                                  ).hexdigest()[:20])
