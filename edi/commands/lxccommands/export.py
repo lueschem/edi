@@ -20,6 +20,7 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 from edi.commands.lxc import Lxc
+from edi.lib.configurationparser import command_context
 from edi.lib.helpers import print_success
 
 
@@ -38,21 +39,22 @@ class Export(Lxc):
         self.run(cli_args.config_file)
 
     def run(self, config_file):
-        self._setup_parser(config_file)
+        with command_context({'edi_create_distributable_image': True}):
+            self._setup_parser(config_file)
 
-        # if self._is_in_image_store():
-        #     logging.info(("{0} is already in image store. "
-        #                   "Delete it to regenerate it."
-        #                   ).format(self._result()))
-        #     return self._result()
-        #
-        # image = LxcImageCommand().run(config_file)
-        #
-        # print("Going to import lxc image into image store.")
-        #
-        # self._import_image(image)
-        #
-        # print_success("Imported lxc image into image store as {}.".format(self._result()))
+            # if self._is_in_image_store():
+            #     logging.info(("{0} is already in image store. "
+            #                   "Delete it to regenerate it."
+            #                   ).format(self._result()))
+            #     return self._result()
+            #
+            # image = LxcImageCommand().run(config_file)
+            #
+            # print("Going to import lxc image into image store.")
+            #
+            # self._import_image(image)
+            #
+            # print_success("Imported lxc image into image store as {}.".format(self._result()))
 
         return self._result()
 

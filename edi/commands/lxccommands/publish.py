@@ -23,6 +23,7 @@ import logging
 from edi.commands.lxc import Lxc
 from edi.lib.helpers import print_success
 from edi.commands.lxccommands.stop import Stop
+from edi.lib.configurationparser import command_context
 from edi.lib.lxchelpers import is_in_image_store, publish_container, delete_image
 
 
@@ -41,19 +42,20 @@ class Publish(Lxc):
         self.run(cli_args.config_file)
 
     def run(self, config_file):
-        self._setup_parser(config_file)
+        with command_context({'edi_create_distributable_image': True}):
+            self._setup_parser(config_file)
 
-        if is_in_image_store(self._result()):
-            logging.info(("{0} is already in image store. "
-                          "Delete it to regenerate it."
-                          ).format(self._result()))
-            return self._result()
+            if is_in_image_store(self._result()):
+                logging.info(("{0} is already in image store. "
+                              "Delete it to regenerate it."
+                              ).format(self._result()))
+                return self._result()
 
-        container_name = Stop().run(config_file)
+            container_name = Stop().run(config_file)
 
-        print("Going to publish lxc container in image store.")
-        publish_container(container_name, self._result())
-        print_success("Published lxc container in image store as {}.".format(self._result()))
+            print("Going to publish lxc container in image store.")
+            publish_container(container_name, self._result())
+            print_success("Published lxc container in image store as {}.".format(self._result()))
 
         return self._result()
 

@@ -20,9 +20,8 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 from aptsources.sourceslist import SourceEntry
-from edi.lib.configurationparser import ConfigurationParser
+from edi.lib.configurationparser import ConfigurationParser, command_context
 from tests.libtesting.fixtures.configfiles import config_files, config_name
-import subprocess
 
 
 def test_project_name(config_files):
@@ -92,3 +91,19 @@ def test_shared_folders(config_files):
         assert content.get('folder') == 'work'
         assert dict.get('edi_current_user_target_home_directory').startswith('/home/')
 
+
+def test_command_context():
+    assert ConfigurationParser.command_context.get('edi_create_distributable_image') is False
+    with command_context({'edi_create_distributable_image': True}):
+        assert ConfigurationParser.command_context.get('edi_create_distributable_image') is True
+        with command_context({'edi_current_context': 'bingo'}):
+            assert ConfigurationParser.command_context.get('edi_create_distributable_image') is True
+            assert ConfigurationParser.command_context.get('edi_current_context') == 'bingo'
+            with command_context({'edi_create_distributable_image': False}):
+                assert ConfigurationParser.command_context.get('edi_create_distributable_image') is False
+                assert ConfigurationParser.command_context.get('edi_current_context') == 'bingo'
+            assert ConfigurationParser.command_context.get('edi_create_distributable_image') is True
+        assert ConfigurationParser.command_context.get('edi_create_distributable_image') is True
+        assert ConfigurationParser.command_context.get('edi_current_context') is None
+    assert ConfigurationParser.command_context.get('edi_create_distributable_image') is False
+    assert ConfigurationParser.command_context.get('edi_current_context') is None

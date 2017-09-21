@@ -21,8 +21,10 @@
 
 import yaml
 import collections
+import copy
 from jinja2 import Template
 import os
+from contextlib import contextmanager
 from os.path import dirname, abspath, basename, splitext, isfile, join
 import logging
 from edi.lib.helpers import (get_user, get_user_gid, get_user_uid,
@@ -67,10 +69,25 @@ def get_base_dictionary():
     return base_dict
 
 
-class ConfigurationParser():
+@contextmanager
+def command_context(dictionary):
+    backup = copy.deepcopy(ConfigurationParser.command_context)
+    ConfigurationParser.command_context.update(dictionary)
+    try:
+        yield
+    finally:
+        ConfigurationParser.command_context = backup
+
+
+class ConfigurationParser:
 
     # shared data for all configuration parsers
     _configurations = {}
+
+    # use the command_context contextmanager to manage dictionary
+    command_context = {
+        'edi_create_distributable_image': False
+    }
 
     def dump(self):
         return yaml.dump(self._get_config(), default_flow_style=False)
@@ -273,6 +290,7 @@ class ConfigurationParser():
 
     def _get_node_dictionary(self, node):
         node_dict = self._get_load_time_dictionary()
+        node_dict.update(ConfigurationParser.command_context)
 
         node_dict["edi_lxc_network_interface_name"] = self._get_general_item("edi_lxc_network_interface_name",
                                                                              "lxcif0")

@@ -22,6 +22,7 @@
 import hashlib
 from edi.commands.lxc import Lxc
 from edi.commands.lxccommands.lxcconfigure import Configure
+from edi.lib.configurationparser import command_context
 from edi.lib.helpers import print_success
 from edi.lib.lxchelpers import stop_container, is_container_existing, is_container_running, delete_container
 
@@ -41,14 +42,15 @@ class Stop(Lxc):
         self.run(cli_args.config_file)
 
     def run(self, config_file):
-        self._setup_parser(config_file)
+        with command_context({'edi_create_distributable_image': True}):
+            self._setup_parser(config_file)
 
-        # configure in any case since the container might be only partially configured
-        Configure().run(self._result(), config_file)
+            # configure in any case since the container might be only partially configured
+            Configure().run(self._result(), config_file)
 
-        print("Going to stop lxc container {}.".format(self._result()))
-        stop_container(self._result())
-        print_success("Stopped lxc container {}.".format(self._result()))
+            print("Going to stop lxc container {}.".format(self._result()))
+            stop_container(self._result())
+            print_success("Stopped lxc container {}.".format(self._result()))
 
         return self._result()
 
