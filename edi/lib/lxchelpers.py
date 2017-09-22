@@ -150,3 +150,20 @@ def get_server_image_compression_algorithm():
         return 'gzip'
     else:
         return algorithm
+
+
+def get_file_extension_from_image_compression_algorithm(algorithm):
+    mapping = {
+        'bzip2': '.tar.bz2',
+        'gzip': '.tar.gz',
+        'lzma': '.tar.lzma',
+        'xz': '.tar.xz',
+        'none': '.tar',
+    }
+
+    extension = mapping.get(algorithm, None)
+    if not extension:
+        raise FatalError(('''Unhandled lxc image compression algorithm '{}'.'''
+                          ).format(algorithm))
+
+    return extension

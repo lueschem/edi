@@ -21,8 +21,11 @@
 
 
 import subprocess
+import pytest
+from edi.lib.helpers import FatalError
 from tests.libtesting.optins import requires_lxc
-from edi.lib.lxchelpers import get_server_image_compression_algorithm
+from edi.lib.lxchelpers import (get_server_image_compression_algorithm,
+                                get_file_extension_from_image_compression_algorithm)
 from edi.lib.shellhelpers import mockablerun
 from tests.libtesting.helpers import get_command, get_sub_command
 
@@ -43,3 +46,21 @@ def test_get_server_image_compression_bzip2(monkeypatch):
     monkeypatch.setattr(mockablerun, 'run_mockable', fake_lxc_config_command)
     result = get_server_image_compression_algorithm()
     assert result is 'bzip2'
+
+
+@pytest.mark.parametrize("algorithm, expected_extension", [
+    ("none", ".tar"),
+    ("bzip2", ".tar.bz2"),
+    ("gzip", ".tar.gz"),
+])
+def test_get_file_extension_from_image_compression_algorithm(algorithm, expected_extension):
+    extension = get_file_extension_from_image_compression_algorithm(algorithm)
+    assert extension == expected_extension
+
+
+def test_get_file_extension_from_image_compression_algorithm_failure():
+    with pytest.raises(FatalError) as e:
+        get_file_extension_from_image_compression_algorithm('42')
+
+    assert 'compression algorithm' in str(e)
+    assert '42' in str(e)
