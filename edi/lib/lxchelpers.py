@@ -141,3 +141,12 @@ def write_lxc_profile(profile_text):
     run(edit_cmd, input=profile_content)
 
     return ext_profile_name, new_profile
+
+
+def get_server_image_compression_algorithm():
+    cmd = ['lxc', 'config', 'get', 'images.compression_algorithm']
+    algorithm = run(cmd, stdout=subprocess.PIPE).stdout.strip('\n')
+    if not algorithm:
+        return 'gzip'
+    else:
+        return algorithm
