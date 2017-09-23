@@ -33,6 +33,7 @@ from edi.lib.versionhelpers import get_edi_version, get_stripped_version
 from edi.lib.shellhelpers import get_user_environment_variable, get_lxd_version
 from packaging.version import Version
 from edi.lib.urlhelpers import obfuscate_url_password
+from edi.lib.sharedfoldercoordinator import SharedFolderCoordinator
 
 
 def remove_passwords(dictionary):
@@ -94,6 +95,30 @@ class ConfigurationParser:
 
     def dump_load_time_dictionary(self):
         return yaml.dump(self._get_load_time_dictionary(), default_flow_style=False)
+
+    def dump_plugins(self):
+        plugin_types = ['lxc_templates', 'lxc_profiles', 'playbooks']
+
+        result = {}
+
+        for plugin_type in plugin_types:
+            plugins = self.get_ordered_path_items(plugin_type)
+
+            if plugins:
+                result[plugin_type] = []
+
+            for plugin in plugins:
+                name, resolved_path, node_dict = plugin
+
+                if plugin_type == 'playbooks':
+                    sfc = SharedFolderCoordinator(self)
+                    node_dict['edi_shared_folder_mountpoints'] = sfc.get_mountpoints()
+
+                plugin_info = {name: {'path': resolved_path, 'dictionary': node_dict}}
+
+                result[plugin_type].append(plugin_info)
+
+        return yaml.dump(result, default_flow_style=False)
 
     def get_project_name(self):
         return self.config_id
@@ -286,11 +311,11 @@ class ConfigurationParser:
         load_dict["edi_work_directory"] = self.get_workdir()
         load_dict["edi_config_directory"] = self.config_directory
         load_dict["edi_project_plugin_directory"] = self.get_project_plugin_directory()
+        load_dict.update(ConfigurationParser.command_context)
         return load_dict
 
     def _get_node_dictionary(self, node):
         node_dict = self._get_load_time_dictionary()
-        node_dict.update(ConfigurationParser.command_context)
 
         node_dict["edi_lxc_network_interface_name"] = self._get_general_item("edi_lxc_network_interface_name",
                                                                              "lxcif0")

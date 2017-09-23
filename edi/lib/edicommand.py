@@ -99,6 +99,35 @@ class EdiCommand(metaclass=CommandFactory):
         parser.add_argument('config_file',
                             type=argparse.FileType('r', encoding='UTF-8'))
 
+    @staticmethod
+    def _offer_introspection_options(parser):
+        group = parser.add_mutually_exclusive_group()
+        group.add_argument('--dictionary', action="store_true",
+                           help='dump the load time dictionary instead of running the command')
+        group.add_argument('--config', action="store_true",
+                           help='dump the merged configuration instead of running the command')
+        group.add_argument('--plugins', action="store_true",
+                           help=('dump the active plugins including their dictionaries instead of '
+                                 'running the command'))
+
+    @staticmethod
+    def _has_introspection_option(cli_args):
+        if not cli_args:
+            return False
+        if cli_args.dictionary or cli_args.config or cli_args.plugins:
+            return True
+        else:
+            return False
+
+    def _get_introspection_output(self, cli_args):
+        if cli_args.dictionary:
+            return self.config.dump_load_time_dictionary()
+        elif cli_args.config:
+            return self.config.dump()
+        else:
+            assert cli_args.plugins
+            return self.config.dump_plugins()
+
     def _require_sudo(self):
         if os.getuid() != 0:
             raise FatalError(("The subcommand '{0}' requires superuser "

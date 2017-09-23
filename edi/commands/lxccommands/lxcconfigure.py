@@ -40,15 +40,20 @@ class Configure(Lxc):
         parser = subparsers.add_parser(cls._get_short_command_name(),
                                        help=help_text,
                                        description=description_text)
+        cls._offer_introspection_options(parser)
         parser.add_argument('container_name')
         cls._require_config_file(parser)
 
     def run_cli(self, cli_args):
-        self.run(cli_args.container_name, cli_args.config_file)
+        self.run(cli_args.container_name, cli_args.config_file, cli_args)
 
-    def run(self, container_name, config_file):
+    def run(self, container_name, config_file, cli_args=None):
         self._setup_parser(config_file)
         self.container_name = container_name
+
+        if self._has_introspection_option(cli_args):
+            print(self._get_introspection_output(cli_args))
+            return self._result()
 
         Launch().run(container_name, config_file)
 
