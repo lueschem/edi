@@ -26,6 +26,9 @@ from edi.lib.helpers import print_success
 
 class Configure(Target):
 
+    def __init__(self):
+        self.ip_address = None
+
     @classmethod
     def advertise(cls, subparsers):
         help_text = "(re)configure an edi target system"
@@ -33,15 +36,22 @@ class Configure(Target):
         parser = subparsers.add_parser(cls._get_short_command_name(),
                                        help=help_text,
                                        description=description_text)
+        cls._offer_introspection_options(parser)
         parser.add_argument('ip_address')
         cls._require_config_file(parser)
 
     def run_cli(self, cli_args):
-        self.run(cli_args.ip_address, cli_args.config_file)
+        self.run(cli_args.ip_address, cli_args.config_file,
+                 introspection_method=self._get_introspection_method(
+                     cli_args, ['playbooks']))
 
-    def run(self, ip_address, config_file):
+    def run(self, ip_address, config_file, introspection_method=None):
         self._setup_parser(config_file)
         self.ip_address = ip_address
+
+        if introspection_method:
+            print(introspection_method())
+            return self._result()
 
         print("Going to configure target system ({}) - be patient.".format(self._result()))
 

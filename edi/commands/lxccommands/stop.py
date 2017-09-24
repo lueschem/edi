@@ -36,14 +36,20 @@ class Stop(Lxc):
         parser = subparsers.add_parser(cls._get_short_command_name(),
                                        help=help_text,
                                        description=description_text)
+        cls._offer_introspection_options(parser)
         cls._require_config_file(parser)
 
     def run_cli(self, cli_args):
-        self.run(cli_args.config_file)
+        self.run(cli_args.config_file, introspection_method=self._get_introspection_method(
+            cli_args, ['lxc_templates', 'lxc_profiles', 'playbooks']))
 
-    def run(self, config_file):
+    def run(self, config_file, introspection_method=None):
         with command_context({'edi_create_distributable_image': True}):
             self._setup_parser(config_file)
+
+            if introspection_method:
+                print(introspection_method())
+                return self._result()
 
             # configure in any case since the container might be only partially configured
             Configure().run(self._result(), config_file)

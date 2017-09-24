@@ -45,13 +45,19 @@ class Lxc(Image):
         parser = subparsers.add_parser(cls._get_short_command_name(),
                                        help=help_text,
                                        description=description_text)
+        cls._offer_introspection_options(parser)
         cls._require_config_file(parser)
 
     def run_cli(self, cli_args):
-        self.run(cli_args.config_file)
+        self.run(cli_args.config_file, introspection_method=self._get_introspection_method(
+            cli_args, ['lxc_templates']))
 
-    def run(self, config_file):
+    def run(self, config_file, introspection_method=None):
         self._setup_parser(config_file)
+
+        if introspection_method:
+            print(introspection_method())
+            return self._result()
 
         if os.path.isfile(self._result()):
             logging.info(("{0} is already there. "

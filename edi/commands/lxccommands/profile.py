@@ -39,15 +39,23 @@ class Profile(Lxc):
         parser = subparsers.add_parser(cls._get_short_command_name(),
                                        help=help_text,
                                        description=description_text)
+        cls._offer_introspection_options(parser)
         cls._require_config_file(parser)
         parser.add_argument("-p", "--include-post-config", action="store_true",
                             help="include profiles that can only be applied after configuration")
 
     def run_cli(self, cli_args):
-        self.run(cli_args.config_file, include_post_config_profiles=cli_args.include_post_config)
+        self.run(cli_args.config_file, include_post_config_profiles=cli_args.include_post_config,
+                 introspection_method=self._get_introspection_method(
+                     cli_args, ['lxc_profiles'])
+                 )
 
-    def run(self, config_file, include_post_config_profiles=False):
+    def run(self, config_file, include_post_config_profiles=False, introspection_method=None):
         self._setup_parser(config_file)
+
+        if introspection_method:
+            print(introspection_method())
+            return []
 
         profile_list = self.config.get_ordered_path_items("lxc_profiles")
         profile_name_list = []

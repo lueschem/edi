@@ -40,15 +40,22 @@ class Launch(Lxc):
         parser = subparsers.add_parser(cls._get_short_command_name(),
                                        help=help_text,
                                        description=description_text)
+        cls._offer_introspection_options(parser)
         parser.add_argument('container_name')
         cls._require_config_file(parser)
 
     def run_cli(self, cli_args):
-        self.run(cli_args.container_name, cli_args.config_file)
+        self.run(cli_args.container_name, cli_args.config_file,
+                 introspection_method=self._get_introspection_method(
+                     cli_args, ['lxc_templates', 'lxc_profiles']))
 
-    def run(self, container_name, config_file):
+    def run(self, container_name, config_file, introspection_method=None):
         self._setup_parser(config_file)
         self.container_name = container_name
+
+        if introspection_method:
+            print(introspection_method())
+            return self._result()
 
         if not is_valid_hostname(container_name):
             raise FatalError(("The provided container name '{}' "
