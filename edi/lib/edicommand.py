@@ -24,6 +24,7 @@ from edi.lib.configurationparser import ConfigurationParser
 import argparse
 import os
 import logging
+from functools import partial
 from edi.lib.helpers import FatalError
 from edi.lib.shellhelpers import run
 from edi.lib.commandfactory import get_sub_commands, get_command
@@ -110,23 +111,24 @@ class EdiCommand(metaclass=CommandFactory):
                            help=('dump the active plugins including their dictionaries instead of '
                                  'running the command'))
 
-    @staticmethod
-    def _has_introspection_option(cli_args):
-        if not cli_args:
-            return False
-        if cli_args.dictionary or cli_args.config or cli_args.plugins:
-            return True
-        else:
-            return False
-
-    def _get_introspection_output(self, cli_args):
+    def _get_introspection_method(self, cli_args, plugin_sections):
         if cli_args.dictionary:
-            return self.config.dump_load_time_dictionary()
+            return self._dump_load_time_dictionary
         elif cli_args.config:
-            return self.config.dump()
+            return self._dump_config
+        elif cli_args.plugins:
+            return partial(self._dump_plugins, plugin_sections)
         else:
-            assert cli_args.plugins
-            return self.config.dump_plugins()
+            return None
+
+    def _dump_load_time_dictionary(self):
+        return self.config.dump_load_time_dictionary()
+
+    def _dump_config(self):
+        return self.config.dump()
+
+    def _dump_plugins(self, sections):
+        return self.config.dump_plugins(sections)
 
     def _require_sudo(self):
         if os.getuid() != 0:

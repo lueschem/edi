@@ -45,14 +45,16 @@ class Configure(Lxc):
         cls._require_config_file(parser)
 
     def run_cli(self, cli_args):
-        self.run(cli_args.container_name, cli_args.config_file, cli_args)
+        self.run(cli_args.container_name, cli_args.config_file,
+                 introspection_method=self._get_introspection_method(
+                     cli_args, ['lxc_templates', 'lxc_profiles', 'playbooks']))
 
-    def run(self, container_name, config_file, cli_args=None):
+    def run(self, container_name, config_file, introspection_method=None):
         self._setup_parser(config_file)
         self.container_name = container_name
 
-        if self._has_introspection_option(cli_args):
-            print(self._get_introspection_output(cli_args))
+        if introspection_method:
+            print(introspection_method())
             return self._result()
 
         Launch().run(container_name, config_file)

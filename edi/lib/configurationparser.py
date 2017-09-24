@@ -96,27 +96,25 @@ class ConfigurationParser:
     def dump_load_time_dictionary(self):
         return yaml.dump(self._get_load_time_dictionary(), default_flow_style=False)
 
-    def dump_plugins(self):
-        plugin_types = ['lxc_templates', 'lxc_profiles', 'playbooks']
-
+    def dump_plugins(self, plugin_sections):
         result = {}
 
-        for plugin_type in plugin_types:
-            plugins = self.get_ordered_path_items(plugin_type)
+        for plugin_section in plugin_sections:
+            plugins = self.get_ordered_path_items(plugin_section)
 
             if plugins:
-                result[plugin_type] = []
+                result[plugin_section] = []
 
             for plugin in plugins:
                 name, resolved_path, node_dict = plugin
 
-                if plugin_type == 'playbooks':
+                if plugin_section == 'playbooks':
                     sfc = SharedFolderCoordinator(self)
                     node_dict['edi_shared_folder_mountpoints'] = sfc.get_mountpoints()
 
                 plugin_info = {name: {'path': resolved_path, 'dictionary': node_dict}}
 
-                result[plugin_type].append(plugin_info)
+                result[plugin_section].append(plugin_info)
 
         return yaml.dump(result, default_flow_style=False)
 
