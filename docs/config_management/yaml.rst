@@ -28,11 +28,11 @@ upon a predefined set of use cases. It just helps you to modularize your differe
 diverge over time.
 
 The configuration is split into several sections. The following command will dump the merged and rendered configuration
-of the use case *develop*:
+of the use case *develop* for the given command:
 
 .. code:: bash
 
-   edi config merge my-project-develop.yml
+   edi lxc configure --config my-container my-project-develop.yml
 
 
 :code:`general` Section
@@ -198,7 +198,8 @@ Such nodes accept the following settings:
        Relative paths are first searched within :code:`edi_project_plugin_directory` and |br|
        if nothing is found the search falls back to :code:`edi_edi_plugin_directory`. |br|
        The values of the plugin and project
-       directory can be retrieved as follows: :code:`edi config dictionary SOME_CONFIG.yml`.
+       directory can be retrieved as follows: |br|
+       :code:`edi lxc configure --dictionary SOME-CONTAINER SOME_CONFIG.yml`.
    * - parameters
      - An optional list of parameters that will be used to parametrize the given plugin.
    * - skip
