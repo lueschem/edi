@@ -19,24 +19,20 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
-from edi.commands.config import Config
+from tests.libtesting.fixtures.configfiles import config_files
+from edi.commands.lxccommands.lxcconfigure import Configure
+import edi
+import yaml
 
 
-class Merge(Config):
+def test_config(config_files, capsys):
+    # TODO: apply to all introspection aware commands
+    parser = edi._setup_command_line_interface()
+    cli_args = parser.parse_args(['lxc', 'configure', '--config', 'cname', config_files])
 
-    @classmethod
-    def advertise(cls, subparsers):
-        help_text = "dump the merged configuration"
-        description_text = "Dump the merged configuration."
-        parser = subparsers.add_parser(cls._get_short_command_name(),
-                                       help=help_text,
-                                       description=description_text)
-        cls._require_config_file(parser)
+    Configure().run_cli(cli_args)
+    out, err = capsys.readouterr()
 
-    def run_cli(self, cli_args):
-        result = self.run(cli_args.config_file)
-        print(result)
-
-    def run(self, config_file):
-        self._setup_parser(config_file)
-        return self.config.dump()
+    assert err == ''
+    merged_config = yaml.load(out)
+    assert merged_config.get('bootstrap').get('architecture') == 'i386'

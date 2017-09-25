@@ -20,18 +20,23 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 from tests.libtesting.fixtures.configfiles import config_files
-from edi.commands.configcommands.configmerge import Merge
+from edi.commands.lxccommands.lxcconfigure import Configure
 import edi
 import yaml
+import os
 
 
-def test_merge(config_files, capsys):
+def test_dictionary(config_files, capsys):
     parser = edi._setup_command_line_interface()
-    cli_args = parser.parse_args(['config', 'merge', config_files])
+    cli_args = parser.parse_args(['lxc', 'configure', '--plugins', 'cname', config_files])
 
-    Merge().run_cli(cli_args)
+    Configure().run_cli(cli_args)
     out, err = capsys.readouterr()
 
     assert err == ''
-    merged_config = yaml.load(out)
-    assert merged_config.get('bootstrap').get('architecture') == 'i386'
+    result = yaml.load(out)
+    assert len(result.get('playbooks')) == 3
+    base_system = result.get('playbooks')[0].get('10_base_system')
+    assert 'plugins/playbooks/foo.yml' in base_system.get('path')
+    assert base_system.get('dictionary').get('kernel_package') == 'linux-image-amd64-rt'
+    assert base_system.get('dictionary').get('edi_config_directory') == os.path.dirname(config_files)

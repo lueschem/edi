@@ -20,7 +20,7 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 from tests.libtesting.fixtures.configfiles import config_files
-from edi.commands.configcommands.configdictionary import Dictionary
+from edi.commands.lxccommands.lxcconfigure import Configure
 import edi
 import yaml
 import os
@@ -28,9 +28,9 @@ import os
 
 def test_dictionary(config_files, capsys):
     parser = edi._setup_command_line_interface()
-    cli_args = parser.parse_args(['config', 'dictionary', config_files])
+    cli_args = parser.parse_args(['lxc', 'configure', '--dictionary', 'cname', config_files])
 
-    Dictionary().run_cli(cli_args)
+    Configure().run_cli(cli_args)
     out, err = capsys.readouterr()
 
     assert err == ''
