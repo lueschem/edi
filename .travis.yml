@@ -5,3 +5,7 @@ install:
   - docker pull ubuntu:16.04
 script:
   - docker run -v $(pwd):/data/edi ubuntu:16.04 bash -c "/data/edi/tests/travis-tests"
+
+branches:
+  except:
+  - drawings
