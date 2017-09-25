@@ -33,8 +33,13 @@ def is_in_image_store(name):
     return result.returncode == 0
 
 
-def import_image(image, name):
-    cmd = ["lxc", "image", "import", image, "local:", "--alias", name]
+def import_image(image, image_name):
+    cmd = ["lxc", "image", "import", image, "local:", "--alias", image_name]
+    run(cmd)
+
+
+def export_image(image_name, image_without_extension):
+    cmd = ["lxc", "image", "export", image_name, image_without_extension]
     run(cmd)
 
 
