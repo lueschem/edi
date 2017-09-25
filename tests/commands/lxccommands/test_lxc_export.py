@@ -25,7 +25,9 @@ from tests.libtesting.contextmanagers.workspace import workspace
 import os
 from tests.libtesting.helpers import get_random_string, get_project_root
 from edi.lib.shellhelpers import run
-from edi.commands.lxccommands.lxcconfigure import Configure
+from edi.lib.lxchelpers import (get_server_image_compression_algorithm,
+                                get_file_extension_from_image_compression_algorithm)
+from edi.commands.lxccommands.export import Export
 from edi.commands.clean import Clean
 import edi
 import subprocess
@@ -35,33 +37,41 @@ import subprocess
 @requires_ansible
 @requires_debootstrap
 @requires_sudo
-def test_build_stretch_container(capsys):
+def test_export_jessie_container(capsys):
     print(os.getcwd())
     with workspace():
         edi_exec = os.path.join(get_project_root(), 'bin', 'edi')
         project_name = 'pytest-{}'.format(get_random_string(6))
-        config_command = [edi_exec, 'config', 'init', project_name, 'debian-stretch-amd64']
+        config_command = [edi_exec, 'config', 'init', project_name, 'debian-jessie-amd64']
         run(config_command)  # run as non root
 
-        container_name = 'pytest-{}'.format(get_random_string(6))
         parser = edi._setup_command_line_interface()
-        cli_args = parser.parse_args(['-v', 'lxc', 'configure', container_name, '{}-develop.yml'.format(project_name)])
+        cli_args = parser.parse_args(['lxc', 'export', '{}-develop.yml'.format(project_name)])
 
-        Configure().run_cli(cli_args)
+        Export().run_cli(cli_args)
         out, err = capsys.readouterr()
         print(out)
         assert not err
 
+        lxc_compression_algo = get_server_image_compression_algorithm()
+        lxc_export_extension = get_file_extension_from_image_compression_algorithm(lxc_compression_algo)
+
         images = [
             '{}-develop_edicommand_image_bootstrap.tar.gz'.format(project_name),
-            '{}-develop_edicommand_image_lxc.tar.gz'.format(project_name)
+            '{}-develop_edicommand_image_lxc.tar.gz'.format(project_name),
+            '{}-develop_edicommand_lxc_export{}'.format(project_name, lxc_export_extension)
         ]
         for image in images:
             assert os.path.isfile(image)
 
+        image_store_items = [
+            "{}-develop_edicommand_lxc_import".format(project_name),
+            "{}-develop_edicommand_lxc_publish".format(project_name)
+        ]
         lxc_image_list_cmd = ['lxc', 'image', 'list']
         result = run(lxc_image_list_cmd, stdout=subprocess.PIPE)
-        assert project_name in result.stdout
+        for image_store_item in image_store_items:
+            assert image_store_item in result.stdout
 
         parser = edi._setup_command_line_interface()
         cli_args = parser.parse_args(['-v', 'clean', '{}-develop.yml'.format(project_name)])
@@ -71,15 +81,5 @@ def test_build_stretch_container(capsys):
             assert not os.path.isfile(image)
 
         result = run(lxc_image_list_cmd, stdout=subprocess.PIPE)
-        assert project_name not in result.stdout
-
-        verification_command = ['lxc', 'exec', container_name, '--', 'cat', '/etc/os-release']
-        result = run(verification_command, stdout=subprocess.PIPE)
-        assert '''VERSION_ID="9"''' in result.stdout
-        assert 'ID=debian' in result.stdout
-
-        stop_command = ['lxc', 'stop', container_name]
-        run(stop_command)
-
-        delete_command = ['lxc', 'delete', container_name]
-        run(delete_command)
+        for image_store_item in image_store_items:
+            assert image_store_item not in result.stdout
