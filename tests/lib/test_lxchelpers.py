@@ -25,7 +25,8 @@ import pytest
 from edi.lib.helpers import FatalError
 from tests.libtesting.optins import requires_lxc
 from edi.lib.lxchelpers import (get_server_image_compression_algorithm,
-                                get_file_extension_from_image_compression_algorithm)
+                                get_file_extension_from_image_compression_algorithm,
+                                get_lxd_version)
 from edi.lib.shellhelpers import mockablerun
 from tests.libtesting.helpers import get_command, get_sub_command
 
@@ -64,3 +65,9 @@ def test_get_file_extension_from_image_compression_algorithm_failure():
 
     assert 'compression algorithm' in str(e)
     assert '42' in str(e)
+
+
+@requires_lxc
+def test_get_lxd_version():
+    version = get_lxd_version()
+    assert '.' in version

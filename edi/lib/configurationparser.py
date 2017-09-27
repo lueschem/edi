@@ -30,7 +30,8 @@ import logging
 from edi.lib.helpers import (get_user, get_user_gid, get_user_uid,
                              get_hostname, get_edi_plugin_directory, FatalError)
 from edi.lib.versionhelpers import get_edi_version, get_stripped_version
-from edi.lib.shellhelpers import get_user_environment_variable, get_lxd_version
+from edi.lib.shellhelpers import get_user_environment_variable
+from edi.lib.lxchelpers import get_lxd_version
 from packaging.version import Version
 from edi.lib.urlhelpers import obfuscate_url_password
 from edi.lib.sharedfoldercoordinator import SharedFolderCoordinator

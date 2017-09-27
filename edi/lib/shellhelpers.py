@@ -88,8 +88,3 @@ def get_user_environment_variable(name, default=None):
 def get_debian_architecture():
     cmd = ['dpkg', '--print-architecture']
     return run(cmd, stdout=subprocess.PIPE).stdout.strip('\n')
-
-
-def get_lxd_version():
-    cmd = ['lxd', '--version']
-    return run(cmd, stdout=subprocess.PIPE).stdout.strip('\n')

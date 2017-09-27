@@ -178,3 +178,13 @@ def get_container_profiles(name):
     cmd = ['lxc', 'config', 'show', name]
     result = run(cmd, stdout=subprocess.PIPE)
     return yaml.load(result.stdout).get('profiles', [])
+
+
+def get_lxd_version():
+    cmd = ['lxd', '--version']
+    result = run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if not result.stdout:
+        # recent lxd versions print the version to stderr!
+        return result.stderr.strip('\n')
+    else:
+        return result.stdout.strip('\n')
