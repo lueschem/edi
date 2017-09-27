@@ -25,7 +25,9 @@ from edi.commands.lxccommands.importcmd import Import
 from edi.commands.lxccommands.profile import Profile
 from edi.lib.helpers import FatalError, print_success
 from edi.lib.networkhelpers import is_valid_hostname
-from edi.lib.lxchelpers import is_container_existing, is_container_running, start_container, launch_container
+from edi.lib.lxchelpers import (is_container_existing, is_container_running, start_container,
+                                launch_container, get_container_profiles, stop_container,
+                                apply_profiles)
 
 
 class Launch(Lxc):
@@ -62,10 +64,25 @@ class Launch(Lxc):
                               "is not a valid host name."
                               ).format(container_name))
 
+        profiles = Profile().run(config_file)
+
         if is_container_existing(self._result()):
             logging.info(("Container {0} is already existing. "
                           "Destroy it to regenerate it or reconfigure it."
                           ).format(self._result()))
+
+            current_profiles = get_container_profiles(self._result())
+            if not Launch.verify_profiles(profiles, current_profiles):
+                # we might end up here if the container got imported
+                # from a distributable image
+                logging.info(("The profiles of container {0} need to be updated."
+                              ).format(self._result()))
+                if is_container_running(self._result()):
+                    logging.info(("Stopping container {0} to update profiles."
+                                  ).format(self._result()))
+                    stop_container(self._result())
+                apply_profiles(self._result(), profiles)
+
             if not is_container_running(self._result()):
                 logging.info(("Starting existing container {0}."
                               ).format(self._result()))
@@ -73,12 +90,18 @@ class Launch(Lxc):
                 print_success("Started container {}.".format(self._result()))
         else:
             image = Import().run(config_file)
-            profiles = Profile().run(config_file)
             print("Going to launch container.")
             launch_container(image, self._result(), profiles)
             print_success("Launched container {}.".format(self._result()))
 
         return self._result()
+
+    @staticmethod
+    def verify_profiles(desired_profiles, current_profiles):
+        for desired_profile in desired_profiles:
+            if desired_profile not in current_profiles:
+                return False
+        return True
 
     def _result(self):
         return self.container_name

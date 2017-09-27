@@ -172,3 +172,9 @@ def get_file_extension_from_image_compression_algorithm(algorithm):
                           ).format(algorithm))
 
     return extension
+
+
+def get_container_profiles(name):
+    cmd = ['lxc', 'config', 'show', name]
+    result = run(cmd, stdout=subprocess.PIPE)
+    return yaml.load(result.stdout).get('profiles', [])
