@@ -21,7 +21,7 @@
 
 from edi.commands.imagecommands.bootstrap import Bootstrap
 from tests.libtesting.fixtures.configfiles import config_files
-from tests.libtesting.helpers import get_command, get_command_parameter
+from tests.libtesting.helpers import get_command, get_command_parameter, get_sub_command
 import os
 import shutil
 import subprocess
@@ -60,6 +60,13 @@ def test_bootstrap(config_files, monkeypatch):
                     fakearchive.write("fake archive")
             elif popenargs[0][-2] == "dpkg" and popenargs[0][-1] == "--print-architecture":
                 return subprocess.CompletedProcess("fakerun", 0, 'amd64')
+            elif get_command(popenargs) == "lxd" and get_sub_command(popenargs) == "--version":
+                return subprocess.CompletedProcess("fakerun", 0, '2.18')
+            elif get_command(popenargs) == "printenv":
+                if get_sub_command(popenargs) == "HOME":
+                    return subprocess.CompletedProcess("fakerun", 0, '/no/such/directory')
+                else:
+                    return subprocess.CompletedProcess("fakerun", 0, '')
             else:
                 print('Passthrough: {}'.format(get_command(popenargs)))
                 return subprocess.run(*popenargs, **kwargs)

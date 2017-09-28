@@ -26,7 +26,7 @@ import yaml
 import os
 
 
-def test_dictionary(config_files, capsys):
+def test_plugins(config_files, capsys):
     parser = edi._setup_command_line_interface()
     cli_args = parser.parse_args(['lxc', 'configure', '--plugins', 'cname', config_files])
 
