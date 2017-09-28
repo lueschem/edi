@@ -65,6 +65,12 @@ class Export(Lxc):
 
             export_image(image_name, self._image_without_extension())
 
+            if (os.path.isfile(self._image_without_extension()) and
+                    not os.path.isfile(self._result())):
+                # Workaround for https://github.com/lxc/lxd/issues/3869
+                logging.info("Fixing file extension of exported image.")
+                os.rename(self._image_without_extension(), self._result())
+
             print_success("Exported lxc image as {}.".format(self._result()))
 
         return self._result()
