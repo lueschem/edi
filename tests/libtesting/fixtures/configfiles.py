@@ -96,6 +96,7 @@ playbooks:
 
 config_name = "sample"
 empty_config_name = "empty"
+empty_overlay_config_name = "hugo"
 
 
 @pytest.fixture(scope='function')
@@ -129,5 +130,24 @@ def empty_config_file(tmpdir_factory):
     main_file = "{0}.yml".format(empty_config_name)
     with open(str(dir_name.join(main_file)), "w") as file:
         file.write("")
+
+    return str(dir_name.join(main_file))
+
+
+@pytest.fixture(scope='function')
+def empty_overlay_config_file(tmpdir_factory):
+    dir_name = tmpdir_factory.mktemp('configuration')
+    main_file = "{0}.yml".format(empty_overlay_config_name)
+    with open(str(dir_name.join(main_file)), "w") as file:
+        file.write(sample_file)
+
+    overlay_dir = dir_name.join("configuration", "overlay")
+    os.makedirs(str(overlay_dir))
+    overlays = [("global", "")]
+    for overlay in overlays:
+        o_type, o_content = overlay
+        o_file_name = "{0}.{1}.yml".format(empty_overlay_config_name, o_type)
+        with open(str(overlay_dir.join(o_file_name)), "w") as o_file:
+            o_file.write(o_content)
 
     return str(dir_name.join(main_file))

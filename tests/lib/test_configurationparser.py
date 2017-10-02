@@ -21,7 +21,7 @@
 
 from aptsources.sourceslist import SourceEntry
 from edi.lib.configurationparser import ConfigurationParser, command_context
-from tests.libtesting.fixtures.configfiles import config_files, config_name
+from tests.libtesting.fixtures.configfiles import config_files, config_name, empty_overlay_config_file
 
 
 def test_project_name(config_files):
@@ -69,6 +69,12 @@ def test_playbooks_overlay(config_files, monkeypatch):
                 assert value == "some message"
             if name == "20_networking":
                 assert path.endswith("playbooks/foo.yml")
+
+
+def test_empty_overlay_file(empty_overlay_config_file):
+    with open(empty_overlay_config_file, "r") as main_file:
+        parser = ConfigurationParser(main_file)
+        assert parser.get_compression() == 'gz'
 
 
 def test_shared_folders(config_files):

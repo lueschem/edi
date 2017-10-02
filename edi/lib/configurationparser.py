@@ -239,7 +239,7 @@ class ConfigurationParser:
             with open(overlay, encoding="UTF-8", mode="r") as config_file:
                 logging.info(("Using overlay configuration file '{0}'"
                               ).format(config_file.name))
-                return yaml.load(self._parse_jina2_file(config_file))
+                return yaml.load(self._parse_jina2_file(config_file)) or {}
         else:
             return {}
 
