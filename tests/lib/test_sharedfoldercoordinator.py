@@ -44,7 +44,7 @@
 from jinja2 import Template
 from edi.lib.helpers import get_user, FatalError
 from edi.lib.shellhelpers import get_user_environment_variable
-from edi.lib.configurationparser import ConfigurationParser
+from edi.lib.configurationparser import ConfigurationParser, command_context
 from edi.lib.sharedfoldercoordinator import SharedFolderCoordinator
 from tests.libtesting.helpers import get_command, get_sub_command, get_command_parameter
 from tests.libtesting.fixtures.configfiles import config_files, empty_config_file
@@ -122,6 +122,7 @@ def test_post_config_profiles(config_files):
 
         for i in range(0, 3):
             assert profiles[i] == expected_profiles[i]
+
 
 def test_get_mountpoints(config_files):
     with open(config_files, "r") as main_file:
@@ -261,6 +262,30 @@ def test_create_host_folders_not_a_folder(config_files, monkeypatch):
             coordinator.create_host_folders() # exists but not a folder
 
         assert 'valid_folder' in error.value.message
+
+
+def test_no_shared_folders_for_distributable_image(config_files, monkeypatch):
+    with open(config_files, "r") as main_file:
+        with command_context({'edi_create_distributable_image': True}):
+            parser = ConfigurationParser(main_file)
+
+            coordinator = SharedFolderCoordinator(parser)
+
+            def fake_os_path_exists(*_):
+                return False
+            monkeypatch.setattr(os.path, 'exists', fake_os_path_exists)
+
+            def fake_run(*popenargs, **kwargs):
+                # We should not run anything!
+                assert False
+
+            monkeypatch.setattr(mockablerun, 'run_mockable', fake_run)
+
+            coordinator.create_host_folders()
+            coordinator.verify_container_mountpoints('does-not-exist')
+            assert coordinator.get_mountpoints() == []
+            assert coordinator.get_pre_config_profiles() == []
+            assert coordinator.get_post_config_profiles() == []
 
 
 def test_create_host_folders_successful_create(config_files, monkeypatch):
