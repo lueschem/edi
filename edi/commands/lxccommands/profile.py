@@ -54,7 +54,7 @@ class Profile(Lxc):
         self._setup_parser(config_file)
 
         if introspection_method:
-            print(introspection_method())
+            self._print(introspection_method())
             return []
 
         profile_list = self.config.get_ordered_path_items("lxc_profiles")

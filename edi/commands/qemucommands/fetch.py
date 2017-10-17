@@ -49,7 +49,7 @@ class Fetch(Qemu):
         self._setup_parser(config_file)
 
         if introspection_method:
-            print(introspection_method())
+            self._print(introspection_method())
             return self._result()
 
         if not self._needs_qemu():

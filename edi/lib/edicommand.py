@@ -24,6 +24,7 @@ from edi.lib.configurationparser import ConfigurationParser
 import argparse
 import os
 import logging
+import yaml
 from functools import partial
 from edi.lib.helpers import FatalError
 from edi.lib.shellhelpers import run
@@ -113,22 +114,29 @@ class EdiCommand(metaclass=CommandFactory):
 
     def _get_introspection_method(self, cli_args, plugin_sections):
         if cli_args.dictionary:
-            return self._dump_load_time_dictionary
+            return self._get_load_time_dictionary
         elif cli_args.config:
-            return self._dump_config
+            return self._get_config
         elif cli_args.plugins:
-            return partial(self._dump_plugins, plugin_sections)
+            return partial(self._get_plugins, plugin_sections)
         else:
             return None
 
-    def _dump_load_time_dictionary(self):
-        return self.config.dump_load_time_dictionary()
+    def _get_load_time_dictionary(self):
+        return self.config.get_load_time_dictionary()
 
-    def _dump_config(self):
-        return self.config.dump()
+    def _get_config(self):
+        return self.config.get_config()
 
-    def _dump_plugins(self, sections):
-        return self.config.dump_plugins(sections)
+    def _get_plugins(self, sections):
+        return self.config.get_plugins(sections)
+
+    @staticmethod
+    def _dump(introspection_result):
+        return yaml.dump(introspection_result, default_flow_style=False)
+
+    def _print(self, introspection_result):
+        print(self._dump(introspection_result))
 
     def _require_sudo(self):
         if os.getuid() != 0:

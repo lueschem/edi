@@ -50,7 +50,7 @@ class Configure(Target):
         self.ip_address = ip_address
 
         if introspection_method:
-            print(introspection_method())
+            self._print(introspection_method())
             return self._result()
 
         print("Going to configure target system ({}) - be patient.".format(self._result()))

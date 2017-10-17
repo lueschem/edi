@@ -98,10 +98,13 @@ class ConfigurationParser:
     def dump(self):
         return yaml.dump(self._get_config(), default_flow_style=False)
 
-    def dump_load_time_dictionary(self):
-        return yaml.dump(self._get_load_time_dictionary(), default_flow_style=False)
+    def get_config(self):
+        return self._get_config()
 
-    def dump_plugins(self, plugin_sections):
+    def get_load_time_dictionary(self):
+        return self._get_load_time_dictionary()
+
+    def get_plugins(self, plugin_sections):
         result = {}
 
         for plugin_section in plugin_sections:
@@ -121,12 +124,13 @@ class ConfigurationParser:
 
                 result[plugin_section].append(plugin_info)
 
-        return yaml.dump(result, default_flow_style=False)
+        return result
 
     def get_project_name(self):
         return self.config_id
 
-    def get_workdir(self):
+    @staticmethod
+    def get_workdir():
         # we might want to overwrite it by a config setting
         return os.getcwd()
 

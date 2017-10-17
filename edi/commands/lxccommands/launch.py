@@ -56,7 +56,7 @@ class Launch(Lxc):
         self.container_name = container_name
 
         if introspection_method:
-            print(introspection_method())
+            self._print(introspection_method())
             return self._result()
 
         if not is_valid_hostname(container_name):
