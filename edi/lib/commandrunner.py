@@ -60,9 +60,6 @@ class CommandRunner():
                     dictionary['edi_output_artifact'] = str(output_artifact)
                     result = str(output_artifact)
 
-                dictionary['edi_plugin_directory'] = str(path)
-                dictionary['edi_log_level'] = logging.getLevelName(logging.getLogger().getEffectiveLevel())
-
                 logging.info(("Running command {} located in "
                               "{} with dictionary:\n{}"
                               ).format(name, path,

@@ -166,6 +166,8 @@ class ConfigurationParser:
                                       ).format(section, name))
                 resolved_path = self._resolve_path(path)
                 node_dict = self._get_node_dictionary(content)
+                node_dict['edi_current_plugin_directory'] = str(resolved_path)
+
                 item_list.append((name, resolved_path, node_dict, content))
             else:
                 logging.debug("Skipping named item '{}' from section '{}'.".format(name, section))
@@ -314,6 +316,7 @@ class ConfigurationParser:
         load_dict["edi_work_directory"] = self.get_workdir()
         load_dict["edi_config_directory"] = self.config_directory
         load_dict["edi_project_plugin_directory"] = self.get_project_plugin_directory()
+        load_dict['edi_log_level'] = logging.getLevelName(logging.getLogger().getEffectiveLevel())
         load_dict.update(ConfigurationParser.command_context)
         return load_dict
 
