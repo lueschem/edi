@@ -29,6 +29,7 @@ import shutil
 import subprocess
 import os
 from codecs import open
+from edi.lib.helpers import get_user
 
 
 def test_run_all(config_files, monkeypatch):
@@ -47,7 +48,8 @@ def test_run_all(config_files, monkeypatch):
     def fakechown(*_):
         pass
 
-    monkeypatch.setattr(shutil, 'chown', fakechown)
+    if get_user() == 'root':  # debuild case
+        monkeypatch.setattr(shutil, 'chown', fakechown)
 
     with workspace() as w:
         with open(config_files, "r") as main_file:
