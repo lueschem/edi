@@ -25,7 +25,7 @@ import tempfile
 import yaml
 import jinja2
 from codecs import open
-from edi.lib.helpers import chown_to_user
+from edi.lib.helpers import chown_to_user, FatalError
 from edi.lib.shellhelpers import run
 from edi.lib.configurationparser import remove_passwords
 
@@ -42,31 +42,35 @@ class CommandRunner():
 
         result = self.input_artifact
 
-        command_list = self.config.get_ordered_command_items(self.section)
-        for name, path, dictionary, output, require_root in command_list:
-            with tempfile.TemporaryDirectory(dir=workdir) as temp_directory:
-                chown_to_user(temp_directory)
+        command_list = self.config.get_ordered_path_items(self.section)
+        for name, path, dictionary, raw_node in command_list:
+            with tempfile.TemporaryDirectory(dir=workdir) as tmpdir:
+                chown_to_user(tmpdir)
 
-                with tempfile.TemporaryDirectory(dir=workdir) as edi_temp_directory:
-                    chown_to_user(edi_temp_directory)
+                output = raw_node.get('output')
+                require_root = raw_node.get('require_root', False)
 
-                    dictionary['edi_input_artifact'] = result
+                dictionary['edi_input_artifact'] = result
+                if output:
+                    if str(output) != os.path.basename(output):
+                        raise FatalError((('''The specified output '{}' within the command node '{}' is invalid.\n'''
+                                           '''The output shall be a file or a folder (no '/' in string).''')
+                                          ).format(output, name))
                     output_artifact = os.path.join(workdir, output)
                     dictionary['edi_output_artifact'] = str(output_artifact)
-                    dictionary['edi_temp_directory'] = str(temp_directory)
-                    dictionary['edi_plugin_directory'] = str(path)
-                    dictionary['edi_log_level'] = logging.getLevelName(logging.getLogger().getEffectiveLevel())
-                    self._write_dictionary_file(edi_temp_directory, dictionary)
-
-                    logging.info(("Running command {} located in "
-                                  "{} with dictionary:\n{}"
-                                  ).format(name, path,
-                                           yaml.dump(remove_passwords(dictionary),
-                                                     default_flow_style=False)))
-
-                    command_file = self._render_command_file(path, dictionary, edi_temp_directory)
-                    self._run_command(command_file, require_root)
                     result = str(output_artifact)
+
+                dictionary['edi_plugin_directory'] = str(path)
+                dictionary['edi_log_level'] = logging.getLevelName(logging.getLogger().getEffectiveLevel())
+
+                logging.info(("Running command {} located in "
+                              "{} with dictionary:\n{}"
+                              ).format(name, path,
+                                       yaml.dump(remove_passwords(dictionary),
+                                                 default_flow_style=False)))
+
+                command_file = self._render_command_file(path, dictionary, tmpdir)
+                self._run_command(command_file, require_root)
 
         return result
 
@@ -77,19 +81,9 @@ class CommandRunner():
         run(cmd, log_threshold=logging.INFO, sudo=require_root)
 
     @staticmethod
-    def _write_dictionary_file(directory, dictionary):
-        dictionary_file = os.path.join(directory, "dictionary.yml")
-        dictionary['edi_dictionary_file'] = str(dictionary_file)
-        with open(dictionary_file, encoding='utf-8', mode='w') as f:
-            f.write(yaml.dump(dictionary))
-        chown_to_user(dictionary_file)
-        return dictionary_file
-
-    @staticmethod
-    @staticmethod
     def _render_command_file(input_file, dictionary, output_dir):
         with open(input_file, encoding="UTF-8", mode="r") as template_file:
-            template = jinja2.Template(template_file.read(), trim_blocks=True, lstrip_blocks=True)
+            template = jinja2.Template(template_file.read())
             result = template.render(dictionary)
 
         filename = os.path.basename(input_file)

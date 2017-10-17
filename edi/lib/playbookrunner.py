@@ -47,7 +47,7 @@ class PlaybookRunner():
             inventory = self._write_inventory_file(tempdir)
 
             playbook_list = self.config.get_ordered_path_items("playbooks")
-            for name, path, extra_vars in playbook_list:
+            for name, path, extra_vars, _ in playbook_list:
                 sfc = SharedFolderCoordinator(self.config)
                 extra_vars['edi_shared_folder_mountpoints'] = sfc.get_mountpoints()
                 logging.info(("Running playbook {} located in "

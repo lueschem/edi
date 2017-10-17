@@ -118,7 +118,7 @@ class Lxc(Image):
             templates_dest = os.path.join(imagedir, "templates")
             os.mkdir(templates_dest)
 
-        for name, path, dictionary in template_list:
+        for name, path, dictionary, _ in template_list:
             logging.info(("Loading template {} located in "
                           "{} with dictionary:\n{}"
                           ).format(name, path,

@@ -111,7 +111,7 @@ class ConfigurationParser:
                 result[plugin_section] = []
 
             for plugin in plugins:
-                name, resolved_path, node_dict = plugin
+                name, resolved_path, node_dict, _ = plugin
 
                 if plugin_section == 'playbooks':
                     sfc = SharedFolderCoordinator(self)
@@ -166,7 +166,7 @@ class ConfigurationParser:
                                       ).format(section, name))
                 resolved_path = self._resolve_path(path)
                 node_dict = self._get_node_dictionary(content)
-                item_list.append((name, resolved_path, node_dict))
+                item_list.append((name, resolved_path, node_dict, content))
             else:
                 logging.debug("Skipping named item '{}' from section '{}'.".format(name, section))
 
