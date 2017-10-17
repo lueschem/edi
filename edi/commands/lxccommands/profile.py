@@ -67,7 +67,7 @@ class Profile(Lxc):
 
         profile_list = self.config.get_ordered_path_items("lxc_profiles")
         profile_name_list = []
-        for name, path, dictionary in profile_list:
+        for name, path, dictionary, _ in profile_list:
             logging.info(("Creating profile {} located in "
                           "{} with dictionary:\n{}"
                           ).format(name, path,

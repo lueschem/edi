@@ -60,7 +60,7 @@ def test_playbooks_overlay(config_files, monkeypatch):
                               "20_networking",
                               "30_foo"]
         for playbook, expected in zip(playbooks, expected_playbooks):
-            name, path, extra_vars = playbook
+            name, path, extra_vars, _ = playbook
             assert name == expected
             if name == "10_base_system":
                 value = extra_vars.get("kernel_package")

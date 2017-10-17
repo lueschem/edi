@@ -113,7 +113,7 @@ class ConfigurationParser:
             result[plugin_section] = []
 
         for plugin in plugins:
-            name, resolved_path, node_dict = plugin
+            name, resolved_path, node_dict, _ = plugin
 
             if plugin_section == 'playbooks':
                 sfc = SharedFolderCoordinator(self)
@@ -169,7 +169,9 @@ class ConfigurationParser:
                                       ).format(section, name))
                 resolved_path = self._resolve_path(path)
                 node_dict = self._get_node_dictionary(content)
-                item_list.append((name, resolved_path, node_dict))
+                node_dict['edi_current_plugin_directory'] = str(resolved_path)
+
+                item_list.append((name, resolved_path, node_dict, content))
             else:
                 logging.debug("Skipping named item '{}' from section '{}'.".format(name, section))
 
@@ -259,7 +261,7 @@ class ConfigurationParser:
                           ] = self._merge_key_value_node(base, overlay,
                                                          element)
 
-        nested_elements = ["playbooks", "keys", "lxc_templates",
+        nested_elements = ["playbooks", "postprocessing_commands", "keys", "lxc_templates",
                            "lxc_profiles", "shared_folders"]
         for element in nested_elements:
             merged_config[element
@@ -317,6 +319,7 @@ class ConfigurationParser:
         load_dict["edi_work_directory"] = self.get_workdir()
         load_dict["edi_config_directory"] = self.config_directory
         load_dict["edi_project_plugin_directory"] = self.get_project_plugin_directory()
+        load_dict['edi_log_level'] = logging.getLevelName(logging.getLogger().getEffectiveLevel())
         load_dict.update(ConfigurationParser.command_context)
         return load_dict
 
