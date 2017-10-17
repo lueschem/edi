@@ -44,11 +44,19 @@ class Profile(Lxc):
         parser.add_argument("-p", "--include-post-config", action="store_true",
                             help="include profiles that can only be applied after configuration")
 
+    def dry_run_cli(self, cli_args):
+        return self.dry_run(cli_args.config_file, include_post_config_profiles=cli_args.include_post_config)
+
+    def dry_run(self, config_file, include_post_config_profiles=False):
+        # TODO: evaluate include_post_config_profiles
+        self._setup_parser(config_file)
+        plugins = {}
+        plugins.update(self.config.get_plugins('lxc_profiles'))
+        return plugins
+
     def run_cli(self, cli_args):
         self.run(cli_args.config_file, include_post_config_profiles=cli_args.include_post_config,
-                 introspection_method=self._get_introspection_method(
-                     cli_args, ['lxc_profiles'])
-                 )
+                 introspection_method=self._get_introspection_method(cli_args))
 
     def run(self, config_file, include_post_config_profiles=False, introspection_method=None):
         self._setup_parser(config_file)

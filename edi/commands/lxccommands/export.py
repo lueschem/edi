@@ -41,9 +41,17 @@ class Export(Lxc):
         cls._offer_introspection_options(parser)
         cls._require_config_file(parser)
 
+    def dry_run_cli(self, cli_args):
+        return self.dry_run(cli_args.config_file)
+
+    def dry_run(self, config_file):
+        self._setup_parser(config_file)
+        plugins = {}
+        plugins.update(Publish().dry_run(config_file))
+        return plugins
+
     def run_cli(self, cli_args):
-        self.run(cli_args.config_file, introspection_method=self._get_introspection_method(
-            cli_args, ['lxc_templates', 'lxc_profiles', 'playbooks']))
+        self.run(cli_args.config_file, introspection_method=self._get_introspection_method(cli_args))
 
     def run(self, config_file, introspection_method=None):
         with command_context({'edi_create_distributable_image': True}):

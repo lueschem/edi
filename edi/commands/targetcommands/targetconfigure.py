@@ -40,10 +40,18 @@ class Configure(Target):
         parser.add_argument('ip_address')
         cls._require_config_file(parser)
 
+    def dry_run_cli(self, cli_args):
+        return self.dry_run(cli_args.ip_address, cli_args.config_file)
+
+    def dry_run(self, ip_address, config_file):
+        self._setup_parser(config_file)
+        plugins = {}
+        plugins.update(self.config.get_plugins('playbooks'))
+        return plugins
+
     def run_cli(self, cli_args):
         self.run(cli_args.ip_address, cli_args.config_file,
-                 introspection_method=self._get_introspection_method(
-                     cli_args, ['playbooks']))
+                 introspection_method=self._get_introspection_method(cli_args))
 
     def run(self, ip_address, config_file, introspection_method=None):
         self._setup_parser(config_file)

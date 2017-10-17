@@ -104,25 +104,24 @@ class ConfigurationParser:
     def get_load_time_dictionary(self):
         return self._get_load_time_dictionary()
 
-    def get_plugins(self, plugin_sections):
+    def get_plugins(self, plugin_section):
         result = {}
 
-        for plugin_section in plugin_sections:
-            plugins = self.get_ordered_path_items(plugin_section)
+        plugins = self.get_ordered_path_items(plugin_section)
 
-            if plugins:
-                result[plugin_section] = []
+        if plugins:
+            result[plugin_section] = []
 
-            for plugin in plugins:
-                name, resolved_path, node_dict = plugin
+        for plugin in plugins:
+            name, resolved_path, node_dict = plugin
 
-                if plugin_section == 'playbooks':
-                    sfc = SharedFolderCoordinator(self)
-                    node_dict['edi_shared_folder_mountpoints'] = sfc.get_mountpoints()
+            if plugin_section == 'playbooks':
+                sfc = SharedFolderCoordinator(self)
+                node_dict['edi_shared_folder_mountpoints'] = sfc.get_mountpoints()
 
-                plugin_info = {name: {'path': resolved_path, 'dictionary': node_dict}}
+            plugin_info = {name: {'path': resolved_path, 'dictionary': node_dict}}
 
-                result[plugin_section].append(plugin_info)
+            result[plugin_section].append(plugin_info)
 
         return result
 

@@ -44,17 +44,27 @@ class Configure(Lxc):
         parser.add_argument('container_name')
         cls._require_config_file(parser)
 
+    def dry_run_cli(self, cli_args):
+        return self.dry_run(cli_args.container_name, cli_args.config_file)
+
+    def dry_run(self, container_name, config_file):
+        self._setup_parser(config_file)
+        plugins = {}
+        plugins.update(Launch().dry_run(container_name, config_file))
+        plugins.update(self.config.get_plugins('playbooks'))
+        plugins.update(Profile().dry_run(config_file, include_post_config_profiles=True))
+        return plugins
+
     def run_cli(self, cli_args):
         self.run(cli_args.container_name, cli_args.config_file,
-                 introspection_method=self._get_introspection_method(
-                     cli_args, ['lxc_templates', 'lxc_profiles', 'playbooks']))
+                 introspection_method=self._get_introspection_method(cli_args))
 
     def run(self, container_name, config_file, introspection_method=None):
         self._setup_parser(config_file)
         self.container_name = container_name
 
         if introspection_method:
-            print(introspection_method())
+            self._print(introspection_method())
             return self._result()
 
         Launch().run(container_name, config_file)
