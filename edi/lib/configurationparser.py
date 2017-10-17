@@ -258,7 +258,7 @@ class ConfigurationParser:
                           ] = self._merge_key_value_node(base, overlay,
                                                          element)
 
-        nested_elements = ["playbooks", "image_creation_commands", "keys", "lxc_templates",
+        nested_elements = ["playbooks", "postprocessing_commands", "keys", "lxc_templates",
                            "lxc_profiles", "shared_folders"]
         for element in nested_elements:
             merged_config[element

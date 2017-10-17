@@ -50,7 +50,7 @@ playbooks:
     20_networking:
         path:               playbooks/bar.yml
 
-image_creation_commands:
+postprocessing_commands:
     10_first_step:
         path:               commands/command
         output:             first.txt
@@ -71,7 +71,7 @@ shared_folders:
 bootstrap:
     repository_key:     https://ftp-master.debian.org/keys/archive-key-8.asc
 
-image_creation_commands:
+postprocessing_commands:
     20_second_step:
         path:               commands/command
         parameters:

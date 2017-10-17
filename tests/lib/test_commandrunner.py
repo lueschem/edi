@@ -57,7 +57,7 @@ def test_run_all(config_files, monkeypatch):
             with open(input_file, mode='w', encoding='utf-8') as i:
                 i.write("*input file*\n")
 
-            runner = CommandRunner(parser, 'image_creation_commands', input_file)
+            runner = CommandRunner(parser, 'postprocessing_commands', input_file)
 
             output = runner.run_all()
 
