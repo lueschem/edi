@@ -49,6 +49,15 @@ playbooks:
             message:        some message
     20_networking:
         path:               playbooks/bar.yml
+
+image_creation_commands:
+    10_first_step:
+        path:               commands/command
+        output:             first.txt
+        parameters:
+            message:        "*first step*"
+    20_second_step:
+        path:               commands/does_not_exist
 """
 
 sample_global_file = """
@@ -61,6 +70,22 @@ shared_folders:
 
 bootstrap:
     repository_key:     https://ftp-master.debian.org/keys/archive-key-8.asc
+
+image_creation_commands:
+    20_second_step:
+        path:               commands/command
+        parameters:
+            message:        "*second step* (not printed since no output specified)"
+    30_third_step:
+        path:               commands/skipped
+        skip:               True
+    40_fourth_step:
+        path:               commands/command
+        parameters:
+            message:        "*last step*"
+        require_root:       False
+        output:             last.txt
+
 """
 
 sample_system_file = """
@@ -94,6 +119,30 @@ playbooks:
         skip: True
 """
 
+sample_command = """#!/bin/bash
+
+set -o nounset
+set -o errexit
+set -o pipefail
+
+INPUT_FILE="{{ edi_input_artifact }}"
+OUTPUT_FILE="{{ edi_output_artifact }}"
+MESSAGE="{{ message }}"
+
+if [ "${INPUT_FILE}" == "" ]
+then
+    exit 1
+fi
+
+if [ "${OUTPUT_FILE}" == "" ]
+then
+    exit 0
+fi
+
+cp ${INPUT_FILE} ${OUTPUT_FILE}
+echo "${MESSAGE}" >> ${OUTPUT_FILE}
+"""
+
 config_name = "sample"
 empty_config_name = "empty"
 empty_overlay_config_name = "hugo"
@@ -121,6 +170,13 @@ def config_files(tmpdir_factory):
     os.makedirs(str(playbook_dir))
     with open(str(playbook_dir.join("foo.yml")), "w") as file:
         file.write("baz")
+
+    commands_dir = dir_name.join("plugins", "commands")
+    os.makedirs(str(commands_dir))
+
+    with open(str(commands_dir.join("command")), "w") as file:
+        file.write(sample_command)
+
     return str(dir_name.join(main_file))
 
 

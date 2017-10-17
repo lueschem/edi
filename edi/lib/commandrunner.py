@@ -24,6 +24,7 @@ import logging
 import tempfile
 import yaml
 import jinja2
+import stat
 from codecs import open
 from edi.lib.helpers import chown_to_user, FatalError
 from edi.lib.shellhelpers import run
@@ -72,7 +73,7 @@ class CommandRunner():
         return result
 
     @staticmethod
-    def _run_command(self, command_file, require_root):
+    def _run_command(command_file, require_root):
         cmd = [command_file]
 
         run(cmd, log_threshold=logging.INFO, sudo=require_root)
@@ -89,7 +90,7 @@ class CommandRunner():
             result_file.write(result)
 
         st = os.stat(output_file)
-        os.chmod(output_file, st.st_mode | os.stat.S_IEXEC)
+        os.chmod(output_file, st.st_mode | stat.S_IEXEC)
 
         chown_to_user(output_file)
 
