@@ -65,34 +65,37 @@ class Profile(Lxc):
             self._print(introspection_method())
             return []
 
-        profile_list = self.config.get_ordered_path_items("lxc_profiles")
         profile_name_list = []
-        for name, path, dictionary, _ in profile_list:
+
+        for profile, name, path, dictionary in self._get_profiles(include_post_config_profiles):
             logging.info(("Creating profile {} located in "
                           "{} with dictionary:\n{}"
                           ).format(name, path,
                                    yaml.dump(remove_passwords(dictionary),
                                              default_flow_style=False)))
 
-            with open(path, encoding="UTF-8", mode="r") as profile_file:
-                profile = Template(profile_file.read())
-                profile_text = profile.render(dictionary)
-                name, new_profile = write_lxc_profile(profile_text)
-                if new_profile:
-                    print_success("Created lxc profile {}.".format(name))
-                profile_name_list.append(name)
-
-        sfc = SharedFolderCoordinator(self.config)
-        if include_post_config_profiles:
-            sfc_profiles = sfc.get_post_config_profiles()
-        else:
-            sfc_profiles = sfc.get_pre_config_profiles()
-
-        for profile in sfc_profiles:
-            name, new_profile = write_lxc_profile(profile)
+            full_name, new_profile = write_lxc_profile(profile)
             if new_profile:
-                print_success("Created lxc profile {}.".format(name))
-            profile_name_list.append(name)
+                print_success("Created lxc profile {}.".format(full_name))
+            profile_name_list.append(full_name)
 
         print_success('The following profiles are now available: {}'.format(', '.join(profile_name_list)))
         return profile_name_list
+
+    def _get_profiles(self, include_post_config_profiles):
+        collected_profiles = []
+        profile_list = self.config.get_ordered_path_items("lxc_profiles")
+        for name, path, dictionary, _ in profile_list:
+            with open(path, encoding="UTF-8", mode="r") as profile_file:
+                profile = Template(profile_file.read())
+                profile_text = profile.render(dictionary)
+                collected_profiles.append((profile_text, name, path, dictionary))
+
+        sfc = SharedFolderCoordinator(self.config)
+        if include_post_config_profiles:
+            collected_profiles.extend(sfc.get_post_config_profiles())
+        else:
+            collected_profiles.extend(sfc.get_pre_config_profiles())
+
+        return collected_profiles
+

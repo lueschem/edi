@@ -27,6 +27,7 @@ import os
 
 
 def test_dictionary(config_files, capsys):
+    # TODO: apply to all introspection aware commands
     parser = edi._setup_command_line_interface()
     cli_args = parser.parse_args(['lxc', 'configure', '--dictionary', 'cname', config_files])
 

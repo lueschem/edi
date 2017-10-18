@@ -106,7 +106,7 @@ def test_pre_config_profiles(config_files):
 
         assert len(profiles) == 1
 
-        assert profiles[0] == expected_profiles[0]
+        assert profiles[0][0] == expected_profiles[0]
 
 
 def test_post_config_profiles(config_files):
@@ -121,7 +121,7 @@ def test_post_config_profiles(config_files):
         assert len(profiles) == 3
 
         for i in range(0, 3):
-            assert profiles[i] == expected_profiles[i]
+            assert profiles[i][0] == expected_profiles[i]
 
 
 def test_get_mountpoints(config_files):
