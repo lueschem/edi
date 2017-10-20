@@ -30,10 +30,12 @@ from edi.commands.lxccommands.publish import Publish
 from edi.commands.lxccommands.stop import Stop
 from edi.commands.qemucommands.fetch import Fetch
 from edi.commands.targetcommands.targetconfigure import Configure as TargetConfigure
+from edi.lib.shellhelpers import mockablerun
 import edi
 import yaml
 import os
 import pytest
+import subprocess
 
 
 @pytest.mark.parametrize("command, command_args, has_templates, has_profiles, has_playbooks", [
@@ -49,8 +51,15 @@ import pytest
     (Fetch, ['qemu', 'fetch', '--plugins'], False, False, False),
     (TargetConfigure, ['target', 'configure', '--plugins', '1.2.3.4'], False, False, True),
 ])
-def test_plugins(config_files, capsys, command, command_args, has_templates, has_profiles, has_playbooks):
-    # TODO: apply to all introspection aware commands
+def test_plugins(monkeypatch, config_files, capsys, command, command_args, has_templates, has_profiles, has_playbooks):
+    def fake_lxc_config_command(*popenargs, **kwargs):
+        if 'images.compression_algorithm' in popenargs[0]:
+            return subprocess.CompletedProcess("fakerun", 0, '')
+        else:
+            return subprocess.run(*popenargs, **kwargs)
+
+    monkeypatch.setattr(mockablerun, 'run_mockable', fake_lxc_config_command)
+
     parser = edi._setup_command_line_interface()
     command_args.append(config_files)
     cli_args = parser.parse_args(command_args)

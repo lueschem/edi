@@ -30,10 +30,12 @@ from edi.commands.lxccommands.publish import Publish
 from edi.commands.lxccommands.stop import Stop
 from edi.commands.qemucommands.fetch import Fetch
 from edi.commands.targetcommands.targetconfigure import Configure as TargetConfigure
+from edi.lib.shellhelpers import mockablerun
 import edi
 import yaml
 import os
 import pytest
+import subprocess
 
 
 @pytest.mark.parametrize("command, command_args", [
@@ -49,7 +51,15 @@ import pytest
     (Fetch, ['qemu', 'fetch', '--dictionary']),
     (TargetConfigure, ['target', 'configure', '--dictionary', '1.2.3.4']),
 ])
-def test_dictionary(config_files, capsys, command, command_args):
+def test_dictionary(monkeypatch, config_files, capsys, command, command_args):
+    def fake_lxc_config_command(*popenargs, **kwargs):
+        if 'images.compression_algorithm' in popenargs[0]:
+            return subprocess.CompletedProcess("fakerun", 0, '')
+        else:
+            return subprocess.run(*popenargs, **kwargs)
+
+    monkeypatch.setattr(mockablerun, 'run_mockable', fake_lxc_config_command)
+
     parser = edi._setup_command_line_interface()
     command_args.append(config_files)
     cli_args = parser.parse_args(command_args)
