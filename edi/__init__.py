@@ -23,7 +23,7 @@ import sys
 import argparse
 import argcomplete
 import logging
-from edi.commands import *
+from edi.commands import *  # noqa: ignore=F401,F403
 from edi.lib.commandfactory import get_sub_commands, get_command
 from edi.lib.helpers import print_error_and_exit, FatalError
 from edi.lib.edicommand import EdiCommand
