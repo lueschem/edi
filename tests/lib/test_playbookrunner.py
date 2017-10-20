@@ -21,7 +21,6 @@
 
 from edi.lib.configurationparser import ConfigurationParser
 from edi.lib.playbookrunner import PlaybookRunner
-from tests.libtesting.fixtures.configfiles import config_files
 from tests.libtesting.helpers import get_command, get_command_parameter
 from edi.lib import mockablerun
 import shutil

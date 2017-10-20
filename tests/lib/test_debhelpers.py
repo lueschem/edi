@@ -25,7 +25,6 @@ import hashlib
 import codecs
 import gzip
 import subprocess
-from tests.libtesting.fixtures.datadir import datadir
 from edi.lib.debhelpers import PackageDownloader
 from edi.lib.helpers import which
 

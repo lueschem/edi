@@ -47,7 +47,6 @@ from edi.lib.shellhelpers import get_user_environment_variable
 from edi.lib.configurationparser import ConfigurationParser, command_context
 from edi.lib.sharedfoldercoordinator import SharedFolderCoordinator
 from tests.libtesting.helpers import get_command, get_sub_command, get_command_parameter
-from tests.libtesting.fixtures.configfiles import config_files, empty_config_file
 from edi.lib.yamlhelpers import normalize_yaml
 import subprocess
 from edi.lib import mockablerun

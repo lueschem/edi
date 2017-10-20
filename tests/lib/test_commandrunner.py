@@ -21,7 +21,6 @@
 
 from edi.lib.configurationparser import ConfigurationParser
 from edi.lib.commandrunner import CommandRunner
-from tests.libtesting.fixtures.configfiles import config_files
 from tests.libtesting.contextmanagers.workspace import workspace
 from tests.libtesting.helpers import get_command
 from edi.lib import mockablerun

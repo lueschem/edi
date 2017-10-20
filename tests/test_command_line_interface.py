@@ -20,7 +20,6 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 import edi
-from tests.libtesting.fixtures.configfiles import empty_config_file
 
 
 def test_command_line_interface_setup(empty_config_file):

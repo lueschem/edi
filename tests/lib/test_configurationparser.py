@@ -21,10 +21,9 @@
 
 from aptsources.sourceslist import SourceEntry
 from edi.lib.configurationparser import ConfigurationParser, command_context
-from tests.libtesting.fixtures.configfiles import config_files, config_name, empty_overlay_config_file
 
 
-def test_project_name(config_files):
+def test_project_name(config_files, config_name):
     with open(config_files, "r") as main_file:
         parser = ConfigurationParser(main_file)
         assert parser.get_project_name() == config_name
