@@ -22,13 +22,15 @@
 from tests.libtesting.optins import requires_flake8
 from edi.lib.shellhelpers import run
 import os
+import subprocess
 
 
 @requires_flake8
 def test_flake8():
     path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     cmd = ['flake8', '--max-line-length=120', path]
-    result = run(cmd, check=False)
+    result = run(cmd, check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if result.returncode != 0:
         print(result.stdout)
+        print(result.stderr)
         assert False, "flake8 reported errors!"
