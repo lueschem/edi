@@ -28,9 +28,13 @@ from edi.lib.helpers import print_success
 from edi.lib.sharedfoldercoordinator import SharedFolderCoordinator
 from edi.lib.configurationparser import remove_passwords
 from edi.lib.lxchelpers import write_lxc_profile
+from edi.lib.yamlhelpers import LiteralString
 
 
 class Profile(Lxc):
+
+    def __init__(self):
+        self.config_section = 'lxc_profiles'
 
     @classmethod
     def advertise(cls, subparsers):
@@ -48,10 +52,9 @@ class Profile(Lxc):
         return self.dry_run(cli_args.config_file, include_post_config_profiles=cli_args.include_post_config)
 
     def dry_run(self, config_file, include_post_config_profiles=False):
-        # TODO: evaluate include_post_config_profiles
         self._setup_parser(config_file)
         plugins = {}
-        plugins.update(self.config.get_plugins('lxc_profiles'))
+        plugins.update(self._get_plugin_report(include_post_config_profiles))
         return plugins
 
     def run_cli(self, cli_args):
@@ -84,7 +87,7 @@ class Profile(Lxc):
 
     def _get_profiles(self, include_post_config_profiles):
         collected_profiles = []
-        profile_list = self.config.get_ordered_path_items("lxc_profiles")
+        profile_list = self.config.get_ordered_path_items(self.config_section)
         for name, path, dictionary, _ in profile_list:
             with open(path, encoding="UTF-8", mode="r") as profile_file:
                 profile = Template(profile_file.read())
@@ -98,4 +101,20 @@ class Profile(Lxc):
             collected_profiles.extend(sfc.get_pre_config_profiles())
 
         return collected_profiles
+
+    def _get_plugin_report(self, include_post_config_profiles):
+        result = {}
+        profiles = self._get_profiles(include_post_config_profiles)
+
+        if profiles:
+            result[self.config_section] = []
+
+        for profile in profiles:
+            profile_text, name, path, dictionary = profile
+
+            plugin_info = {name: {'path': path, 'dictionary': dictionary, 'result': LiteralString(profile_text)}}
+
+            result[self.config_section].append(plugin_info)
+
+        return result
 

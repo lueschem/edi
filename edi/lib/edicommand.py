@@ -133,7 +133,7 @@ class EdiCommand(metaclass=CommandFactory):
 
     @staticmethod
     def _dump(introspection_result):
-        return yaml.dump(introspection_result, default_flow_style=False)
+        return yaml.dump(introspection_result, default_flow_style=False, width=1000)
 
     def _print(self, introspection_result):
         print(self._dump(introspection_result))
