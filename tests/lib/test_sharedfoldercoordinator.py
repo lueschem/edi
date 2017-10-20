@@ -85,13 +85,13 @@ devices:
 
 def render_expected_profiles():
     user = get_user()
-    dict = {'user': get_user(),
-            'home': get_user_environment_variable('HOME'),
-            'target_home': '/home/{}'.format(user)}
+    dictionary = {'user': get_user(),
+                  'home': get_user_environment_variable('HOME'),
+                  'target_home': '/home/{}'.format(user)}
     expected_profiles = []
     for boilerplate in expected_profile_boilerplates:
         template = Template(boilerplate)
-        expected_profiles.append(normalize_yaml(template.render(dict)))
+        expected_profiles.append(normalize_yaml(template.render(dictionary)))
     return expected_profiles
 
 
@@ -202,7 +202,7 @@ def test_get_mandatory_item():
     assert 'mountpoint' in missing.value.message
 
     with pytest.raises(FatalError) as subfolder:
-        SharedFolderCoordinator._get_mandatory_item('some_folder', {'mountpoint': 'mount/point' }, 'mountpoint')
+        SharedFolderCoordinator._get_mandatory_item('some_folder', {'mountpoint': 'mount/point'}, 'mountpoint')
     assert 'some_folder' in subfolder.value.message
     assert 'mountpoint' in subfolder.value.message
 
@@ -239,7 +239,7 @@ def test_create_host_folders_folder_exists(config_files, monkeypatch):
 
         monkeypatch.setattr(os.path, 'exists', fake_os_path_exists)
 
-        coordinator.create_host_folders() # nothing to do
+        coordinator.create_host_folders()  # nothing to do
 
 
 def test_create_host_folders_not_a_folder(config_files, monkeypatch):
@@ -259,7 +259,7 @@ def test_create_host_folders_not_a_folder(config_files, monkeypatch):
         monkeypatch.setattr(os.path, 'exists', fake_os_path_exists)
 
         with pytest.raises(FatalError) as error:
-            coordinator.create_host_folders() # exists but not a folder
+            coordinator.create_host_folders()  # exists but not a folder
 
         assert 'valid_folder' in error.value.message
 
@@ -314,7 +314,7 @@ def test_create_host_folders_successful_create(config_files, monkeypatch):
 
         monkeypatch.setattr(mockablerun, 'run_mockable', fake_mkdir_command)
 
-        coordinator.create_host_folders() # successful mkdir
+        coordinator.create_host_folders()  # successful mkdir
 
 
 def test_create_host_folders_failed_create(config_files, monkeypatch):
@@ -343,7 +343,7 @@ def test_create_host_folders_failed_create(config_files, monkeypatch):
         monkeypatch.setattr(mockablerun, 'run_mockable', fake_mkdir_command)
 
         with pytest.raises(FatalError) as error:
-            coordinator.create_host_folders() # failed mkdir
+            coordinator.create_host_folders()  # failed mkdir
 
         assert 'valid_folder' in error.value.message
         assert 'no permission' in error.value.message

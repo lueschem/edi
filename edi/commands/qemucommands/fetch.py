@@ -21,13 +21,14 @@
 
 from edi.commands.qemu import Qemu
 from edi.lib.helpers import print_success, chown_to_user, FatalError
-from edi.lib.shellhelpers import get_user_environment_variable, get_debian_architecture
+from edi.lib.shellhelpers import get_debian_architecture
 import apt_inst
 import tempfile
 import os
 import logging
 import shutil
 from edi.lib.debhelpers import PackageDownloader
+
 
 class Fetch(Qemu):
 

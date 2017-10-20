@@ -20,7 +20,6 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 from edi.lib.edicommand import EdiCommand
-from edi.lib.commandfactory import get_sub_commands
 
 
 class Clean(EdiCommand):

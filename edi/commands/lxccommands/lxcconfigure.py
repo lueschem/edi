@@ -90,4 +90,3 @@ class Configure(Lxc):
 
     def _result(self):
         return self.container_name
-

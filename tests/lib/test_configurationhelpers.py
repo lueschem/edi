@@ -32,7 +32,7 @@ from codecs import open
 def test_configuration_rendering(tmpdir):
     source = os.path.join(get_edi_plugin_directory(), 'config_templates', 'project_tree')
     assert os.path.isdir(source)
-    assert not os.listdir(str(tmpdir)) # target should be empty
+    assert not os.listdir(str(tmpdir))  # target should be empty
 
     copy_tree(source, str(tmpdir))
     template_link = os.path.join(str(tmpdir), 'PROJECTNAME-develop.yml.edilink')

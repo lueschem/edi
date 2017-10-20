@@ -117,4 +117,3 @@ class Profile(Lxc):
             result[self.config_section].append(plugin_info)
 
         return result
-

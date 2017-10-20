@@ -30,4 +30,4 @@ def test_command_line_interface_setup(empty_config_file):
     assert str(args.config_file.name) == str(empty_config_file)
     assert args.container_name == 'some-container'
     assert args.sub_command_name == 'configure'
-    assert args.verbose == True
+    assert args.verbose is True
