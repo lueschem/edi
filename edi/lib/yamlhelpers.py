@@ -31,3 +31,12 @@ def literal_string_representer(dumper, data):
 
 
 yaml.add_representer(LiteralString, literal_string_representer)
+
+
+def normalize_yaml(yaml_string):
+    """
+    Feeds a yaml string through pyyaml to normalize its representation.
+    :param yaml_string: string in yaml format
+    :return: string in yaml format with pyyaml default_flow_style=False
+    """
+    return yaml.dump(yaml.load(yaml_string), default_flow_style=False)

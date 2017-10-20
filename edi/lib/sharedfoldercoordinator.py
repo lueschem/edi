@@ -26,6 +26,7 @@ from edi.lib.shellhelpers import run
 import os
 import logging
 import subprocess
+from edi.lib.yamlhelpers import normalize_yaml
 
 
 profile_privileged = """
@@ -127,7 +128,7 @@ class SharedFolderCoordinator():
             return []
 
         if self._config.get_ordered_raw_items('shared_folders'):
-            return [(Template(profile_privileged).render({}), 'zzz_privileged', 'builtin', {})]
+            return [(normalize_yaml(Template(profile_privileged).render({})), 'zzz_privileged', 'builtin', {})]
         else:
             return []
 
@@ -147,7 +148,8 @@ class SharedFolderCoordinator():
                 for item in ['folder', 'mountpoint']:
                     node_dict['shared_folder_{}'.format(item)] = self._get_mandatory_item(name, content, item)
                 node_dict['shared_folder_name'] = name
-                profiles.append((template.render(node_dict), 'zzz_{}'.format(name), 'builtin', node_dict))
+                profiles.append((normalize_yaml(template.render(node_dict)),
+                                 'zzz_{}'.format(name), 'builtin', node_dict))
 
             return profiles
         else:
