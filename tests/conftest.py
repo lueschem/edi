@@ -33,6 +33,8 @@ def pytest_addoption(parser):
                      help="include tests that rely on ansible availability")
     parser.addoption("--debootstrap", action="store_true",
                      help="include tests that rely on debootstrap availability")
+    parser.addoption("--flake8", action="store_true",
+                     help="include tests that rely on flake8 availability")
 
 
 @fixture

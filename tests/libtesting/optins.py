@@ -42,6 +42,12 @@ requires_debootstrap = pytest.mark.skipif(
 )
 
 
+requires_flake8 = pytest.mark.skipif(
+    not (pytest.config.getoption("--flake8") or pytest.config.getoption("--all")),
+    reason="requires --flake8 option to run"
+)
+
+
 requires_sudo = pytest.mark.skipif(
     os.getuid() != 0,
     reason="requires sudo privileges to run"
