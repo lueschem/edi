@@ -48,6 +48,7 @@ from edi.lib.configurationparser import ConfigurationParser, command_context
 from edi.lib.sharedfoldercoordinator import SharedFolderCoordinator
 from tests.libtesting.helpers import get_command, get_sub_command, get_command_parameter
 from tests.libtesting.fixtures.configfiles import config_files, empty_config_file
+from edi.lib.yamlhelpers import normalize_yaml
 import subprocess
 from edi.lib import mockablerun
 import pytest
@@ -58,7 +59,7 @@ expected_profile_boilerplates = [
 name: privileged
 description: Privileged edi lxc container
 config:
-  security.privileged: "true"
+  security.privileged: 'true'
 devices: {}
 """,
     """
@@ -91,7 +92,7 @@ def render_expected_profiles():
     expected_profiles = []
     for boilerplate in expected_profile_boilerplates:
         template = Template(boilerplate)
-        expected_profiles.append(template.render(dict))
+        expected_profiles.append(normalize_yaml(template.render(dict)))
     return expected_profiles
 
 

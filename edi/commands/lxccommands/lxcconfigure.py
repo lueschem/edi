@@ -32,6 +32,7 @@ class Configure(Lxc):
 
     def __init__(self):
         self.container_name = ""
+        self.ansible_connection = 'lxd'
 
     @classmethod
     def advertise(cls, subparsers):
@@ -51,7 +52,8 @@ class Configure(Lxc):
         self._setup_parser(config_file)
         plugins = {}
         plugins.update(Launch().dry_run(container_name, config_file))
-        plugins.update(self.config.get_plugins('playbooks'))
+        playbook_runner = PlaybookRunner(self.config, self._result(), self.ansible_connection)
+        plugins.update(playbook_runner.get_plugin_report())
         plugins.update(Profile().dry_run(config_file, include_post_config_profiles=True))
         return plugins
 
@@ -71,7 +73,7 @@ class Configure(Lxc):
 
         print("Going to configure container {} - be patient.".format(self._result()))
 
-        playbook_runner = PlaybookRunner(self.config, self._result(), "lxd")
+        playbook_runner = PlaybookRunner(self.config, self._result(), self.ansible_connection)
         playbook_runner.run_all()
 
         sfc = SharedFolderCoordinator(self.config)
@@ -88,3 +90,4 @@ class Configure(Lxc):
 
     def _result(self):
         return self.container_name
+

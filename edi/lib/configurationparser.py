@@ -34,7 +34,6 @@ from edi.lib.shellhelpers import get_user_environment_variable
 from edi.lib.lxchelpers import get_lxd_version
 from packaging.version import Version
 from edi.lib.urlhelpers import obfuscate_url_password
-from edi.lib.sharedfoldercoordinator import SharedFolderCoordinator
 
 
 def remove_passwords(dictionary):
@@ -114,10 +113,6 @@ class ConfigurationParser:
 
         for plugin in plugins:
             name, resolved_path, node_dict, _ = plugin
-
-            if plugin_section == 'playbooks':
-                sfc = SharedFolderCoordinator(self)
-                node_dict['edi_shared_folder_mountpoints'] = sfc.get_mountpoints()
 
             plugin_info = {name: {'path': resolved_path, 'dictionary': node_dict}}
 
