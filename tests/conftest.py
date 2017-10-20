@@ -70,6 +70,14 @@ bootstrap:
     architecture:           amd64
     repository:             deb http://ftp.ch.debian.org/debian/ jessie main
 
+lxc_templates:
+    10_foo:
+        path:              templates/foo.yml
+
+lxc_profiles:
+    10_foo:
+        path:              profiles/foo.yml
+
 playbooks:
     10_base_system:
         path:               playbooks/foo.yml
@@ -200,10 +208,11 @@ def config_files(tmpdir_factory):
         with open(str(overlay_dir.join(o_file_name)), "w") as o_file:
             o_file.write(o_content)
 
-    playbook_dir = dir_name.join("plugins", "playbooks")
-    os.makedirs(str(playbook_dir))
-    with open(str(playbook_dir.join("foo.yml")), "w") as file:
-        file.write("baz")
+    for subdir in ['playbooks', 'templates', 'profiles']:
+        directory = dir_name.join("plugins", subdir)
+        os.makedirs(str(directory))
+        with open(str(directory.join("foo.yml")), "w") as file:
+            file.write("baz")
 
     commands_dir = dir_name.join("plugins", "commands")
     os.makedirs(str(commands_dir))

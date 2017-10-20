@@ -37,5 +37,6 @@ class Version(EdiCommand):
         version = self.run()
         print(version)
 
-    def run(self):
+    @staticmethod
+    def run():
         return get_edi_version()
