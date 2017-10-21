@@ -26,7 +26,7 @@ from edi.lib.configurationparser import command_context
 from edi.lib.lxchelpers import (export_image, get_file_extension_from_image_compression_algorithm,
                                 get_server_image_compression_algorithm)
 from edi.commands.lxccommands.publish import Publish
-from edi.lib.helpers import print_success
+from edi.lib.helpers import print_success, get_workdir
 
 
 class Export(Lxc):
@@ -96,10 +96,10 @@ class Export(Lxc):
                                 self._get_command_file_name_prefix())
 
     def _image_without_extension(self):
-        return os.path.join(self.config.get_workdir(), self._result_base_name())
+        return os.path.join(get_workdir(), self._result_base_name())
 
     def _result(self):
         algorithm = get_server_image_compression_algorithm()
         extension = get_file_extension_from_image_compression_algorithm(algorithm)
         archive = "{}{}".format(self._result_base_name(), extension)
-        return os.path.join(self.config.get_workdir(), archive)
+        return os.path.join(get_workdir(), archive)

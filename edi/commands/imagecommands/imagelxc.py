@@ -32,7 +32,7 @@ from codecs import open
 from edi.commands.image import Image
 from edi.commands.imagecommands.bootstrap import Bootstrap
 from edi.lib.yamlhelpers import LiteralString, normalize_yaml
-from edi.lib.helpers import chown_to_user, print_success
+from edi.lib.helpers import chown_to_user, print_success, get_workdir
 from edi.lib.shellhelpers import get_debian_architecture
 from edi.lib.configurationparser import remove_passwords
 
@@ -85,7 +85,7 @@ class Lxc(Image):
         # This command is based upon the output of the bootstrap command
         bootstrap_result = bootstrap_cmd.run(config_file)
 
-        workdir = self.config.get_workdir()
+        workdir = get_workdir()
 
         print("Going to upgrade the bootstrap image to a lxc image.")
 
@@ -115,7 +115,7 @@ class Lxc(Image):
                         ).format(self.config.get_project_name(),
                                  self._get_command_file_name_prefix(),
                                  self.config.get_compression())
-        return os.path.join(self.config.get_workdir(), archive_name)
+        return os.path.join(get_workdir(), archive_name)
 
     def _write_container_metadata(self, imagedir):
         metadata = {}

@@ -28,7 +28,7 @@ from aptsources.sourceslist import SourceEntry
 from edi.commands.image import Image
 from edi.commands.qemucommands.fetch import Fetch
 from edi.lib.helpers import (require_executable, FatalError,
-                             chown_to_user, print_success)
+                             chown_to_user, print_success, get_workdir)
 from edi.lib.shellhelpers import run, get_chroot_cmd
 from edi.lib.keyhelpers import fetch_repository_key, build_keyring
 
@@ -82,7 +82,7 @@ class Bootstrap(Image):
 
         require_executable("debootstrap", "sudo apt install debootstrap")
 
-        workdir = self.config.get_workdir()
+        workdir = get_workdir()
 
         with tempfile.TemporaryDirectory(dir=workdir) as tempdir:
             chown_to_user(tempdir)
@@ -111,7 +111,7 @@ class Bootstrap(Image):
                         ).format(self.config.get_project_name(),
                                  self._get_command_file_name_prefix(),
                                  self.config.get_compression())
-        return os.path.join(self.config.get_workdir(), archive_name)
+        return os.path.join(get_workdir(), archive_name)
 
     def _run_debootstrap(self, tempdir, keyring_file, qemu_executable):
         # Ansible uses python on the target system

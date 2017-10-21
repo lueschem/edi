@@ -128,3 +128,19 @@ def require_executable(executable, hint):
 
 def chown_to_user(path):
     shutil.chown(path, get_user_uid(), get_user_gid())
+
+
+def get_workdir():
+    return os.getcwd()
+
+
+def get_artifact_dir():
+    return os.path.join(get_workdir(), 'edi-artifacts')
+
+
+def create_artifact_dir():
+    directory = get_artifact_dir()
+    if not os.path.isdir(directory):
+        logging.info('''Creating artifact directory '{}'.'''.format(directory))
+        os.mkdir(directory)
+        chown_to_user(directory)

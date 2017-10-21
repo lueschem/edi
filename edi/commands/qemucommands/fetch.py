@@ -20,7 +20,7 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 from edi.commands.qemu import Qemu
-from edi.lib.helpers import print_success, chown_to_user, FatalError
+from edi.lib.helpers import print_success, chown_to_user, FatalError, get_workdir
 from edi.lib.shellhelpers import get_debian_architecture
 import apt_inst
 import tempfile
@@ -72,7 +72,7 @@ class Fetch(Qemu):
         qemu_package = self.config.get_qemu_package_name()
         print("Going to fetch qemu Debian package ({}).".format(qemu_package))
 
-        workdir = self.config.get_workdir()
+        workdir = get_workdir()
 
         with tempfile.TemporaryDirectory(dir=workdir) as tempdir:
             chown_to_user(tempdir)
@@ -112,7 +112,7 @@ class Fetch(Qemu):
         if not self._needs_qemu():
             return None
         else:
-            return os.path.join(self.config.get_workdir(), self._get_qemu_binary_name())
+            return os.path.join(get_workdir(), self._get_qemu_binary_name())
 
     def _get_qemu_binary_name(self):
         arch_dict = {'amd64': 'x86_64',

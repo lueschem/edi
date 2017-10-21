@@ -25,7 +25,7 @@ import tempfile
 import yaml
 from codecs import open
 from edi.lib.helpers import chown_to_user
-from edi.lib.helpers import require_executable, get_user
+from edi.lib.helpers import require_executable, get_user, get_workdir
 from edi.lib.shellhelpers import run
 from edi.lib.sharedfoldercoordinator import SharedFolderCoordinator
 from edi.lib.configurationparser import remove_passwords
@@ -40,7 +40,7 @@ class PlaybookRunner():
         self.config_section = 'playbooks'
 
     def run_all(self):
-        workdir = self.config.get_workdir()
+        workdir = get_workdir()
 
         applied_playbooks = []
         with tempfile.TemporaryDirectory(dir=workdir) as tempdir:

@@ -27,7 +27,7 @@ import os
 from contextlib import contextmanager
 from os.path import dirname, abspath, basename, splitext, isfile, join
 import logging
-from edi.lib.helpers import (get_user, get_user_gid, get_user_uid,
+from edi.lib.helpers import (get_user, get_user_gid, get_user_uid, get_workdir,
                              get_hostname, get_edi_plugin_directory, FatalError)
 from edi.lib.versionhelpers import get_edi_version, get_stripped_version
 from edi.lib.shellhelpers import get_user_environment_variable
@@ -122,11 +122,6 @@ class ConfigurationParser:
 
     def get_project_name(self):
         return self.config_id
-
-    @staticmethod
-    def get_workdir():
-        # we might want to overwrite it by a config setting
-        return os.getcwd()
 
     def get_bootstrap_repository(self):
         return self._get_bootstrap_item("repository", None)
@@ -311,7 +306,7 @@ class ConfigurationParser:
 
     def _get_load_time_dictionary(self):
         load_dict = get_base_dictionary()
-        load_dict["edi_work_directory"] = self.get_workdir()
+        load_dict["edi_work_directory"] = get_workdir()
         load_dict["edi_config_directory"] = self.config_directory
         load_dict["edi_project_plugin_directory"] = self.get_project_plugin_directory()
         load_dict['edi_log_level'] = logging.getLevelName(logging.getLogger().getEffectiveLevel())

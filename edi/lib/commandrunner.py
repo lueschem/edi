@@ -26,7 +26,7 @@ import yaml
 import jinja2
 import stat
 from codecs import open
-from edi.lib.helpers import chown_to_user, FatalError
+from edi.lib.helpers import chown_to_user, FatalError, get_workdir
 from edi.lib.shellhelpers import run
 from edi.lib.configurationparser import remove_passwords
 from edi.lib.yamlhelpers import LiteralString
@@ -40,7 +40,7 @@ class CommandRunner():
         self.input_artifact = input_artifact
 
     def run_all(self):
-        workdir = self.config.get_workdir()
+        workdir = get_workdir()
         result = self.input_artifact
 
         commands = self._get_commands()
@@ -100,7 +100,7 @@ class CommandRunner():
         run(cmd, log_threshold=logging.INFO, sudo=require_root)
 
     def _get_commands(self):
-        workdir = self.config.get_workdir()
+        workdir = get_workdir()
         result = self.input_artifact
         commands = self.config.get_ordered_path_items(self.config_section)
         augmented_commands = []
