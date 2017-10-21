@@ -135,7 +135,7 @@ def get_workdir():
 
 
 def get_artifact_dir():
-    return os.path.join(get_workdir(), 'edi-artifacts')
+    return os.path.join(get_workdir(), 'artifacts')
 
 
 def create_artifact_dir():

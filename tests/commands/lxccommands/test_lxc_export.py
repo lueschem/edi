@@ -29,6 +29,7 @@ from edi.lib.lxchelpers import (get_server_image_compression_algorithm,
                                 get_file_extension_from_image_compression_algorithm)
 from edi.commands.lxccommands.export import Export
 from edi.commands.clean import Clean
+from edi.lib.helpers import get_artifact_dir
 import edi
 import subprocess
 
@@ -57,9 +58,10 @@ def test_export_jessie_container(capsys):
         lxc_export_extension = get_file_extension_from_image_compression_algorithm(lxc_compression_algo)
 
         images = [
-            '{}-develop_edicommand_image_bootstrap.tar.gz'.format(project_name),
-            '{}-develop_edicommand_image_lxc.tar.gz'.format(project_name),
-            '{}-develop_edicommand_lxc_export{}'.format(project_name, lxc_export_extension)
+            os.path.join(get_artifact_dir(), '{}-develop_edicommand_image_bootstrap.tar.gz'.format(project_name)),
+            os.path.join(get_artifact_dir(), '{}-develop_edicommand_image_lxc.tar.gz'.format(project_name)),
+            os.path.join(get_artifact_dir(), '{}-develop_edicommand_lxc_export{}'.format(project_name,
+                                                                                         lxc_export_extension))
         ]
         for image in images:
             assert os.path.isfile(image)

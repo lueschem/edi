@@ -32,7 +32,7 @@ from codecs import open
 from edi.commands.image import Image
 from edi.commands.imagecommands.bootstrap import Bootstrap
 from edi.lib.yamlhelpers import LiteralString, normalize_yaml
-from edi.lib.helpers import chown_to_user, print_success, get_workdir
+from edi.lib.helpers import chown_to_user, print_success, get_workdir, get_artifact_dir, create_artifact_dir
 from edi.lib.shellhelpers import get_debian_architecture
 from edi.lib.configurationparser import remove_passwords
 
@@ -96,6 +96,7 @@ class Lxc(Image):
             self._write_container_metadata(lxcimagedir)
             archive = self._pack_image(tempdir, lxcimagedir)
             chown_to_user(archive)
+            create_artifact_dir()
             shutil.move(archive, self._result())
 
         print_success("Created lxc image {}.".format(self._result()))
@@ -115,7 +116,7 @@ class Lxc(Image):
                         ).format(self.config.get_project_name(),
                                  self._get_command_file_name_prefix(),
                                  self.config.get_compression())
-        return os.path.join(get_workdir(), archive_name)
+        return os.path.join(get_artifact_dir(), archive_name)
 
     def _write_container_metadata(self, imagedir):
         metadata = {}

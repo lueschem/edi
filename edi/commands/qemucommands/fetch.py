@@ -20,7 +20,8 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 from edi.commands.qemu import Qemu
-from edi.lib.helpers import print_success, chown_to_user, FatalError, get_workdir
+from edi.lib.helpers import (print_success, chown_to_user, FatalError, get_workdir,
+                             get_artifact_dir, create_artifact_dir)
 from edi.lib.shellhelpers import get_debian_architecture
 import apt_inst
 import tempfile
@@ -92,6 +93,7 @@ class Fetch(Qemu):
             apt_inst.DebFile(package_file).data.extractall(tempdir)
             qemu_binary = os.path.join(tempdir, 'usr', 'bin', self._get_qemu_binary_name())
             chown_to_user(qemu_binary)
+            create_artifact_dir()
             shutil.move(qemu_binary, self._result())
 
         print_success("Fetched qemu binary {}.".format(self._result()))
@@ -112,7 +114,7 @@ class Fetch(Qemu):
         if not self._needs_qemu():
             return None
         else:
-            return os.path.join(get_workdir(), self._get_qemu_binary_name())
+            return os.path.join(get_artifact_dir(), self._get_qemu_binary_name())
 
     def _get_qemu_binary_name(self):
         arch_dict = {'amd64': 'x86_64',

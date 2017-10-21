@@ -26,7 +26,7 @@ import yaml
 import jinja2
 import stat
 from codecs import open
-from edi.lib.helpers import chown_to_user, FatalError, get_workdir
+from edi.lib.helpers import chown_to_user, FatalError, get_workdir, get_artifact_dir, create_artifact_dir
 from edi.lib.shellhelpers import run
 from edi.lib.configurationparser import remove_passwords
 from edi.lib.yamlhelpers import LiteralString
@@ -42,6 +42,8 @@ class CommandRunner():
     def run_all(self):
         workdir = get_workdir()
         result = self.input_artifact
+
+        create_artifact_dir()
 
         commands = self._get_commands()
         start_index = 0
@@ -73,7 +75,7 @@ class CommandRunner():
                 if new_result:
                     result = new_result
                     if not os.path.isfile(new_result) and not os.path.isdir(new_result):
-                        raise FatalError(('''The command '{}' did not generate ''' 
+                        raise FatalError(('''The command '{}' did not generate '''
                                           '''the specified output artifact '{}'.'''.format(name, new_result)))
 
         return result
@@ -100,7 +102,7 @@ class CommandRunner():
         run(cmd, log_threshold=logging.INFO, sudo=require_root)
 
     def _get_commands(self):
-        workdir = get_workdir()
+        artifactdir = get_artifact_dir()
         result = self.input_artifact
         commands = self.config.get_ordered_path_items(self.config_section)
         augmented_commands = []
@@ -113,7 +115,7 @@ class CommandRunner():
                     raise FatalError((('''The specified output '{}' within the command node '{}' is invalid.\n'''
                                        '''The output shall be a file or a folder (no '/' in string).''')
                                       ).format(output, name))
-                output_artifact = os.path.join(workdir, output)
+                output_artifact = os.path.join(artifactdir, output)
                 dictionary['edi_output_artifact'] = str(output_artifact)
                 result = str(output_artifact)
 
