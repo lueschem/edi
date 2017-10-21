@@ -43,7 +43,20 @@ class CommandRunner():
         workdir = self.config.get_workdir()
         result = self.input_artifact
 
-        for filename, content, name, path, dictionary, raw_node in self._get_commands():
+        commands = self._get_commands()
+        start_index = 0
+        for index, command in reversed(list(enumerate(commands))):
+            _, _, name, _, dictionary, _ = command
+            artifact = dictionary.get('edi_output_artifact')
+            if artifact and (os.path.isfile(artifact) or os.path.isdir(artifact)):
+                start_index = index + 1
+                logging.info(('''Artifact '{}' for command '{}' is already there. '''
+                              '''Delete it to regenerate it.'''
+                              ).format(artifact, name))
+                break
+
+        for index in range(start_index, len(commands)):
+            filename, content, name, path, dictionary, raw_node = commands[index]
             with tempfile.TemporaryDirectory(dir=workdir) as tmpdir:
                 chown_to_user(tmpdir)
                 require_root = raw_node.get('require_root', False)
@@ -59,6 +72,9 @@ class CommandRunner():
                 new_result = dictionary.get('edi_output_artifact')
                 if new_result:
                     result = new_result
+                    if not os.path.isfile(new_result) and not os.path.isdir(new_result):
+                        raise FatalError(('''The command '{}' did not generate ''' 
+                                          '''the specified output artifact '{}'.'''.format(name, new_result)))
 
         return result
 
