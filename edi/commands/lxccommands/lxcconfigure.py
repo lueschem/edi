@@ -59,8 +59,7 @@ class Configure(Lxc):
         return plugins
 
     def run_cli(self, cli_args):
-        self.run(cli_args.container_name, cli_args.config_file,
-                 introspection_method=self._get_introspection_method(cli_args))
+        self.run(*self._unpack_cli_args(cli_args), introspection_method=self._get_introspection_method(cli_args))
 
     def run(self, container_name, config_file, introspection_method=None):
         self._setup_parser(config_file)
