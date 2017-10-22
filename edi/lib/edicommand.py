@@ -112,13 +112,17 @@ class EdiCommand(metaclass=CommandFactory):
                            help=('dump the active plugins including their dictionaries instead of '
                                  'running the command'))
 
+    @staticmethod
+    def _unpack_cli_args(cli_args):
+        return [cli_args.config_file]
+
     def _get_introspection_method(self, cli_args):
         if cli_args.dictionary:
             return partial(self._print, self._get_load_time_dictionary)
         elif cli_args.config:
             return partial(self._print, self._get_config)
         elif cli_args.plugins:
-            return partial(self._print, partial(self.dry_run_cli, cli_args))
+            return partial(self._print, partial(self.dry_run, *self._unpack_cli_args(cli_args)))
         else:
             return None
 

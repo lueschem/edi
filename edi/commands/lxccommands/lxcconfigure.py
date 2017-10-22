@@ -45,8 +45,9 @@ class Configure(Lxc):
         parser.add_argument('container_name')
         cls._require_config_file(parser)
 
-    def dry_run_cli(self, cli_args):
-        return self.dry_run(cli_args.container_name, cli_args.config_file)
+    @staticmethod
+    def _unpack_cli_args(cli_args):
+        return [cli_args.container_name, cli_args.config_file]
 
     def dry_run(self, container_name, config_file):
         self._setup_parser(config_file)

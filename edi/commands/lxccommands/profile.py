@@ -48,8 +48,9 @@ class Profile(Lxc):
         parser.add_argument("-p", "--include-post-config", action="store_true",
                             help="include profiles that can only be applied after configuration")
 
-    def dry_run_cli(self, cli_args):
-        return self.dry_run(cli_args.config_file, include_post_config_profiles=cli_args.include_post_config)
+    @staticmethod
+    def _unpack_cli_args(cli_args):
+        return [cli_args.config_file, cli_args.include_post_config]
 
     def dry_run(self, config_file, include_post_config_profiles=False):
         self._setup_parser(config_file)

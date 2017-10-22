@@ -39,9 +39,6 @@ class Stop(Lxc):
         cls._offer_introspection_options(parser)
         cls._require_config_file(parser)
 
-    def dry_run_cli(self, cli_args):
-        return self.dry_run(cli_args.config_file)
-
     def dry_run(self, config_file):
         self._setup_parser(config_file)
         plugins = {}

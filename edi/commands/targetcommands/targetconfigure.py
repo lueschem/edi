@@ -40,8 +40,9 @@ class Configure(Target):
         parser.add_argument('ip_address')
         cls._require_config_file(parser)
 
-    def dry_run_cli(self, cli_args):
-        return self.dry_run(cli_args.ip_address, cli_args.config_file)
+    @staticmethod
+    def _unpack_cli_args(cli_args):
+        return [cli_args.ip_address, cli_args.config_file]
 
     def dry_run(self, ip_address, config_file):
         self._setup_parser(config_file)
