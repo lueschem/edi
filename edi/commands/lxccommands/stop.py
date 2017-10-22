@@ -46,14 +46,14 @@ class Stop(Lxc):
         return plugins
 
     def run_cli(self, cli_args):
-        self.run(*self._unpack_cli_args(cli_args), introspection_method=self._get_introspection_method(cli_args))
+        self.run(*self._unpack_cli_args(cli_args), run_method=self._get_run_method(cli_args))
 
-    def run(self, config_file, introspection_method=None):
+    def run(self, config_file, run_method=None):
         with command_context({'edi_create_distributable_image': True}):
             self._setup_parser(config_file)
 
-            if introspection_method:
-                introspection_method()
+            if run_method:
+                run_method()
                 return self._result()
 
             # configure in any case since the container might be only partially configured

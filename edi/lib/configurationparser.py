@@ -184,6 +184,7 @@ class ConfigurationParser:
         return join(self.config_directory, "plugins")
 
     def __init__(self, base_config_file):
+        self.base_config_file = base_config_file
         self.config_directory = dirname(abspath(base_config_file.name))
         self.config_id = splitext(basename(base_config_file.name))[0]
         if not ConfigurationParser._configurations.get(self.config_id):
@@ -208,6 +209,13 @@ class ConfigurationParser:
             logging.info("Merged configuration:\n{0}".format(self.dump()))
 
             self._verify_version_compatibility()
+
+    def get_base_config_file(self):
+        """
+        Returns the base config file that can be passed in for a next command.
+        :return: The base config file
+        """
+        return self.base_config_file
 
     def _verify_version_compatibility(self):
         current_version = get_edi_version()

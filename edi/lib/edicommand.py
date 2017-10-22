@@ -116,7 +116,7 @@ class EdiCommand(metaclass=CommandFactory):
     def _unpack_cli_args(cli_args):
         return [cli_args.config_file]
 
-    def _get_introspection_method(self, cli_args):
+    def _get_run_method(self, cli_args):
         if cli_args.dictionary:
             return partial(self._print, self._get_load_time_dictionary)
         elif cli_args.config:
@@ -125,6 +125,12 @@ class EdiCommand(metaclass=CommandFactory):
             return partial(self._print, partial(self.dry_run, *self._unpack_cli_args(cli_args)))
         else:
             return None
+
+    def _evaluate(self, run_method):
+        if run_method:
+            return run_method()
+        else:
+            return self._run()
 
     def _get_load_time_dictionary(self):
         return self.config.get_load_time_dictionary()

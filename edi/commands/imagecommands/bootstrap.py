@@ -46,21 +46,19 @@ class Bootstrap(Image):
         cls._require_config_file(parser)
 
     def dry_run(self, config_file):
-        self._setup_parser(config_file)
-        plugins = {}
-        plugins.update(Fetch().dry_run(config_file))
-        return plugins
+        return self.run(config_file, run_method=self._dry_run)
+
+    def _dry_run(self):
+        return Fetch().dry_run(self.config.get_base_config_file())
 
     def run_cli(self, cli_args):
-        self.run(*self._unpack_cli_args(cli_args), introspection_method=self._get_introspection_method(cli_args))
+        self.run(*self._unpack_cli_args(cli_args), run_method=self._get_run_method(cli_args))
 
-    def run(self, config_file, introspection_method=None):
+    def run(self, config_file, run_method=None):
         self._setup_parser(config_file)
+        return self._evaluate(run_method)
 
-        if introspection_method:
-            introspection_method()
-            return self._result()
-
+    def _run(self):
         if os.path.isfile(self._result()):
             logging.info(("{0} is already there. "
                           "Delete it to regenerate it."
@@ -69,7 +67,7 @@ class Bootstrap(Image):
 
         self._require_sudo()
 
-        qemu_executable = Fetch().run(config_file)
+        qemu_executable = Fetch().run(self.config.get_base_config_file())
 
         print("Going to bootstrap initial image - be patient.")
 
@@ -93,12 +91,12 @@ class Bootstrap(Image):
             shutil.move(archive, self._result())
 
         print_success("Bootstrapped initial image {}.".format(self._result()))
-
         return self._result()
 
     def clean(self, config_file):
-        self._setup_parser(config_file)
+        self.run(config_file, run_method=self._clean)
 
+    def _clean(self):
         if os.path.isfile(self._result()):
             logging.info("Removing '{}'.".format(self._result()))
             os.remove(self._result())

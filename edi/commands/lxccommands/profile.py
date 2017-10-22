@@ -59,13 +59,13 @@ class Profile(Lxc):
         return plugins
 
     def run_cli(self, cli_args):
-        self.run(*self._unpack_cli_args(cli_args), introspection_method=self._get_introspection_method(cli_args))
+        self.run(*self._unpack_cli_args(cli_args), run_method=self._get_run_method(cli_args))
 
-    def run(self, config_file, include_post_config_profiles=False, introspection_method=None):
+    def run(self, config_file, include_post_config_profiles=False, run_method=None):
         self._setup_parser(config_file)
 
-        if introspection_method:
-            introspection_method()
+        if run_method:
+            run_method()
             return []
 
         profile_name_list = []
