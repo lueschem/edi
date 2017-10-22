@@ -56,7 +56,7 @@ class Stop(Lxc):
             self._setup_parser(config_file)
 
             if introspection_method:
-                self._print(introspection_method())
+                introspection_method()
                 return self._result()
 
             # configure in any case since the container might be only partially configured

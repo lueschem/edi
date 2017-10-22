@@ -66,7 +66,7 @@ class Configure(Lxc):
         self.container_name = container_name
 
         if introspection_method:
-            self._print(introspection_method())
+            introspection_method()
             return self._result()
 
         Launch().run(container_name, config_file)

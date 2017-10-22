@@ -114,11 +114,11 @@ class EdiCommand(metaclass=CommandFactory):
 
     def _get_introspection_method(self, cli_args):
         if cli_args.dictionary:
-            return self._get_load_time_dictionary
+            return partial(self._print, self._get_load_time_dictionary)
         elif cli_args.config:
-            return self._get_config
+            return partial(self._print, self._get_config)
         elif cli_args.plugins:
-            return partial(self.dry_run_cli, cli_args)
+            return partial(self._print, partial(self.dry_run_cli, cli_args))
         else:
             return None
 
@@ -135,8 +135,8 @@ class EdiCommand(metaclass=CommandFactory):
     def _dump(introspection_result):
         return yaml.dump(introspection_result, default_flow_style=False, width=1000)
 
-    def _print(self, introspection_result):
-        print(self._dump(introspection_result))
+    def _print(self, method):
+        print(self._dump(method()))
 
     def _require_sudo(self):
         if os.getuid() != 0:

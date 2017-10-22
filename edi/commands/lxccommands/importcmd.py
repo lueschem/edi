@@ -54,7 +54,7 @@ class Import(Lxc):
         self._setup_parser(config_file)
 
         if introspection_method:
-            self._print(introspection_method())
+            introspection_method()
             return self._result()
 
         if is_in_image_store(self._result()):
