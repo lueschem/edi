@@ -35,6 +35,7 @@ class Profile(Lxc):
 
     def __init__(self):
         self.config_section = 'lxc_profiles'
+        self.include_post_config_profiles = False
 
     @classmethod
     def advertise(cls, subparsers):
@@ -52,25 +53,22 @@ class Profile(Lxc):
     def _unpack_cli_args(cli_args):
         return [cli_args.config_file, cli_args.include_post_config]
 
-    def dry_run(self, config_file, include_post_config_profiles=False):
-        self._setup_parser(config_file)
-        plugins = {}
-        plugins.update(self._get_plugin_report(include_post_config_profiles))
-        return plugins
-
     def run_cli(self, cli_args):
-        self.run(*self._unpack_cli_args(cli_args), run_method=self._get_run_method(cli_args))
+        self._dispatch(*self._unpack_cli_args(cli_args), run_method=self._get_run_method(cli_args))
 
-    def run(self, config_file, include_post_config_profiles=False, run_method=None):
-        self._setup_parser(config_file)
+    def dry_run(self, config_file, include_post_config_profiles):
+        return self._dispatch(config_file, include_post_config_profiles, run_method=self._dry_run)
 
-        if run_method:
-            run_method()
-            return []
+    def _dry_run(self):
+        return self._get_plugin_report(self.include_post_config_profiles)
 
+    def run(self, config_file, include_post_config_profiles):
+        return self._dispatch(config_file, include_post_config_profiles, run_method=self._run)
+
+    def _run(self):
         profile_name_list = []
 
-        for profile, name, path, dictionary in self._get_profiles(include_post_config_profiles):
+        for profile, name, path, dictionary in self._get_profiles(self.include_post_config_profiles):
             logging.info(("Creating profile {} located in "
                           "{} with dictionary:\n{}"
                           ).format(name, path,
@@ -84,6 +82,11 @@ class Profile(Lxc):
 
         print_success('The following profiles are now available: {}'.format(', '.join(profile_name_list)))
         return profile_name_list
+
+    def _dispatch(self, config_file, include_post_config_profiles, run_method):
+        self._setup_parser(config_file)
+        self.include_post_config_profiles = include_post_config_profiles
+        return run_method()
 
     def _get_profiles(self, include_post_config_profiles):
         collected_profiles = []

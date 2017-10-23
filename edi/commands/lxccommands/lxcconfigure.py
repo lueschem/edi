@@ -49,27 +49,25 @@ class Configure(Lxc):
     def _unpack_cli_args(cli_args):
         return [cli_args.container_name, cli_args.config_file]
 
+    def run_cli(self, cli_args):
+        self._dispatch(*self._unpack_cli_args(cli_args), run_method=self._get_run_method(cli_args))
+
     def dry_run(self, container_name, config_file):
-        self._setup_parser(config_file)
+        return self._dispatch(container_name, config_file, run_method=self._dry_run)
+
+    def _dry_run(self):
         plugins = {}
-        plugins.update(Launch().dry_run(container_name, config_file))
+        plugins.update(Launch().dry_run(self.container_name, self.config.get_base_config_file()))
         playbook_runner = PlaybookRunner(self.config, self._result(), self.ansible_connection)
         plugins.update(playbook_runner.get_plugin_report())
-        plugins.update(Profile().dry_run(config_file, include_post_config_profiles=True))
+        plugins.update(Profile().dry_run(self.config.get_base_config_file(), include_post_config_profiles=True))
         return plugins
 
-    def run_cli(self, cli_args):
-        self.run(*self._unpack_cli_args(cli_args), run_method=self._get_run_method(cli_args))
+    def run(self, container_name, config_file):
+        return self._dispatch(container_name, config_file, run_method=self._run)
 
-    def run(self, container_name, config_file, run_method=None):
-        self._setup_parser(config_file)
-        self.container_name = container_name
-
-        if run_method:
-            run_method()
-            return self._result()
-
-        Launch().run(container_name, config_file)
+    def _run(self):
+        Launch().run(self.container_name, self.config.get_base_config_file())
 
         print("Going to configure container {} - be patient.".format(self._result()))
 
@@ -78,15 +76,20 @@ class Configure(Lxc):
 
         sfc = SharedFolderCoordinator(self.config)
         sfc.create_host_folders()
-        sfc.verify_container_mountpoints(container_name)
+        sfc.verify_container_mountpoints(self.container_name)
 
-        profiles = Profile().run(config_file, include_post_config_profiles=True)
+        profiles = Profile().run(self.config.get_base_config_file(), include_post_config_profiles=True)
         # TODO: stop container if profiles need to be updated
-        apply_profiles(container_name, profiles)
+        apply_profiles(self.container_name, profiles)
         # TODO: restart container if needed
 
         print_success("Configured container {}.".format(self._result()))
         return self._result()
+
+    def _dispatch(self, container_name, config_file, run_method):
+        self._setup_parser(config_file)
+        self.container_name = container_name
+        return run_method()
 
     def _result(self):
         return self.container_name

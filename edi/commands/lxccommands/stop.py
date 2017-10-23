@@ -39,35 +39,32 @@ class Stop(Lxc):
         cls._offer_introspection_options(parser)
         cls._require_config_file(parser)
 
-    def dry_run(self, config_file):
-        self._setup_parser(config_file)
-        plugins = {}
-        plugins.update(Configure().dry_run(self._result(), config_file))
-        return plugins
-
     def run_cli(self, cli_args):
-        self.run(*self._unpack_cli_args(cli_args), run_method=self._get_run_method(cli_args))
+        self._dispatch(*self._unpack_cli_args(cli_args), run_method=self._get_run_method(cli_args))
 
-    def run(self, config_file, run_method=None):
-        with command_context({'edi_create_distributable_image': True}):
-            self._setup_parser(config_file)
+    def dry_run(self, config_file):
+        return self._dispatch(config_file, run_method=self._dry_run)
 
-            if run_method:
-                run_method()
-                return self._result()
+    def _dry_run(self):
+        return Configure().dry_run(self._result(), self.config.get_base_config_file())
 
-            # configure in any case since the container might be only partially configured
-            Configure().run(self._result(), config_file)
+    def run(self, config_file):
+        return self._dispatch(config_file, run_method=self._run)
 
-            print("Going to stop lxc container {}.".format(self._result()))
-            stop_container(self._result())
-            print_success("Stopped lxc container {}.".format(self._result()))
+    def _run(self):
+        # configure in any case since the container might be only partially configured
+        Configure().run(self._result(), self.config.get_base_config_file())
+
+        print("Going to stop lxc container {}.".format(self._result()))
+        stop_container(self._result())
+        print_success("Stopped lxc container {}.".format(self._result()))
 
         return self._result()
 
     def clean(self, config_file):
-        self._setup_parser(config_file)
+        self._dispatch(config_file, run_method=self._clean)
 
+    def _clean(self):
         if is_container_existing(self._result()):
             if is_container_running(self._result()):
                 stop_container(self._result())
@@ -75,6 +72,11 @@ class Stop(Lxc):
             delete_container(self._result())
 
             print_success("Deleted lxc container {}.".format(self._result()))
+
+    def _dispatch(self, config_file, run_method):
+        with command_context({'edi_create_distributable_image': True}):
+            self._setup_parser(config_file)
+            return run_method()
 
     def _result(self):
         # a generated container name

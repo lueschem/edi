@@ -45,18 +45,17 @@ class Bootstrap(Image):
         cls._offer_introspection_options(parser)
         cls._require_config_file(parser)
 
+    def run_cli(self, cli_args):
+        self._dispatch(*self._unpack_cli_args(cli_args), run_method=self._get_run_method(cli_args))
+
     def dry_run(self, config_file):
-        return self.run(config_file, run_method=self._dry_run)
+        return self._dispatch(config_file, run_method=self._dry_run)
 
     def _dry_run(self):
         return Fetch().dry_run(self.config.get_base_config_file())
 
-    def run_cli(self, cli_args):
-        self.run(*self._unpack_cli_args(cli_args), run_method=self._get_run_method(cli_args))
-
-    def run(self, config_file, run_method=None):
-        self._setup_parser(config_file)
-        return self._evaluate(run_method)
+    def run(self, config_file):
+        return self._dispatch(config_file, run_method=self._run)
 
     def _run(self):
         if os.path.isfile(self._result()):
@@ -94,13 +93,17 @@ class Bootstrap(Image):
         return self._result()
 
     def clean(self, config_file):
-        self.run(config_file, run_method=self._clean)
+        self._dispatch(config_file, run_method=self._clean)
 
     def _clean(self):
         if os.path.isfile(self._result()):
             logging.info("Removing '{}'.".format(self._result()))
             os.remove(self._result())
             print_success("Removed bootstrap image {}.".format(self._result()))
+
+    def _dispatch(self, config_file, run_method):
+        self._setup_parser(config_file)
+        return run_method()
 
     def _result(self):
         archive_name = ("{0}_{1}.tar.{2}"

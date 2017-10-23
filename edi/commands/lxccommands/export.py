@@ -41,53 +41,54 @@ class Export(Lxc):
         cls._offer_introspection_options(parser)
         cls._require_config_file(parser)
 
-    def dry_run(self, config_file):
-        self._setup_parser(config_file)
-        plugins = {}
-        plugins.update(Publish().dry_run(config_file))
-        return plugins
-
     def run_cli(self, cli_args):
-        self.run(*self._unpack_cli_args(cli_args), run_method=self._get_run_method(cli_args))
+        self._dispatch(*self._unpack_cli_args(cli_args), run_method=self._get_run_method(cli_args))
 
-    def run(self, config_file, run_method=None):
-        with command_context({'edi_create_distributable_image': True}):
-            self._setup_parser(config_file)
+    def dry_run(self, config_file):
+        return self._dispatch(config_file, run_method=self._dry_run)
 
-            if run_method:
-                run_method()
-                return self._result()
+    def _dry_run(self):
+        return Publish().dry_run(self.config.get_base_config_file())
 
-            if os.path.isfile(self._result()):
-                logging.info(("{0} is already there. "
-                              "Delete it to regenerate it."
-                              ).format(self._result()))
-                return self._result()
+    def run(self, config_file):
+        return self._dispatch(config_file, run_method=self._run)
 
-            image_name = Publish().run(config_file)
+    def _run(self):
+        if os.path.isfile(self._result()):
+            logging.info(("{0} is already there. "
+                          "Delete it to regenerate it."
+                          ).format(self._result()))
+            return self._result()
 
-            print("Going to export lxc image from image store.")
+        image_name = Publish().run(self.config.get_base_config_file())
 
-            create_artifact_dir()
-            export_image(image_name, self._image_without_extension())
+        print("Going to export lxc image from image store.")
 
-            if (os.path.isfile(self._image_without_extension()) and
-                    not os.path.isfile(self._result())):
-                # Workaround for https://github.com/lxc/lxd/issues/3869
-                logging.info("Fixing file extension of exported image.")
-                os.rename(self._image_without_extension(), self._result())
+        create_artifact_dir()
+        export_image(image_name, self._image_without_extension())
 
-            print_success("Exported lxc image as {}.".format(self._result()))
+        if (os.path.isfile(self._image_without_extension()) and
+                not os.path.isfile(self._result())):
+            # Workaround for https://github.com/lxc/lxd/issues/3869
+            logging.info("Fixing file extension of exported image.")
+            os.rename(self._image_without_extension(), self._result())
 
+        print_success("Exported lxc image as {}.".format(self._result()))
         return self._result()
 
     def clean(self, config_file):
-        self._setup_parser(config_file)
+        self._dispatch(config_file, run_method=self._clean)
 
+    def _clean(self):
         if os.path.isfile(self._result()):
             logging.info("Removing '{}'.".format(self._result()))
             os.remove(self._result())
             print_success("Removed lxc image {}.".format(self._result()))
+
+    def _dispatch(self, config_file, run_method):
+        with command_context({'edi_create_distributable_image': True}):
+            self._setup_parser(config_file)
+            return run_method()
 
     def _result_base_name(self):
         return "{0}_{1}".format(self.config.get_project_name(),

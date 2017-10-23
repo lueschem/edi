@@ -52,23 +52,22 @@ class Lxc(Image):
         cls._offer_introspection_options(parser)
         cls._require_config_file(parser)
 
+    def run_cli(self, cli_args):
+        self._dispatch(*self._unpack_cli_args(cli_args), run_method=self._get_run_method(cli_args))
+
     def dry_run(self, config_file):
-        self._setup_parser(config_file)
+        return self._dispatch(config_file, run_method=self._dry_run)
+
+    def _dry_run(self):
         plugins = {}
-        plugins.update(Bootstrap().dry_run(config_file))
+        plugins.update(Bootstrap().dry_run(self.config.get_base_config_file()))
         plugins.update(self._get_plugin_report())
         return plugins
 
-    def run_cli(self, cli_args):
-        self.run(*self._unpack_cli_args(cli_args), run_method=self._get_run_method(cli_args))
+    def run(self, config_file):
+        return self._dispatch(config_file, run_method=self._run)
 
-    def run(self, config_file, run_method=None):
-        self._setup_parser(config_file)
-
-        if run_method:
-            run_method()
-            return self._result()
-
+    def _run(self):
         if os.path.isfile(self._result()):
             logging.info(("{0} is already there. "
                           "Delete it to regenerate it."
@@ -80,7 +79,7 @@ class Lxc(Image):
         bootstrap_cmd = Bootstrap()
 
         # This command is based upon the output of the bootstrap command
-        bootstrap_result = bootstrap_cmd.run(config_file)
+        bootstrap_result = bootstrap_cmd.run(self.config.get_base_config_file())
 
         workdir = get_workdir()
 
@@ -97,16 +96,20 @@ class Lxc(Image):
             shutil.move(archive, self._result())
 
         print_success("Created lxc image {}.".format(self._result()))
-
         return self._result()
 
     def clean(self, config_file):
-        self._setup_parser(config_file)
+        self._dispatch(config_file, run_method=self._clean)
 
+    def _clean(self):
         if os.path.isfile(self._result()):
             logging.info("Removing '{}'.".format(self._result()))
             os.remove(self._result())
             print_success("Removed lxc image {}.".format(self._result()))
+
+    def _dispatch(self, config_file, run_method):
+        self._setup_parser(config_file)
+        return run_method()
 
     def _result(self):
         archive_name = ("{0}_{1}.tar.{2}"

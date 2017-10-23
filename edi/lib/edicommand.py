@@ -124,13 +124,13 @@ class EdiCommand(metaclass=CommandFactory):
         elif cli_args.plugins:
             return partial(self._print, partial(self.dry_run, *self._unpack_cli_args(cli_args)))
         else:
-            return None
+            return partial(self.run, *self._unpack_cli_args(cli_args))
 
-    def _evaluate(self, run_method):
-        if run_method:
-            return run_method()
-        else:
-            return self._run()
+    def run(self, *args, **kwargs):
+        raise FatalError('''Missing 'run' implementation for '{}'.'''.format(self._get_command_name()))
+
+    def dry_run(self, *args, **kwargs):
+        raise FatalError('''Missing 'dry_run' implementation for '{}'.'''.format(self._get_command_name()))
 
     def _get_load_time_dictionary(self):
         return self.config.get_load_time_dictionary()
