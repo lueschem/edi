@@ -21,6 +21,7 @@
 
 from edi.commands.imagecommands.bootstrap import Bootstrap
 from edi.commands.imagecommands.imagelxc import Lxc
+from edi.commands.imagecommands.create import Create
 from edi.commands.lxccommands.export import Export
 from edi.commands.lxccommands.importcmd import Import
 from edi.commands.lxccommands.launch import Launch
@@ -38,20 +39,23 @@ import pytest
 import subprocess
 
 
-@pytest.mark.parametrize("command, command_args, has_templates, has_profiles, has_playbooks", [
-    (Bootstrap, ['image', 'bootstrap', '--plugins'], False, False, False),
-    (Lxc, ['image', 'lxc', '--plugins'], True, False, False),
-    (Export, ['lxc', 'export', '--plugins'], True, True, True),
-    (Import, ['lxc', 'import', '--plugins'], True, False, False),
-    (Launch, ['lxc', 'launch', '--plugins', 'cname'], True, True, False),
-    (Configure, ['lxc', 'configure', '--plugins', 'cname'], True, True, True),
-    (Profile, ['lxc', 'profile', '--plugins'], False, True, False),
-    (Publish, ['lxc', 'publish', '--plugins'], True, True, True),
-    (Stop, ['lxc', 'stop', '--plugins'], True, True, True),
-    (Fetch, ['qemu', 'fetch', '--plugins'], False, False, False),
-    (TargetConfigure, ['target', 'configure', '--plugins', '1.2.3.4'], False, False, True),
+@pytest.mark.parametrize(("command, command_args, has_templates, "
+                          "has_profiles, has_playbooks, has_postprocessing_commands"), [
+    (Bootstrap, ['image', 'bootstrap', '--plugins'], False, False, False, False),
+    (Lxc, ['image', 'lxc', '--plugins'], True, False, False, False),
+    (Create, ['image', 'create', '--plugins'], True, True, True, True),
+    (Export, ['lxc', 'export', '--plugins'], True, True, True, False),
+    (Import, ['lxc', 'import', '--plugins'], True, False, False, False),
+    (Launch, ['lxc', 'launch', '--plugins', 'cname'], True, True, False, False),
+    (Configure, ['lxc', 'configure', '--plugins', 'cname'], True, True, True, False),
+    (Profile, ['lxc', 'profile', '--plugins'], False, True, False, False),
+    (Publish, ['lxc', 'publish', '--plugins'], True, True, True, False),
+    (Stop, ['lxc', 'stop', '--plugins'], True, True, True, False),
+    (Fetch, ['qemu', 'fetch', '--plugins'], False, False, False, False),
+    (TargetConfigure, ['target', 'configure', '--plugins', '1.2.3.4'], False, False, True, False),
 ])
-def test_plugins(monkeypatch, config_files, capsys, command, command_args, has_templates, has_profiles, has_playbooks):
+def test_plugins(monkeypatch, config_files, capsys, command, command_args, has_templates,
+                 has_profiles, has_playbooks, has_postprocessing_commands):
     def fake_lxc_config_command(*popenargs, **kwargs):
         if 'images.compression_algorithm' in popenargs[0]:
             return subprocess.CompletedProcess("fakerun", 0, '')
@@ -88,3 +92,8 @@ def test_plugins(monkeypatch, config_files, capsys, command, command_args, has_t
         assert base_system.get('dictionary').get('edi_config_directory') == os.path.dirname(config_files)
     else:
         assert not result.get('playbooks')
+
+    if has_postprocessing_commands:
+        assert result.get('postprocessing_commands')
+    else:
+        assert not result.get('postprocessing_commands')

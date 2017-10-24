@@ -21,6 +21,7 @@
 
 from edi.commands.imagecommands.bootstrap import Bootstrap
 from edi.commands.imagecommands.imagelxc import Lxc
+from edi.commands.imagecommands.create import Create
 from edi.commands.lxccommands.export import Export
 from edi.commands.lxccommands.importcmd import Import
 from edi.commands.lxccommands.launch import Launch
@@ -40,6 +41,7 @@ import subprocess
 @pytest.mark.parametrize("command, command_args", [
     (Bootstrap, ['image', 'bootstrap', '--config']),
     (Lxc, ['image', 'lxc', '--config']),
+    (Create, ['image', 'create', '--config']),
     (Export, ['lxc', 'export', '--config']),
     (Import, ['lxc', 'import', '--config']),
     (Launch, ['lxc', 'launch', '--config', 'cname']),

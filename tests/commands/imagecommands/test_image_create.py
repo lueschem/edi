@@ -27,7 +27,7 @@ from tests.libtesting.helpers import get_random_string, get_project_root
 from edi.lib.shellhelpers import run
 from edi.lib.lxchelpers import (get_server_image_compression_algorithm,
                                 get_file_extension_from_image_compression_algorithm)
-from edi.commands.lxccommands.export import Export
+from edi.commands.imagecommands.create import Create
 from edi.commands.clean import Clean
 from edi.lib.helpers import get_artifact_dir
 import edi
@@ -38,7 +38,7 @@ import subprocess
 @requires_ansible
 @requires_debootstrap
 @requires_sudo
-def test_export_jessie_container(capsys):
+def test_create_jessie_image(capsys):
     print(os.getcwd())
     with workspace():
         edi_exec = os.path.join(get_project_root(), 'bin', 'edi')
@@ -47,9 +47,9 @@ def test_export_jessie_container(capsys):
         run(config_command)  # run as non root
 
         parser = edi._setup_command_line_interface()
-        cli_args = parser.parse_args(['lxc', 'export', '{}-develop.yml'.format(project_name)])
+        cli_args = parser.parse_args(['image', 'create', '{}-develop.yml'.format(project_name)])
 
-        Export().run_cli(cli_args)
+        Create().run_cli(cli_args)
         out, err = capsys.readouterr()
         print(out)
         assert not err
