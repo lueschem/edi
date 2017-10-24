@@ -101,3 +101,14 @@ def test_plugin_report(config_files):
         assert next(iter(commands[0].keys())) == '10_first_step'
         assert next(iter(commands[1].keys())) == '20_second_step'
         assert next(iter(commands[2].keys())) == '40_fourth_step'
+
+
+def test_require_root(config_files):
+    with open(config_files, "r") as main_file:
+        parser = ConfigurationParser(main_file)
+
+        input_file = os.path.join(os.sep, 'fake_folder', 'input.txt')
+
+        runner = CommandRunner(parser, 'postprocessing_commands', input_file)
+        assert not runner.require_root()
+        assert not runner.require_root_for_clean()
