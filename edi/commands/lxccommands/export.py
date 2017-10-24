@@ -97,6 +97,9 @@ class Export(Lxc):
     def _image_without_extension(self):
         return os.path.join(get_artifact_dir(), self._result_base_name())
 
+    def result(self, config_file):
+        return self._dispatch(config_file, run_method=self._result)
+
     def _result(self):
         algorithm = get_server_image_compression_algorithm()
         extension = get_file_extension_from_image_compression_algorithm(algorithm)

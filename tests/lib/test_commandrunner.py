@@ -31,7 +31,7 @@ from codecs import open
 from edi.lib.helpers import get_user
 
 
-def test_run_all(config_files, monkeypatch):
+def test_run_and_clean(config_files, monkeypatch):
     def intercept_command_run(*popenargs, **kwargs):
         if "command" in get_command(popenargs):
             print(popenargs)
@@ -60,17 +60,31 @@ def test_run_all(config_files, monkeypatch):
 
             runner = CommandRunner(parser, 'postprocessing_commands', input_file)
 
-            output = runner.run_all()
+            output = runner.run()
 
-            assert str(w) in str(output)
-            assert 'last.txt' in str(output)
+            assert os.path.isfile(os.path.join('artifacts', 'first.txt'))
+            assert os.path.isfile(os.path.join('artifacts', 'last.txt'))
 
-            with open(output, mode='r') as result:
-                content = result.read()
-                assert "*input file*" in content
-                assert "*first step*" in content
-                assert "*last step*" in content
-                assert "*second step*" not in content
+            def verify_result(result):
+                assert str(w) in str(result)
+                assert 'artifacts/last.txt' in str(result)
+                assert 'last.txt' in str(result)
+
+                with open(result, mode='r') as result_file:
+                    content = result_file.read()
+                    assert "*input file*" in content
+                    assert "*first step*" in content
+                    assert "*last step*" in content
+                    assert "*second step*" not in content
+
+            verify_result(output)
+
+            os.remove(os.path.join('artifacts', 'first.txt'))
+            runner.run()
+            # no need to re-create first.txt since last.txt is still here
+            assert not os.path.isfile(os.path.join('artifacts', 'first.txt'))
+            runner.clean()
+            assert not os.path.isfile(os.path.join('artifacts', 'last.txt'))
 
 
 def test_plugin_report(config_files):
