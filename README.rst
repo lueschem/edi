@@ -4,14 +4,14 @@ Embedded Development Infrastructure - edi
 .. image:: https://travis-ci.org/lueschem/edi.svg?branch=master
     :target: https://travis-ci.org/lueschem/edi
 
-Driven by the DevOps mindset edi helps you to streamline your embedded development infrastructure. To achieve this
-goal, edi leverages top-notch open source technologies:
+Driven by the DevOps mindset edi helps you to streamline your embedded development infrastructure.
+To achieve this goal, edi leverages top-notch open source technologies:
 
 - Ansible_ is the tool of choice for doing the configuration management.
 - LXD_ allows you to run multiple OS instances on your development host. For complex target system deployments
   LXD is a great choice too.
 - Yaml_ and Jinja2_ are the consistent way to write edi configuration files and Ansible playbooks.
-- Python_ ist the language and ecosystem that makes the system integration efficient.
+- Python_ is the language and ecosystem that makes the system integration efficient.
 - edi is supposed to be used on the popular `Ubuntu Linux`_ distribution.
 - By default, edi generates Debian_ based target systems.
 
