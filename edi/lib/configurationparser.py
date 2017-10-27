@@ -94,6 +94,12 @@ class ConfigurationParser:
     def create_distributable_image():
         return ConfigurationParser.command_context.get('edi_create_distributable_image')
 
+    def get_context_suffix(self):
+        if self.create_distributable_image():
+            return '_di'
+        else:
+            return ''
+
     def dump(self):
         return yaml.dump(self._get_config(), default_flow_style=False)
 

@@ -58,8 +58,8 @@ def test_create_jessie_image(capsys):
         lxc_export_extension = get_file_extension_from_image_compression_algorithm(lxc_compression_algo)
 
         images = [
-            os.path.join(get_artifact_dir(), '{}-develop_edicommand_image_bootstrap.tar.gz'.format(project_name)),
-            os.path.join(get_artifact_dir(), '{}-develop_edicommand_image_lxc.tar.gz'.format(project_name)),
+            os.path.join(get_artifact_dir(), '{}-develop_edicommand_image_bootstrap_di.tar.gz'.format(project_name)),
+            os.path.join(get_artifact_dir(), '{}-develop_edicommand_image_lxc_di.tar.gz'.format(project_name)),
             os.path.join(get_artifact_dir(), '{}-develop_edicommand_lxc_export{}'.format(project_name,
                                                                                          lxc_export_extension))
         ]
@@ -67,7 +67,7 @@ def test_create_jessie_image(capsys):
             assert os.path.isfile(image)
 
         image_store_items = [
-            "{}-develop_edicommand_lxc_import".format(project_name),
+            "{}-develop_edicommand_lxc_import_di".format(project_name),
             "{}-develop_edicommand_lxc_publish".format(project_name)
         ]
         lxc_image_list_cmd = ['lxc', 'image', 'list']

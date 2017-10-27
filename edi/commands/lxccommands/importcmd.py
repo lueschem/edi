@@ -25,6 +25,7 @@ from edi.commands.lxc import Lxc
 from edi.commands.lxccommands.lxcprepare import Lxc as LxcImageCommand
 from edi.lib.helpers import print_success
 from edi.lib.lxchelpers import is_in_image_store, import_image, delete_image
+from edi.lib.configurationparser import command_context
 
 
 class Import(Lxc):
@@ -71,6 +72,9 @@ class Import(Lxc):
     def clean(self, config_file):
         self._dispatch(config_file, run_method=self._clean)
 
+        with command_context({'edi_create_distributable_image': True}):
+            self._dispatch(config_file, run_method=self._clean)
+
     def _clean(self):
         if is_in_image_store(self._result()):
             logging.info(("Removing '{}' from image store."
@@ -83,5 +87,6 @@ class Import(Lxc):
         return run_method()
 
     def _result(self):
-        return "{}_{}".format(self.config.get_configuration_name(),
-                              self._get_command_file_name_prefix())
+        return "{}_{}{}".format(self.config.get_configuration_name(),
+                                self._get_command_file_name_prefix(),
+                                self.config.get_context_suffix())

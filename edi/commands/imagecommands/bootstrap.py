@@ -29,6 +29,7 @@ from edi.commands.image import Image
 from edi.commands.qemucommands.fetch import Fetch
 from edi.lib.helpers import (require_executable, FatalError, chown_to_user, print_success,
                              get_workdir, get_artifact_dir, create_artifact_dir)
+from edi.lib.configurationparser import command_context
 from edi.lib.shellhelpers import run, get_chroot_cmd
 from edi.lib.keyhelpers import fetch_repository_key, build_keyring
 
@@ -95,6 +96,9 @@ class Bootstrap(Image):
     def clean(self, config_file):
         self._dispatch(config_file, run_method=self._clean)
 
+        with command_context({'edi_create_distributable_image': True}):
+            self._dispatch(config_file, run_method=self._clean)
+
     def _clean(self):
         if os.path.isfile(self._result()):
             logging.info("Removing '{}'.".format(self._result()))
@@ -106,9 +110,10 @@ class Bootstrap(Image):
         return run_method()
 
     def _result(self):
-        archive_name = ("{0}_{1}.tar.{2}"
+        archive_name = ("{0}_{1}{2}.tar.{3}"
                         ).format(self.config.get_configuration_name(),
                                  self._get_command_file_name_prefix(),
+                                 self.config.get_context_suffix(),
                                  self.config.get_compression())
         return os.path.join(get_artifact_dir(), archive_name)
 
