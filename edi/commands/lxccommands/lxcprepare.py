@@ -113,7 +113,7 @@ class Lxc(Image):
 
     def _result(self):
         archive_name = ("{0}_{1}.tar.{2}"
-                        ).format(self.config.get_project_name(),
+                        ).format(self.config.get_configuration_name(),
                                  self._get_command_file_name_prefix(),
                                  self.config.get_compression())
         return os.path.join(get_artifact_dir(), archive_name)

@@ -26,7 +26,7 @@ from edi.lib.configurationparser import ConfigurationParser, command_context
 def test_project_name(config_files, config_name):
     with open(config_files, "r") as main_file:
         parser = ConfigurationParser(main_file)
-        assert parser.get_project_name() == config_name
+        assert parser.get_configuration_name() == config_name
 
 
 def test_global_configuration_overlay(config_files):

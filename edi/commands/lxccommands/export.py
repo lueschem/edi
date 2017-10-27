@@ -91,7 +91,7 @@ class Export(Lxc):
             return run_method()
 
     def _result_base_name(self):
-        return "{0}_{1}".format(self.config.get_project_name(),
+        return "{0}_{1}".format(self.config.get_configuration_name(),
                                 self._get_command_file_name_prefix())
 
     def _image_without_extension(self):

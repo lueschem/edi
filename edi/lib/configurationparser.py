@@ -120,14 +120,17 @@ class ConfigurationParser:
 
         return result
 
-    def get_project_name(self):
+    def get_configuration_name(self):
         return self.config_id
 
     def get_bootstrap_repository(self):
         return self._get_bootstrap_item("repository", None)
 
     def get_bootstrap_architecture(self):
-        return self._get_bootstrap_item("architecture", None)
+        architecture = self._get_bootstrap_item("architecture", None)
+        if not architecture:
+            raise FatalError('''Missing mandatory element 'architecture' in section 'bootstrap'.''')
+        return architecture
 
     def get_bootstrap_tool(self):
         return self._get_bootstrap_item("tool", "debootstrap")
@@ -324,6 +327,7 @@ class ConfigurationParser:
         load_dict["edi_config_directory"] = self.config_directory
         load_dict["edi_project_plugin_directory"] = self.get_project_plugin_directory()
         load_dict['edi_log_level'] = logging.getLevelName(logging.getLogger().getEffectiveLevel())
+        load_dict['edi_configuration_name'] = self.get_configuration_name()
         load_dict.update(ConfigurationParser.command_context)
         return load_dict
 
@@ -334,6 +338,7 @@ class ConfigurationParser:
                                                                              "lxcif0")
         node_dict["edi_config_management_user_name"] = self._get_general_item("edi_config_management_user_name",
                                                                               "edicfgmgmt")
+        node_dict['edi_bootstrap_architecture'] = self.get_bootstrap_architecture()
 
         parameters = node.get("parameters", None)
 

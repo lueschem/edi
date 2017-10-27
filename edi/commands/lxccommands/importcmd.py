@@ -83,5 +83,5 @@ class Import(Lxc):
         return run_method()
 
     def _result(self):
-        return "{}_{}".format(self.config.get_project_name(),
+        return "{}_{}".format(self.config.get_configuration_name(),
                               self._get_command_file_name_prefix())
