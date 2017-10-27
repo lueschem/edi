@@ -216,7 +216,7 @@ class PackageDownloader():
                 keyring = build_keyring(tempdir, 'trusted.gpg', key_data)
                 self._verify_signature(tempdir, keyring, release_file, signature_file)
             else:
-                logging.warning('Warning: Package {} will get downloaded without verification!'.format(package_name))
+                logging.warning('Package {} will get downloaded without verification!'.format(package_name))
 
             package_files = self._parse_release_file(release_file)
             requested_package = self._find_package_in_package_files(package_name, package_files)

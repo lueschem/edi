@@ -147,6 +147,12 @@ class ConfigurationParser:
     def get_compression(self):
         return self._get_general_item("edi_compression", "xz")
 
+    def get_lxc_stop_timeout(self):
+        timeout = self._get_general_item("edi_lxc_stop_timeout", 120)
+        if type(timeout) != int:
+            raise FatalError('''The value of 'edi_lxc_stop_timeout' must be an integer.''')
+        return timeout
+
     def get_ordered_path_items(self, section):
         citems = self._get_config().get(section, {})
         ordered_items = collections.OrderedDict(sorted(citems.items()))

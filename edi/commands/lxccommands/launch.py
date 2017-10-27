@@ -87,7 +87,7 @@ class Launch(Lxc):
                 if is_container_running(self._result()):
                     logging.info(("Stopping container {0} to update profiles."
                                   ).format(self._result()))
-                    stop_container(self._result())
+                    stop_container(self._result(), timeout=self.config.get_lxc_stop_timeout())
                 apply_profiles(self._result(), profiles)
 
             if not is_container_running(self._result()):

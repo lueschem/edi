@@ -56,6 +56,7 @@ sample_file = """
 ---
 general:
     edi_compression:        gz
+    edi_lxc_stop_timeout:   130
 
 shared_folders:
     skip_me:

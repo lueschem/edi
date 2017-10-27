@@ -33,6 +33,7 @@ def test_global_configuration_overlay(config_files):
     with open(config_files, "r") as main_file:
         parser = ConfigurationParser(main_file)
         assert parser.get_compression() == "gz"
+        assert parser.get_lxc_stop_timeout() == 130
 
 
 def test_bootstrap_overlay(config_files):

@@ -56,7 +56,7 @@ class Stop(Lxc):
         Configure().run(self._result(), self.config.get_base_config_file())
 
         print("Going to stop lxc container {}.".format(self._result()))
-        stop_container(self._result())
+        stop_container(self._result(), timeout=self.config.get_lxc_stop_timeout())
         print_success("Stopped lxc container {}.".format(self._result()))
 
         return self._result()
@@ -67,7 +67,7 @@ class Stop(Lxc):
     def _clean(self):
         if is_container_existing(self._result()):
             if is_container_running(self._result()):
-                stop_container(self._result())
+                stop_container(self._result(), timeout=self.config.get_lxc_stop_timeout())
 
             delete_container(self._result())
 
