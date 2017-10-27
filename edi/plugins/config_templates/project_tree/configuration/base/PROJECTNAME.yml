@@ -47,6 +47,8 @@ playbooks:
         path: playbooks/debian/development_user_facilities/main.yml
     050_sample_playbook:
         path: playbooks/sample_playbook/main.yml
+    900_base_system_cleanup:
+        path: playbooks/debian/base_system_cleanup/main.yml
 
 {% if edi_qemu_repository %}
 qemu:
