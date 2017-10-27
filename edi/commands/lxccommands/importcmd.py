@@ -20,8 +20,9 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
+
 from edi.commands.lxc import Lxc
-from edi.commands.imagecommands.imagelxc import Lxc as LxcImageCommand
+from edi.commands.lxccommands.lxcprepare import Lxc as LxcImageCommand
 from edi.lib.helpers import print_success
 from edi.lib.lxchelpers import is_in_image_store, import_image, delete_image
 

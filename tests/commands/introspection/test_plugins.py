@@ -19,10 +19,17 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
+import subprocess
+
+import pytest
+import yaml
+
+import edi
 from edi.commands.imagecommands.bootstrap import Bootstrap
-from edi.commands.imagecommands.imagelxc import Lxc
 from edi.commands.imagecommands.create import Create
 from edi.commands.lxccommands.export import Export
+from edi.commands.lxccommands.lxcprepare import Lxc
 from edi.commands.lxccommands.importcmd import Import
 from edi.commands.lxccommands.launch import Launch
 from edi.commands.lxccommands.lxcconfigure import Configure
@@ -32,11 +39,6 @@ from edi.commands.lxccommands.stop import Stop
 from edi.commands.qemucommands.fetch import Fetch
 from edi.commands.targetcommands.targetconfigure import Configure as TargetConfigure
 from edi.lib.shellhelpers import mockablerun
-import edi
-import yaml
-import os
-import pytest
-import subprocess
 
 
 @pytest.mark.parametrize(("command, command_args, has_templates, "
