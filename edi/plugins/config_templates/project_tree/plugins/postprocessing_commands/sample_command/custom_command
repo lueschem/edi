@@ -1,0 +1,22 @@
+{% raw %}#!/bin/bash
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+INPUT_FILE="{{ edi_input_artifact }}"
+SIZE_OF_INPUT_FILE=$(stat --printf="%s" ${INPUT_FILE})
+OUTPUT_FILE="{{ edi_output_artifact }}"
+MESSAGE="{{ message }}"
+
+if [ "${OUTPUT_FILE}" == "" ]
+then
+    >&2 echo "Error: Missing output file."
+    exit 1
+fi
+
+echo "Processing ${INPUT_FILE} ..."
+echo "Size of ${INPUT_FILE} is ${SIZE_OF_INPUT_FILE} bytes." > ${OUTPUT_FILE}
+echo "${MESSAGE}" >> ${OUTPUT_FILE}
+echo "Successfully generated ${OUTPUT_FILE}."
+{% endraw %}

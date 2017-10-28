@@ -61,7 +61,8 @@ def test_create_jessie_image(capsys):
             os.path.join(get_artifact_dir(), '{}-develop_edicommand_image_bootstrap_di.tar.gz'.format(project_name)),
             os.path.join(get_artifact_dir(), '{}-develop_edicommand_image_lxc_di.tar.gz'.format(project_name)),
             os.path.join(get_artifact_dir(), '{}-develop_edicommand_lxc_export{}'.format(project_name,
-                                                                                         lxc_export_extension))
+                                                                                         lxc_export_extension)),
+            os.path.join(get_artifact_dir(), '{}-develop.result'.format(project_name)),
         ]
         for image in images:
             assert os.path.isfile(image)
