@@ -40,6 +40,7 @@ def get_install_requires():
     install_reqs = parse_requirements("requirements.txt", session=False)
     return [str(ir.req) for ir in install_reqs]
 
+
 setup(
     name='edi',
 
