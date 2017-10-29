@@ -1,3 +1,40 @@
+edi (0.8.0) xenial; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Do not create shared folders for distributable images.
+  * Implemented command runner.
+  * Reworked introspection methods.
+  * Implemented dry_run recursion.
+  * Refactored profile handling.
+  * Dump profile content during introspection.
+  * Normalize yaml prior to passing it into lxd.
+  * Dump playbook information via playbook runner.
+  * Improved handling of test fixtures.
+  * Fixed flake8 reports.
+  * Run flake8 from within pytest.
+  * Output templates with --plugin option.
+  * Improved coverage of introspection operations.
+  * Fix tests in case of missing lxc executable.
+  * Output generated artifacts into sub folder.
+  * Refactored handling of non trivial commands.
+  * Implemented image creation command.
+  * Renamed command image.lxc to lxc.prepare.
+  * Updated command pipeline drawing.
+  * Force container shutdown after a timeout.
+  * Added architecture and configuration name to dictionary.
+
+  [ Timo Furrer ]
+  * Fix typo: ist -> is
+
+  [ Matthias Lüscher ]
+  * Added base_system_cleanup plugin, handle policy-rc.d.
+  * Separate distributable image artifacts from non distributable image artifacts.
+  * Added sample postprocessing_command to config template.
+
+  [ Matthias Lüscher (Launchpad) ]
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Sun, 29 Oct 2017 10:47:27 +0100
+
 edi (0.7.3) xenial; urgency=medium
 
   [ Matthias Lüscher ]
