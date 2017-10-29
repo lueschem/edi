@@ -45,7 +45,7 @@ class PackageDownloader():
         self._source = SourceEntry(repository)
         self._source.uri = self._source.uri.rstrip('/')
         self._compressions = ['gz', 'bz2', 'xz']
-        self._checksum_algorithms = ['SHA512', 'SHA256'] # strongest first
+        self._checksum_algorithms = ['SHA512', 'SHA256']  # strongest first
 
     def _get_release_file_url(self, filename):
         return '{}/dists/{}/{}'.format(self._source.uri, self._source.dist, filename)
@@ -87,7 +87,7 @@ class PackageDownloader():
                                for architecture in self._architectures
                                for compression in self._compressions]
 
-            package_files = [ element for element in section if element.get('name') in packages_filter ]
+            package_files = [element for element in section if element.get('name') in packages_filter]
 
             return package_files
 
@@ -110,7 +110,7 @@ class PackageDownloader():
         logging.info(output.stdout)
 
         goodsig = re.search('''^\[GNUPG:\] GOODSIG''', output.stdout, re.MULTILINE)
-        validsig =  re.search('''^\[GNUPG:\] VALIDSIG''', output.stdout, re.MULTILINE)
+        validsig = re.search('''^\[GNUPG:\] VALIDSIG''', output.stdout, re.MULTILINE)
 
         if goodsig and validsig:
             logging.info('Signature check ok!')
@@ -216,7 +216,7 @@ class PackageDownloader():
                 keyring = build_keyring(tempdir, 'trusted.gpg', key_data)
                 self._verify_signature(tempdir, keyring, release_file, signature_file)
             else:
-                logging.warning('Warning: Package {} will get downloaded without verification!'.format(package_name))
+                logging.warning('Package {} will get downloaded without verification!'.format(package_name))
 
             package_files = self._parse_release_file(release_file)
             requested_package = self._find_package_in_package_files(package_name, package_files)

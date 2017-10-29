@@ -73,8 +73,8 @@ setup(
     install_requires=get_install_requires(),
 
     extras_require={
-    #    'dev': ['check-manifest'],
-    #    'test': ['coverage'],
+        # 'dev': ['check-manifest'],
+        # 'test': ['coverage'],
     },
 
     package_data={

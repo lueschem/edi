@@ -44,10 +44,10 @@
 from jinja2 import Template
 from edi.lib.helpers import get_user, FatalError
 from edi.lib.shellhelpers import get_user_environment_variable
-from edi.lib.configurationparser import ConfigurationParser
+from edi.lib.configurationparser import ConfigurationParser, command_context
 from edi.lib.sharedfoldercoordinator import SharedFolderCoordinator
 from tests.libtesting.helpers import get_command, get_sub_command, get_command_parameter
-from tests.libtesting.fixtures.configfiles import config_files, empty_config_file
+from edi.lib.yamlhelpers import normalize_yaml
 import subprocess
 from edi.lib import mockablerun
 import pytest
@@ -58,7 +58,7 @@ expected_profile_boilerplates = [
 name: privileged
 description: Privileged edi lxc container
 config:
-  security.privileged: "true"
+  security.privileged: 'true'
 devices: {}
 """,
     """
@@ -85,13 +85,13 @@ devices:
 
 def render_expected_profiles():
     user = get_user()
-    dict = {'user': get_user(),
-            'home': get_user_environment_variable('HOME'),
-            'target_home': '/home/{}'.format(user)}
+    dictionary = {'user': get_user(),
+                  'home': get_user_environment_variable('HOME'),
+                  'target_home': '/home/{}'.format(user)}
     expected_profiles = []
     for boilerplate in expected_profile_boilerplates:
         template = Template(boilerplate)
-        expected_profiles.append(template.render(dict))
+        expected_profiles.append(normalize_yaml(template.render(dictionary)))
     return expected_profiles
 
 
@@ -106,7 +106,7 @@ def test_pre_config_profiles(config_files):
 
         assert len(profiles) == 1
 
-        assert profiles[0] == expected_profiles[0]
+        assert profiles[0][0] == expected_profiles[0]
 
 
 def test_post_config_profiles(config_files):
@@ -121,7 +121,8 @@ def test_post_config_profiles(config_files):
         assert len(profiles) == 3
 
         for i in range(0, 3):
-            assert profiles[i] == expected_profiles[i]
+            assert profiles[i][0] == expected_profiles[i]
+
 
 def test_get_mountpoints(config_files):
     with open(config_files, "r") as main_file:
@@ -201,7 +202,7 @@ def test_get_mandatory_item():
     assert 'mountpoint' in missing.value.message
 
     with pytest.raises(FatalError) as subfolder:
-        SharedFolderCoordinator._get_mandatory_item('some_folder', {'mountpoint': 'mount/point' }, 'mountpoint')
+        SharedFolderCoordinator._get_mandatory_item('some_folder', {'mountpoint': 'mount/point'}, 'mountpoint')
     assert 'some_folder' in subfolder.value.message
     assert 'mountpoint' in subfolder.value.message
 
@@ -238,7 +239,7 @@ def test_create_host_folders_folder_exists(config_files, monkeypatch):
 
         monkeypatch.setattr(os.path, 'exists', fake_os_path_exists)
 
-        coordinator.create_host_folders() # nothing to do
+        coordinator.create_host_folders()  # nothing to do
 
 
 def test_create_host_folders_not_a_folder(config_files, monkeypatch):
@@ -258,9 +259,33 @@ def test_create_host_folders_not_a_folder(config_files, monkeypatch):
         monkeypatch.setattr(os.path, 'exists', fake_os_path_exists)
 
         with pytest.raises(FatalError) as error:
-            coordinator.create_host_folders() # exists but not a folder
+            coordinator.create_host_folders()  # exists but not a folder
 
         assert 'valid_folder' in error.value.message
+
+
+def test_no_shared_folders_for_distributable_image(config_files, monkeypatch):
+    with open(config_files, "r") as main_file:
+        with command_context({'edi_create_distributable_image': True}):
+            parser = ConfigurationParser(main_file)
+
+            coordinator = SharedFolderCoordinator(parser)
+
+            def fake_os_path_exists(*_):
+                return False
+            monkeypatch.setattr(os.path, 'exists', fake_os_path_exists)
+
+            def fake_run(*popenargs, **kwargs):
+                # We should not run anything!
+                assert False
+
+            monkeypatch.setattr(mockablerun, 'run_mockable', fake_run)
+
+            coordinator.create_host_folders()
+            coordinator.verify_container_mountpoints('does-not-exist')
+            assert coordinator.get_mountpoints() == []
+            assert coordinator.get_pre_config_profiles() == []
+            assert coordinator.get_post_config_profiles() == []
 
 
 def test_create_host_folders_successful_create(config_files, monkeypatch):
@@ -289,7 +314,7 @@ def test_create_host_folders_successful_create(config_files, monkeypatch):
 
         monkeypatch.setattr(mockablerun, 'run_mockable', fake_mkdir_command)
 
-        coordinator.create_host_folders() # successful mkdir
+        coordinator.create_host_folders()  # successful mkdir
 
 
 def test_create_host_folders_failed_create(config_files, monkeypatch):
@@ -318,7 +343,7 @@ def test_create_host_folders_failed_create(config_files, monkeypatch):
         monkeypatch.setattr(mockablerun, 'run_mockable', fake_mkdir_command)
 
         with pytest.raises(FatalError) as error:
-            coordinator.create_host_folders() # failed mkdir
+            coordinator.create_host_folders()  # failed mkdir
 
         assert 'valid_folder' in error.value.message
         assert 'no permission' in error.value.message

@@ -26,7 +26,7 @@ from edi.lib.configurationparser import command_context
 from edi.lib.lxchelpers import (export_image, get_file_extension_from_image_compression_algorithm,
                                 get_server_image_compression_algorithm)
 from edi.commands.lxccommands.publish import Publish
-from edi.lib.helpers import print_success
+from edi.lib.helpers import print_success, get_artifact_dir, create_artifact_dir
 
 
 class Export(Lxc):
@@ -42,56 +42,66 @@ class Export(Lxc):
         cls._require_config_file(parser)
 
     def run_cli(self, cli_args):
-        self.run(cli_args.config_file, introspection_method=self._get_introspection_method(
-            cli_args, ['lxc_templates', 'lxc_profiles', 'playbooks']))
+        self._dispatch(*self._unpack_cli_args(cli_args), run_method=self._get_run_method(cli_args))
 
-    def run(self, config_file, introspection_method=None):
-        with command_context({'edi_create_distributable_image': True}):
-            self._setup_parser(config_file)
+    def dry_run(self, config_file):
+        return self._dispatch(config_file, run_method=self._dry_run)
 
-            if introspection_method:
-                print(introspection_method())
-                return self._result()
+    def _dry_run(self):
+        return Publish().dry_run(self.config.get_base_config_file())
 
-            if os.path.isfile(self._result()):
-                logging.info(("{0} is already there. "
-                              "Delete it to regenerate it."
-                              ).format(self._result()))
-                return self._result()
+    def run(self, config_file):
+        return self._dispatch(config_file, run_method=self._run)
 
-            image_name = Publish().run(config_file)
+    def _run(self):
+        if os.path.isfile(self._result()):
+            logging.info(("{0} is already there. "
+                          "Delete it to regenerate it."
+                          ).format(self._result()))
+            return self._result()
 
-            print("Going to export lxc image from image store.")
+        image_name = Publish().run(self.config.get_base_config_file())
 
-            export_image(image_name, self._image_without_extension())
+        print("Going to export lxc image from image store.")
 
-            if (os.path.isfile(self._image_without_extension()) and
-                    not os.path.isfile(self._result())):
-                # Workaround for https://github.com/lxc/lxd/issues/3869
-                logging.info("Fixing file extension of exported image.")
-                os.rename(self._image_without_extension(), self._result())
+        create_artifact_dir()
+        export_image(image_name, self._image_without_extension())
 
-            print_success("Exported lxc image as {}.".format(self._result()))
+        if (os.path.isfile(self._image_without_extension()) and
+                not os.path.isfile(self._result())):
+            # Workaround for https://github.com/lxc/lxd/issues/3869
+            logging.info("Fixing file extension of exported image.")
+            os.rename(self._image_without_extension(), self._result())
 
+        print_success("Exported lxc image as {}.".format(self._result()))
         return self._result()
 
     def clean(self, config_file):
-        self._setup_parser(config_file)
+        self._dispatch(config_file, run_method=self._clean)
 
+    def _clean(self):
         if os.path.isfile(self._result()):
             logging.info("Removing '{}'.".format(self._result()))
             os.remove(self._result())
             print_success("Removed lxc image {}.".format(self._result()))
 
+    def _dispatch(self, config_file, run_method):
+        with command_context({'edi_create_distributable_image': True}):
+            self._setup_parser(config_file)
+            return run_method()
+
     def _result_base_name(self):
-        return "{0}_{1}".format(self.config.get_project_name(),
+        return "{0}_{1}".format(self.config.get_configuration_name(),
                                 self._get_command_file_name_prefix())
 
     def _image_without_extension(self):
-        return os.path.join(self.config.get_workdir(), self._result_base_name())
+        return os.path.join(get_artifact_dir(), self._result_base_name())
+
+    def result(self, config_file):
+        return self._dispatch(config_file, run_method=self._result)
 
     def _result(self):
         algorithm = get_server_image_compression_algorithm()
         extension = get_file_extension_from_image_compression_algorithm(algorithm)
         archive = "{}{}".format(self._result_base_name(), extension)
-        return os.path.join(self.config.get_workdir(), archive)
+        return os.path.join(get_artifact_dir(), archive)

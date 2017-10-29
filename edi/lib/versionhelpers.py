@@ -22,7 +22,6 @@
 import os
 import pkg_resources
 import re
-import logging
 from edi.lib.helpers import FatalError
 
 # The do_release script will update this version!

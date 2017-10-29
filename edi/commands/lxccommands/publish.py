@@ -40,40 +40,46 @@ class Publish(Lxc):
         cls._require_config_file(parser)
 
     def run_cli(self, cli_args):
-        self.run(cli_args.config_file, introspection_method=self._get_introspection_method(
-            cli_args, ['lxc_templates', 'lxc_profiles', 'playbooks']))
+        self._dispatch(*self._unpack_cli_args(cli_args), run_method=self._get_run_method(cli_args))
 
-    def run(self, config_file, introspection_method=None):
-        with command_context({'edi_create_distributable_image': True}):
-            self._setup_parser(config_file)
+    def dry_run(self, config_file):
+        return self._dispatch(config_file, run_method=self._dry_run)
 
-            if introspection_method:
-                print(introspection_method())
-                return self._result()
+    def _dry_run(self):
+        return Stop().dry_run(self.config.get_base_config_file())
 
-            if is_in_image_store(self._result()):
-                logging.info(("{0} is already in image store. "
-                              "Delete it to regenerate it."
-                              ).format(self._result()))
-                return self._result()
+    def run(self, config_file):
+        return self._dispatch(config_file, self._run)
 
-            container_name = Stop().run(config_file)
+    def _run(self):
+        if is_in_image_store(self._result()):
+            logging.info(("{0} is already in image store. "
+                          "Delete it to regenerate it."
+                          ).format(self._result()))
+            return self._result()
 
-            print("Going to publish lxc container in image store.")
-            publish_container(container_name, self._result())
-            print_success("Published lxc container in image store as {}.".format(self._result()))
+        container_name = Stop().run(self.config.get_base_config_file())
 
+        print("Going to publish lxc container in image store.")
+        publish_container(container_name, self._result())
+        print_success("Published lxc container in image store as {}.".format(self._result()))
         return self._result()
 
     def clean(self, config_file):
-        self._setup_parser(config_file)
+        self._dispatch(config_file, run_method=self._clean)
 
+    def _clean(self):
         if is_in_image_store(self._result()):
             logging.info(("Removing '{}' from image store."
                           ).format(self._result()))
             delete_image(self._result())
             print_success("Removed {} from image store.".format(self._result()))
 
+    def _dispatch(self, config_file, run_method):
+        with command_context({'edi_create_distributable_image': True}):
+            self._setup_parser(config_file)
+            return run_method()
+
     def _result(self):
-        return "{}_{}".format(self.config.get_project_name(),
+        return "{}_{}".format(self.config.get_configuration_name(),
                               self._get_command_file_name_prefix())

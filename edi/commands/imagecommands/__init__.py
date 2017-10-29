@@ -19,4 +19,4 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
-__all__ = ["bootstrap", "imagelxc", "imageclean"]
+__all__ = ["bootstrap", "imageclean", "create"]

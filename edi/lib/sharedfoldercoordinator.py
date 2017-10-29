@@ -26,6 +26,7 @@ from edi.lib.shellhelpers import run
 import os
 import logging
 import subprocess
+from edi.lib.yamlhelpers import normalize_yaml
 
 
 profile_privileged = """
@@ -59,6 +60,9 @@ class SharedFolderCoordinator():
         Make sure that all configured shared folders exist on the host system.
         If a folder is missing, create it!
         """
+        if self._suppress_shared_folders():
+            return
+
         host_folders = self._get_folder_list('edi_current_user_host_home_directory', 'folder')
         for folder in host_folders:
             if os.path.exists(folder):
@@ -87,6 +91,9 @@ class SharedFolderCoordinator():
         If a target mount point is missing, raise a fatal error.
         Hint: It is assumed that the mount points within the target get created during the configuration phase.
         """
+        if self._suppress_shared_folders():
+            return
+
         test_cmd = ['lxc', 'exec', container_name, '--', 'true']
         result = run(test_cmd, check=False, stderr=subprocess.PIPE)
         if result.returncode != 0:
@@ -107,6 +114,9 @@ class SharedFolderCoordinator():
         Get a list of mount points.
         :return: a list of mountpoints
         """
+        if self._suppress_shared_folders():
+            return []
+
         return self._get_folder_list('edi_current_user_target_home_directory', 'mountpoint')
 
     def get_pre_config_profiles(self):
@@ -114,8 +124,11 @@ class SharedFolderCoordinator():
         Creates all profiles that can be applied prior to the configuration of the target.
         :return: list of profiles
         """
+        if self._suppress_shared_folders():
+            return []
+
         if self._config.get_ordered_raw_items('shared_folders'):
-            return [Template(profile_privileged).render({})]
+            return [(normalize_yaml(Template(profile_privileged).render({})), 'zzz_privileged', 'builtin', {})]
         else:
             return []
 
@@ -124,19 +137,27 @@ class SharedFolderCoordinator():
         Creates all profiles that can be applied after the configuration of the target.
         :return: list of profiles
         """
+        if self._suppress_shared_folders():
+            return []
+
         shared_folders = self._config.get_ordered_raw_items('shared_folders')
         if shared_folders:
-            profiles = [Template(profile_privileged).render({})]
+            profiles = self.get_pre_config_profiles()
             template = Template(profile_shared_folder)
             for name, content, node_dict in shared_folders:
                 for item in ['folder', 'mountpoint']:
                     node_dict['shared_folder_{}'.format(item)] = self._get_mandatory_item(name, content, item)
                 node_dict['shared_folder_name'] = name
-                profiles.append(template.render(node_dict))
+                profiles.append((normalize_yaml(template.render(node_dict)),
+                                 'zzz_{}'.format(name), 'builtin', node_dict))
 
             return profiles
         else:
             return []
+
+    def _suppress_shared_folders(self):
+        # Do not create shared folders for a distributable image.
+        return self._config.create_distributable_image()
 
     @staticmethod
     def _get_mandatory_item(folder_name, folder_config, item):

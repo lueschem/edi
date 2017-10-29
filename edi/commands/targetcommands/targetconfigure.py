@@ -40,19 +40,23 @@ class Configure(Target):
         parser.add_argument('ip_address')
         cls._require_config_file(parser)
 
+    @staticmethod
+    def _unpack_cli_args(cli_args):
+        return [cli_args.ip_address, cli_args.config_file]
+
     def run_cli(self, cli_args):
-        self.run(cli_args.ip_address, cli_args.config_file,
-                 introspection_method=self._get_introspection_method(
-                     cli_args, ['playbooks']))
+        self._dispatch(*self._unpack_cli_args(cli_args), run_method=self._get_run_method(cli_args))
 
-    def run(self, ip_address, config_file, introspection_method=None):
-        self._setup_parser(config_file)
-        self.ip_address = ip_address
+    def dry_run(self, ip_address, config_file):
+        return self._dispatch(ip_address, config_file, run_method=self._dry_run)
 
-        if introspection_method:
-            print(introspection_method())
-            return self._result()
+    def _dry_run(self):
+        return self.config.get_plugins('playbooks')
 
+    def run(self, ip_address, config_file):
+        return self._dispatch(ip_address, config_file, run_method=self._run)
+
+    def _run(self):
         print("Going to configure target system ({}) - be patient.".format(self._result()))
 
         playbook_runner = PlaybookRunner(self.config, self._result(), "ssh")
@@ -60,6 +64,11 @@ class Configure(Target):
 
         print_success("Configured target system ({}).".format(self._result()))
         return self._result()
+
+    def _dispatch(self, ip_address, config_file, run_method):
+        self._setup_parser(config_file)
+        self.ip_address = ip_address
+        return run_method()
 
     def _result(self):
         return self.ip_address

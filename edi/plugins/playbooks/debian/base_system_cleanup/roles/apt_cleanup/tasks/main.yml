@@ -1,0 +1,4 @@
+---
+- name: Remove service startup prevention.
+  file: dest=/usr/sbin/policy-rc.d state=absent
+

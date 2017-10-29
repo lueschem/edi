@@ -20,14 +20,16 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 from edi.commands.qemu import Qemu
-from edi.lib.helpers import print_success, chown_to_user, FatalError
-from edi.lib.shellhelpers import get_user_environment_variable, get_debian_architecture
+from edi.lib.helpers import (print_success, chown_to_user, FatalError, get_workdir,
+                             get_artifact_dir, create_artifact_dir)
+from edi.lib.shellhelpers import get_debian_architecture
 import apt_inst
 import tempfile
 import os
 import logging
 import shutil
 from edi.lib.debhelpers import PackageDownloader
+
 
 class Fetch(Qemu):
 
@@ -42,16 +44,19 @@ class Fetch(Qemu):
         cls._require_config_file(parser)
 
     def run_cli(self, cli_args):
-        self.run(cli_args.config_file, introspection_method=self._get_introspection_method(
-            cli_args, []))
+        self._dispatch(*self._unpack_cli_args(cli_args), run_method=self._get_run_method(cli_args))
 
-    def run(self, config_file, introspection_method=None):
-        self._setup_parser(config_file)
+    def dry_run(self, config_file):
+        return self._dispatch(config_file, run_method=self._dry_run)
 
-        if introspection_method:
-            print(introspection_method())
-            return self._result()
+    @staticmethod
+    def _dry_run():
+        return {}
 
+    def run(self, config_file):
+        return self._dispatch(config_file, run_method=self._run)
+
+    def _run(self):
         if not self._needs_qemu():
             return None
 
@@ -64,7 +69,7 @@ class Fetch(Qemu):
         qemu_package = self.config.get_qemu_package_name()
         print("Going to fetch qemu Debian package ({}).".format(qemu_package))
 
-        workdir = self.config.get_workdir()
+        workdir = get_workdir()
 
         with tempfile.TemporaryDirectory(dir=workdir) as tempdir:
             chown_to_user(tempdir)
@@ -84,14 +89,16 @@ class Fetch(Qemu):
             apt_inst.DebFile(package_file).data.extractall(tempdir)
             qemu_binary = os.path.join(tempdir, 'usr', 'bin', self._get_qemu_binary_name())
             chown_to_user(qemu_binary)
+            create_artifact_dir()
             shutil.move(qemu_binary, self._result())
 
         print_success("Fetched qemu binary {}.".format(self._result()))
         return self._result()
 
     def clean(self, config_file):
-        self._setup_parser(config_file)
+        self._dispatch(config_file, run_method=self._clean)
 
+    def _clean(self):
         result = self._result()
         if not result:
             return
@@ -100,11 +107,15 @@ class Fetch(Qemu):
             os.remove(result)
             print_success("Removed QEMU binary {}.".format(result))
 
+    def _dispatch(self, config_file, run_method):
+        self._setup_parser(config_file)
+        return run_method()
+
     def _result(self):
         if not self._needs_qemu():
             return None
         else:
-            return os.path.join(self.config.get_workdir(), self._get_qemu_binary_name())
+            return os.path.join(get_artifact_dir(), self._get_qemu_binary_name())
 
     def _get_qemu_binary_name(self):
         arch_dict = {'amd64': 'x86_64',

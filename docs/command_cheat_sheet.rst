@@ -23,6 +23,14 @@ Run all tests (including coverage):
 
   sudo py.test-3 --all --cov=edi --cov-report=html
 
+
+Check source code using flake8:
+
+::
+
+  flake8 --max-line-length=120 .
+
+
 Debian
 ++++++
 

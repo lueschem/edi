@@ -19,22 +19,24 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
-from pytest import fixture
-import os
-from edi.lib.helpers import copy_tree
+import yaml
 
 
-@fixture
-def datadir(tmpdir, request):
-    '''
-    Move data from tests/data/TESTNAME into a temporary directory
-    so that the test can modify its data set.
-    '''
-    test_subdir = os.path.basename(os.path.splitext(request.module.__file__)[0])
-    test_data = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                             '..', '..', 'data', test_subdir))
+class LiteralString(str):
+    pass
 
-    if os.path.isdir(test_data):
-        copy_tree(str(test_data), str(tmpdir))
 
-    return tmpdir
+def literal_string_representer(dumper, data):
+    return dumper.represent_scalar(u'tag:yaml.org,2002:str', data, style='|')
+
+
+yaml.add_representer(LiteralString, literal_string_representer)
+
+
+def normalize_yaml(yaml_string):
+    """
+    Feeds a yaml string through pyyaml to normalize its representation.
+    :param yaml_string: string in yaml format
+    :return: string in yaml format with pyyaml default_flow_style=False
+    """
+    return yaml.dump(yaml.load(yaml_string), default_flow_style=False)

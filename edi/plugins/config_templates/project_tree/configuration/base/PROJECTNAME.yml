@@ -47,6 +47,17 @@ playbooks:
         path: playbooks/debian/development_user_facilities/main.yml
     050_sample_playbook:
         path: playbooks/sample_playbook/main.yml
+    900_base_system_cleanup:
+        path: playbooks/debian/base_system_cleanup/main.yml
+
+postprocessing_commands:
+    010_sample_command:
+        path: postprocessing_commands/sample_command/custom_command
+{% raw %}
+        output: {{ edi_configuration_name }}.result
+{% endraw %}
+        parameters:
+            message: We could do something useful within this command!
 
 {% if edi_qemu_repository %}
 qemu:

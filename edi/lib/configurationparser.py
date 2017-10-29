@@ -27,14 +27,13 @@ import os
 from contextlib import contextmanager
 from os.path import dirname, abspath, basename, splitext, isfile, join
 import logging
-from edi.lib.helpers import (get_user, get_user_gid, get_user_uid,
+from edi.lib.helpers import (get_user, get_user_gid, get_user_uid, get_workdir,
                              get_hostname, get_edi_plugin_directory, FatalError)
 from edi.lib.versionhelpers import get_edi_version, get_stripped_version
 from edi.lib.shellhelpers import get_user_environment_variable
 from edi.lib.lxchelpers import get_lxd_version
 from packaging.version import Version
 from edi.lib.urlhelpers import obfuscate_url_password
-from edi.lib.sharedfoldercoordinator import SharedFolderCoordinator
 
 
 def remove_passwords(dictionary):
@@ -91,46 +90,53 @@ class ConfigurationParser:
         'edi_create_distributable_image': False
     }
 
+    @staticmethod
+    def create_distributable_image():
+        return ConfigurationParser.command_context.get('edi_create_distributable_image')
+
+    def get_context_suffix(self):
+        if self.create_distributable_image():
+            return '_di'
+        else:
+            return ''
+
     def dump(self):
         return yaml.dump(self._get_config(), default_flow_style=False)
 
-    def dump_load_time_dictionary(self):
-        return yaml.dump(self._get_load_time_dictionary(), default_flow_style=False)
+    def get_config(self):
+        return self._get_config()
 
-    def dump_plugins(self, plugin_sections):
+    def get_load_time_dictionary(self):
+        return self._get_load_time_dictionary()
+
+    def get_plugins(self, plugin_section):
         result = {}
 
-        for plugin_section in plugin_sections:
-            plugins = self.get_ordered_path_items(plugin_section)
+        plugins = self.get_ordered_path_items(plugin_section)
 
-            if plugins:
-                result[plugin_section] = []
+        if plugins:
+            result[plugin_section] = []
 
-            for plugin in plugins:
-                name, resolved_path, node_dict = plugin
+        for plugin in plugins:
+            name, resolved_path, node_dict, _ = plugin
 
-                if plugin_section == 'playbooks':
-                    sfc = SharedFolderCoordinator(self)
-                    node_dict['edi_shared_folder_mountpoints'] = sfc.get_mountpoints()
+            plugin_info = {name: {'path': resolved_path, 'dictionary': node_dict}}
 
-                plugin_info = {name: {'path': resolved_path, 'dictionary': node_dict}}
+            result[plugin_section].append(plugin_info)
 
-                result[plugin_section].append(plugin_info)
+        return result
 
-        return yaml.dump(result, default_flow_style=False)
-
-    def get_project_name(self):
+    def get_configuration_name(self):
         return self.config_id
-
-    def get_workdir(self):
-        # we might want to overwrite it by a config setting
-        return os.getcwd()
 
     def get_bootstrap_repository(self):
         return self._get_bootstrap_item("repository", None)
 
     def get_bootstrap_architecture(self):
-        return self._get_bootstrap_item("architecture", None)
+        architecture = self._get_bootstrap_item("architecture", None)
+        if not architecture:
+            raise FatalError('''Missing mandatory element 'architecture' in section 'bootstrap'.''')
+        return architecture
 
     def get_bootstrap_tool(self):
         return self._get_bootstrap_item("tool", "debootstrap")
@@ -150,6 +156,12 @@ class ConfigurationParser:
     def get_compression(self):
         return self._get_general_item("edi_compression", "xz")
 
+    def get_lxc_stop_timeout(self):
+        timeout = self._get_general_item("edi_lxc_stop_timeout", 120)
+        if type(timeout) != int:
+            raise FatalError('''The value of 'edi_lxc_stop_timeout' must be an integer.''')
+        return timeout
+
     def get_ordered_path_items(self, section):
         citems = self._get_config().get(section, {})
         ordered_items = collections.OrderedDict(sorted(citems.items()))
@@ -162,7 +174,9 @@ class ConfigurationParser:
                                       ).format(section, name))
                 resolved_path = self._resolve_path(path)
                 node_dict = self._get_node_dictionary(content)
-                item_list.append((name, resolved_path, node_dict))
+                node_dict['edi_current_plugin_directory'] = str(resolved_path)
+
+                item_list.append((name, resolved_path, node_dict, content))
             else:
                 logging.debug("Skipping named item '{}' from section '{}'.".format(name, section))
 
@@ -185,6 +199,7 @@ class ConfigurationParser:
         return join(self.config_directory, "plugins")
 
     def __init__(self, base_config_file):
+        self.base_config_file = base_config_file
         self.config_directory = dirname(abspath(base_config_file.name))
         self.config_id = splitext(basename(base_config_file.name))[0]
         if not ConfigurationParser._configurations.get(self.config_id):
@@ -209,6 +224,13 @@ class ConfigurationParser:
             logging.info("Merged configuration:\n{0}".format(self.dump()))
 
             self._verify_version_compatibility()
+
+    def get_base_config_file(self):
+        """
+        Returns the base config file that can be passed in for a next command.
+        :return: The base config file
+        """
+        return self.base_config_file
 
     def _verify_version_compatibility(self):
         current_version = get_edi_version()
@@ -252,7 +274,7 @@ class ConfigurationParser:
                           ] = self._merge_key_value_node(base, overlay,
                                                          element)
 
-        nested_elements = ["playbooks", "keys", "lxc_templates",
+        nested_elements = ["playbooks", "postprocessing_commands", "keys", "lxc_templates",
                            "lxc_profiles", "shared_folders"]
         for element in nested_elements:
             merged_config[element
@@ -307,9 +329,11 @@ class ConfigurationParser:
 
     def _get_load_time_dictionary(self):
         load_dict = get_base_dictionary()
-        load_dict["edi_work_directory"] = self.get_workdir()
+        load_dict["edi_work_directory"] = get_workdir()
         load_dict["edi_config_directory"] = self.config_directory
         load_dict["edi_project_plugin_directory"] = self.get_project_plugin_directory()
+        load_dict['edi_log_level'] = logging.getLevelName(logging.getLogger().getEffectiveLevel())
+        load_dict['edi_configuration_name'] = self.get_configuration_name()
         load_dict.update(ConfigurationParser.command_context)
         return load_dict
 
@@ -320,6 +344,7 @@ class ConfigurationParser:
                                                                              "lxcif0")
         node_dict["edi_config_management_user_name"] = self._get_general_item("edi_config_management_user_name",
                                                                               "edicfgmgmt")
+        node_dict['edi_bootstrap_architecture'] = self.get_bootstrap_architecture()
 
         parameters = node.get("parameters", None)
 

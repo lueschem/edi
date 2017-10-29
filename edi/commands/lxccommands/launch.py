@@ -46,25 +46,32 @@ class Launch(Lxc):
         parser.add_argument('container_name')
         cls._require_config_file(parser)
 
+    @staticmethod
+    def _unpack_cli_args(cli_args):
+        return [cli_args.container_name, cli_args.config_file]
+
     def run_cli(self, cli_args):
-        self.run(cli_args.container_name, cli_args.config_file,
-                 introspection_method=self._get_introspection_method(
-                     cli_args, ['lxc_templates', 'lxc_profiles']))
+        self._dispatch(*self._unpack_cli_args(cli_args), run_method=self._get_run_method(cli_args))
 
-    def run(self, container_name, config_file, introspection_method=None):
-        self._setup_parser(config_file)
-        self.container_name = container_name
+    def dry_run(self, container_name, config_file):
+        return self._dispatch(container_name, config_file, run_method=self._dry_run)
 
-        if introspection_method:
-            print(introspection_method())
-            return self._result()
+    def _dry_run(self):
+        plugins = {}
+        plugins.update(Profile().dry_run(self.config.get_base_config_file(), include_post_config_profiles=False))
+        plugins.update(Import().dry_run(self.config.get_base_config_file()))
+        return plugins
 
-        if not is_valid_hostname(container_name):
+    def run(self, container_name, config_file):
+        return self._dispatch(container_name, config_file, run_method=self._run)
+
+    def _run(self):
+        if not is_valid_hostname(self.container_name):
             raise FatalError(("The provided container name '{}' "
                               "is not a valid host name."
-                              ).format(container_name))
+                              ).format(self.container_name))
 
-        profiles = Profile().run(config_file)
+        profiles = Profile().run(self.config.get_base_config_file(), include_post_config_profiles=False)
 
         if is_container_existing(self._result()):
             logging.info(("Container {0} is already existing. "
@@ -80,7 +87,7 @@ class Launch(Lxc):
                 if is_container_running(self._result()):
                     logging.info(("Stopping container {0} to update profiles."
                                   ).format(self._result()))
-                    stop_container(self._result())
+                    stop_container(self._result(), timeout=self.config.get_lxc_stop_timeout())
                 apply_profiles(self._result(), profiles)
 
             if not is_container_running(self._result()):
@@ -89,12 +96,17 @@ class Launch(Lxc):
                 start_container(self._result())
                 print_success("Started container {}.".format(self._result()))
         else:
-            image = Import().run(config_file)
+            image = Import().run(self.config.get_base_config_file())
             print("Going to launch container.")
             launch_container(image, self._result(), profiles)
             print_success("Launched container {}.".format(self._result()))
 
         return self._result()
+
+    def _dispatch(self, container_name, config_file, run_method):
+        self._setup_parser(config_file)
+        self.container_name = container_name
+        return run_method()
 
     @staticmethod
     def verify_profiles(desired_profiles, current_profiles):

@@ -19,15 +19,18 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
-import edi
+from tests.libtesting.optins import requires_flake8
+from edi.lib.shellhelpers import run
+import os
+import subprocess
 
 
-def test_command_line_interface_setup(empty_config_file):
-    parser = edi._setup_command_line_interface()
-    assert 'embedded development infrastructure' in parser.description
-    args = parser.parse_args(['-v', 'lxc', 'configure', 'some-container', empty_config_file])
-    assert args.command_name == 'lxc'
-    assert str(args.config_file.name) == str(empty_config_file)
-    assert args.container_name == 'some-container'
-    assert args.sub_command_name == 'configure'
-    assert args.verbose is True
+@requires_flake8
+def test_flake8():
+    path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    cmd = ['flake8', '--max-line-length=120', path]
+    result = run(cmd, check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if result.returncode != 0:
+        print(result.stdout)
+        print(result.stderr)
+        assert False, "flake8 reported errors!"

@@ -25,7 +25,6 @@ import hashlib
 import codecs
 import gzip
 import subprocess
-from tests.libtesting.fixtures.datadir import datadir
 from edi.lib.debhelpers import PackageDownloader
 from edi.lib.helpers import which
 
@@ -67,7 +66,7 @@ class RepositoryMock():
                 data = self._replace_all(data, checksum_dict)
             with codecs.open(package_path, mode='w', encoding='utf-8') as f:
                 f.write(data)
-            compressed_package_path =  os.path.join(str(self.datadir), '{}.gz'.format(package_name))
+            compressed_package_path = os.path.join(str(self.datadir), '{}.gz'.format(package_name))
             with open(package_path, mode='rb') as f:
                 bdata = f.read()
             with gzip.open(compressed_package_path, mode='wb') as f:
@@ -159,6 +158,7 @@ def do_package_download(datadir, key):
 
 def test_package_download_without_key(datadir):
     do_package_download(datadir, None)
+
 
 def test_package_download_with_key(datadir):
     do_package_download(datadir, 'https://www.example.com/keys/test-archive-key.asc')

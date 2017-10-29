@@ -31,9 +31,9 @@ def _gz_decompress(data):
 
 
 decompressor_from_magic = [
-    (b'\x1f\x8b\x08', partial(_gz_decompress)), # gz
-    (b'\x42\x5a\x68', partial(bz2.decompress)), # bz2
-    (b'\xfd\x37\x7a\x58\x5a\x00', partial(lzma.decompress)), # xz
+    (b'\x1f\x8b\x08', partial(_gz_decompress)),  # gz
+    (b'\x42\x5a\x68', partial(bz2.decompress)),  # bz2
+    (b'\xfd\x37\x7a\x58\x5a\x00', partial(lzma.decompress)),  # xz
     ]
 
 

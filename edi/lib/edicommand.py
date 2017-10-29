@@ -24,6 +24,7 @@ from edi.lib.configurationparser import ConfigurationParser
 import argparse
 import os
 import logging
+import yaml
 from functools import partial
 from edi.lib.helpers import FatalError
 from edi.lib.shellhelpers import run
@@ -111,24 +112,41 @@ class EdiCommand(metaclass=CommandFactory):
                            help=('dump the active plugins including their dictionaries instead of '
                                  'running the command'))
 
-    def _get_introspection_method(self, cli_args, plugin_sections):
+    @staticmethod
+    def _unpack_cli_args(cli_args):
+        return [cli_args.config_file]
+
+    def _get_run_method(self, cli_args):
         if cli_args.dictionary:
-            return self._dump_load_time_dictionary
+            return partial(self._print, self._get_load_time_dictionary)
         elif cli_args.config:
-            return self._dump_config
+            return partial(self._print, self._get_config)
         elif cli_args.plugins:
-            return partial(self._dump_plugins, plugin_sections)
+            return partial(self._print, partial(self.dry_run, *self._unpack_cli_args(cli_args)))
         else:
-            return None
+            return partial(self.run, *self._unpack_cli_args(cli_args))
 
-    def _dump_load_time_dictionary(self):
-        return self.config.dump_load_time_dictionary()
+    def run(self, *args, **kwargs):
+        raise FatalError('''Missing 'run' implementation for '{}'.'''.format(self._get_command_name()))
 
-    def _dump_config(self):
-        return self.config.dump()
+    def dry_run(self, *args, **kwargs):
+        raise FatalError('''Missing 'dry_run' implementation for '{}'.'''.format(self._get_command_name()))
 
-    def _dump_plugins(self, sections):
-        return self.config.dump_plugins(sections)
+    def _get_load_time_dictionary(self):
+        return self.config.get_load_time_dictionary()
+
+    def _get_config(self):
+        return self.config.get_config()
+
+    def _get_plugins(self, sections):
+        return self.config.get_plugins(sections)
+
+    @staticmethod
+    def _dump(introspection_result):
+        return yaml.dump(introspection_result, default_flow_style=False, width=1000)
+
+    def _print(self, method):
+        print(self._dump(method()))
 
     def _require_sudo(self):
         if os.getuid() != 0:

@@ -27,8 +27,9 @@ from codecs import open
 from aptsources.sourceslist import SourceEntry
 from edi.commands.image import Image
 from edi.commands.qemucommands.fetch import Fetch
-from edi.lib.helpers import (require_executable, FatalError,
-                             chown_to_user, print_success)
+from edi.lib.helpers import (require_executable, FatalError, chown_to_user, print_success,
+                             get_workdir, get_artifact_dir, create_artifact_dir)
+from edi.lib.configurationparser import command_context
 from edi.lib.shellhelpers import run, get_chroot_cmd
 from edi.lib.keyhelpers import fetch_repository_key, build_keyring
 
@@ -46,16 +47,18 @@ class Bootstrap(Image):
         cls._require_config_file(parser)
 
     def run_cli(self, cli_args):
-        self.run(cli_args.config_file, introspection_method=self._get_introspection_method(
-            cli_args, []))
+        self._dispatch(*self._unpack_cli_args(cli_args), run_method=self._get_run_method(cli_args))
 
-    def run(self, config_file, introspection_method=None):
-        self._setup_parser(config_file)
+    def dry_run(self, config_file):
+        return self._dispatch(config_file, run_method=self._dry_run)
 
-        if introspection_method:
-            print(introspection_method())
-            return self._result()
+    def _dry_run(self):
+        return Fetch().dry_run(self.config.get_base_config_file())
 
+    def run(self, config_file):
+        return self._dispatch(config_file, run_method=self._run)
+
+    def _run(self):
         if os.path.isfile(self._result()):
             logging.info(("{0} is already there. "
                           "Delete it to regenerate it."
@@ -64,7 +67,7 @@ class Bootstrap(Image):
 
         self._require_sudo()
 
-        qemu_executable = Fetch().run(config_file)
+        qemu_executable = Fetch().run(self.config.get_base_config_file())
 
         print("Going to bootstrap initial image - be patient.")
 
@@ -74,7 +77,7 @@ class Bootstrap(Image):
 
         require_executable("debootstrap", "sudo apt install debootstrap")
 
-        workdir = self.config.get_workdir()
+        workdir = get_workdir()
 
         with tempfile.TemporaryDirectory(dir=workdir) as tempdir:
             chown_to_user(tempdir)
@@ -84,26 +87,35 @@ class Bootstrap(Image):
             self._postprocess_rootfs(rootfs, key_data)
             archive = self._pack_image(tempdir, rootfs)
             chown_to_user(archive)
+            create_artifact_dir()
             shutil.move(archive, self._result())
 
         print_success("Bootstrapped initial image {}.".format(self._result()))
-
         return self._result()
 
     def clean(self, config_file):
-        self._setup_parser(config_file)
+        self._dispatch(config_file, run_method=self._clean)
 
+        with command_context({'edi_create_distributable_image': True}):
+            self._dispatch(config_file, run_method=self._clean)
+
+    def _clean(self):
         if os.path.isfile(self._result()):
             logging.info("Removing '{}'.".format(self._result()))
             os.remove(self._result())
             print_success("Removed bootstrap image {}.".format(self._result()))
 
+    def _dispatch(self, config_file, run_method):
+        self._setup_parser(config_file)
+        return run_method()
+
     def _result(self):
-        archive_name = ("{0}_{1}.tar.{2}"
-                        ).format(self.config.get_project_name(),
+        archive_name = ("{0}_{1}{2}.tar.{3}"
+                        ).format(self.config.get_configuration_name(),
                                  self._get_command_file_name_prefix(),
+                                 self.config.get_context_suffix(),
                                  self.config.get_compression())
-        return os.path.join(self.config.get_workdir(), archive_name)
+        return os.path.join(get_artifact_dir(), archive_name)
 
     def _run_debootstrap(self, tempdir, keyring_file, qemu_executable):
         # Ansible uses python on the target system

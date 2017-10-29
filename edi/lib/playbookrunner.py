@@ -25,7 +25,7 @@ import tempfile
 import yaml
 from codecs import open
 from edi.lib.helpers import chown_to_user
-from edi.lib.helpers import require_executable, get_user
+from edi.lib.helpers import require_executable, get_user, get_workdir
 from edi.lib.shellhelpers import run
 from edi.lib.sharedfoldercoordinator import SharedFolderCoordinator
 from edi.lib.configurationparser import remove_passwords
@@ -37,19 +37,17 @@ class PlaybookRunner():
         self.config = config
         self.target = target
         self.connection = connection
+        self.config_section = 'playbooks'
 
     def run_all(self):
-        workdir = self.config.get_workdir()
+        workdir = get_workdir()
 
         applied_playbooks = []
         with tempfile.TemporaryDirectory(dir=workdir) as tempdir:
             chown_to_user(tempdir)
             inventory = self._write_inventory_file(tempdir)
 
-            playbook_list = self.config.get_ordered_path_items("playbooks")
-            for name, path, extra_vars in playbook_list:
-                sfc = SharedFolderCoordinator(self.config)
-                extra_vars['edi_shared_folder_mountpoints'] = sfc.get_mountpoints()
+            for name, path, extra_vars, in self._get_playbooks():
                 logging.info(("Running playbook {} located in "
                               "{} with extra vars:\n{}"
                               ).format(name, path,
@@ -66,6 +64,31 @@ class PlaybookRunner():
                 applied_playbooks.append(name)
 
         return applied_playbooks
+
+    def _get_playbooks(self):
+        augmented_list = []
+        playbook_list = self.config.get_ordered_path_items(self.config_section)
+        for name, path, extra_vars, _ in playbook_list:
+            sfc = SharedFolderCoordinator(self.config)
+            extra_vars['edi_shared_folder_mountpoints'] = sfc.get_mountpoints()
+            augmented_list.append((name, path, extra_vars))
+
+        return augmented_list
+
+    def get_plugin_report(self):
+        result = {}
+
+        playbooks = self._get_playbooks()
+
+        if playbooks:
+            result[self.config_section] = []
+
+        for name, path, extra_vars in playbooks:
+            plugin_info = {name: {'path': path, 'dictionary': extra_vars}}
+
+            result[self.config_section].append(plugin_info)
+
+        return result
 
     def _run_playbook(self, playbook, inventory, extra_vars, ansible_user):
         require_executable("ansible-playbook", "sudo apt install ansible")

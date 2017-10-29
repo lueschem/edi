@@ -53,6 +53,10 @@ edi supports the following settings:
        Possible values are :code:`gz` (fast but not very small), |br|
        :code:`bz2` or :code:`xz` (slower but minimal required space). |br|
        If not specified, edi uses :code:`xz` compression.
+   * - edi_lxc_stop_timeout
+     - The maximum time in seconds that edi will wait until |br|
+       it forces the shutdown of the lxc container. |br|
+       The default timeout is :code:`120` seconds.
    * - edi_required_minimal_edi_version
      - Defines the minimal edi version that is required for the given configuration.  |br|
        If the edi executable does not meet the required minimal version, it will exit with an error. |br|

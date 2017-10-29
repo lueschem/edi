@@ -21,19 +21,19 @@
 
 from aptsources.sourceslist import SourceEntry
 from edi.lib.configurationparser import ConfigurationParser, command_context
-from tests.libtesting.fixtures.configfiles import config_files, config_name, empty_overlay_config_file
 
 
-def test_project_name(config_files):
+def test_project_name(config_files, config_name):
     with open(config_files, "r") as main_file:
         parser = ConfigurationParser(main_file)
-        assert parser.get_project_name() == config_name
+        assert parser.get_configuration_name() == config_name
 
 
 def test_global_configuration_overlay(config_files):
     with open(config_files, "r") as main_file:
         parser = ConfigurationParser(main_file)
         assert parser.get_compression() == "gz"
+        assert parser.get_lxc_stop_timeout() == 130
 
 
 def test_bootstrap_overlay(config_files):
@@ -60,7 +60,7 @@ def test_playbooks_overlay(config_files, monkeypatch):
                               "20_networking",
                               "30_foo"]
         for playbook, expected in zip(playbooks, expected_playbooks):
-            name, path, extra_vars = playbook
+            name, path, extra_vars, _ = playbook
             assert name == expected
             if name == "10_base_system":
                 value = extra_vars.get("kernel_package")
@@ -86,7 +86,7 @@ def test_shared_folders(config_files):
         name, content, dict = shared_folders[0]
         assert name == 'other_folder'
         assert content.get('mountpoint') == 'target_mountpoint'
-        assert content.get('folder') == 'valid_folder' # merge result
+        assert content.get('folder') == 'valid_folder'  # merge result
         assert dict.get('edi_current_user_host_home_directory')
         assert dict.get('edi_current_user_target_home_directory') == '/foo/bar'
 

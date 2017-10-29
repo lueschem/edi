@@ -101,10 +101,16 @@ def start_container(name):
     run(cmd, log_threshold=logging.INFO)
 
 
-def stop_container(name):
+def stop_container(name, timeout=120):
     cmd = ["lxc", "stop", name]
 
-    run(cmd, log_threshold=logging.INFO)
+    try:
+        run(cmd, log_threshold=logging.INFO, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        logging.warning(("Timeout ({} seconds) expired while stopping container {}.\n"
+                         "Forcing container shutdown!").format(timeout, name))
+        cmd = ["lxc", "stop", "-f", name]
+        run(cmd, log_threshold=logging.INFO)
 
 
 def delete_container(name):

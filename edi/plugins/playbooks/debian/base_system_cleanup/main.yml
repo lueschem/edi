@@ -1,0 +1,6 @@
+- hosts: edi
+  roles:
+    - role: apt_cleanup
+      become: True
+      become_user: root
+

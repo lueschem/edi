@@ -25,6 +25,7 @@ from tests.libtesting.contextmanagers.workspace import workspace
 import os
 from tests.libtesting.helpers import get_random_string, get_project_root
 from edi.lib.shellhelpers import run
+from edi.lib.helpers import get_artifact_dir
 from edi.commands.lxccommands.lxcconfigure import Configure
 from edi.commands.clean import Clean
 import edi
@@ -53,8 +54,8 @@ def test_build_stretch_container(capsys):
         assert not err
 
         images = [
-            '{}-develop_edicommand_image_bootstrap.tar.gz'.format(project_name),
-            '{}-develop_edicommand_image_lxc.tar.gz'.format(project_name)
+            os.path.join(get_artifact_dir(), '{}-develop_edicommand_image_bootstrap.tar.gz'.format(project_name)),
+            os.path.join(get_artifact_dir(), '{}-develop_edicommand_image_lxc.tar.gz'.format(project_name))
         ]
         for image in images:
             assert os.path.isfile(image)
