@@ -174,7 +174,7 @@ class ConfigurationParser:
                                       ).format(section, name))
                 resolved_path = self._resolve_path(path)
                 node_dict = self._get_node_dictionary(content)
-                node_dict['edi_current_plugin_directory'] = str(resolved_path)
+                node_dict['edi_current_plugin_directory'] = str(dirname(resolved_path))
 
                 item_list.append((name, resolved_path, node_dict, content))
             else:
