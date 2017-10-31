@@ -127,7 +127,7 @@ class CommandRunner():
 
     @staticmethod
     def _run_command(command_file, require_root):
-        cmd = [command_file]
+        cmd = ['sh', '-c', command_file]
 
         run(cmd, log_threshold=logging.INFO, sudo=require_root)
 
