@@ -1,3 +1,13 @@
+edi (0.8.1) xenial; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Make command execution more robust.
+  * Fixed parameter edi_current_plugin_directory.
+
+  [ Matthias Lüscher (Launchpad) ]
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Tue, 31 Oct 2017 22:06:40 +0100
+
 edi (0.8.0) xenial; urgency=medium
 
   [ Matthias Lüscher ]
