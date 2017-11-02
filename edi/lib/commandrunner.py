@@ -42,12 +42,10 @@ class CommandRunner():
 
     def run(self):
         workdir = get_workdir()
-        result = self.input_artifact
-
         create_artifact_dir()
 
         commands = self._get_commands()
-        start_index = self._evaluate_start_index(commands)
+        start_index = self._evaluate_start_index(commands, log_existing=True)
 
         for index in range(start_index, len(commands)):
             filename, content, name, path, dictionary, raw_node = commands[index]
@@ -63,16 +61,15 @@ class CommandRunner():
 
                 command_file = self._flush_command_file(tmpdir, filename, content)
                 self._run_command(command_file, require_root)
-                new_result = dictionary.get('edi_output_artifact')
-                if new_result:
-                    result = new_result
-                    if not os.path.isfile(new_result) and not os.path.isdir(new_result):
+                result = dictionary.get('edi_output_artifact')
+                if result:
+                    if not os.path.isfile(result) and not os.path.isdir(result):
                         raise FatalError(('''The command '{}' did not generate '''
-                                          '''the specified output artifact '{}'.'''.format(name, new_result)))
-                    elif os.path.isfile(new_result):
-                        chown_to_user(new_result)
+                                          '''the specified output artifact '{}'.'''.format(name, result)))
+                    elif os.path.isfile(result):
+                        chown_to_user(result)
 
-        return result
+        return self._result(commands)
 
     def require_root(self):
         commands = self._get_commands()
@@ -189,3 +186,12 @@ class CommandRunner():
         chown_to_user(output_file)
 
         return output_file
+
+    def _result(self, commands):
+        for command in reversed(list(commands)):
+            _, _, _, _, dictionary, _ = command
+            artifact = dictionary.get('edi_output_artifact')
+            if artifact:
+                return artifact
+
+        return self.input_artifact
