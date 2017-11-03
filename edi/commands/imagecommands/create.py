@@ -68,7 +68,8 @@ class Create(Image):
 
         result = command_runner.run()
 
-        print_success("Successfully post processed image {}.".format(result))
+        print_success(("Completed the image creation post processing commands.\n"
+                       "The following artifacts are now available:\n- {}".format('\n- '.join(result))))
         return result
 
     def clean(self, config_file):

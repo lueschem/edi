@@ -45,49 +45,42 @@ class CommandRunner():
         create_artifact_dir()
 
         commands = self._get_commands()
-        start_index = self._evaluate_start_index(commands, log_existing=True)
 
-        for index in range(start_index, len(commands)):
-            filename, content, name, path, dictionary, raw_node = commands[index]
-            with tempfile.TemporaryDirectory(dir=workdir) as tmpdir:
-                chown_to_user(tmpdir)
-                require_root = raw_node.get('require_root', False)
+        for filename, content, name, path, dictionary, raw_node, artifacts in commands:
+            if self._are_all_artifacts_available(artifacts):
+                logging.info(('''Artifacts for command '{}' are already there. '''
+                              '''Delete them to regenerate them.'''
+                              ).format(name))
+            else:
+                with tempfile.TemporaryDirectory(dir=workdir) as tmpdir:
+                    chown_to_user(tmpdir)
+                    require_root = raw_node.get('require_root', False)
 
-                logging.info(("Running command {} located in "
-                              "{} with dictionary:\n{}"
-                              ).format(name, path,
-                                       yaml.dump(remove_passwords(dictionary),
-                                                 default_flow_style=False)))
+                    logging.info(("Running command {} located in "
+                                  "{} with dictionary:\n{}"
+                                  ).format(name, path,
+                                           yaml.dump(remove_passwords(dictionary),
+                                                     default_flow_style=False)))
 
-                command_file = self._flush_command_file(tmpdir, filename, content)
-                self._run_command(command_file, require_root)
-                result = dictionary.get('edi_output_artifact')
-                if result:
-                    if not os.path.isfile(result) and not os.path.isdir(result):
-                        raise FatalError(('''The command '{}' did not generate '''
-                                          '''the specified output artifact '{}'.'''.format(name, result)))
-                    elif os.path.isfile(result):
-                        chown_to_user(result)
+                    command_file = self._flush_command_file(tmpdir, filename, content)
+                    self._run_command(command_file, require_root)
+                    self._post_process_artifacts(name, artifacts)
 
         return self._result(commands)
 
     def require_root(self):
         commands = self._get_commands()
-        start_index = self._evaluate_start_index(commands)
 
-        for index in range(start_index, len(commands)):
-            _, _, _, _, _, raw_node = commands[index]
-            if raw_node.get('require_root', False):
+        for _, _, _, _, _, raw_node, artifacts in commands:
+            if not self._are_all_artifacts_available(artifacts) and raw_node.get('require_root', False):
                 return True
 
         return False
 
     def require_root_for_clean(self):
-        for _, _, _, _, dictionary, raw_node in self._get_commands():
-            if raw_node.get('require_root', False):
-                output = dictionary.get('edi_output_artifact')
-                if output and os.path.isdir(output):
-                    return True
+        for _, _, _, _, _, raw_node, artifacts in self._get_commands():
+            if raw_node.get('require_root', False) and self._is_an_artifact_a_directory(artifacts):
+                return True
 
         return False
 
@@ -99,7 +92,7 @@ class CommandRunner():
         if commands:
             result[self.config_section] = []
 
-        for _, content, name, path, dictionary, _ in commands:
+        for _, content, name, path, dictionary, _, _ in commands:
             plugin_info = {name: {'path': path, 'dictionary': dictionary, 'result': LiteralString(content)}}
 
             result[self.config_section].append(plugin_info)
@@ -108,18 +101,17 @@ class CommandRunner():
 
     def clean(self):
         commands = self._get_commands()
-        for filename, content, name, path, dictionary, raw_node in commands:
-            output = dictionary.get('edi_output_artifact')
+        for filename, content, name, path, dictionary, raw_node, artifacts in commands:
+            for _, artifact in artifacts.items():
+                if not str(get_workdir()) in str(artifact):
+                    raise FatalError(('Output artifact {} is not within the current working directory!'
+                                      ).format(artifact))
 
-            if output:
-                if not str(get_workdir()) in str(output):
-                    raise FatalError('Output artifact {} is not within the current working directory!'.format(output))
-
-                if os.path.isfile(output):
-                    logging.info("Removing '{}'.".format(output))
-                    os.remove(output)
-                    print_success("Removed image artifact {}.".format(output))
-                elif os.path.isdir(output):
+                if os.path.isfile(artifact):
+                    logging.info("Removing '{}'.".format(artifact))
+                    os.remove(artifact)
+                    print_success("Removed image artifact {}.".format(artifact))
+                elif os.path.isdir(artifact):
                     logging.warning("Command runner clean command is not implemented for directories.")
 
     @staticmethod
@@ -130,40 +122,59 @@ class CommandRunner():
 
     def _get_commands(self):
         artifactdir = get_artifact_dir()
-        result = self.input_artifact
         commands = self.config.get_ordered_path_items(self.config_section)
         augmented_commands = []
+        artifacts = dict()
+        if self.input_artifact:
+            artifacts['edi_input_artifact'] = self.input_artifact
+
         for name, path, dictionary, raw_node in commands:
             output = raw_node.get('output')
+            if type(output) != dict:
+                raise FatalError(('''The output specification in command node '{}' is not a key value dictionary.'''
+                                  ).format(name))
 
-            dictionary['edi_input_artifact'] = result
-            if output:
-                if str(output) != os.path.basename(output):
-                    raise FatalError((('''The specified output '{}' within the command node '{}' is invalid.\n'''
+            new_artifacts = dict()
+            for artifact_key, artifact_item in output.items():
+                if str(artifact_item) != os.path.basename(artifact_item):
+                    raise FatalError((('''The specified output artifact '{}' within the '''
+                                       '''command node '{}' is invalid.\n'''
                                        '''The output shall be a file or a folder (no '/' in string).''')
-                                      ).format(output, name))
-                output_artifact = os.path.join(artifactdir, output)
-                dictionary['edi_output_artifact'] = str(output_artifact)
-                result = str(output_artifact)
+                                      ).format(artifact_key, name))
+                artifact_path = os.path.join(artifactdir, artifact_item)
+                new_artifacts[artifact_key] = str(artifact_path)
 
+            artifacts.update(new_artifacts)
+            dictionary.update(artifacts)
             filename, content = self._render_command_file(path, dictionary)
-            augmented_commands.append((filename, content, name, path, dictionary, raw_node))
+            augmented_commands.append((filename, content, name, path, dictionary, raw_node, new_artifacts))
 
         return augmented_commands
 
     @staticmethod
-    def _evaluate_start_index(commands, log_existing=False):
-        for index, command in reversed(list(enumerate(commands))):
-            _, _, name, _, dictionary, _ = command
-            artifact = dictionary.get('edi_output_artifact')
-            if artifact and (os.path.isfile(artifact) or os.path.isdir(artifact)):
-                if log_existing:
-                    logging.info(('''Artifact '{}' for command '{}' is already there. '''
-                                  '''Delete it to regenerate it.'''
-                                  ).format(artifact, name))
-                return index + 1
+    def _are_all_artifacts_available(artifacts):
+        for _, artifact in artifacts.items():
+            if not os.path.isfile(artifact) and not os.path.isdir(artifact):
+                return False
 
-        return 0
+        return True
+
+    @staticmethod
+    def _is_an_artifact_a_directory(artifacts):
+        for _, artifact in artifacts.items():
+            if os.path.isdir(artifact):
+                return True
+
+        return False
+
+    @staticmethod
+    def _post_process_artifacts(command_name, expected_artifacts):
+        for _, artifact in expected_artifacts.items():
+            if not os.path.isfile(artifact) and not os.path.isdir(artifact):
+                raise FatalError(('''The command '{}' did not generate '''
+                                  '''the specified output artifact '{}'.'''.format(command_name, artifact)))
+            elif os.path.isfile(artifact):
+                chown_to_user(artifact)
 
     @staticmethod
     def _render_command_file(input_file, dictionary):
@@ -188,10 +199,12 @@ class CommandRunner():
         return output_file
 
     def _result(self, commands):
-        for command in reversed(list(commands)):
-            _, _, _, _, dictionary, _ = command
-            artifact = dictionary.get('edi_output_artifact')
-            if artifact:
-                return artifact
+        all_artifacts = list()
+        for _, _, _, _, _, _, artifacts in commands:
+            for _, artifact in artifacts.items():
+                all_artifacts.append(artifact)
 
-        return self.input_artifact
+        if all_artifacts:
+            return all_artifacts
+        else:
+            return [self.input_artifact]

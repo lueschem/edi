@@ -6,7 +6,7 @@ set -o pipefail
 
 INPUT_FILE="{{ edi_input_artifact }}"
 SIZE_OF_INPUT_FILE=$(stat --printf="%s" ${INPUT_FILE})
-OUTPUT_FILE="{{ edi_output_artifact }}"
+OUTPUT_FILE="{{ sample_output }}"
 MESSAGE="{{ message }}"
 
 if [ "${OUTPUT_FILE}" == "" ]

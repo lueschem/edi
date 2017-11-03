@@ -89,13 +89,17 @@ playbooks:
         path:               playbooks/bar.yml
 
 postprocessing_commands:
-    10_first_step:
-        path:               commands/command
-        output:             first.txt
+    10_first_command:
+        path:               commands/first
+        output:
+            first_output_file: first.txt
+            first_output_folder: first_folder
         parameters:
             message:        "*first step*"
-    20_second_step:
+    20_second_command:
         path:               commands/does_not_exist
+        output:
+            second_output_file: overwrite_me.txt
 """
 
 sample_global_file = """
@@ -110,20 +114,24 @@ bootstrap:
     repository_key:     https://ftp-master.debian.org/keys/archive-key-8.asc
 
 postprocessing_commands:
-    20_second_step:
-        path:               commands/command
+    20_second_command:
+        path:               commands/second
         parameters:
-            message:        "*second step* (not printed since no output specified)"
-    30_third_step:
+            message:        "*second step*"
+        output:
+            second_output_file: second.txt
+    30_third_command:
         path:               commands/skipped
         skip:               True
-    40_fourth_step:
-        path:               commands/command
+        output:
+            will_get_skipped: nothing.txt
+    40_last_command:
+        path:               commands/last
         parameters:
             message:        "*last step*"
         require_root:       False
-        output:             last.txt
-
+        output:
+            last_output_file: last.txt
 """
 
 sample_system_file = """
@@ -157,29 +165,52 @@ playbooks:
         skip: True
 """
 
-sample_command = """#!/bin/bash
+first_command = """#!/bin/bash
 
 set -o nounset
 set -o errexit
 set -o pipefail
 
 INPUT_FILE="{{ edi_input_artifact }}"
-OUTPUT_FILE="{{ edi_output_artifact }}"
+OUTPUT_FILE="{{ first_output_file }}"
+OUTPUT_FOLDER="{{ first_output_folder }}"
 MESSAGE="{{ message }}"
 
-if [ "${INPUT_FILE}" == "" ]
-then
-    exit 1
-fi
+cp ${INPUT_FILE} ${OUTPUT_FILE}
+echo "${MESSAGE}" >> ${OUTPUT_FILE}
+mkdir -p "${OUTPUT_FOLDER}"
+"""
 
-if [ "${OUTPUT_FILE}" == "" ]
-then
-    exit 0
-fi
+
+second_command = """#!/bin/bash
+
+set -o nounset
+set -o errexit
+set -o pipefail
+
+INPUT_FILE="{{ first_output_file }}"
+OUTPUT_FILE="{{ second_output_file }}"
+MESSAGE="{{ message }}"
 
 cp ${INPUT_FILE} ${OUTPUT_FILE}
 echo "${MESSAGE}" >> ${OUTPUT_FILE}
 """
+
+
+last_command = """#!/bin/bash
+
+set -o nounset
+set -o errexit
+set -o pipefail
+
+INPUT_FILE="{{ second_output_file }}"
+OUTPUT_FILE="{{ last_output_file }}"
+MESSAGE="{{ message }}"
+
+cp ${INPUT_FILE} ${OUTPUT_FILE}
+echo "${MESSAGE}" >> ${OUTPUT_FILE}
+"""
+
 
 _config_name = "sample"
 _empty_config_name = "empty"
@@ -218,8 +249,10 @@ def config_files(tmpdir_factory):
     commands_dir = dir_name.join("plugins", "commands")
     os.makedirs(str(commands_dir))
 
-    with open(str(commands_dir.join("command")), "w") as file:
-        file.write(sample_command)
+    commands = [('first', first_command), ('second', second_command), ('last', last_command), ]
+    for name, content in commands:
+        with open(str(commands_dir.join(name)), "w") as file:
+            file.write(content)
 
     return str(dir_name.join(main_file))
 

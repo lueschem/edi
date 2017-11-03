@@ -50,39 +50,38 @@ def test_run_and_clean(config_files, monkeypatch):
     if get_user() == 'root':  # debuild case
         monkeypatch.setattr(shutil, 'chown', fakechown)
 
-    with workspace() as w:
+    with workspace() as workdir:
         with open(config_files, "r") as main_file:
             parser = ConfigurationParser(main_file)
 
-            input_file = os.path.join(w, 'input.txt')
+            input_file = os.path.join(workdir, 'input.txt')
             with open(input_file, mode='w', encoding='utf-8') as i:
                 i.write("*input file*\n")
 
             runner = CommandRunner(parser, 'postprocessing_commands', input_file)
 
-            output = runner.run()
+            artifacts = runner.run()
 
             assert os.path.isfile(os.path.join('artifacts', 'first.txt'))
             assert os.path.isfile(os.path.join('artifacts', 'last.txt'))
 
-            def verify_result(result):
-                assert str(w) in str(result)
-                assert 'artifacts/last.txt' in str(result)
-                assert 'last.txt' in str(result)
+            def verify_last_artifact(artifact):
+                assert str(workdir) in str(artifact)
+                assert 'artifacts/last.txt' in str(artifact)
+                assert 'last.txt' in str(artifact)
 
-                with open(result, mode='r') as result_file:
+                with open(artifact, mode='r') as result_file:
                     content = result_file.read()
                     assert "*input file*" in content
                     assert "*first step*" in content
+                    assert "*second step*" in content
                     assert "*last step*" in content
-                    assert "*second step*" not in content
 
-            verify_result(output)
+            verify_last_artifact(artifacts[-1])
 
             os.remove(os.path.join('artifacts', 'first.txt'))
             runner.run()
-            # no need to re-create first.txt since last.txt is still here
-            assert not os.path.isfile(os.path.join('artifacts', 'first.txt'))
+            assert os.path.isfile(os.path.join('artifacts', 'first.txt'))
             runner.clean()
             assert not os.path.isfile(os.path.join('artifacts', 'last.txt'))
 
@@ -98,9 +97,9 @@ def test_plugin_report(config_files):
         output = runner.get_plugin_report()
         commands = output.get('postprocessing_commands', [])
         assert len(commands) == 3
-        assert next(iter(commands[0].keys())) == '10_first_step'
-        assert next(iter(commands[1].keys())) == '20_second_step'
-        assert next(iter(commands[2].keys())) == '40_fourth_step'
+        assert next(iter(commands[0].keys())) == '10_first_command'
+        assert next(iter(commands[1].keys())) == '20_second_command'
+        assert next(iter(commands[2].keys())) == '40_last_command'
 
 
 def test_require_root(config_files):
