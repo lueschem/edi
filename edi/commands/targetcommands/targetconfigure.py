@@ -27,6 +27,7 @@ from edi.lib.helpers import print_success
 class Configure(Target):
 
     def __init__(self):
+        super().__init__()
         self.ip_address = None
 
     @classmethod
@@ -36,7 +37,7 @@ class Configure(Target):
         parser = subparsers.add_parser(cls._get_short_command_name(),
                                        help=help_text,
                                        description=description_text)
-        cls._offer_introspection_options(parser)
+        cls._offer_options(parser, introspection=True, clean=False)
         parser.add_argument('ip_address')
         cls._require_config_file(parser)
 

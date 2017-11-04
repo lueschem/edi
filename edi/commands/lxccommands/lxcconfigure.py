@@ -31,6 +31,7 @@ from edi.lib.lxchelpers import apply_profiles
 class Configure(Lxc):
 
     def __init__(self):
+        super().__init__()
         self.container_name = ""
         self.ansible_connection = 'lxd'
 
@@ -41,7 +42,7 @@ class Configure(Lxc):
         parser = subparsers.add_parser(cls._get_short_command_name(),
                                        help=help_text,
                                        description=description_text)
-        cls._offer_introspection_options(parser)
+        cls._offer_options(parser, introspection=True, clean=True)
         parser.add_argument('container_name')
         cls._require_config_file(parser)
 
@@ -85,6 +86,14 @@ class Configure(Lxc):
 
         print_success("Configured container {}.".format(self._result()))
         return self._result()
+
+    def clean_recursive(self, container_name, config_file, depth):
+        self.clean_depth = depth
+        self._dispatch(container_name, config_file, run_method=self._clean)
+
+    def _clean(self):
+        if self.clean_depth > 0:
+            Launch().clean_recursive(self.container_name, self.config.get_base_config_file(), self.clean_depth - 1)
 
     def _dispatch(self, container_name, config_file, run_method):
         self._setup_parser(config_file)

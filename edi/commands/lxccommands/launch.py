@@ -33,6 +33,7 @@ from edi.lib.lxchelpers import (is_container_existing, is_container_running, sta
 class Launch(Lxc):
 
     def __init__(self):
+        super().__init__()
         self.container_name = ""
 
     @classmethod
@@ -42,7 +43,7 @@ class Launch(Lxc):
         parser = subparsers.add_parser(cls._get_short_command_name(),
                                        help=help_text,
                                        description=description_text)
-        cls._offer_introspection_options(parser)
+        cls._offer_options(parser, introspection=True, clean=True)
         parser.add_argument('container_name')
         cls._require_config_file(parser)
 
@@ -102,6 +103,14 @@ class Launch(Lxc):
             print_success("Launched container {}.".format(self._result()))
 
         return self._result()
+
+    def clean_recursive(self, container_name, config_file, depth):
+        self.clean_depth = depth
+        self._dispatch(container_name, config_file, run_method=self._clean)
+
+    def _clean(self):
+        if self.clean_depth > 0:
+            Import().clean_recursive(self.config.get_base_config_file(), self.clean_depth - 1)
 
     def _dispatch(self, container_name, config_file, run_method):
         self._setup_parser(config_file)

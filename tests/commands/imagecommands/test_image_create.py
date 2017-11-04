@@ -28,7 +28,6 @@ from edi.lib.shellhelpers import run
 from edi.lib.lxchelpers import (get_server_image_compression_algorithm,
                                 get_file_extension_from_image_compression_algorithm)
 from edi.commands.imagecommands.create import Create
-from edi.commands.clean import Clean
 from edi.lib.helpers import get_artifact_dir
 import edi
 import subprocess
@@ -77,8 +76,13 @@ def test_create_jessie_image(capsys):
             assert image_store_item in result.stdout
 
         parser = edi._setup_command_line_interface()
-        cli_args = parser.parse_args(['-v', 'clean', '{}-develop.yml'.format(project_name)])
-        Clean().run_cli(cli_args)
+        cli_args = parser.parse_args(['image', 'create', '--clean', '{}-develop.yml'.format(project_name)])
+        Create().run_cli(cli_args)
+
+        parser = edi._setup_command_line_interface()
+        cli_args = parser.parse_args(['image', 'create', '--recursive-clean', '8',
+                                      '{}-develop.yml'.format(project_name)])
+        Create().run_cli(cli_args)
 
         for image in images:
             assert not os.path.isfile(image)

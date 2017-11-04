@@ -42,6 +42,10 @@ def compose_command_name(current_class):
 
 class EdiCommand(metaclass=CommandFactory):
 
+    def __init__(self):
+        self.clean_depth = 0
+        self.config = None
+
     def clean(self, config_file):
         pass
 
@@ -102,15 +106,21 @@ class EdiCommand(metaclass=CommandFactory):
                             type=argparse.FileType('r', encoding='UTF-8'))
 
     @staticmethod
-    def _offer_introspection_options(parser):
+    def _offer_options(parser, introspection=False, clean=False):
         group = parser.add_mutually_exclusive_group()
-        group.add_argument('--dictionary', action="store_true",
-                           help='dump the load time dictionary instead of running the command')
-        group.add_argument('--config', action="store_true",
-                           help='dump the merged configuration instead of running the command')
-        group.add_argument('--plugins', action="store_true",
-                           help=('dump the active plugins including their dictionaries instead of '
-                                 'running the command'))
+        if introspection:
+            group.add_argument('--dictionary', action="store_true",
+                               help='dump the load time dictionary instead of running the command')
+            group.add_argument('--config', action="store_true",
+                               help='dump the merged configuration instead of running the command')
+            group.add_argument('--plugins', action="store_true",
+                               help=('dump the active plugins including their dictionaries instead of '
+                                     'running the command'))
+        if clean:
+            group.add_argument('--clean', action="store_true",
+                               help='clean the artifacts that got produced by this command')
+            group.add_argument('--recursive-clean', type=int, metavar='N',
+                               help='clean the artifacts that got produced by this and the preceding N commands')
 
     @staticmethod
     def _unpack_cli_args(cli_args):
@@ -123,6 +133,10 @@ class EdiCommand(metaclass=CommandFactory):
             return partial(self._print, self._get_config)
         elif cli_args.plugins:
             return partial(self._print, partial(self.dry_run, *self._unpack_cli_args(cli_args)))
+        elif cli_args.clean:
+            return partial(self.clean_recursive, *self._unpack_cli_args(cli_args), 0)
+        elif cli_args.recursive_clean is not None:
+            return partial(self.clean_recursive, *self._unpack_cli_args(cli_args), cli_args.recursive_clean)
         else:
             return partial(self.run, *self._unpack_cli_args(cli_args))
 
@@ -131,6 +145,9 @@ class EdiCommand(metaclass=CommandFactory):
 
     def dry_run(self, *args, **kwargs):
         raise FatalError('''Missing 'dry_run' implementation for '{}'.'''.format(self._get_command_name()))
+
+    def clean_recursive(self, *args, **kwargs):
+        raise FatalError('''Missing 'clean_recursive' implementation for '{}'.'''.format(self._get_command_name()))
 
     def _get_load_time_dictionary(self):
         return self.config.get_load_time_dictionary()

@@ -37,7 +37,7 @@ class Import(Lxc):
         parser = subparsers.add_parser(cls._get_short_command_name(),
                                        help=help_text,
                                        description=description_text)
-        cls._offer_introspection_options(parser)
+        cls._offer_options(parser, introspection=True, clean=True)
         cls._require_config_file(parser)
 
     def run_cli(self, cli_args):
@@ -69,6 +69,10 @@ class Import(Lxc):
 
         return self._result()
 
+    def clean_recursive(self, config_file, depth):
+        self.clean_depth = depth
+        self._dispatch(config_file, run_method=self._clean)
+
     def clean(self, config_file):
         self._dispatch(config_file, run_method=self._clean)
 
@@ -81,6 +85,9 @@ class Import(Lxc):
                           ).format(self._result()))
             delete_image(self._result())
             print_success("Removed {} from image store.".format(self._result()))
+
+        if self.clean_depth > 0:
+            LxcImageCommand().clean_recursive(self.config.get_base_config_file(), self.clean_depth - 1)
 
     def _dispatch(self, config_file, run_method):
         self._setup_parser(config_file)

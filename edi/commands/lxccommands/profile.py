@@ -34,6 +34,7 @@ from edi.lib.yamlhelpers import LiteralString
 class Profile(Lxc):
 
     def __init__(self):
+        super().__init__()
         self.config_section = 'lxc_profiles'
         self.include_post_config_profiles = False
 
@@ -44,7 +45,7 @@ class Profile(Lxc):
         parser = subparsers.add_parser(cls._get_short_command_name(),
                                        help=help_text,
                                        description=description_text)
-        cls._offer_introspection_options(parser)
+        cls._offer_options(parser, introspection=True, clean=False)
         cls._require_config_file(parser)
         parser.add_argument("-p", "--include-post-config", action="store_true",
                             help="include profiles that can only be applied after configuration")
