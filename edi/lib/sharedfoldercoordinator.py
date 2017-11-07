@@ -157,7 +157,7 @@ class SharedFolderCoordinator():
 
     def _suppress_shared_folders(self):
         # Do not create shared folders for a distributable image.
-        return self._config.create_distributable_image()
+        return self._config.create_distributable_image() or self._config.configure_remote_target()
 
     @staticmethod
     def _get_mandatory_item(folder_name, folder_config, item):

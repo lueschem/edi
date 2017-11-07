@@ -22,6 +22,7 @@
 from edi.commands.target import Target
 from edi.lib.playbookrunner import PlaybookRunner
 from edi.lib.helpers import print_success
+from edi.lib.configurationparser import command_context
 
 
 class Configure(Target):
@@ -67,9 +68,10 @@ class Configure(Target):
         return self._result()
 
     def _dispatch(self, ip_address, config_file, run_method):
-        self._setup_parser(config_file)
-        self.ip_address = ip_address
-        return run_method()
+        with command_context({'edi_configure_remote_target': True}):
+            self._setup_parser(config_file)
+            self.ip_address = ip_address
+            return run_method()
 
     def _result(self):
         return self.ip_address

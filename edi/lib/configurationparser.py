@@ -87,12 +87,17 @@ class ConfigurationParser:
 
     # use the command_context contextmanager to manage dictionary
     command_context = {
-        'edi_create_distributable_image': False
+        'edi_create_distributable_image': False,
+        'edi_configure_remote_target': False,
     }
 
     @staticmethod
     def create_distributable_image():
         return ConfigurationParser.command_context.get('edi_create_distributable_image')
+
+    @staticmethod
+    def configure_remote_target():
+        return ConfigurationParser.command_context.get('edi_configure_remote_target')
 
     def get_context_suffix(self):
         if self.create_distributable_image():
