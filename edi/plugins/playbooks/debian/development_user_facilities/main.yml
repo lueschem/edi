@@ -3,8 +3,9 @@
     - role: host_user_as_target_user
       become: True
       become_user: root
+      when: not edi_create_distributable_image
 
     - role: shared_folder_mountpoints
       become: True
       become_user: "{{ edi_current_user_name }}"
-
+      when: not edi_create_distributable_image
