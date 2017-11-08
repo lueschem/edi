@@ -22,7 +22,7 @@
 import logging
 import subprocess
 import os
-from edi.lib.helpers import get_user
+from edi.lib.helpers import get_user, get_artifact_dir, FatalError
 from edi.lib import mockablerun
 
 _ADAPTIVE = -42
@@ -88,3 +88,21 @@ def get_user_environment_variable(name, default=None):
 def get_debian_architecture():
     cmd = ['dpkg', '--print-architecture']
     return run(cmd, stdout=subprocess.PIPE).stdout.strip('\n')
+
+
+def safely_remove_artifacts_folder(abs_folder_path, sudo=False):
+    """
+    Do some paranoid checking before removing a folder possibly using sudo.
+    :param abs_folder_path: Absolute path to folder that should get deleted.
+    :param sudo: If True, use sudo to delete folder.
+    """
+    artifacts_dir = get_artifact_dir()
+    assert 'artifacts' in str(abs_folder_path)
+    assert str(artifacts_dir) in str(abs_folder_path)
+    assert os.path.isdir(abs_folder_path)
+    assert os.path.isabs(abs_folder_path)
+    mount_result = run(['mount'])
+    if str(abs_folder_path) in mount_result.stdout:
+        raise FatalError(('''Refusing to delete '{}' since it contains mounted elements.'''
+                          ).format(abs_folder_path))
+    run(['rm', '-rf', abs_folder_path], sudo=sudo)
