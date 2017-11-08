@@ -26,10 +26,27 @@ import os
 from tests.libtesting.helpers import get_random_string, get_project_root
 from edi.lib.shellhelpers import run
 from edi.lib.helpers import get_artifact_dir
+from edi.lib.configurationparser import get_base_dictionary
 from edi.commands.lxccommands.lxcconfigure import Configure
 from edi.commands.clean import Clean
 import edi
 import subprocess
+
+
+def verify_shared_folder(container_name):
+    base_dict = get_base_dictionary()
+    random_file = get_random_string(20)
+    workspace_folder = 'edi-workspace'
+    cmd = ['lxc', 'exec', container_name, '--',
+           'sudo', '-u', base_dict.get('edi_current_user_name'), 'touch',
+           os.path.join(base_dict.get('edi_current_user_target_home_directory'), workspace_folder, random_file)]
+    run(cmd)
+    shared_file = os.path.join(base_dict.get('edi_current_user_host_home_directory'),
+                               workspace_folder, random_file)
+    stat = os.stat(shared_file)
+    assert stat.st_gid == base_dict.get('edi_current_user_gid')
+    assert stat.st_uid == base_dict.get('edi_current_user_uid')
+    os.remove(shared_file)
 
 
 @requires_lxc
@@ -78,6 +95,8 @@ def test_build_stretch_container(capsys):
         result = run(verification_command, stdout=subprocess.PIPE)
         assert '''VERSION_ID="9"''' in result.stdout
         assert 'ID=debian' in result.stdout
+
+        verify_shared_folder(container_name)
 
         stop_command = ['lxc', 'stop', container_name]
         run(stop_command)
