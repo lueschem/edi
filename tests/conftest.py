@@ -178,7 +178,7 @@ MESSAGE="{{ message }}"
 
 cp ${INPUT_FILE} ${OUTPUT_FILE}
 echo "${MESSAGE}" >> ${OUTPUT_FILE}
-mkdir -p "${OUTPUT_FOLDER}"
+mkdir "${OUTPUT_FOLDER}"
 """
 
 

@@ -28,7 +28,7 @@ import stat
 from codecs import open
 from edi.lib.helpers import (chown_to_user, FatalError, get_workdir, get_artifact_dir,
                              create_artifact_dir, print_success)
-from edi.lib.shellhelpers import run
+from edi.lib.shellhelpers import run, safely_remove_artifacts_folder
 from edi.lib.configurationparser import remove_passwords
 from edi.lib.yamlhelpers import LiteralString
 
@@ -110,9 +110,10 @@ class CommandRunner():
                 if os.path.isfile(artifact):
                     logging.info("Removing '{}'.".format(artifact))
                     os.remove(artifact)
-                    print_success("Removed image artifact {}.".format(artifact))
+                    print_success("Removed image file artifact {}.".format(artifact))
                 elif os.path.isdir(artifact):
-                    logging.warning("Command runner clean command is not implemented for directories.")
+                    safely_remove_artifacts_folder(artifact, sudo=raw_node.get('require_root', False))
+                    print_success("Removed image directory artifact {}.".format(artifact))
 
     @staticmethod
     def _run_command(command_file, require_root):

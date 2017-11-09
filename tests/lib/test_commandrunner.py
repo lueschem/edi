@@ -79,11 +79,18 @@ def test_run_and_clean(config_files, monkeypatch):
 
             verify_last_artifact(artifacts[-1])
 
-            os.remove(os.path.join('artifacts', 'first.txt'))
+            first_file = os.path.join('artifacts', 'first.txt')
+            first_folder = os.path.join('artifacts', 'first_folder')
+            os.remove(first_file)
+            os.rmdir(first_folder)
+
             runner.run()
-            assert os.path.isfile(os.path.join('artifacts', 'first.txt'))
+            assert os.path.isfile(first_file)
+            assert os.path.isdir(first_folder)
             runner.clean()
             assert not os.path.isfile(os.path.join('artifacts', 'last.txt'))
+            assert not os.path.isfile(first_file)
+            assert not os.path.isdir(first_folder)
 
 
 def test_plugin_report(config_files):
