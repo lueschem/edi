@@ -43,14 +43,21 @@
 
 import os
 import pytest
+import shutil
 from edi.lib.shellhelpers import run, safely_remove_artifacts_folder
 from tests.libtesting.contextmanagers.workspace import workspace
 from tests.libtesting.helpers import get_random_string
-from edi.lib.helpers import get_artifact_dir, create_artifact_dir, FatalError
+from edi.lib.helpers import get_artifact_dir, create_artifact_dir, FatalError, get_user
 from tests.libtesting.optins import requires_sudo
 
 
-def test_artifacts_folder_removal():
+def test_artifacts_folder_removal(monkeypatch):
+    def fakechown(*_):
+        pass
+
+    if get_user() == 'root':  # debuild case
+        monkeypatch.setattr(shutil, 'chown', fakechown)
+
     with workspace() as workdir:
         create_artifact_dir()
         artifacts_dir = get_artifact_dir()
