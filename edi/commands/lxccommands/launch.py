@@ -27,7 +27,7 @@ from edi.lib.helpers import FatalError, print_success
 from edi.lib.networkhelpers import is_valid_hostname
 from edi.lib.lxchelpers import (is_container_existing, is_container_running, start_container,
                                 launch_container, get_container_profiles, stop_container,
-                                apply_profiles)
+                                apply_profiles, try_delete_container)
 
 
 class Launch(Lxc):
@@ -109,6 +109,11 @@ class Launch(Lxc):
         self._dispatch(container_name, config_file, run_method=self._clean)
 
     def _clean(self):
+        if self.config.create_distributable_image():
+            # Do not delete containers that were generated using "edi lxc configure ..."!
+            if try_delete_container(self._result(), self.config.get_lxc_stop_timeout()):
+                print_success("Deleted lxc container {}.".format(self._result()))
+
         if self.clean_depth > 0:
             Import().clean_recursive(self.config.get_base_config_file(), self.clean_depth - 1)
 

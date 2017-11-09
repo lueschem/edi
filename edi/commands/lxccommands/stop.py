@@ -24,10 +24,14 @@ from edi.commands.lxc import Lxc
 from edi.commands.lxccommands.lxcconfigure import Configure
 from edi.lib.configurationparser import command_context
 from edi.lib.helpers import print_success
-from edi.lib.lxchelpers import stop_container, is_container_existing, is_container_running, delete_container
+from edi.lib.lxchelpers import stop_container, try_delete_container
 
 
 class Stop(Lxc):
+
+    def __init__(self):
+        super().__init__()
+        self._delete_container = True
 
     @classmethod
     def advertise(cls, subparsers):
@@ -62,6 +66,7 @@ class Stop(Lxc):
         return self._result()
 
     def clean_recursive(self, config_file, depth):
+        self._delete_container = False  # Delete the container within the launch command!
         self.clean_depth = depth
         self._dispatch(config_file, run_method=self._clean)
 
@@ -69,12 +74,7 @@ class Stop(Lxc):
         self._dispatch(config_file, run_method=self._clean)
 
     def _clean(self):
-        if is_container_existing(self._result()):
-            if is_container_running(self._result()):
-                stop_container(self._result(), timeout=self.config.get_lxc_stop_timeout())
-
-            delete_container(self._result())
-
+        if self._delete_container and try_delete_container(self._result(), self.config.get_lxc_stop_timeout()):
             print_success("Deleted lxc container {}.".format(self._result()))
 
         if self.clean_depth > 0:

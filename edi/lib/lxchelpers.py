@@ -194,3 +194,20 @@ def get_lxd_version():
         return result.stderr.strip('\n')
     else:
         return result.stdout.strip('\n')
+
+
+def try_delete_container(container_name, timeout):
+    """
+    Try to delete a container.
+    :param container_name: The name of the container.
+    :param timeout: Stop timeout in seconds.
+    :return: True if container got deleted, False if container does not exist.
+    """
+    if is_container_existing(container_name):
+        if is_container_running(container_name):
+            stop_container(container_name, timeout=timeout)
+
+        delete_container(container_name)
+        return True
+    else:
+        return False
