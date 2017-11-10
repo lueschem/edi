@@ -1,0 +1,5 @@
+name: privileged
+description: Privileged edi lxc container
+config:
+  security.privileged: "true"
+devices: {}
