@@ -1,14 +1,14 @@
 ---
 - name: Replace temporary hostname in /etc/hostname file.
   lineinfile:
-    path: /etc/hostname
+    dest: /etc/hostname
     regexp: '^edi-tmp-[a-z0-9]{20}$'
     line: '{{ hostname }}'
     backrefs: yes
 
 - name: Replace temporary hostname in /etc/hosts file.
   lineinfile:
-    path: /etc/hosts
+    dest: /etc/hosts
     regexp: '^(127\.0\.1\.1.*)edi-tmp-[a-z0-9]{20}(.*)$'
     line: '\1{{ hostname }}\2'
     backrefs: yes
