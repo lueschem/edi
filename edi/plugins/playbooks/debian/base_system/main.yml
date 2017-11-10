@@ -2,6 +2,7 @@
   vars:
     apply_proxy_settings: True
     configure_lxc_network_interface: True
+    create_default_user: False
   roles:
     - role: lxc_interfaces
       become: True
@@ -14,3 +15,7 @@
     - role: apt_setup
       become: True
       become_user: root
+    - role: default_user
+      become: True
+      become_user: root
+      when: create_default_user

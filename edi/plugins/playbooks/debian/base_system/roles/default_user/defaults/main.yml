@@ -1,0 +1,11 @@
+---
+default_user_group_name: edi
+default_user_gid: 2000
+
+default_user_name: edi
+default_user_uid: 2000
+default_user_shell: /bin/bash
+default_user_groups: adm,sudo
+# password=ChangeMe!
+default_user_password: "$6$nqXAG09MHYE$MZ6kZGJyVcU6ETl.YjCs0fX9y0BOA3qzTkjgoYYUceT4tTgaVbVs0Aeh4kBZqLqLRlSrzhLKLOCEV/uUagm351"
+

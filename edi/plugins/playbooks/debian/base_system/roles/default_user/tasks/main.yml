@@ -1,0 +1,18 @@
+---
+- name: Add a group for the default user.
+  group:
+    name: "{{ default_user_group_name }}"
+    gid: "{{ default_user_gid }}"
+    state: present
+
+- name: Add the default user.
+  user:
+    name: "{{ default_user_name }}"
+    group: "{{ default_user_group_name }}"
+    uid: "{{ default_user_uid }}"
+    shell: "{{ default_user_shell }}"
+    groups: "{{ default_user_groups }}"
+    password: "{{ default_user_password }}"
+    append: yes
+    update_password: on_create
+
