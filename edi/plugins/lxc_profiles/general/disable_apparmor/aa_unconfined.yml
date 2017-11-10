@@ -1,0 +1,6 @@
+name: disable_apparmor
+config:
+  raw.lxc: lxc.aa_profile=unconfined
+description: Disable apparmor
+devices: {}
+
