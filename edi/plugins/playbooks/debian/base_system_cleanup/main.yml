@@ -1,6 +1,18 @@
 - hosts: edi
+  vars:
+    # revert proxy settings
+    cleanup_proxy_settings: True
+    target_http_proxy: ""
+    target_https_proxy: ""
+    target_ftp_proxy: ""
+    target_socks_proxy: ""
+    target_no_proxy: ""
   roles:
     - role: apt_cleanup
       become: True
       become_user: root
+    - role: proxy_settings
+      become: True
+      become_user: root
+      when: edi_create_distributable_image and cleanup_proxy_settings
 

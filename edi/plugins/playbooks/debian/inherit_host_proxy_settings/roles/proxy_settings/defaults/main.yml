@@ -1,0 +1,6 @@
+---
+target_http_proxy: "{{ edi_host_http_proxy }}"
+target_https_proxy: "{{ edi_host_https_proxy }}"
+target_ftp_proxy: "{{ edi_host_ftp_proxy }}"
+target_socks_proxy: "{{ edi_host_socks_proxy }}"
+target_no_proxy: "{{ edi_host_no_proxy }}"

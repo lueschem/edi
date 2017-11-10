@@ -1,0 +1,6 @@
+---
+proxy_configs: [{ key: 'http_proxy', apt_key: 'Acquire::http::proxy', value: "{{ target_http_proxy }}" },
+                { key: 'https_proxy', apt_key: 'Acquire::https::proxy', value: "{{ target_https_proxy }}" },
+                { key: 'ftp_proxy', apt_key: 'Acquire::ftp::proxy', value: "{{ target_ftp_proxy }}" },
+                { key: 'all_proxy', apt_key: 'Acquire::socks::proxy', value: "{{ target_socks_proxy }}" },
+                { key: 'no_proxy', apt_key: '', value: "{{ target_no_proxy }}" }]

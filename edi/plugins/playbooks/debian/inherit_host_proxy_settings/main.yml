@@ -1,5 +1,5 @@
 - hosts: edi
   roles:
-    - role: inherit_host_proxy_settings
+    - role: proxy_settings
       become: True
       become_user: root
