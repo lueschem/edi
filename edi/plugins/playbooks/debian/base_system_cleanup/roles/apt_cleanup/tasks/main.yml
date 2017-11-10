@@ -2,3 +2,21 @@
 - name: Remove service startup prevention.
   file: dest=/usr/sbin/policy-rc.d state=absent
 
+- name: Remove unused packages.
+  command: apt-get -y autoremove
+  when: edi_create_distributable_image
+
+- name: Clean apt cache.
+  command: apt-get -y clean
+  when: edi_create_distributable_image
+
+- name: Identify apt lists.
+  find: paths=/var/lib/apt/lists patterns="*"
+  register: apt_lists
+  when: edi_create_distributable_image
+
+- name: Remove apt lists that will get re-downloaded using apt-get update.
+  file: path="{{ item.path }}" state=absent
+  when: edi_create_distributable_image and not item.path == "/var/lib/apt/lists/lock"
+  with_items:
+    - "{{ apt_lists.files }}"
