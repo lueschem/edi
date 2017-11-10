@@ -1,6 +1,16 @@
 - hosts: edi
+  vars:
+    apply_proxy_settings: True
+    configure_lxc_network_interface: True
   roles:
+    - role: lxc_interfaces
+      become: True
+      become_user: root
+      when: configure_lxc_network_interface and not edi_configure_remote_target
+    - role: proxy_settings
+      become: True
+      become_user: root
+      when: apply_proxy_settings
     - role: apt_setup
       become: True
       become_user: root
-
