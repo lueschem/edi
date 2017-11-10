@@ -1,0 +1,7 @@
+---
+- name: Install openssh server.
+  apt: 
+    name: openssh-server
+    state: present
+    install_recommends: no
+

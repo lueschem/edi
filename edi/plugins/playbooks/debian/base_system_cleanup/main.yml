@@ -1,5 +1,6 @@
 - hosts: edi
   vars:
+    regenerate_openssh_server_keys: True 
     # revert proxy settings
     cleanup_proxy_settings: True
     target_http_proxy: ""
@@ -8,6 +9,10 @@
     target_socks_proxy: ""
     target_no_proxy: ""
   roles:
+    - role: openssh_server_keys
+      become: True
+      become_user: root
+      when: edi_create_distributable_image and regenerate_openssh_server_keys
     - role: apt_cleanup
       become: True
       become_user: root

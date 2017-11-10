@@ -3,6 +3,7 @@
     apply_proxy_settings: True
     configure_lxc_network_interface: True
     create_default_user: False
+    install_openssh_server: False
   roles:
     - role: lxc_interfaces
       become: True
@@ -19,3 +20,7 @@
       become: True
       become_user: root
       when: create_default_user
+    - role: openssh_server
+      become: True
+      become_user: root
+      when: install_openssh_server
