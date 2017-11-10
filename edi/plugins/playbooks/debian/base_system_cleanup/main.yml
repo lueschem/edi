@@ -15,4 +15,8 @@
       become: True
       become_user: root
       when: edi_create_distributable_image and cleanup_proxy_settings
+    - role: replace_temp_hostname
+      become: True
+      become_user: root
+      when: edi_create_distributable_image
 
