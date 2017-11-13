@@ -1,3 +1,26 @@
+edi (0.10.0) xenial; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Implemented option to recursively delete artifacts.
+  * Added command context edi_configure_remote_target.
+  * Only create the host user on the target if it is not a distributable image.
+  * Do not enforce uid and gid for a remote target.
+  * Added possiblity to safely remove artifacts folder via command runner.
+  * Safely delete artifact folders that got created during post processing step.
+  * Delete temporary containers within launch command.
+  * Revert proxy settings during cleanup.
+  * Merged lxc_interfaces and proxy_settings roles into base system setup.
+  * Added default user to base_system playbook (opt-in).
+  * Replace temporary hostname during cleanup.
+  * Add option to install openssh-server.
+  * Fix compatibility with Ansible < 2.4.
+  * Added profile that disables apparmor (aa_unconfined).
+  * Added profile that enables privileged mode.
+
+  [ Matthias Lüscher (Launchpad) ]
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Mon, 13 Nov 2017 12:54:25 +0100
+
 edi (0.9.0) xenial; urgency=medium
 
   [ Matthias Lüscher ]
