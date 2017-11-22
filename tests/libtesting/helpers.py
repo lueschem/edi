@@ -22,6 +22,8 @@
 import os
 import string
 import random
+import shutil
+from edi.lib.helpers import get_user
 
 
 def get_random_string(length):
@@ -51,3 +53,11 @@ def get_command_parameter(popenargs, option):
 
 def get_project_root():
     return os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+
+
+def suppress_chown_during_debuild(monkeypatch):
+    def fakechown(*_):
+        pass
+
+    if get_user() == 'root':  # debuild case
+        monkeypatch.setattr(shutil, 'chown', fakechown)

@@ -22,13 +22,11 @@
 from edi.lib.configurationparser import ConfigurationParser
 from edi.lib.commandrunner import CommandRunner
 from tests.libtesting.contextmanagers.workspace import workspace
-from tests.libtesting.helpers import get_command
+from tests.libtesting.helpers import get_command, suppress_chown_during_debuild
 from edi.lib import mockablerun
-import shutil
 import subprocess
 import os
 from codecs import open
-from edi.lib.helpers import get_user
 
 
 def test_run_and_clean(config_files, monkeypatch):
@@ -44,11 +42,7 @@ def test_run_and_clean(config_files, monkeypatch):
 
     monkeypatch.setattr(mockablerun, 'run_mockable', intercept_command_run)
 
-    def fakechown(*_):
-        pass
-
-    if get_user() == 'root':  # debuild case
-        monkeypatch.setattr(shutil, 'chown', fakechown)
+    suppress_chown_during_debuild(monkeypatch)
 
     with workspace() as workdir:
         with open(config_files, "r") as main_file:

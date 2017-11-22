@@ -20,12 +20,11 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 from edi.commands.targetcommands.targetconfigure import Configure
-from tests.libtesting.helpers import get_command
+from tests.libtesting.helpers import get_command, suppress_chown_during_debuild
 from tests.libtesting.contextmanagers.workspace import workspace
 from tests.libtesting.helpers import get_random_string, get_project_root
 from edi.lib.shellhelpers import run
 import os
-import shutil
 import subprocess
 from edi.lib import mockablerun
 import edi
@@ -40,6 +39,8 @@ def test_target_configure(config_files, monkeypatch, capsys):
             return subprocess.run(*popenargs, **kwargs)
 
     monkeypatch.setattr(mockablerun, 'run_mockable', fakerun)
+
+    suppress_chown_during_debuild(monkeypatch)
 
     with workspace():
         edi_exec = os.path.join(get_project_root(), 'bin', 'edi')
