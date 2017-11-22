@@ -127,15 +127,15 @@ class EdiCommand(metaclass=CommandFactory):
         return [cli_args.config_file]
 
     def _get_run_method(self, cli_args):
-        if cli_args.dictionary:
+        if hasattr(cli_args, 'dictionary') and cli_args.dictionary:
             return partial(self._print, self._get_load_time_dictionary)
-        elif cli_args.config:
+        elif hasattr(cli_args, 'config') and cli_args.config:
             return partial(self._print, self._get_config)
-        elif cli_args.plugins:
+        elif hasattr(cli_args, 'plugins') and cli_args.plugins:
             return partial(self._print, partial(self.dry_run, *self._unpack_cli_args(cli_args)))
-        elif cli_args.clean:
+        elif hasattr(cli_args, 'clean') and cli_args.clean:
             return partial(self.clean_recursive, *self._unpack_cli_args(cli_args), 0)
-        elif cli_args.recursive_clean is not None:
+        elif hasattr(cli_args, 'recursive_clean') and cli_args.recursive_clean is not None:
             return partial(self.clean_recursive, *self._unpack_cli_args(cli_args), cli_args.recursive_clean)
         else:
             return partial(self.run, *self._unpack_cli_args(cli_args))
