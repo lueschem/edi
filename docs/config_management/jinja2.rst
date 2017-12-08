@@ -8,7 +8,7 @@ file :code:`my-project-develop.yml` contains a line that dynamically derives the
 from the project name (:code:`sample_output: {{ edi_configuration_name }}.result`).
 Jinja2 will replace the expression :code:`{{ edi_configuration_name }}` with the name of the configuration.
 
-The following command can be used to reveal the dictionary that is available for Jinja2 operations when loading
+The following command can be used to display the dictionary that is available for Jinja2 operations when loading
 the configuration :code:`my-project-develop.yml`:
 
 .. code:: bash
@@ -32,7 +32,7 @@ This conditional code will make sure that an additional LXD profile gets generat
 LXD versions.
 
 Plugins can even further benefit from Jinja2 since there are additional dictionary entries available. The option
-:code:`--plugins` will reveal the details:
+:code:`--plugins` will output the details:
 
 .. code:: bash
 
