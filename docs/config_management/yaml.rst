@@ -231,6 +231,15 @@ of :ref:`plugin nodes <plugin_node>`. Please consult the LXD documentation if yo
 The playbooks section is an :ref:`ordered node section <ordered_node_section>` consisting
 of :ref:`plugin nodes <plugin_node>`. Please consult the Ansible documentation if you want to write custom playbooks.
 
+:code:`postprocessing_commands` Section
++++++++++++++++++++++++++++++++++++++++
+
+The postprocessing_commands section is an :ref:`ordered node section <ordered_node_section>` consisting
+of :ref:`plugin nodes <plugin_node>`. The post processing commands can be written in any language of choice.
+In contrast to the other plugin nodes the post processing command nodes require an explicit declaration of the
+generated artifacts. Please read the chapter :ref:`plugins` for more details.
+
+
 :code:`shared_folders` Section
 ++++++++++++++++++++++++++++++
 
