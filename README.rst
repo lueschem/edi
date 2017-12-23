@@ -35,13 +35,6 @@ Contributions
 
 You are welcome to contribute to edi. In case of questions you can contact me by e-mail (lueschem@gmail.com).
 
-Warning
-+++++++
-
-edi is still a very young project and therefore interfaces might change quickly and without notice.
-Many edi features are yet undocumented.
-
-
 More Information
 ++++++++++++++++
 
