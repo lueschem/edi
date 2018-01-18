@@ -1,0 +1,4 @@
+---
+- name: Restart ssh daemon.
+  service: name=ssh state=restarted
+  when: not edi_create_distributable_image

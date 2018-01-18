@@ -5,3 +5,11 @@
     state: present
     install_recommends: no
 
+- name: Stop accepting locale settings on ssh server.
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^AcceptEnv(.*)'
+    backrefs: yes
+    line: '# AcceptEnv\1'
+  notify:
+    - Restart ssh daemon.
