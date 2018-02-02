@@ -95,7 +95,7 @@ Building a First Container
 
    ::
 
-     cd ..
+     cd ~/
      mkdir my-first-edi-project
      cd my-first-edi-project
 
