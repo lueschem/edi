@@ -87,7 +87,7 @@ This section tells edi how the initial system shall be bootstrapped. The followi
        :code:`amd64`, :code:`armel` or :code:`armhf`.
    * - repository
      - The repository specification where the initial image will get bootstrapped from. |br|
-       A valid value looks like this: :code:`deb http://ftp.ch.debian.org/debian/ stretch main`.
+       A valid value looks like this: :code:`deb http://deb.debian.org/debian/ stretch main`.
    * - repository_key
      - The signature key for the repository. |br|
        *Attention*: If you do not specify a key the downloaded packages
@@ -129,7 +129,7 @@ you to do this. The following settings are available:
        If not specified edi assumes that the package is named :code:`qemu-user-static`.
    * - repository
      - The repository specification where QEMU will get downloaded from. |br|
-       A valid value looks like this: :code:`deb http://ftp.ch.debian.org/debian/ stretch main`. |br|
+       A valid value looks like this: :code:`deb http://deb.debian.org/debian/ stretch main`. |br|
        If unspecified, edi will try to download QEMU from the repository indicated in the bootstrap section.
    * - repository_key
      - The signature key for the QEMU repository. |br|

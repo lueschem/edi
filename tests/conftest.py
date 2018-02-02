@@ -69,7 +69,7 @@ shared_folders:
 bootstrap:
     tool:                   debootstrap
     architecture:           amd64
-    repository:             deb http://ftp.ch.debian.org/debian/ jessie main
+    repository:             deb http://deb.debian.org/debian/ jessie main
 
 lxc_templates:
     10_foo:

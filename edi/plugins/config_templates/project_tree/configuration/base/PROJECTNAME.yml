@@ -15,7 +15,7 @@ bootstrap:
     repository_key: {{ edi_bootstrap_repository_key }}
 {% endif %}
 {% else %}
-    repository: deb http://ftp.ch.debian.org/debian/ jessie main
+    repository: deb http://deb.debian.org/debian/ jessie main
     repository_key: https://ftp-master.debian.org/keys/archive-key-8.asc
 {% endif %}
     tool: debootstrap

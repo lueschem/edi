@@ -1,5 +1,5 @@
 parameters:
     edi_bootstrap_architecture: amd64
-    edi_bootstrap_repository: deb http://ftp.ch.debian.org/debian/ jessie main
+    edi_bootstrap_repository: deb http://deb.debian.org/debian/ jessie main
     edi_bootstrap_repository_key: https://ftp-master.debian.org/keys/archive-key-8.asc
 
