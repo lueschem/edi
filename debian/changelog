@@ -1,3 +1,14 @@
+edi (0.10.2+u17.10) artful; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Simplified project cloning during tests.
+  * Do travis testing also on Ubuntu 17.10.
+  * Added possibility to do a release on newer Ubuntu versions.
+
+  [ Matthias Lüscher (Launchpad) ]
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Mon, 05 Feb 2018 22:28:41 +0000
+
 edi (0.10.2) xenial; urgency=medium
 
   [ Matthias Lüscher ]
