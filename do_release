@@ -72,3 +72,5 @@ dput ppa:m-luescher/edi-snapshots ../edi_${NEW_VERSION}_source.changes
 
 git push origin ${GIT_BRANCH}
 git push --tags
+git checkout master
+
