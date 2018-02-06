@@ -6,10 +6,9 @@ The following setup steps have been tested on Ubuntu 16.04 and on Ubuntu 17.10.
 Prerequisites
 +++++++++++++
 
-#. This first step is only required on Ubuntu 16.04 and can be skipped if you
-are on a more recent Ubuntu version. edi requires features that got introduced
-with Ansible 2.1. On Ubuntu 16.04 you can enable xenial-backports and then
-install Ansible as follows:
+#. This first step is only required on Ubuntu 16.04 and can be skipped if you are on a more recent Ubuntu version.
+   edi requires features that got introduced with Ansible 2.1. On Ubuntu 16.04 you can enable xenial-backports and
+   then install Ansible as follows:
 
    ::
 
