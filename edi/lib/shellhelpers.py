@@ -101,7 +101,7 @@ def safely_remove_artifacts_folder(abs_folder_path, sudo=False):
     assert str(artifacts_dir) in str(abs_folder_path)
     assert os.path.isdir(abs_folder_path)
     assert os.path.isabs(abs_folder_path)
-    mount_result = run(['mount'])
+    mount_result = run(['mount'], stdout=subprocess.PIPE)
     if str(abs_folder_path) in mount_result.stdout:
         raise FatalError(('''Refusing to delete '{}' since it contains mounted elements.'''
                           ).format(abs_folder_path))
