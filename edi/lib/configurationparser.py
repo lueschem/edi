@@ -203,11 +203,11 @@ class ConfigurationParser:
         return item_list
 
     def get_project_plugin_directory(self):
-        return join(self.config_directory, "plugins")
+        return join(self.project_directory, "plugins")
 
     def __init__(self, base_config_file):
         self.base_config_file = base_config_file
-        self.config_directory = dirname(abspath(base_config_file.name))
+        self.project_directory = dirname(abspath(base_config_file.name))
         self.config_id = splitext(basename(base_config_file.name))[0]
         if not ConfigurationParser._configurations.get(self.config_id):
             logging.info(("Load time dictionary:\n{}"
@@ -337,7 +337,7 @@ class ConfigurationParser:
     def _get_load_time_dictionary(self):
         load_dict = get_base_dictionary()
         load_dict["edi_work_directory"] = get_workdir()
-        load_dict["edi_config_directory"] = self.config_directory
+        load_dict["edi_project_directory"] = self.project_directory
         load_dict["edi_project_plugin_directory"] = self.get_project_plugin_directory()
         load_dict['edi_log_level'] = logging.getLevelName(logging.getLogger().getEffectiveLevel())
         load_dict['edi_configuration_name'] = self.get_configuration_name()

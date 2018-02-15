@@ -91,7 +91,7 @@ def test_plugins(monkeypatch, config_files, capsys, command, command_args, has_t
         base_system = result.get('playbooks')[0].get('10_base_system')
         assert 'plugins/playbooks/foo.yml' in base_system.get('path')
         assert base_system.get('dictionary').get('kernel_package') == 'linux-image-amd64-rt'
-        assert base_system.get('dictionary').get('edi_config_directory') == os.path.dirname(config_files)
+        assert base_system.get('dictionary').get('edi_project_directory') == os.path.dirname(config_files)
     else:
         assert not result.get('playbooks')
 
