@@ -29,6 +29,7 @@ from os.path import dirname, abspath, basename, splitext, isfile, join
 import logging
 from edi.lib.helpers import (get_user, get_user_gid, get_user_uid, get_workdir,
                              get_hostname, get_edi_plugin_directory, FatalError)
+from edi.lib.sshkeyhelpers import get_user_ssh_pub_keys
 from edi.lib.versionhelpers import get_edi_version, get_stripped_version
 from edi.lib.shellhelpers import get_user_environment_variable
 from edi.lib.lxchelpers import get_lxd_version
@@ -55,6 +56,7 @@ def get_base_dictionary():
     base_dict = {}
     current_user_name = get_user()
     base_dict["edi_current_user_name"] = current_user_name
+    base_dict["edi_current_user_ssh_pub_keys"] = get_user_ssh_pub_keys()
     base_dict["edi_current_user_uid"] = get_user_uid()
     base_dict["edi_current_user_gid"] = get_user_gid()
     base_dict["edi_current_user_host_home_directory"] = get_user_environment_variable("HOME")
