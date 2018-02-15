@@ -22,6 +22,7 @@
 from edi.commands.image import Image
 from edi.commands.lxccommands.export import Export
 from edi.lib.commandrunner import CommandRunner
+from edi.lib.configurationparser import command_context
 from edi.lib.helpers import print_success
 
 
@@ -90,8 +91,9 @@ class Create(Image):
             Export().clean_recursive(self.config.get_base_config_file(), self.clean_depth - 1)
 
     def _dispatch(self, config_file, run_method):
-        self._setup_parser(config_file)
-        return run_method()
+        with command_context({'edi_create_distributable_image': True}):
+            self._setup_parser(config_file)
+            return run_method()
 
     def _input_artifact(self):
         return Export().result(self.config.get_base_config_file())
