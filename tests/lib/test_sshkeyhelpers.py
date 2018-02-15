@@ -22,6 +22,7 @@
 
 import os
 import edi.lib.helpers
+from codecs import open
 from edi.lib.sshkeyhelpers import get_user_ssh_pub_keys
 from tests.libtesting.helpers import get_command, get_sub_command
 from edi.lib import mockablerun
@@ -30,12 +31,18 @@ import subprocess
 
 fake_config = """
 cow moo
-identitiyfile ~/bingo
-identitiyfile ~/bongo
-identitiyfile ~/baz
-myidentitifile ~/bingo
+identityfile ~/bingo
+identityfile ~/bongo
+identityfile ~/baz
+myidentityfile ~/blabla
 dog bark
 """
+
+
+def create_file(tmpdir, file_name):
+    file_path = os.path.join(str(tmpdir), file_name)
+    with open(file_path, mode='w') as file:
+        file.write(file_name)
 
 
 def fake_ssh_environment(monkeypatch, tmpdir):
@@ -68,3 +75,31 @@ def test_ssh_identity_files(monkeypatch, tmpdir):
     fake_ssh_environment(monkeypatch, tmpdir)
 
     assert get_user_ssh_pub_keys() == []
+
+    create_file(tmpdir, 'blabla')
+    create_file(tmpdir, 'blabla.pub')
+
+    assert get_user_ssh_pub_keys() == []
+
+    create_file(tmpdir, 'bongo.pub')
+
+    assert get_user_ssh_pub_keys() == []
+
+    create_file(tmpdir, 'baz')
+
+    assert get_user_ssh_pub_keys() == []
+
+    create_file(tmpdir, 'baz.pub')
+
+    pub_keys = get_user_ssh_pub_keys()
+
+    assert len(pub_keys) == 1
+    assert str(os.path.join(str(tmpdir), 'baz.pub')) in pub_keys
+
+    create_file(tmpdir, 'bongo')
+
+    pub_keys = get_user_ssh_pub_keys()
+
+    assert len(pub_keys) == 2
+    assert str(os.path.join(str(tmpdir), 'baz.pub')) in pub_keys
+    assert str(os.path.join(str(tmpdir), 'bongo.pub')) in pub_keys
