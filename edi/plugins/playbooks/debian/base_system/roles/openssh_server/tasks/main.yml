@@ -13,3 +13,22 @@
     line: '# AcceptEnv\1'
   notify:
     - Restart ssh daemon.
+
+- name: Disable ssh password authentication (modify existing config line).
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^#*\s*PasswordAuthentication\s*(yes|no)$'
+    backrefs: yes
+    line: 'PasswordAuthentication no'
+  when: disable_ssh_password_authentication
+  notify:
+    - Restart ssh daemon.
+
+- name: Disable ssh password authentication (add new config line).
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    line: 'PasswordAuthentication no'
+    state: present
+  when: disable_ssh_password_authentication
+  notify:
+    - Restart ssh daemon.
