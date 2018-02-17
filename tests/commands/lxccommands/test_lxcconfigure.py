@@ -30,7 +30,11 @@ from edi.lib.configurationparser import get_base_dictionary
 from edi.commands.lxccommands.lxcconfigure import Configure
 from edi.commands.clean import Clean
 import edi
+import yaml
+import re
 import subprocess
+from codecs import open
+from shutil import copyfile
 
 
 def verify_shared_folder(container_name):
@@ -49,17 +53,54 @@ def verify_shared_folder(container_name):
     os.remove(shared_file)
 
 
+def modify_develop_overlay(project_name):
+    overlay_file = os.path.join('configuration', 'overlay', '{}-develop.global.yml'.format(project_name))
+    with open(overlay_file, mode='r') as overlay:
+        overlay_config = yaml.load(overlay.read())
+
+    base_system_mod = {'playbooks': {
+        '100_base_system': {
+            'parameters': {
+                'create_default_user': True,
+                'default_user_name': 'testuser',
+                'install_openssh_server': True
+            }}}}
+
+    overlay_config.update(base_system_mod)
+
+    with open(overlay_file, mode='w') as overlay:
+        overlay.write(yaml.dump(overlay_config))
+
+
+def prepare_pub_key(datadir):
+    os.mkdir('ssh_pub_keys')
+
+    pub_key_file = os.path.join(str(datadir), 'test_id_rsa.pub')
+    pub_key_file_copy = os.path.join('ssh_pub_keys', 'test_id_rsa.pub')
+    copyfile(pub_key_file, pub_key_file_copy)
+
+
+def get_container_ip_addr(container_name, interface):
+    cmd = ['lxc', 'exec', container_name, '--', 'ip', '-4', 'addr', 'show', interface]
+    raw_ip_result = run(cmd, stdout=subprocess.PIPE).stdout
+    return re.findall(r'^\s*inet\s([0-9\.]*)/.*', raw_ip_result, re.MULTILINE)[0]
+
+
 @requires_lxc
 @requires_ansible
 @requires_debootstrap
 @requires_sudo
-def test_build_stretch_container(capsys):
-    print(os.getcwd())
+def test_build_stretch_container(capsys, datadir):
     with workspace():
         edi_exec = os.path.join(get_project_root(), 'bin', 'edi')
         project_name = 'pytest-{}'.format(get_random_string(6))
         config_command = [edi_exec, 'config', 'init', project_name, 'debian-stretch-amd64']
         run(config_command)  # run as non root
+
+        # enable ssh server and create a default user
+        modify_develop_overlay(project_name)
+        # copy pub key into default pub key folder
+        prepare_pub_key(datadir)
 
         container_name = 'pytest-{}'.format(get_random_string(6))
         parser = edi._setup_command_line_interface()
@@ -95,6 +136,13 @@ def test_build_stretch_container(capsys):
         result = run(verification_command, stdout=subprocess.PIPE)
         assert '''VERSION_ID="9"''' in result.stdout
         assert 'ID=debian' in result.stdout
+
+        container_ip = get_container_ip_addr(container_name, 'lxcif0')
+        ssh_cmd = ['ssh', '-i', str(os.path.join(str(datadir), 'test_id_rsa')),
+                   '-o', 'UserKnownHostsFile=/dev/null', '-o', 'StrictHostKeyChecking=no',
+                   'testuser@{}'.format(container_ip), 'true']
+        # ssh command should work without password due to proper ssh key setup!
+        run(ssh_cmd, sudo=True, timeout=5)
 
         verify_shared_folder(container_name)
 
