@@ -93,6 +93,8 @@ class EdiCommand(metaclass=CommandFactory):
             command.advertise(subparsers)
 
     def _run_sub_command_cli(self, cli_args):
+        if not cli_args.sub_command_name:
+            raise FatalError("Missing subcommand. Use 'edi --help' for help.")
         self._get_sub_command(cli_args.sub_command_name)().run_cli(cli_args)
 
     def _get_sub_command(self, command):

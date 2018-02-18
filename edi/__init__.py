@@ -69,7 +69,7 @@ def main():
         _setup_logging(cli_args)
 
         if cli_args.command_name is None:
-            raise FatalError("Missing subcommand. Use 'edi --help' for help.")
+            raise FatalError("Missing command. Use 'edi --help' for help.")
 
         command_name = "{0}.{1}".format(EdiCommand._get_command_name(),
                                         cli_args.command_name)
