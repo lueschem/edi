@@ -1,3 +1,9 @@
+edi (0.11.1+u17.10) artful; urgency=medium
+
+  * Artful release. 
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Tue, 20 Feb 2018 21:43:08 +0000
+
 edi (0.11.1) xenial; urgency=medium
 
   [ Matthias Lüscher ]
