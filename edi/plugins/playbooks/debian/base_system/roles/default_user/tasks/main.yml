@@ -16,3 +16,19 @@
     append: yes
     update_password: on_create
 
+- name: Set up authorized keys for current user.
+  authorized_key:
+    user: '{{ default_user_name }}'
+    state: present
+    key: '{{ item }}'
+  with_file: '{{ edi_current_user_ssh_pub_keys }}'
+  when: authorize_current_user
+
+- name: Set up authorized keys for group of users.
+  authorized_key:
+    user: '{{ default_user_name }}'
+    state: present
+    key: "{{ lookup('file', '{{ item }}') }}"
+  with_fileglob: '{{ ssh_pub_key_directory }}/*.pub'
+  when: ssh_pub_key_directory != ""
+

@@ -4,6 +4,9 @@
     configure_lxc_network_interface: True
     create_default_user: False
     install_openssh_server: False
+    disable_ssh_password_authentication: True
+    authorize_current_user: True
+    ssh_pub_key_directory: '{{ edi_project_directory }}/ssh_pub_keys'
   roles:
     - role: lxc_interfaces
       become: True

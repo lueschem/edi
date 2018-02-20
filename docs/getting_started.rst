@@ -90,6 +90,35 @@ Hint: You can skip this section if you just want to use edi without having a loo
      source local_setup
 
 
+Setting up ssh Keys
++++++++++++++++++++
+
+If you plan to access edi generated containers or target systems using ssh, it is a good idea to create a ssh key pair.
+Hint: edi versions greater or equal than 0.11.0 have a secure by default setup of ssh and disable password based login.
+
+#. Review if you already have existing ssh keys:
+
+   ::
+
+     ls -al ~/.ssh
+
+   Valid public keys are typically named `id_rsa.pub`, `id_dsa.pub`, `id_ecdsa.pub` or `id_ed25519.pub`.
+
+#. If there is no valid ssh key pair, generate one:
+
+   ::
+
+     $ ssh-keygen -t rsa -b 4096 -C "you@example.com"
+     Generating public/private rsa key pair.
+     Enter file in which to save the key (/home/YOU/.ssh/id_rsa):
+     Created directory '/home/YOU/.ssh'.
+     Enter passphrase (empty for no passphrase):
+     Enter same passphrase again:
+
+   Hint: If you decided to use a passphrase and do not want to reenter it every time, it is a good idea
+   to use a `ssh-agent`.
+
+
 Building a First Container
 ++++++++++++++++++++++++++
 
@@ -159,6 +188,24 @@ Exploring the Container
    ::
 
      lxc exec my-first-edi-container -- bash
+
+#. And leave it again:
+
+   ::
+
+     exit
+
+#. Get the IP address of the container:
+
+   ::
+
+     lxc list my-first-edi-container
+
+#. Enter the container using ssh:
+
+   ::
+
+     ssh CONTAINER_IP
 
 #. And leave it again:
 

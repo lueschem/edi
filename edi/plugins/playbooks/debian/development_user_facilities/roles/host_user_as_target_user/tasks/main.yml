@@ -24,3 +24,10 @@
 
 - name: Enable sudo without password for the development user.
   template: src=no_passwd dest=/etc/sudoers.d/{{ edi_current_user_name }}
+
+- name: Set up authorized keys for current user.
+  authorized_key:
+    user: '{{ edi_current_user_name }}'
+    state: present
+    key: '{{ item }}'
+  with_file: '{{ edi_current_user_ssh_pub_keys }}'

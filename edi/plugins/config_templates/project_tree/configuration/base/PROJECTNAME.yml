@@ -39,6 +39,9 @@ lxc_templates:
 playbooks:
     100_base_system:
         path: playbooks/debian/base_system/main.yml
+        parameters:
+            create_default_user: True
+            install_openssh_server: True
     200_development_user_facilities:
         path: playbooks/debian/development_user_facilities/main.yml
     300_sample_playbook:

@@ -29,6 +29,7 @@ from os.path import dirname, abspath, basename, splitext, isfile, join
 import logging
 from edi.lib.helpers import (get_user, get_user_gid, get_user_uid, get_workdir,
                              get_hostname, get_edi_plugin_directory, FatalError)
+from edi.lib.sshkeyhelpers import get_user_ssh_pub_keys
 from edi.lib.versionhelpers import get_edi_version, get_stripped_version
 from edi.lib.shellhelpers import get_user_environment_variable
 from edi.lib.lxchelpers import get_lxd_version
@@ -55,6 +56,7 @@ def get_base_dictionary():
     base_dict = {}
     current_user_name = get_user()
     base_dict["edi_current_user_name"] = current_user_name
+    base_dict["edi_current_user_ssh_pub_keys"] = get_user_ssh_pub_keys()
     base_dict["edi_current_user_uid"] = get_user_uid()
     base_dict["edi_current_user_gid"] = get_user_gid()
     base_dict["edi_current_user_host_home_directory"] = get_user_environment_variable("HOME")
@@ -201,11 +203,11 @@ class ConfigurationParser:
         return item_list
 
     def get_project_plugin_directory(self):
-        return join(self.config_directory, "plugins")
+        return join(self.project_directory, "plugins")
 
     def __init__(self, base_config_file):
         self.base_config_file = base_config_file
-        self.config_directory = dirname(abspath(base_config_file.name))
+        self.project_directory = dirname(abspath(base_config_file.name))
         self.config_id = splitext(basename(base_config_file.name))[0]
         if not ConfigurationParser._configurations.get(self.config_id):
             logging.info(("Load time dictionary:\n{}"
@@ -279,7 +281,7 @@ class ConfigurationParser:
                           ] = self._merge_key_value_node(base, overlay,
                                                          element)
 
-        nested_elements = ["playbooks", "postprocessing_commands", "keys", "lxc_templates",
+        nested_elements = ["playbooks", "postprocessing_commands", "lxc_templates",
                            "lxc_profiles", "shared_folders"]
         for element in nested_elements:
             merged_config[element
@@ -335,7 +337,7 @@ class ConfigurationParser:
     def _get_load_time_dictionary(self):
         load_dict = get_base_dictionary()
         load_dict["edi_work_directory"] = get_workdir()
-        load_dict["edi_config_directory"] = self.config_directory
+        load_dict["edi_project_directory"] = self.project_directory
         load_dict["edi_project_plugin_directory"] = self.get_project_plugin_directory()
         load_dict['edi_log_level'] = logging.getLevelName(logging.getLogger().getEffectiveLevel())
         load_dict['edi_configuration_name'] = self.get_configuration_name()
