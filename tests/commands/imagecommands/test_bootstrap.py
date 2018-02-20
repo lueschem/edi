@@ -61,6 +61,8 @@ def test_bootstrap(config_files, monkeypatch):
                 return subprocess.CompletedProcess("fakerun", 0, 'amd64')
             elif get_command(popenargs) == "lxd" and get_sub_command(popenargs) == "--version":
                 return subprocess.CompletedProcess("fakerun", 0, '2.18')
+            elif get_command(popenargs) == "ssh" and get_sub_command(popenargs) == "-G":
+                return subprocess.CompletedProcess("fakerun", 0, 'ssh config')
             elif get_command(popenargs) == "printenv":
                 if get_sub_command(popenargs) == "HOME":
                     return subprocess.CompletedProcess("fakerun", 0, '/no/such/directory')
