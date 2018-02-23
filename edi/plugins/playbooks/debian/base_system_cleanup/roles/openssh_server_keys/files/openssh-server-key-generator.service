@@ -1,10 +1,11 @@
 [Unit]
 Description=Generate host keys for openssh-server.
-ConditionPathExistsGlob=!/etc/ssh/ssh_host_*_key*
+Before=ssh.service
 
 [Service]
 Type=oneshot
-ExecStart=/usr/sbin/dpkg-reconfigure -fnoninteractive openssh-server
+ExecStart=/usr/bin/ssh-keygen -A -v
 
 [Install]
 RequiredBy=multi-user.target
+
