@@ -1,3 +1,13 @@
+edi (0.11.2) xenial; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Improved ssh host key generation. Fixes #30.
+  * Adjusted access rights of ssh test keys. Fixes #29.
+
+  [ Matthias Lüscher (Launchpad) ]
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Fri, 23 Feb 2018 22:00:21 +0100
+
 edi (0.11.1) xenial; urgency=medium
 
   [ Matthias Lüscher ]
