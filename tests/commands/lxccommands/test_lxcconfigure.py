@@ -75,7 +75,7 @@ def modify_develop_overlay(project_name):
 def prepare_pub_key(datadir):
     os.mkdir('ssh_pub_keys')
 
-    pub_key_file = os.path.join(str(datadir), 'test_id_rsa.pub')
+    pub_key_file = os.path.join(str(datadir), 'keys', 'test_id_rsa.pub')
     pub_key_file_copy = os.path.join('ssh_pub_keys', 'test_id_rsa.pub')
     copyfile(pub_key_file, pub_key_file_copy)
 
@@ -137,8 +137,10 @@ def test_build_stretch_container(capsys, datadir):
         assert '''VERSION_ID="9"''' in result.stdout
         assert 'ID=debian' in result.stdout
 
+        os.chmod(os.path.join(str(datadir), 'keys'), 0o700)
+        os.chmod(os.path.join(str(datadir), 'keys', 'test_id_rsa'), 0o600)
         container_ip = get_container_ip_addr(container_name, 'lxcif0')
-        ssh_cmd = ['ssh', '-i', str(os.path.join(str(datadir), 'test_id_rsa')),
+        ssh_cmd = ['ssh', '-i', str(os.path.join(str(datadir), 'keys', 'test_id_rsa')),
                    '-o', 'UserKnownHostsFile=/dev/null', '-o', 'StrictHostKeyChecking=no',
                    'testuser@{}'.format(container_ip), 'true']
         # ssh command should work without password due to proper ssh key setup!
