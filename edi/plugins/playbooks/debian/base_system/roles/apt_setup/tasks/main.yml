@@ -5,3 +5,14 @@
 - name: Prevent service startup during package installation.
   copy: src=policy-rc.d dest=/usr/sbin/ mode=755
   when: edi_create_distributable_image
+
+- name: Prevent documentation installation for future package installations.
+  copy: src=01_no_documentation dest=/etc/dpkg/dpkg.cfg.d/ mode=644
+  when: not install_documentation
+
+- name: Remove documenation of already installed packages.
+  script: remove_documentation
+  args:
+    creates: /usr/share/README.doc.edi
+  when: not install_documentation
+
