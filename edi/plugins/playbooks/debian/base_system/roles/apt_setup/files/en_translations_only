@@ -1,0 +1,17 @@
+#!/bin/bash
+
+set -o errexit
+set -o nounset
+
+DPKG_CONTROL_FILE=$1
+
+find /usr/share/locale -mindepth 1 -maxdepth 1 ! -name 'en*'|xargs rm -r
+
+cat << EOF > ${DPKG_CONTROL_FILE}
+# save disk space by excluding translations
+path-exclude /usr/share/locale/*
+path-include /usr/share/locale/en*
+EOF
+
+chmod 644 ${DPKG_CONTROL_FILE}
+

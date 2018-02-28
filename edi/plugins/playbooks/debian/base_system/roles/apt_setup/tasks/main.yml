@@ -9,6 +9,11 @@
 - name: Prevent documentation installation and remove existing documentation.
   script: remove_documentation {{ dpkg_no_documentation }}
   args:
-    creates: {{ dpkg_no_documentation }}
+    creates: "{{ dpkg_no_documentation }}"
   when: not install_documentation
 
+- name: Install only a subset of translations.
+  script: "{{ translations_filter }} {{ dpkg_translations_filter }}"
+  args:
+    creates: "{{ dpkg_translations_filter }}"
+  when: translations_filter != ""

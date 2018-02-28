@@ -8,6 +8,7 @@
     authorize_current_user: True
     ssh_pub_key_directory: '{{ edi_project_directory }}/ssh_pub_keys'
     install_documentation: True
+    translations_filter: ""
   roles:
     - role: lxc_interfaces
       become: True
