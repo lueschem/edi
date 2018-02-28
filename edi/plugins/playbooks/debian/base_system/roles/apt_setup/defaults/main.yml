@@ -1,3 +1,4 @@
 ---
 
 install_documentation: True
+dpkg_no_documentation: /etc/dpkg/dpkg.cfg.d/01_no_documentation
