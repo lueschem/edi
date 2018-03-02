@@ -1,3 +1,13 @@
+edi (0.11.3) xenial; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Added option to exclude documentation from installation. Closes #32.
+  * Allow filtering of translations to save disk space. Closes #33.
+
+  [ Matthias Lüscher (Launchpad) ]
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Fri, 02 Mar 2018 21:52:07 +0100
+
 edi (0.11.2) xenial; urgency=medium
 
   [ Matthias Lüscher ]
