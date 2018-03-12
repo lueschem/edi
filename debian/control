@@ -27,6 +27,7 @@ Build-Depends: ansible,
                python3-yaml,
                qemu-user-static,
                sudo,
+               zstd,
 Maintainer: Matthias Luescher <lueschem@gmail.com>
 Standards-Version: 3.9.7
 X-Python3-Version: >= 3.5
@@ -44,6 +45,7 @@ Depends: ${misc:Depends},
          python3-apt (>= 1),
          qemu-user-static,
          sudo,
+         zstd,
 Description: Embedded Development Infrastructure - edi
  Driven by the DevOps mindset edi helps you to streamline your embedded
  development infrastructure. To achieve this goal, edi leverages top-notch
