@@ -26,7 +26,6 @@ import codecs
 import gzip
 import subprocess
 from edi.lib.debhelpers import PackageDownloader
-from edi.lib.helpers import which
 
 
 class RepositoryMock():
