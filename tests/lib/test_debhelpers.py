@@ -93,24 +93,15 @@ class RepositoryMock():
             f.write(data)
 
     def sign_release(self):
-        # on ubuntu <= 16.04: gpg is gpg v1, gpg2 is gpg v2
-        # on ubuntu > 16.04: gpg1 is gpg v1, gpg is gpg v2
-        # here we want to use gpg v1 since the key handling for gpg v2 has changed
-        if which('gpg1'):
-            executable = 'gpg1'
-        else:
-            executable = 'gpg'
-
-        cmd = [executable]
-        cmd.extend(['--batch', '--yes',
-                    '--homedir', str(self.datadir),
-                    '--no-default-keyring',
-                    '--secret-keyring', os.path.join(str(self.datadir), 'test-secring.gpg'),
-                    '--keyring', os.path.join(str(self.datadir), 'test-pubring.gpg'),
-                    '--digest-algo', 'SHA256',
-                    '-abs',
-                    '-o', os.path.join(str(self.datadir), 'Release.gpg'),
-                    os.path.join(str(self.datadir), 'Release')])
+        cmd = ['gpg', '--batch', '--yes',
+               '--homedir', str(self.datadir),
+               '--no-default-keyring',
+               '--secret-keyring', os.path.join(str(self.datadir), 'test-secring.gpg'),
+               '--keyring', os.path.join(str(self.datadir), 'test-pubring.gpg'),
+               '--digest-algo', 'SHA256',
+               '-abs',
+               '-o', os.path.join(str(self.datadir), 'Release.gpg'),
+               os.path.join(str(self.datadir), 'Release')]
         subprocess.run(cmd, input=None, timeout=None, check=True)
 
     def repository_matcher(self, request):
