@@ -73,7 +73,7 @@ def test_artifacts_folder_removal_as_sudo():
 
 def test_gpg_agent(tmpdir):
     fake_socket = os.path.join(str(tmpdir), 'S.gpg-agent.fake')
-    with gpg_agent(tmpdir):
+    with gpg_agent(str(tmpdir)):
         assert not os.path.isfile(fake_socket)
         with open(fake_socket, mode='w') as file:
             file.write('fake socket')
