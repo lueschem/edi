@@ -26,6 +26,7 @@ debian/edi.*.debhelper
 debian/debhelper-build-stamp
 debian/edi.debhelper.log
 debian/edi.substvars
+debian/.debhelper
 debian/files
 .pybuild/
 
