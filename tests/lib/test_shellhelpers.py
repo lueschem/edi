@@ -22,7 +22,7 @@
 
 import os
 import pytest
-from edi.lib.shellhelpers import run, safely_remove_artifacts_folder
+from edi.lib.shellhelpers import run, safely_remove_artifacts_folder, gpg_agent
 from tests.libtesting.contextmanagers.workspace import workspace
 from tests.libtesting.helpers import get_random_string, suppress_chown_during_debuild
 from edi.lib.helpers import get_artifact_dir, create_artifact_dir, FatalError
@@ -69,3 +69,14 @@ def test_artifacts_folder_removal_as_sudo():
         safely_remove_artifacts_folder(abs_dir_name, sudo=True)
 
         assert not os.path.isdir(abs_dir_name)
+
+
+def test_gpg_agent(tmpdir):
+    fake_socket = os.path.join(str(tmpdir), 'S.gpg-agent.fake')
+    with gpg_agent(tmpdir):
+        assert not os.path.isfile(fake_socket)
+        with open(fake_socket, mode='w') as file:
+            file.write('fake socket')
+        assert os.path.isfile(fake_socket)
+
+    assert not os.path.isfile(fake_socket)

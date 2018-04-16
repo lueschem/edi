@@ -22,6 +22,7 @@
 import logging
 import subprocess
 import os
+from contextlib import contextmanager
 from edi.lib.helpers import get_user, get_artifact_dir, FatalError
 from edi.lib import mockablerun
 
@@ -106,3 +107,23 @@ def safely_remove_artifacts_folder(abs_folder_path, sudo=False):
         raise FatalError(('''Refusing to delete '{}' since it contains mounted elements.'''
                           ).format(abs_folder_path))
     run(['rm', '-rf', abs_folder_path], sudo=sudo)
+
+
+@contextmanager
+def gpg_agent(directory):
+    """
+    gpg >= 2.1 will automatically launch a gpg agent that creates some unix sockets.
+    tempfile.TemporaryDirectory will fail to remove those unix sockets. Therefore this contextmanager will take
+    care of the socket removal.
+    Please note that the removal of the sockets will trigger the shutdown of the respective gpg-agent.
+    :param directory: The directory where the sockets are located.
+    """
+    try:
+        yield
+    finally:
+        for file in os.listdir(directory):
+            if file.startswith('S.gpg-agent'):
+                try:
+                    os.remove(os.path.join(directory, file))
+                except OSError:
+                    pass
