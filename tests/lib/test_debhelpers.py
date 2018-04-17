@@ -102,7 +102,7 @@ class RepositoryMock():
                '-abs',
                '-o', os.path.join(str(self.datadir), 'Release.gpg'),
                os.path.join(str(self.datadir), 'Release')]
-        with gpg_agent(self.datadir):
+        with gpg_agent(str(self.datadir)):
             subprocess.run(cmd, input=None, timeout=None, check=True)
 
     def repository_matcher(self, request):
