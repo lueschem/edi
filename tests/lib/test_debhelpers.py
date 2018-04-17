@@ -26,6 +26,7 @@ import codecs
 import gzip
 import subprocess
 from edi.lib.debhelpers import PackageDownloader
+from edi.lib.shellhelpers import gpg_agent
 
 
 class RepositoryMock():
@@ -101,7 +102,8 @@ class RepositoryMock():
                '-abs',
                '-o', os.path.join(str(self.datadir), 'Release.gpg'),
                os.path.join(str(self.datadir), 'Release')]
-        subprocess.run(cmd, input=None, timeout=None, check=True)
+        with gpg_agent(self.datadir):
+            subprocess.run(cmd, input=None, timeout=None, check=True)
 
     def repository_matcher(self, request):
         print('Requesting {}.'.format(request.path_url))
