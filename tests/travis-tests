@@ -11,6 +11,7 @@ set -o nounset
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd ${SCRIPTDIR}/..
 
+export DEBIAN_FRONTEND=noninteractive
 apt-get update
 apt-get --no-install-recommends -y install sudo 
 
