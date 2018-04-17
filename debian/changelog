@@ -1,3 +1,13 @@
+edi (0.11.4) bionic; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Added support for zstd compressed deb packages. Closes #34.
+  * Add travis testing for Ubuntu 18.04.
+  * Declared Ubuntu 18.04 as the new default release.
+  * Fixed gpg handling on Ubuntu 18.04.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Tue, 17 Apr 2018 22:53:12 +0200
+
 edi (0.11.3) xenial; urgency=medium
 
   [ Matthias Lüscher ]
