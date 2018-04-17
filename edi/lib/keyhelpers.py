@@ -23,6 +23,7 @@ import requests
 import gnupg
 import os
 from edi.lib.helpers import FatalError
+from edi.lib.shellhelpers import gpg_agent
 
 
 def fetch_repository_key(key_url):
@@ -40,9 +41,10 @@ def fetch_repository_key(key_url):
 def build_keyring(tempdir, keyring_file, key_data):
     if key_data:
         keyring_file_path = os.path.join(tempdir, keyring_file)
-        gpg = gnupg.GPG(gnupghome=tempdir, keyring=keyring_file_path)
-        gpg.encoding = 'utf-8'
-        gpg.import_keys(key_data)
+        with gpg_agent(str(tempdir)):
+            gpg = gnupg.GPG(gnupghome=tempdir, keyring=keyring_file_path)
+            gpg.encoding = 'utf-8'
+            gpg.import_keys(key_data)
         return keyring_file_path
     else:
         return None

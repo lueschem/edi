@@ -30,7 +30,7 @@ from edi.commands.qemucommands.fetch import Fetch
 from edi.lib.helpers import (require_executable, FatalError, chown_to_user, print_success,
                              get_workdir, get_artifact_dir, create_artifact_dir)
 from edi.lib.configurationparser import command_context
-from edi.lib.shellhelpers import run, get_chroot_cmd, gpg_agent
+from edi.lib.shellhelpers import run, get_chroot_cmd
 from edi.lib.keyhelpers import fetch_repository_key, build_keyring
 
 
@@ -80,16 +80,15 @@ class Bootstrap(Image):
         workdir = get_workdir()
 
         with tempfile.TemporaryDirectory(dir=workdir) as tempdir:
-            with gpg_agent(tempdir):
-                chown_to_user(tempdir)
-                key_data = fetch_repository_key(self.config.get_bootstrap_repository_key())
-                keyring_file = build_keyring(tempdir, "temp_keyring.gpg", key_data)
-                rootfs = self._run_debootstrap(tempdir, keyring_file, qemu_executable)
-                self._postprocess_rootfs(rootfs, key_data)
-                archive = self._pack_image(tempdir, rootfs)
-                chown_to_user(archive)
-                create_artifact_dir()
-                shutil.move(archive, self._result())
+            chown_to_user(tempdir)
+            key_data = fetch_repository_key(self.config.get_bootstrap_repository_key())
+            keyring_file = build_keyring(tempdir, "temp_keyring.gpg", key_data)
+            rootfs = self._run_debootstrap(tempdir, keyring_file, qemu_executable)
+            self._postprocess_rootfs(rootfs, key_data)
+            archive = self._pack_image(tempdir, rootfs)
+            chown_to_user(archive)
+            create_artifact_dir()
+            shutil.move(archive, self._result())
 
         print_success("Bootstrapped initial image {}.".format(self._result()))
         return self._result()

@@ -31,6 +31,7 @@ from aptsources.sourceslist import SourceEntry
 from edi.lib.helpers import FatalError
 from edi.lib.archivehelpers import decompress
 from edi.lib.keyhelpers import fetch_repository_key, build_keyring
+from edi.lib.shellhelpers import gpg_agent
 
 
 class PackageDownloader():
@@ -103,9 +104,10 @@ class PackageDownloader():
             cmd.append(detached_signature)
         cmd.append(signed_file)
 
-        output = subprocess.run(cmd, input=None, timeout=None, check=False,
-                                universal_newlines=True, stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE)
+        with gpg_agent(str(homedir)):
+            output = subprocess.run(cmd, input=None, timeout=None, check=False,
+                                    universal_newlines=True, stdout=subprocess.PIPE,
+                                    stderr=subprocess.PIPE)
 
         logging.info(output.stdout)
 
