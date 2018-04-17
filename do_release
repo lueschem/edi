@@ -35,16 +35,21 @@ git clean -dxf
 
 source /etc/os-release
 
-if [ "${VERSION_ID}" == "16.04" ]
+if [ "${VERSION_ID}" == "18.04" ]
 then
     NEW_VERSION=${1}
     GIT_BRANCH="master"
 else
-    NEW_VERSION="${1}+u${VERSION_ID}"
+    UBUNTU_VERSION_YEAR=$(echo ${VERSION_ID} | cut -d'.' -f 1)
+    if [ "${UBUNTU_VERSION_YEAR}" -lt "18" ]
+    then
+        NEW_VERSION="${1}~u${VERSION_ID}"
+    else
+        NEW_VERSION="${1}+u${VERSION_ID}"
+    fi
     GIT_BRANCH="${NEW_VERSION}"
     git checkout -b ${GIT_BRANCH}
 fi
-
 
 SETUP_PY="setup.py"
 sed -i "s/^    version=.*/    version='${NEW_VERSION}',/g" ${SETUP_PY}
