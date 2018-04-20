@@ -109,6 +109,9 @@ class Bootstrap(Image):
             os.remove(self._result())
             print_success("Removed bootstrap image {}.".format(self._result()))
 
+        if self.clean_depth > 0:
+            Fetch().clean_recursive(self.config.get_base_config_file(), self.clean_depth - 1)
+
     def _dispatch(self, config_file, run_method):
         self._setup_parser(config_file)
         return run_method()

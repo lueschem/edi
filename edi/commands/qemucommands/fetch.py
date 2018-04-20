@@ -90,6 +90,10 @@ class Fetch(Qemu):
             qemu_binary = os.path.join(tempdir, 'usr', 'bin', self._get_qemu_binary_name())
             chown_to_user(qemu_binary)
             create_artifact_dir()
+            if not os.path.isdir(self._result_folder()):
+                os.mkdir(self._result_folder())
+                chown_to_user(self._result_folder())
+
             shutil.move(qemu_binary, self._result())
 
         print_success("Fetched qemu binary {}.".format(self._result()))
@@ -103,23 +107,31 @@ class Fetch(Qemu):
         self._dispatch(config_file, run_method=self._clean)
 
     def _clean(self):
-        result = self._result()
-        if not result:
+        result_folder = self._result_folder()
+        if not result_folder:
             return
-        elif os.path.isfile(result):
-            logging.info("Removing '{}'.".format(result))
-            os.remove(result)
-            print_success("Removed QEMU binary {}.".format(result))
+        elif os.path.isdir(result_folder):
+            logging.info("Removing '{}'.".format(result_folder))
+            shutil.rmtree(result_folder)
+            print_success("Removed QEMU binary folder {}.".format(result_folder))
 
     def _dispatch(self, config_file, run_method):
         self._setup_parser(config_file)
         return run_method()
 
+    def _result_folder(self):
+        if not self._needs_qemu():
+            return None
+        else:
+            folder_name = "{0}_{1}".format(self.config.get_configuration_name(),
+                                           self._get_command_file_name_prefix())
+            return os.path.join(get_artifact_dir(), folder_name)
+
     def _result(self):
         if not self._needs_qemu():
             return None
         else:
-            return os.path.join(get_artifact_dir(), self._get_qemu_binary_name())
+            return os.path.join(self._result_folder(), self._get_qemu_binary_name())
 
     def _get_qemu_binary_name(self):
         arch_dict = {'amd64': 'x86_64',
