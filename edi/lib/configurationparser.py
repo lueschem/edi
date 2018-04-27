@@ -311,14 +311,14 @@ class ConfigurationParser:
                                                           overlay_node,
                                                           key)
 
-            element = "parameters"
-            base_params = base_node.get(key, {})
-            overlay_params = overlay_node.get(key, {})
-            merged_params = self._merge_key_value_node(base_params,
-                                                       overlay_params,
-                                                       element)
-            if merged_params:
-                merged_node[key][element] = merged_params
+            for element in ["parameters", "output"]:
+                base_items = base_node.get(key, {})
+                overlay_items = overlay_node.get(key, {})
+                merged_items = self._merge_key_value_node(base_items,
+                                                          overlay_items,
+                                                          element)
+                if merged_items:
+                    merged_node[key][element] = merged_items
 
         return merged_node
 

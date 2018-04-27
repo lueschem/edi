@@ -1,0 +1,15 @@
+general:
+    edi_compression: gz
+
+shared_folders:
+    edi_workspace:
+        folder: edi-workspace
+        mountpoint: edi-workspace
+
+postprocessing_commands:
+    120_second_command:
+        output:
+            output2: baz.result
+        parameters:
+            message: Foo and baz!
+        path: postprocessing_commands/sample_command/custom_command
