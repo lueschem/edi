@@ -29,7 +29,7 @@ import edi
 def test_output_node(datadir, capsys):
     parser = edi._setup_command_line_interface()
     # without overlay
-    cli_args = parser.parse_args(['image', 'create', '--config', os.path.join(datadir, 'output-node-base.yml')])
+    cli_args = parser.parse_args(['image', 'create', '--config', os.path.join(str(datadir), 'output-node-base.yml')])
     Create().run_cli(cli_args)
     out, err = capsys.readouterr()
     config = yaml.load(out)
@@ -42,7 +42,7 @@ def test_output_node(datadir, capsys):
     assert not err
 
     # with overlay
-    cli_args = parser.parse_args(['image', 'create', '--config', os.path.join(datadir, 'output-node.yml')])
+    cli_args = parser.parse_args(['image', 'create', '--config', os.path.join(str(datadir), 'output-node.yml')])
     Create().run_cli(cli_args)
     out, err = capsys.readouterr()
     config = yaml.load(out)
