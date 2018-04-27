@@ -218,10 +218,14 @@ class ConfigurationParser:
             base_config = self._get_base_config(base_config_file)
             global_config = self._get_overlay_config(base_config_file,
                                                      "global")
-            system_config = self._get_overlay_config(base_config_file,
-                                                     get_hostname())
-            user_config = self._get_overlay_config(base_config_file,
-                                                   get_user())
+            hostname = get_hostname()
+            system_config = self._get_overlay_config(base_config_file, hostname)
+            user = get_user()
+            if user == hostname:
+                user = '{}.user'.format(user)
+                logging.warning(("User name and host name are equal! Going to search user overlay file "
+                                 "with '.user' postfix."))
+            user_config = self._get_overlay_config(base_config_file, user)
 
             merge_1 = self._merge_configurations(base_config, global_config)
             merge_2 = self._merge_configurations(merge_1, system_config)

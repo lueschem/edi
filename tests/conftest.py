@@ -231,9 +231,13 @@ def config_files(tmpdir_factory):
 
     overlay_dir = dir_name.join("configuration", "overlay")
     os.makedirs(str(overlay_dir))
+    user = get_user()
+    hostname = get_hostname()
+    if user == hostname:
+        user = '{}.user'.format(user)
     overlays = [("global", sample_global_file),
-                (get_user(), sample_user_file),
-                (get_hostname(), sample_system_file)]
+                (user, sample_user_file),
+                (hostname, sample_system_file)]
     for overlay in overlays:
         o_type, o_content = overlay
         o_file_name = "{0}.{1}.yml".format(_config_name, o_type)
