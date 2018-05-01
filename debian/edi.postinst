@@ -3,7 +3,7 @@ set -e
 
 case "$1" in
     configure)
-        register-python-argcomplete3 edi > /etc/bash_completion.d/umake
+        register-python-argcomplete3 edi > /etc/bash_completion.d/edi
     ;;
 
     *)
