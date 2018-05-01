@@ -1,3 +1,12 @@
+edi (0.11.5) bionic; urgency=medium
+
+  * Improved qemu artifact handling. Fixes #31.
+  * Fixed merging of output node. Closes #26.
+  * Fix handling of config files if user name and hostname are identical. Closes #6.
+  * Write bash completion to correct file.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Tue, 01 May 2018 16:48:31 +0200
+
 edi (0.11.4) bionic; urgency=medium
 
   [ Matthias Lüscher ]
