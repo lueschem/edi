@@ -72,13 +72,12 @@ class Launch(Lxc):
                               "is not a valid host name."
                               ).format(self.container_name))
 
-        profiles = Profile().run(self.config.get_base_config_file(), include_post_config_profiles=False)
-
         if is_container_existing(self._result()):
             logging.info(("Container {0} is already existing. "
                           "Destroy it to regenerate it or reconfigure it."
                           ).format(self._result()))
 
+            profiles = Profile().run(self.config.get_base_config_file(), include_post_config_profiles=False)
             current_profiles = get_container_profiles(self._result())
             if not Launch.verify_profiles(profiles, current_profiles):
                 # we might end up here if the container got imported
@@ -98,6 +97,7 @@ class Launch(Lxc):
                 print_success("Started container {}.".format(self._result()))
         else:
             image = Import().run(self.config.get_base_config_file())
+            profiles = Profile().run(self.config.get_base_config_file(), include_post_config_profiles=False)
             print("Going to launch container.")
             launch_container(image, self._result(), profiles)
             print_success("Launched container {}.".format(self._result()))
