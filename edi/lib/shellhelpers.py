@@ -29,8 +29,8 @@ from edi.lib import mockablerun
 _ADAPTIVE = -42
 
 
-def run(popenargs, sudo=False, input=None, timeout=None,
-        check=True, universal_newlines=True, stdout=_ADAPTIVE, log_threshold=logging.DEBUG,
+def run(popenargs, sudo=False, input=None, timeout=None, check=True, universal_newlines=True,
+        stdout=_ADAPTIVE, log_threshold=logging.DEBUG, preserve_env=False,
         **kwargs):
     """
     Small wrapper around subprocess.run().
@@ -46,19 +46,25 @@ def run(popenargs, sudo=False, input=None, timeout=None,
         else:
             subprocess_stdout = subprocess.PIPE
 
-    myargs = popenargs.copy()
-
+    all_args = list()
     if not sudo and os.getuid() == 0:
         current_user = get_user()
         if current_user != 'root':
             # drop privileges
-            myargs = ["sudo", "-u", current_user] + myargs
+            all_args.append('sudo')
+            if preserve_env:
+                all_args.append('-E')
+            all_args.extend(['-u', current_user])
     elif sudo and os.getuid() != 0:
-        myargs.insert(0, "sudo")
+        all_args.append('sudo')
+        if preserve_env:
+            all_args.append('-E')
 
-    logging.log(log_threshold, "Running command: {0}".format(myargs))
+    all_args.extend(popenargs)
 
-    result = mockablerun.run_mockable(myargs, input=input, timeout=timeout, check=check,
+    logging.log(log_threshold, "Running command: {0}".format(all_args))
+
+    result = mockablerun.run_mockable(all_args, input=input, timeout=timeout, check=check,
                                       universal_newlines=universal_newlines,
                                       stdout=subprocess_stdout, **kwargs)
 
