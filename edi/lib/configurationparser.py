@@ -29,6 +29,7 @@ from os.path import dirname, abspath, basename, splitext, isfile, join
 import logging
 from edi.lib.helpers import (get_user, get_user_gid, get_user_uid, get_workdir,
                              get_hostname, get_edi_plugin_directory, FatalError)
+from edi.lib.proxyhelpers import get_proxy_setup
 from edi.lib.sshkeyhelpers import get_user_ssh_pub_keys
 from edi.lib.versionhelpers import get_edi_version, get_stripped_version
 from edi.lib.shellhelpers import get_user_environment_variable
@@ -63,11 +64,11 @@ def get_base_dictionary():
     base_dict["edi_current_user_target_home_directory"] = "/home/{}".format(current_user_name)
     base_dict["edi_host_hostname"] = get_hostname()
     base_dict["edi_edi_plugin_directory"] = get_edi_plugin_directory()
-    base_dict["edi_host_http_proxy"] = get_user_environment_variable('http_proxy', '')
-    base_dict["edi_host_https_proxy"] = get_user_environment_variable('https_proxy', '')
-    base_dict["edi_host_ftp_proxy"] = get_user_environment_variable('ftp_proxy', '')
-    base_dict["edi_host_socks_proxy"] = get_user_environment_variable('all_proxy', '')
-    base_dict["edi_host_no_proxy"] = get_user_environment_variable('no_proxy', '')
+    base_dict["edi_host_http_proxy"] = get_proxy_setup('http')
+    base_dict["edi_host_https_proxy"] = get_proxy_setup('https')
+    base_dict["edi_host_ftp_proxy"] = get_proxy_setup('ftp')
+    base_dict["edi_host_socks_proxy"] = get_proxy_setup('socks')
+    base_dict["edi_host_no_proxy"] = get_proxy_setup('no')
     base_dict["edi_lxd_version"] = get_lxd_version()
     return base_dict
 

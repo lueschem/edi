@@ -30,7 +30,7 @@ _ADAPTIVE = -42
 
 
 def run(popenargs, sudo=False, input=None, timeout=None, check=True, universal_newlines=True,
-        stdout=_ADAPTIVE, log_threshold=logging.DEBUG, preserve_env=False,
+        stdout=_ADAPTIVE, log_threshold=logging.DEBUG,
         **kwargs):
     """
     Small wrapper around subprocess.run().
@@ -51,14 +51,9 @@ def run(popenargs, sudo=False, input=None, timeout=None, check=True, universal_n
         current_user = get_user()
         if current_user != 'root':
             # drop privileges
-            all_args.append('sudo')
-            if preserve_env:
-                all_args.append('-E')
-            all_args.extend(['-u', current_user])
+            all_args.extend(['sudo', '-u', current_user])
     elif sudo and os.getuid() != 0:
         all_args.append('sudo')
-        if preserve_env:
-            all_args.append('-E')
 
     all_args.extend(popenargs)
 
