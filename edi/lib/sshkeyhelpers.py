@@ -24,7 +24,7 @@ import random
 import string
 import subprocess
 import re
-from edi.lib.shellhelpers import run, get_user_environment_variable
+from edi.lib.shellhelpers import run, get_environment_variable
 import edi.lib.helpers
 
 
@@ -39,7 +39,7 @@ def get_user_ssh_pub_keys():
     random_host = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
     cmd = ['ssh', '-G', random_host]
     ssh_config = run(cmd, stdout=subprocess.PIPE).stdout
-    user_home = get_user_environment_variable('HOME')
+    user_home = get_environment_variable('HOME')
     identity_files = re.findall(r'^identityfile (.*)$', ssh_config, flags=re.MULTILINE)
     ssh_pub_keys = []
     for file in identity_files:

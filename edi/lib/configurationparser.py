@@ -32,7 +32,7 @@ from edi.lib.helpers import (get_user, get_user_gid, get_user_uid, get_workdir,
 from edi.lib.proxyhelpers import get_proxy_setup
 from edi.lib.sshkeyhelpers import get_user_ssh_pub_keys
 from edi.lib.versionhelpers import get_edi_version, get_stripped_version
-from edi.lib.shellhelpers import get_user_environment_variable
+from edi.lib.shellhelpers import get_environment_variable
 from edi.lib.lxchelpers import get_lxd_version
 from packaging.version import Version
 from edi.lib.urlhelpers import obfuscate_url_password
@@ -60,7 +60,7 @@ def get_base_dictionary():
     base_dict["edi_current_user_ssh_pub_keys"] = get_user_ssh_pub_keys()
     base_dict["edi_current_user_uid"] = get_user_uid()
     base_dict["edi_current_user_gid"] = get_user_gid()
-    base_dict["edi_current_user_host_home_directory"] = get_user_environment_variable("HOME")
+    base_dict["edi_current_user_host_home_directory"] = get_environment_variable("HOME")
     base_dict["edi_current_user_target_home_directory"] = "/home/{}".format(current_user_name)
     base_dict["edi_host_hostname"] = get_hostname()
     base_dict["edi_edi_plugin_directory"] = get_edi_plugin_directory()

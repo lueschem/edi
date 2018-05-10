@@ -22,7 +22,7 @@
 
 from jinja2 import Template
 from edi.lib.helpers import get_user, FatalError
-from edi.lib.shellhelpers import get_user_environment_variable
+from edi.lib.shellhelpers import get_environment_variable
 from edi.lib.configurationparser import ConfigurationParser, command_context
 from edi.lib.sharedfoldercoordinator import SharedFolderCoordinator
 from tests.libtesting.helpers import get_command, get_sub_command, get_command_parameter
@@ -65,7 +65,7 @@ devices:
 def render_expected_profiles():
     user = get_user()
     dictionary = {'user': get_user(),
-                  'home': get_user_environment_variable('HOME'),
+                  'home': get_environment_variable('HOME'),
                   'target_home': '/home/{}'.format(user)}
     expected_profiles = []
     for boilerplate in expected_profile_boilerplates:

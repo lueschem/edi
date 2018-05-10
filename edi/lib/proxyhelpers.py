@@ -20,7 +20,11 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from edi.lib.shellhelpers import get_user_environment_variable
+import os
+import logging
+import subprocess
+from edi.lib.helpers import which
+from edi.lib.shellhelpers import run, get_environment_variable
 
 
 def get_proxy_setup(protocol):
@@ -33,6 +37,21 @@ def get_proxy_setup(protocol):
     }
     assert protocol in protocol_to_env.keys()
 
-    result = get_user_environment_variable(protocol_to_env[protocol], default='')
+    result = get_environment_variable(protocol_to_env[protocol], default='')
 
     return result
+
+
+def has_gsettings():
+    return which('gsettings') is not None
+
+
+def get_gsettings_value(schema, key, default=None):
+    cmd = ['gsettings', 'get', schema, key]
+    keep_sudo = os.getuid() == 0
+    result = run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False, sudo=keep_sudo)
+    if result.returncode == 0:
+        return result.stdout.strip('\n').strip("'")
+    else:
+        logging.debug('''The command '{}' failed: {}'''.format(cmd, result.stderr))
+        return default

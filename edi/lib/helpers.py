@@ -102,11 +102,11 @@ def copy_tree(src, dst):
 
 
 def which(executable):
-    def is_exe(fpath):
-        return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+    def is_exe(abs_path):
+        return os.path.isfile(abs_path) and os.access(abs_path, os.X_OK)
 
-    fpath, _ = os.path.split(executable)
-    if fpath:
+    exe_dir, _ = os.path.split(executable)
+    if exe_dir:
         if is_exe(executable):
             return executable
     else:
