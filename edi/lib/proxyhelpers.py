@@ -26,7 +26,7 @@ import logging
 import subprocess
 from functools import partial
 
-from edi.lib.helpers import which
+import edi.lib.helpers
 from edi.lib.shellhelpers import run, get_environment_variable
 
 
@@ -43,7 +43,7 @@ def get_gsettings_value(schema, key, default=None):
 
 class ProxySetup:
     def __init__(self):
-        self._has_gsettings = (which('gsettings') is not None)
+        self._has_gsettings = (edi.lib.helpers.which('gsettings') is not None)
         self._proxy_mode = None
         if self._has_gsettings:
             self._proxy_mode = get_gsettings_value('org.gnome.system.proxy', 'mode')
