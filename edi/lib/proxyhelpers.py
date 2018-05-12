@@ -102,7 +102,7 @@ class ProxySetup:
     def _gsettings_get_ignore_hosts():
         no_proxy = get_gsettings_value('org.gnome.system.proxy', 'ignore-hosts')
 
-        if no_proxy:
+        if no_proxy and no_proxy != '@as []':
             return ','.join(ast.literal_eval(no_proxy))
         else:
             return ''
