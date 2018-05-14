@@ -31,6 +31,7 @@ from edi.lib.helpers import (require_executable, FatalError, chown_to_user, prin
                              get_workdir, get_artifact_dir, create_artifact_dir)
 from edi.lib.configurationparser import command_context
 from edi.lib.shellhelpers import run, get_chroot_cmd
+from edi.lib.proxyhelpers import ProxySetup
 from edi.lib.keyhelpers import fetch_repository_key, build_keyring
 
 
@@ -147,7 +148,7 @@ class Bootstrap(Image):
         cmd.append(bootstrap_source.dist)
         cmd.append(rootfs)
         cmd.append(bootstrap_source.uri)
-        run(cmd, sudo=True, log_threshold=logging.INFO)
+        run(cmd, sudo=True, log_threshold=logging.INFO, env=ProxySetup().get_environment())
 
         if qemu_executable:
             qemu_target_path = os.path.join(rootfs, "usr", "bin")
