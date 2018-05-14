@@ -42,12 +42,12 @@ def get_gsettings_value(schema, key, default=None):
 
 
 class ProxySetup:
-    def __init__(self):
-        self._has_gsettings = (edi.lib.helpers.which('gsettings') is not None)
-        self._proxy_mode = None
-        if self._has_gsettings:
-            self._proxy_mode = get_gsettings_value('org.gnome.system.proxy', 'mode')
-        self._warn_if_auto_mode = True
+    _cache = dict()
+    _warn_if_auto_mode = True
+
+    def __init__(self, clear_cache=False):
+        if clear_cache:
+            ProxySetup._cache = dict()
         self._env_to_getter = {
             'http_proxy': partial(self._get_value, 'http_proxy',
                                   partial(self._gsettings_get_proxy, 'org.gnome.system.proxy.http', 'http')),
@@ -60,9 +60,33 @@ class ProxySetup:
             'no_proxy': partial(self._get_value, 'no_proxy', self._gsettings_get_ignore_hosts),
         }
 
-    def get(self, environment_variable):
-        assert environment_variable in self._env_to_getter.keys()
-        return self._env_to_getter[environment_variable]()
+    def get(self, environment_variable, default=None):
+        assert environment_variable in self._env_to_getter
+
+        if environment_variable in ProxySetup._cache:
+            result = ProxySetup._cache.get(environment_variable)
+        else:
+            result = self._env_to_getter[environment_variable]()
+            ProxySetup._cache[environment_variable] = result
+
+        if result:
+            return result
+        else:
+            return default
+
+    def get_requests_dict(self):
+        proxy_dict = {
+            'http': self.get('http_proxy', default=None),
+            'https': self.get('https_proxy', default=None),
+            'no_proxy': self.get('no_proxy', default=None),
+        }
+        return proxy_dict
+
+    def get_environment(self):
+        env_with_proxy = os.environ.copy()
+        for item in self._env_to_getter.keys():
+            env_with_proxy[item] = self.get(item, '')
+        return env_with_proxy
 
     def _get_value(self, environment_variable, gsettings_getter):
         env_value = get_environment_variable(environment_variable, default='')
@@ -71,22 +95,22 @@ class ProxySetup:
             logging.debug('''Retrieved '{}' from environment.'''.format(environment_variable))
             return env_value
 
-        if not self._has_gsettings:
-            return ''
+        if not self._has_gsettings():
+            return None
 
-        if self._proxy_mode == 'auto' and self._warn_if_auto_mode:
-            self._warn_if_auto_mode = False
+        if self._proxy_mode() == 'auto' and ProxySetup._warn_if_auto_mode:
+            ProxySetup._warn_if_auto_mode = False
             logging.warning('Automatic proxy mode is not supported!')
 
-        if self._proxy_mode != 'manual':
-            return ''
+        if self._proxy_mode() != 'manual':
+            return None
 
         gsettings_value = gsettings_getter()
         if gsettings_value:
             logging.debug('''Retrieved '{}' from gsettings.'''.format(environment_variable))
             return gsettings_value
         else:
-            return ''
+            return None
 
     @staticmethod
     def _gsettings_get_proxy(schema, prefix):
@@ -96,7 +120,7 @@ class ProxySetup:
         if host and port and port != '0':
             return '{}://{}:{}/'.format(prefix, host, port)
         else:
-            return ''
+            return None
 
     @staticmethod
     def _gsettings_get_ignore_hosts():
@@ -105,4 +129,22 @@ class ProxySetup:
         if no_proxy and no_proxy != '@as []':
             return ','.join(ast.literal_eval(no_proxy))
         else:
-            return ''
+            return None
+
+    @staticmethod
+    def _has_gsettings():
+        key = 'has-gsettings'
+        if key not in ProxySetup._cache:
+            result = (edi.lib.helpers.which('gsettings') is not None)
+            ProxySetup._cache[key] = result
+
+        return ProxySetup._cache.get(key)
+
+    @staticmethod
+    def _proxy_mode():
+        key = 'gsettings-proxy-mode'
+        if key not in ProxySetup._cache:
+            result = get_gsettings_value('org.gnome.system.proxy', 'mode')
+            ProxySetup._cache[key] = result
+
+        return ProxySetup._cache.get(key)

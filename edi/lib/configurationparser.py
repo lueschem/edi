@@ -65,11 +65,11 @@ def get_base_dictionary():
     base_dict["edi_host_hostname"] = get_hostname()
     base_dict["edi_edi_plugin_directory"] = get_edi_plugin_directory()
     proxy_setup = ProxySetup()
-    base_dict["edi_host_http_proxy"] = proxy_setup.get('http_proxy')
-    base_dict["edi_host_https_proxy"] = proxy_setup.get('https_proxy')
-    base_dict["edi_host_ftp_proxy"] = proxy_setup.get('ftp_proxy')
-    base_dict["edi_host_socks_proxy"] = proxy_setup.get('all_proxy')
-    base_dict["edi_host_no_proxy"] = proxy_setup.get('no_proxy')
+    base_dict["edi_host_http_proxy"] = proxy_setup.get('http_proxy', default='')
+    base_dict["edi_host_https_proxy"] = proxy_setup.get('https_proxy', default='')
+    base_dict["edi_host_ftp_proxy"] = proxy_setup.get('ftp_proxy', default='')
+    base_dict["edi_host_socks_proxy"] = proxy_setup.get('all_proxy', default='')
+    base_dict["edi_host_no_proxy"] = proxy_setup.get('no_proxy', default='')
     base_dict["edi_lxd_version"] = get_lxd_version()
     return base_dict
 
