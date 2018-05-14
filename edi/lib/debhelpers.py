@@ -32,6 +32,7 @@ from edi.lib.helpers import FatalError
 from edi.lib.archivehelpers import decompress
 from edi.lib.keyhelpers import fetch_repository_key, build_keyring
 from edi.lib.shellhelpers import gpg_agent
+from edi.lib.proxyhelpers import ProxySetup
 
 
 class PackageDownloader():
@@ -59,7 +60,7 @@ class PackageDownloader():
 
     @staticmethod
     def _fetch_archive_element_impl(url, check=True):
-        req = requests.get(url)
+        req = requests.get(url, proxies=ProxySetup().get_requests_dict())
         if req.status_code != 200:
             if check:
                 raise FatalError(("Unable to fetch archive element '{0}'."

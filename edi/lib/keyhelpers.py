@@ -24,11 +24,12 @@ import gnupg
 import os
 from edi.lib.helpers import FatalError
 from edi.lib.shellhelpers import gpg_agent
+from edi.lib.proxyhelpers import ProxySetup
 
 
 def fetch_repository_key(key_url):
     if key_url:
-        key_req = requests.get(key_url)
+        key_req = requests.get(key_url, proxies=ProxySetup().get_requests_dict())
         if key_req.status_code != 200:
             raise FatalError(("Unable to fetch repository key '{0}'"
                               ).format(key_url))
