@@ -23,6 +23,7 @@ import sys
 import argparse
 import argcomplete
 import logging
+import requests
 from edi.commands import *  # noqa: ignore=F401,F403
 from edi.lib.commandfactory import get_sub_commands, get_command
 from edi.lib.helpers import print_error_and_exit, FatalError
@@ -80,3 +81,8 @@ def main():
         print_error_and_exit("Command interrupted by user.")
     except CalledProcessError as subprocess_error:
         print_error_and_exit("{}\nFor more information increase the log level.".format(subprocess_error))
+    except requests.exceptions.SSLError as ssl_error:
+        print_error_and_exit("{}\nPlease verify your ssl/proxy setup.".format(ssl_error))
+    except requests.exceptions.ConnectionError as connection_error:
+        print_error_and_exit(("{}\nPlease verify your internet connectivity and the requested url."
+                              ).format(connection_error))
