@@ -22,6 +22,7 @@
 import yaml
 import collections
 import copy
+import hashlib
 from jinja2 import Template
 import os
 from contextlib import contextmanager
@@ -203,6 +204,9 @@ class ConfigurationParser:
                 logging.debug("Skipping named item '{}' from section '{}'.".format(name, section))
 
         return item_list
+
+    def get_project_directory_hash(self):
+        return hashlib.sha256(str(self.project_directory).encode()).hexdigest()[:8]
 
     def get_project_plugin_directory(self):
         return join(self.project_directory, "plugins")
