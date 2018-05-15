@@ -1,3 +1,9 @@
+edi (0.11.7) bionic; urgency=medium
+
+  * Avoid concurrency issues within lxd image store when doing parallel builds.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Tue, 15 May 2018 16:30:37 +0200
+
 edi (0.11.6) bionic; urgency=medium
 
   * Run commands that might require sudo first.
