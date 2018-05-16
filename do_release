@@ -35,18 +35,12 @@ git clean -dxf
 
 source /etc/os-release
 
+NEW_VERSION="${1}+u$(echo ${VERSION_ID} | sed s#\\.##g)"
+
 if [ "${VERSION_ID}" == "18.04" ]
 then
-    NEW_VERSION=${1}
     GIT_BRANCH="master"
 else
-    UBUNTU_VERSION_YEAR=$(echo ${VERSION_ID} | cut -d'.' -f 1)
-    if [ "${UBUNTU_VERSION_YEAR}" -lt "18" ]
-    then
-        NEW_VERSION="${1}~u${VERSION_ID}"
-    else
-        NEW_VERSION="${1}+u${VERSION_ID}"
-    fi
     GIT_BRANCH="${NEW_VERSION}"
     git checkout -b ${GIT_BRANCH}
 fi
@@ -64,7 +58,13 @@ VERSION_HELPERS="edi/lib/versionhelpers.py"
 sed -i "s/^edi_fallback_version =.*/edi_fallback_version = '${NEW_VERSION}'/g" ${VERSION_HELPERS}
 git add ${VERSION_HELPERS}
 
-gbp dch --new-version ${NEW_VERSION} --release --distribution ${VERSION_CODENAME} --debian-branch ${GIT_BRANCH} --debian-tag v%\(version\)s
+if [ "${GIT_BRANCH}" == "master" ]
+then
+    gbp dch --new-version ${NEW_VERSION} --release --distribution ${VERSION_CODENAME} --debian-branch ${GIT_BRANCH} --debian-tag v%\(version\)s
+else
+    dch -b --newversion ${NEW_VERSION} --distribution ${VERSION_CODENAME}
+fi
+
 git add debian/changelog
 git commit -m "New version ${NEW_VERSION}."
 git tag -a v${NEW_VERSION} -m "New version ${NEW_VERSION}."
