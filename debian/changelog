@@ -1,3 +1,9 @@
+edi (0.11.8+u1604) xenial; urgency=medium
+
+  * Xenial backport. 
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Wed, 16 May 2018 16:39:57 +0200
+
 edi (0.11.8+u1804) bionic; urgency=medium
 
   * Fixed backports version handling.
