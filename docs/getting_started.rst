@@ -1,7 +1,7 @@
 Getting Started
 ===============
 
-The following setup steps have been tested on Ubuntu 16.04 and on Ubuntu 17.10.
+The following setup steps have been tested on Ubuntu 16.04 and on Ubuntu 18.04.
 
 Prerequisites
 +++++++++++++
