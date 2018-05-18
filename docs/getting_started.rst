@@ -54,42 +54,6 @@ For your convenience, you can directly install edi from a ppa:
 .. _`edi-snapshots`: https://launchpad.net/~m-luescher/+archive/ubuntu/edi-snapshots
 
 
-Working with the edi Source Code
-++++++++++++++++++++++++++++++++
-
-Hint: You can skip this section if you just want to use edi without having a look at the source code.
-
-#. Clone the source code:
-
-   ::
-
-     git clone https://github.com/lueschem/edi.git
-
-#. Change into the edi subfolder:
-
-   ::
-
-     cd edi
-
-#. Install various packages that are required for the development of this project:
-
-   ::
-
-     sudo apt install -y git-buildpackage dh-make equivs && sudo mk-build-deps -i debian/control
-
-#. Build the edi Debian package (just to verify that everything works):
-
-   ::
-
-     debuild -us -uc
-
-#. Make the development setup convenient by adding some environment variables:
-
-   ::
-
-     source local_setup
-
-
 Setting up ssh Keys
 +++++++++++++++++++
 
@@ -147,7 +111,7 @@ Exploring the Container
 +++++++++++++++++++++++
 
 #. Log into the container using your current user name (Note: This user is only available
-   within a development container.) Use the password *ChangeMe!*:
+   within a development container.) and the password *ChangeMe!*:
 
    ::
 

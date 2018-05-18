@@ -13,6 +13,7 @@ Contents:
 
    introduction
    getting_started
+   source_code
    config_management/index
    command_pipeline
    upgrade_notes
