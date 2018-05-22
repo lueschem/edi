@@ -240,6 +240,8 @@ In contrast to the other plugin nodes the post processing command nodes require 
 generated artifacts. Please read the chapter :ref:`plugins` for more details.
 
 
+.. _`shared folders`:
+
 :code:`shared_folders` Section
 ++++++++++++++++++++++++++++++
 
