@@ -35,6 +35,7 @@ git clean -dxf
 
 source /etc/os-release
 
+RAW_VERSION="${1}"
 NEW_VERSION="${1}+u$(echo ${VERSION_ID} | sed s#\\.##g)"
 
 if [ "${VERSION_ID}" == "18.04" ]
@@ -68,6 +69,11 @@ fi
 git add debian/changelog
 git commit -m "New version ${NEW_VERSION}."
 git tag -a v${NEW_VERSION} -m "New version ${NEW_VERSION}."
+
+if [ "${GIT_BRANCH}" == "master" ]
+then
+    git tag -a v${RAW_VERSION} -m "Tag for setuptools scm."
+fi
 
 # verify that the package can be built:
 debuild -us -uc
