@@ -97,7 +97,7 @@ class SharedFolderCoordinator():
         test_cmd = ['lxc', 'exec', container_name, '--', 'true']
         result = run(test_cmd, check=False, stderr=subprocess.PIPE)
         if result.returncode != 0:
-            raise FatalError(('''The communicate with the container '{}' failed with the message '{}'.'''
+            raise FatalError(('''The communication with the container '{}' failed with the message '{}'.'''
                               ).format(container_name, result.stderr))
 
         mountpoints = self.get_mountpoints()

@@ -23,7 +23,7 @@ import logging
 import subprocess
 import os
 from contextlib import contextmanager
-from edi.lib.helpers import get_user, get_artifact_dir, FatalError
+from edi.lib.helpers import get_user, get_artifact_dir, FatalError, which
 from edi.lib import mockablerun
 
 _ADAPTIVE = -42
@@ -129,3 +129,48 @@ def gpg_agent(directory):
                     os.remove(os.path.join(directory, file))
                 except OSError:
                     pass
+
+
+class Executables:
+    """
+    Caches the availability of executables.
+    """
+    _cache = dict()
+
+    def __init__(self, clear_cache=False):
+        if clear_cache:
+            Executables._cache = dict()
+
+    @staticmethod
+    def has(executable):
+        if executable in Executables._cache:
+            return Executables._cache.get(executable)
+        else:
+            result = bool(which(executable))
+            Executables._cache[executable] = result
+            return result
+
+
+def require(executable, installation_command=None):
+    """
+    Make sure that a certain executable is available.
+    Use this method as a decorator.
+    :param executable: The required executable.
+    :param installation_command: A suggested installation command if the executable is missing.
+    :return:
+    """
+    def require_decorator(func):
+        def func_wrapper(*args, **kwargs):
+            if not Executables.has(executable):
+                if not installation_command:
+                    installation_hint = 'e.g. apt or snap'
+                else:
+                    installation_hint = "e.g. '{}'".format(installation_command)
+                raise FatalError(("Missing executable '{0}'.\n"
+                                  "Use {1} to install it.").format(executable,
+                                                                   installation_hint))
+            return func(*args, **kwargs)
+
+        return func_wrapper
+
+    return require_decorator
