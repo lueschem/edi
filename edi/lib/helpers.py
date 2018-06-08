@@ -119,13 +119,6 @@ def which(executable):
     return None
 
 
-def require_executable(executable, hint):
-    if which(executable) is None:
-        raise FatalError(("Missing executable '{0}'.\n"
-                          "Use '{1}' to install it.").format(executable,
-                                                             hint))
-
-
 def chown_to_user(path):
     shutil.chown(path, get_user_uid(), get_user_gid())
 

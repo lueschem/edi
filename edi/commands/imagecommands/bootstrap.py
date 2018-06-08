@@ -27,10 +27,10 @@ from codecs import open
 from aptsources.sourceslist import SourceEntry
 from edi.commands.image import Image
 from edi.commands.qemucommands.fetch import Fetch
-from edi.lib.helpers import (require_executable, FatalError, chown_to_user, print_success,
+from edi.lib.helpers import (FatalError, chown_to_user, print_success,
                              get_workdir, get_artifact_dir, create_artifact_dir)
 from edi.lib.configurationparser import command_context
-from edi.lib.shellhelpers import run, get_chroot_cmd
+from edi.lib.shellhelpers import run, get_chroot_cmd, require
 from edi.lib.proxyhelpers import ProxySetup
 from edi.lib.keyhelpers import fetch_repository_key, build_keyring
 
@@ -75,8 +75,6 @@ class Bootstrap(Image):
         if self.config.get_bootstrap_tool() != "debootstrap":
             raise FatalError(("At the moment only debootstrap "
                               "is supported for bootstrapping!"))
-
-        require_executable("debootstrap", "sudo apt install debootstrap")
 
         workdir = get_workdir()
 
@@ -125,6 +123,7 @@ class Bootstrap(Image):
                                  self.config.get_compression())
         return os.path.join(get_artifact_dir(), archive_name)
 
+    @require("debootstrap", "'sudo apt install debootstrap'")
     def _run_debootstrap(self, tempdir, keyring_file, qemu_executable):
         # Ansible uses python on the target system
         # sudo is needed for privilege escalation

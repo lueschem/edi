@@ -25,8 +25,8 @@ import tempfile
 import yaml
 from codecs import open
 from edi.lib.helpers import chown_to_user
-from edi.lib.helpers import require_executable, get_user, get_workdir
-from edi.lib.shellhelpers import run
+from edi.lib.helpers import get_user, get_workdir
+from edi.lib.shellhelpers import run, require
 from edi.lib.sharedfoldercoordinator import SharedFolderCoordinator
 from edi.lib.configurationparser import remove_passwords
 
@@ -90,10 +90,9 @@ class PlaybookRunner():
 
         return result
 
+    @require("ansible-playbook", "'sudo apt install ansible'")
     def _run_playbook(self, playbook, inventory, extra_vars, ansible_user):
-        require_executable("ansible-playbook", "sudo apt install ansible")
-
-        cmd = []
+        cmd = list()
         cmd.append("ansible-playbook")
         cmd.extend(["--connection", self.connection])
         cmd.extend(["--inventory", inventory])

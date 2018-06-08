@@ -163,12 +163,12 @@ def require(executable, installation_command=None):
         def func_wrapper(*args, **kwargs):
             if not Executables.has(executable):
                 if not installation_command:
-                    installation_hint = 'e.g. apt or snap'
+                    installation_hint = 'apt or snap'
                 else:
-                    installation_hint = "e.g. '{}'".format(installation_command)
+                    installation_hint = installation_command
                 raise FatalError(("Missing executable '{0}'.\n"
-                                  "Use {1} to install it.").format(executable,
-                                                                   installation_hint))
+                                  "Use e.g. {1} to install it.").format(executable,
+                                                                        installation_hint))
             return func(*args, **kwargs)
 
         return func_wrapper

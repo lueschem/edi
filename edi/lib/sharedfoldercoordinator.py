@@ -22,7 +22,7 @@
 
 from jinja2 import Template
 from edi.lib.helpers import FatalError
-from edi.lib.shellhelpers import run
+from edi.lib.shellhelpers import run, require
 import os
 import logging
 import subprocess
@@ -85,6 +85,7 @@ class SharedFolderCoordinator():
                     logging.debug(('''Successfully created the shared folder '{}' on the host system.'''
                                    ).format(folder))
 
+    @require('lxc')
     def verify_container_mountpoints(self, container_name):
         """
         Verify that all mount points exist within the target system.

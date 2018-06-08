@@ -24,41 +24,51 @@ import yaml
 import logging
 import hashlib
 from edi.lib.helpers import FatalError
-from edi.lib.shellhelpers import run
+from edi.lib.shellhelpers import run, Executables, require
 
 
+lxd_install_hint = "'sudo apt install lxd' or 'sudo snap install lxd'"
+
+
+@require('lxc', lxd_install_hint)
 def is_in_image_store(name):
     cmd = ["lxc", "image", "show", "local:{}".format(name)]
     result = run(cmd, check=False, stderr=subprocess.PIPE)
     return result.returncode == 0
 
 
+@require('lxc', lxd_install_hint)
 def import_image(image, image_name):
     cmd = ["lxc", "image", "import", image, "local:", "--alias", image_name]
     run(cmd)
 
 
+@require('lxc', lxd_install_hint)
 def export_image(image_name, image_without_extension):
     cmd = ["lxc", "image", "export", image_name, image_without_extension]
     run(cmd)
 
 
+@require('lxc', lxd_install_hint)
 def publish_container(container_name, image_name):
     cmd = ["lxc", "publish", container_name, "--alias", image_name]
     run(cmd)
 
 
+@require('lxc', lxd_install_hint)
 def delete_image(name):
     cmd = ["lxc", "image", "delete", "local:{}".format(name)]
     run(cmd)
 
 
+@require('lxc', lxd_install_hint)
 def is_container_existing(name):
     cmd = ["lxc", "info", name]
     result = run(cmd, check=False, stderr=subprocess.PIPE)
     return result.returncode == 0
 
 
+@require('lxc', lxd_install_hint)
 def is_container_running(name):
     cmd = ["lxc", "list", "--format=json", "^{}$".format(name)]
     result = run(cmd, stdout=subprocess.PIPE)
@@ -77,6 +87,7 @@ def is_container_running(name):
         raise FatalError("Unable to parse lxc output ({}).".format(exc))
 
 
+@require('lxc', lxd_install_hint)
 def launch_container(image, name, profiles):
     cmd = ["lxc", "launch", "local:{}".format(image), name]
     for profile in profiles:
@@ -95,12 +106,14 @@ def launch_container(image, name, profiles):
                               ).format(image, result.stderr))
 
 
+@require('lxc', lxd_install_hint)
 def start_container(name):
     cmd = ["lxc", "start", name]
 
     run(cmd, log_threshold=logging.INFO)
 
 
+@require('lxc', lxd_install_hint)
 def stop_container(name, timeout=120):
     cmd = ["lxc", "stop", name]
 
@@ -113,6 +126,7 @@ def stop_container(name, timeout=120):
         run(cmd, log_threshold=logging.INFO)
 
 
+@require('lxc', lxd_install_hint)
 def delete_container(name):
     # needs to be stopped first!
     cmd = ["lxc", "delete", name]
@@ -120,17 +134,20 @@ def delete_container(name):
     run(cmd, log_threshold=logging.INFO)
 
 
+@require('lxc', lxd_install_hint)
 def apply_profiles(name, profiles):
     cmd = ['lxc', 'profile', 'apply', name, ','.join(profiles)]
     run(cmd)
 
 
+@require('lxc', lxd_install_hint)
 def is_profile_existing(name):
     cmd = ["lxc", "profile", "show", name]
     result = run(cmd, check=False, stderr=subprocess.PIPE)
     return result.returncode == 0
 
 
+@require('lxc', lxd_install_hint)
 def write_lxc_profile(profile_text):
     new_profile = False
     profile_yaml = yaml.load(profile_text)
@@ -154,6 +171,7 @@ def write_lxc_profile(profile_text):
     return ext_profile_name, new_profile
 
 
+@require('lxc', lxd_install_hint)
 def get_server_image_compression_algorithm():
     cmd = ['lxc', 'config', 'get', 'images.compression_algorithm']
     algorithm = run(cmd, stdout=subprocess.PIPE).stdout.strip('\n')
@@ -180,6 +198,7 @@ def get_file_extension_from_image_compression_algorithm(algorithm):
     return extension
 
 
+@require('lxc', lxd_install_hint)
 def get_container_profiles(name):
     cmd = ['lxc', 'config', 'show', name]
     result = run(cmd, stdout=subprocess.PIPE)
@@ -187,6 +206,9 @@ def get_container_profiles(name):
 
 
 def get_lxd_version():
+    if not Executables.has('lxd'):
+        return '0.0.0'
+
     cmd = ['lxd', '--version']
     result = run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if not result.stdout:
