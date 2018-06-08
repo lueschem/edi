@@ -22,7 +22,7 @@
 
 import os
 import pytest
-from edi.lib.shellhelpers import run, safely_remove_artifacts_folder, gpg_agent
+from edi.lib.shellhelpers import run, safely_remove_artifacts_folder, gpg_agent, require, Executables
 from tests.libtesting.contextmanagers.workspace import workspace
 from tests.libtesting.helpers import get_random_string, suppress_chown_during_debuild
 from edi.lib.helpers import get_artifact_dir, create_artifact_dir, FatalError
@@ -80,3 +80,51 @@ def test_gpg_agent(tmpdir):
         assert os.path.isfile(fake_socket)
 
     assert not os.path.isfile(fake_socket)
+
+
+def test_executables():
+    executables = Executables(clear_cache=True)
+    assert executables.has('ls') is True
+    assert executables.has('does-really-not-exist') is False
+    assert executables.has('ls') is True  # cache
+    assert executables.has('does-really-not-exist') is False
+
+
+@require('ls', 'some command')
+def some_decorated_function(arg1, arg2):
+    print('{} + {})'.format(arg1, arg2))
+    return arg1 + arg2
+
+
+@require('does-really-not-exist', 'other command')
+def other_decorated_function(arg1, arg2):
+    print('{} + {})'.format(arg1, arg2))
+    return arg1 + arg2
+
+
+class SomeClass:
+    def __init__(self):
+        self.some_name = "foo"
+        self.other_name = "bar"
+
+    @require('ls')
+    def do_this(self, directory):
+        return 'ls {}'.format(directory)
+
+    @require('does-really-not-exist')
+    def do_that(self, message):
+        return 'does-really-not-exist {}'.format(message)
+
+
+def test_require():
+    assert some_decorated_function(40, 2) == 42
+    with pytest.raises(FatalError) as error:
+        other_decorated_function(40, 2)
+    assert 'other command' in error.value.message
+    sc = SomeClass()
+    assert sc.do_this('foo') == 'ls foo'
+    with pytest.raises(FatalError) as error:
+        sc.do_that('Hello world!')
+
+    assert 'apt or snap' in error.value.message
+    assert 'does-really-not-exist' in error.value.message
