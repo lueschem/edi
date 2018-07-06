@@ -1,3 +1,9 @@
+edi (0.11.9+u1604) xenial; urgency=medium
+
+  * Ubuntu Xenial release. 
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Fri, 06 Jul 2018 15:11:03 +0000
+
 edi (0.11.9+u1804) bionic; urgency=medium
 
   * Downgraded lxd to Recommends so that it can get installed as a snap. Closes #11.
