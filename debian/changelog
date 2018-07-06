@@ -1,3 +1,10 @@
+edi (0.11.9+u1804) bionic; urgency=medium
+
+  * Downgraded lxd to Recommends so that it can get installed as a snap. Closes #11.
+  * Gracefully handle yaml parsing errors. Closes #7.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Fri, 06 Jul 2018 11:27:48 +0200
+
 edi (0.11.8+u1804) bionic; urgency=medium
 
   * Fixed backports version handling.
