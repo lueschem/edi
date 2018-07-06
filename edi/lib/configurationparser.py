@@ -37,6 +37,7 @@ from edi.lib.shellhelpers import get_environment_variable
 from edi.lib.lxchelpers import get_lxd_version
 from packaging.version import Version
 from edi.lib.urlhelpers import obfuscate_url_password
+from edi.lib.yamlhelpers import annotated_yaml_load
 
 
 def remove_passwords(dictionary):
@@ -265,7 +266,7 @@ class ConfigurationParser:
         return template.render(self._get_load_time_dictionary())
 
     def _get_base_config(self, config_file):
-        return yaml.load(self._parse_jina2_file(config_file)) or {}
+        return annotated_yaml_load(self._parse_jina2_file(config_file), config_file.name) or {}
 
     def _get_overlay_config(self, base_config_file, overlay_name):
         fname, extension = splitext(basename(base_config_file.name))
@@ -278,7 +279,7 @@ class ConfigurationParser:
             with open(overlay, encoding="UTF-8", mode="r") as config_file:
                 logging.info(("Using overlay configuration file '{0}'"
                               ).format(config_file.name))
-                return yaml.load(self._parse_jina2_file(config_file)) or {}
+                return annotated_yaml_load(self._parse_jina2_file(config_file), config_file.name) or {}
         else:
             return {}
 
