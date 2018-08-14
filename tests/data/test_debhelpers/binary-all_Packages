@@ -6,7 +6,7 @@ Architecture: all
 Pre-Depends: dpkg (>= 1.15.6~)
 Suggests: baz
 Description: Sample package
-Homepage: http://www.get-edi.io/
+Homepage: https://www.get-edi.io/
 Description-md5: deadbeefdeadbeefdeadbeefdeadbeef
 Tag: role::app-data
 Section: devel

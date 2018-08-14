@@ -38,6 +38,6 @@ You are welcome to contribute to edi. In case of questions you can contact me by
 More Information
 ++++++++++++++++
 
-For more information please visit `http://www.get-edi.io`_.
+For more information please visit `https://www.get-edi.io`_.
 
-.. _`http://www.get-edi.io`: http://www.get-edi.io
+.. _`https://www.get-edi.io`: https://www.get-edi.io

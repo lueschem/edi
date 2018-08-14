@@ -1,6 +1,6 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: foo
-Source: http://www.get-edi.io
+Source: https://www.get-edi.io
 
 Files: *
 Copyright: 2017 Matthias Lüscher <lueschem@gmail.com>
