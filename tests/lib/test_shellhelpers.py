@@ -85,7 +85,9 @@ def test_gpg_agent(tmpdir):
 def test_executables():
     executables = Executables(clear_cache=True)
     assert executables.has('ls') is True
+    assert executables.get('true') == '/bin/true'
     assert executables.has('does-really-not-exist') is False
+    assert executables.get('does-not-exist-at-all') is None
     assert executables.has('ls') is True  # cache
     assert executables.has('does-really-not-exist') is False
 

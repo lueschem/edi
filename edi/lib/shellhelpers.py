@@ -144,11 +144,23 @@ class Executables:
     @staticmethod
     def has(executable):
         if executable in Executables._cache:
-            return Executables._cache.get(executable)
+            return bool(Executables._cache.get(executable))
         else:
-            result = bool(which(executable))
+            result = which(executable)
             Executables._cache[executable] = result
-            return result
+            return bool(result)
+
+    @classmethod
+    def get(cls, executable):
+        """
+        Get the absolute path to an executable.
+        :param executable: name of the executable
+        :return: /path/to/executable or None
+        """
+        if cls.has(executable):
+            return Executables._cache[executable]
+        else:
+            return None
 
 
 def require(executable, installation_command=None):
