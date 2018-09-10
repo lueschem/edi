@@ -105,12 +105,22 @@ def which(executable):
     def is_exe(abs_path):
         return os.path.isfile(abs_path) and os.access(abs_path, os.X_OK)
 
+    def get_path_list():
+        paths = os.environ["PATH"].split(os.pathsep)
+        # paths not visible for unprivileged user on Debian
+        paths.append(os.path.join(os.sep, 'usr', 'local', 'sbin'))
+        paths.append(os.path.join(os.sep, 'usr', 'sbin'))
+        paths.append(os.path.join(os.sep, 'sbin'))
+        # path not visible for super user on Debian
+        paths.append(os.path.join(os.sep, 'snap', 'bin'))
+        return paths
+
     exe_dir, _ = os.path.split(executable)
     if exe_dir:
         if is_exe(executable):
             return executable
     else:
-        for path in os.environ["PATH"].split(os.pathsep):
+        for path in get_path_list():
             path = path.strip('"')
             exe_file_path = os.path.join(path, executable)
             if is_exe(exe_file_path):
