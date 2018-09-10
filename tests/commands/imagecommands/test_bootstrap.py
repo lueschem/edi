@@ -59,7 +59,7 @@ def test_bootstrap(config_files, monkeypatch):
                     fakearchive.write("fake archive")
             elif popenargs[0][-2] == "dpkg" and popenargs[0][-1] == "--print-architecture":
                 return subprocess.CompletedProcess("fakerun", 0, 'amd64')
-            elif get_command(popenargs) == "lxd" and get_sub_command(popenargs) == "--version":
+            elif get_command(popenargs).endswith("lxd") and get_sub_command(popenargs) == "--version":
                 return subprocess.CompletedProcess("fakerun", 0, '2.18')
             elif get_command(popenargs) == "ssh" and get_sub_command(popenargs) == "-G":
                 return subprocess.CompletedProcess("fakerun", 0, 'ssh config')

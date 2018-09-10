@@ -209,7 +209,7 @@ def get_lxd_version():
     if not Executables.has('lxd'):
         return '0.0.0'
 
-    cmd = ['lxd', '--version']
+    cmd = [Executables.get('lxd'), '--version']
     result = run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if not result.stdout:
         # recent lxd versions print the version to stderr!
