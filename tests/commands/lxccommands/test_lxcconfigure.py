@@ -24,7 +24,7 @@ from tests.libtesting.optins import requires_lxc, requires_ansible, requires_deb
 from tests.libtesting.contextmanagers.workspace import workspace
 import os
 from tests.libtesting.helpers import get_random_string, get_project_root
-from edi.lib.shellhelpers import run
+from edi.lib.shellhelpers import run, get_debian_architecture
 from edi.lib.helpers import get_artifact_dir
 from edi.lib.configurationparser import get_base_dictionary
 from edi.commands.lxccommands.lxcconfigure import Configure
@@ -95,7 +95,8 @@ def test_build_stretch_container(capsys, datadir):
     with workspace():
         edi_exec = os.path.join(get_project_root(), 'bin', 'edi')
         project_name = 'pytest-{}'.format(get_random_string(6))
-        config_command = [edi_exec, 'config', 'init', project_name, 'debian-stretch-amd64']
+        config_command = [edi_exec, 'config', 'init', project_name,
+                          'debian-stretch-{}'.format(get_debian_architecture())]
         run(config_command)  # run as non root
 
         # enable ssh server and create a default user
