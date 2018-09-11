@@ -39,7 +39,7 @@ def test_get_server_image_compression():
 
 def test_get_server_image_compression_bzip2(monkeypatch):
     def fake_lxc_config_command(*popenargs, **kwargs):
-        if get_command(popenargs) == 'lxc' and get_sub_command(popenargs) == 'config':
+        if get_command(popenargs).endswith('lxc') and get_sub_command(popenargs) == 'config':
             return subprocess.CompletedProcess("fakerun", 0, stdout='bzip2')
         else:
             return subprocess.run(*popenargs, **kwargs)

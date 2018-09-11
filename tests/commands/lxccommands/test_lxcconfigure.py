@@ -29,6 +29,7 @@ from edi.lib.helpers import get_artifact_dir
 from edi.lib.configurationparser import get_base_dictionary
 from edi.commands.lxccommands.lxcconfigure import Configure
 from edi.commands.clean import Clean
+from edi.lib.lxchelpers import lxc_exec
 import edi
 import yaml
 import re
@@ -41,7 +42,7 @@ def verify_shared_folder(container_name):
     base_dict = get_base_dictionary()
     random_file = get_random_string(20)
     workspace_folder = 'edi-workspace'
-    cmd = ['lxc', 'exec', container_name, '--',
+    cmd = [lxc_exec(), 'exec', container_name, '--',
            'sudo', '-u', base_dict.get('edi_current_user_name'), 'touch',
            os.path.join(base_dict.get('edi_current_user_target_home_directory'), workspace_folder, random_file)]
     run(cmd)
@@ -81,7 +82,7 @@ def prepare_pub_key(datadir):
 
 
 def get_container_ip_addr(container_name, interface):
-    cmd = ['lxc', 'exec', container_name, '--', 'ip', '-4', 'addr', 'show', interface]
+    cmd = [lxc_exec(), 'exec', container_name, '--', 'ip', '-4', 'addr', 'show', interface]
     raw_ip_result = run(cmd, stdout=subprocess.PIPE).stdout
     return re.findall(r'^\s*inet\s([0-9\.]*)/.*', raw_ip_result, re.MULTILINE)[0]
 
@@ -118,7 +119,7 @@ def test_build_stretch_container(capsys, datadir):
         for image in images:
             assert os.path.isfile(image)
 
-        lxc_image_list_cmd = ['lxc', 'image', 'list']
+        lxc_image_list_cmd = [lxc_exec(), 'image', 'list']
         result = run(lxc_image_list_cmd, stdout=subprocess.PIPE)
         assert project_name in result.stdout
 
@@ -132,7 +133,7 @@ def test_build_stretch_container(capsys, datadir):
         result = run(lxc_image_list_cmd, stdout=subprocess.PIPE)
         assert project_name not in result.stdout
 
-        verification_command = ['lxc', 'exec', container_name, '--', 'cat', '/etc/os-release']
+        verification_command = [lxc_exec(), 'exec', container_name, '--', 'cat', '/etc/os-release']
         result = run(verification_command, stdout=subprocess.PIPE)
         assert '''VERSION_ID="9"''' in result.stdout
         assert 'ID=debian' in result.stdout
@@ -148,8 +149,8 @@ def test_build_stretch_container(capsys, datadir):
 
         verify_shared_folder(container_name)
 
-        stop_command = ['lxc', 'stop', container_name]
+        stop_command = [lxc_exec(), 'stop', container_name]
         run(stop_command)
 
-        delete_command = ['lxc', 'delete', container_name]
+        delete_command = [lxc_exec(), 'delete', container_name]
         run(delete_command)

@@ -116,7 +116,7 @@ def test_get_mountpoints(config_files):
 def test_verify_container_mountpoints(config_files, monkeypatch):
     with open(config_files, "r") as main_file:
         def fake_lxc_exec_command(*popenargs, **kwargs):
-            if get_command(popenargs) == 'lxc' and get_sub_command(popenargs) == 'exec':
+            if get_command(popenargs).endswith('lxc') and get_sub_command(popenargs) == 'exec':
                 return subprocess.CompletedProcess("fakerun", 0, '')
             else:
                 return subprocess.run(*popenargs, **kwargs)
@@ -132,7 +132,7 @@ def test_verify_container_mountpoints(config_files, monkeypatch):
 def test_verify_container_mountpoints_connection_failure(config_files, monkeypatch):
     with open(config_files, "r") as main_file:
         def fake_lxc_exec_command(*popenargs, **kwargs):
-            if get_command(popenargs) == 'lxc' and get_sub_command(popenargs) == 'exec':
+            if get_command(popenargs).endswith('lxc') and get_sub_command(popenargs) == 'exec':
                 if get_command_parameter(popenargs, '--') == 'true':
                     cmd = ['bash', '-c', '>&2 echo -e "lxc command failed" ; exit 1']
                     return subprocess.run(cmd, **kwargs)
@@ -155,7 +155,7 @@ def test_verify_container_mountpoints_connection_failure(config_files, monkeypat
 def test_verify_container_mountpoints_failure(config_files, monkeypatch):
     with open(config_files, "r") as main_file:
         def fake_lxc_exec_command(*popenargs, **kwargs):
-            if get_command(popenargs) == 'lxc' and get_sub_command(popenargs) == 'exec':
+            if get_command(popenargs).endswith('lxc') and get_sub_command(popenargs) == 'exec':
                 if get_command_parameter(popenargs, '--') == 'test':
                     return subprocess.CompletedProcess("failure", 1, 'failure')
                 else:

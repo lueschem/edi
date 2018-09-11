@@ -23,6 +23,7 @@
 from jinja2 import Template
 from edi.lib.helpers import FatalError
 from edi.lib.shellhelpers import run, require
+from edi.lib.lxchelpers import lxc_exec
 import os
 import logging
 import subprocess
@@ -95,7 +96,7 @@ class SharedFolderCoordinator():
         if self._suppress_shared_folders():
             return
 
-        test_cmd = ['lxc', 'exec', container_name, '--', 'true']
+        test_cmd = [lxc_exec(), 'exec', container_name, '--', 'true']
         result = run(test_cmd, check=False, stderr=subprocess.PIPE)
         if result.returncode != 0:
             raise FatalError(('''The communication with the container '{}' failed with the message '{}'.'''
@@ -103,7 +104,7 @@ class SharedFolderCoordinator():
 
         mountpoints = self.get_mountpoints()
         for mountpoint in mountpoints:
-            cmd = ['lxc', 'exec', container_name, '--', 'test', '-d', mountpoint]
+            cmd = [lxc_exec(), 'exec', container_name, '--', 'test', '-d', mountpoint]
             if run(cmd, check=False).returncode != 0:
                 raise FatalError(('''Please make sure that '{}' is valid mount point in the container '{}'.\n'''
                                   '''Hint: Use an appropriate playbook that generates those mount points\n'''

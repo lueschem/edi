@@ -25,7 +25,7 @@ from tests.libtesting.contextmanagers.workspace import workspace
 import os
 from tests.libtesting.helpers import get_random_string, get_project_root
 from edi.lib.shellhelpers import run
-from edi.lib.lxchelpers import (get_server_image_compression_algorithm,
+from edi.lib.lxchelpers import (get_server_image_compression_algorithm, lxc_exec,
                                 get_file_extension_from_image_compression_algorithm)
 from edi.commands.imagecommands.create import Create
 from edi.lib.helpers import get_artifact_dir
@@ -70,7 +70,7 @@ def test_create_jessie_image(capsys):
             "{}-develop_edicommand_lxc_import_di".format(project_name),
             "{}-develop_edicommand_lxc_publish".format(project_name)
         ]
-        lxc_image_list_cmd = ['lxc', 'image', 'list']
+        lxc_image_list_cmd = [lxc_exec(), 'image', 'list']
         result = run(lxc_image_list_cmd, stdout=subprocess.PIPE)
         for image_store_item in image_store_items:
             assert image_store_item in result.stdout
