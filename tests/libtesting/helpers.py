@@ -31,14 +31,20 @@ def get_random_string(length):
 
 
 def get_command(popenargs):
+    def get_real_command(cmd, expected_position):
+        if cmd[expected_position] == 'env':
+            return cmd[expected_position + 2]
+        else:
+            return cmd[expected_position]
+
     command = popenargs[0]
     if command[0] == 'sudo':
         if command[1] == '-u':
-            return command[3]
+            return get_real_command(command, 3)
         else:
-            return command[1]
+            return get_real_command(command, 1)
     else:
-        return command[0]
+        return get_real_command(command, 0)
 
 
 def get_sub_command(popenargs):
