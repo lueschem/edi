@@ -78,6 +78,9 @@ def get_chroot_cmd(rootfs):
 
 
 def get_environment_variable(name, default=None):
+    # the environment varible HOME is treated differently on Ubuntu and Debian
+    # use get_user_home_directory instead
+    assert name is not 'HOME'
     cmd = ["printenv", name]
     # in order to keep environment variables do not drop privileges with sudo -u ...
     keep_sudo = os.getuid() == 0
@@ -86,6 +89,12 @@ def get_environment_variable(name, default=None):
         return result.stdout.strip('\n')
     else:
         return default
+
+
+def get_user_home_directory(username):
+    cmd = ['getent', 'passwd', username]
+    result = run(cmd, stdout=subprocess.PIPE)
+    return result.stdout.split(':')[5]
 
 
 def get_debian_architecture():

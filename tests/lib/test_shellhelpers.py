@@ -22,11 +22,28 @@
 
 import os
 import pytest
-from edi.lib.shellhelpers import run, safely_remove_artifacts_folder, gpg_agent, require, Executables
+from edi.lib.shellhelpers import (run, safely_remove_artifacts_folder, gpg_agent, require,
+                                  Executables, get_user_home_directory)
 from tests.libtesting.contextmanagers.workspace import workspace
-from tests.libtesting.helpers import get_random_string, suppress_chown_during_debuild
+from tests.libtesting.helpers import (get_random_string, suppress_chown_during_debuild, get_command,
+                                      get_sub_command, get_command_parameter)
 from edi.lib.helpers import get_artifact_dir, create_artifact_dir, FatalError
 from tests.libtesting.optins import requires_sudo
+from edi.lib.shellhelpers import mockablerun
+import subprocess
+
+
+def test_get_user_home_directory(monkeypatch):
+    def fake_getent_passwd(*popenargs, **kwargs):
+        if get_command(popenargs) == 'getent' and get_sub_command(popenargs) == 'passwd' and \
+                get_command_parameter(popenargs, 'passwd') == 'john':
+            return subprocess.CompletedProcess("fakerun", 0,
+                                               stdout='john:x:1000:1000:John Doe,,,:/home/john:/bin/bash\n')
+        else:
+            return subprocess.run(*popenargs, **kwargs)
+
+    monkeypatch.setattr(mockablerun, 'run_mockable', fake_getent_passwd)
+    assert get_user_home_directory('john') == '/home/john'
 
 
 def test_artifacts_folder_removal(monkeypatch):

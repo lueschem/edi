@@ -54,8 +54,9 @@ def fake_ssh_environment(monkeypatch, tmpdir):
     def intercept_command_run(*popenargs, **kwargs):
         if get_command(popenargs) == 'ssh' and get_sub_command(popenargs) == '-G':
             return subprocess.CompletedProcess("fakerun", 0, stdout=fake_config)
-        elif get_command(popenargs) == "printenv" and get_sub_command(popenargs) == "HOME":
-            return subprocess.CompletedProcess("fakerun", 0, stdout=str(tmpdir))
+        elif get_command(popenargs) == "getent" and get_sub_command(popenargs) == "passwd":
+            return subprocess.CompletedProcess("fakerun", 0,
+                                               stdout='john:x:1000:1000:John Doe,,,:{}:/bin/bash\n'.format(str(tmpdir)))
         else:
             return subprocess.run(*popenargs, **kwargs)
 
