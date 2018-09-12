@@ -20,7 +20,7 @@ TESTUSERHOME=/home/${TESTUSER}
 adduser --disabled-password --gecos "" ${TESTUSER}
 addgroup  ${TESTUSER} adm
 
-apt-get --no-install-recommends -y install git
+apt-get --no-install-recommends -y install git lxd
 
 if ! git diff --exit-code --quiet
 then
