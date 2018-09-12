@@ -92,7 +92,11 @@ class PlaybookRunner():
 
     @require("ansible-playbook", "'sudo apt install ansible'")
     def _run_playbook(self, playbook, inventory, extra_vars, ansible_user):
+        snap_path = '/snap/bin'
         cmd = list()
+        # on a Debian system the snap path might not be found in the PATH variable
+        if snap_path not in os.environ['PATH']:
+            cmd.extend(["env", "PATH={}:{}".format(os.environ['PATH'], snap_path)])
         cmd.append("ansible-playbook")
         cmd.extend(["--connection", self.connection])
         cmd.extend(["--inventory", inventory])
