@@ -32,8 +32,10 @@ from edi.lib.shellhelpers import run, get_environment_variable
 
 def get_gsettings_value(schema, key, default=None):
     cmd = ['gsettings', 'get', schema, key]
-    keep_sudo = os.getuid() == 0
-    result = run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False, sudo=keep_sudo)
+    # On Ubuntu the following command will cause some output on stderr.
+    # This could be avoided by running the command as root but with this attempt
+    # we would fail to retrieve the correct gsettings values on Debian.
+    result = run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
     if result.returncode == 0:
         return result.stdout.strip('\n').strip("'")
     else:
