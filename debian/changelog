@@ -1,3 +1,18 @@
+edi (0.12.0+u1804) bionic; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Switched links to https.
+  * Search binaries in additional paths not always visible on Debian.
+  * Fixed lxc/lxd usage for Debian/snap.
+  * Added two additional configuration templates.
+  * Removed lxd build dependency since it might be provided as a snap package.
+  * Make sure that Ansible on Debian finds the lxc (snap) executable.
+  * Fixed gsettings value retrieval on Debian.
+  * Fixed retrieval of home directory on Debian.
+  * Added possibility to release on Debian.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Fri, 14 Sep 2018 10:48:14 +0200
+
 edi (0.11.9+u1804) bionic; urgency=medium
 
   * Downgraded lxd to Recommends so that it can get installed as a snap. Closes #11.
