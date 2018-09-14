@@ -19,6 +19,12 @@ set -o nounset
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd ${SCRIPTDIR}
 
+if [ "$(git rev-parse --abbrev-ref HEAD)" != "master" ]
+then
+    >&2 echo "Error: please switch to the master branch before doing a release!"
+    exit 1
+fi
+
 if ! git diff --exit-code --quiet
 then
     >&2 echo "Error: there are unstaged changes!"
@@ -36,7 +42,18 @@ git clean -dxf
 source /etc/os-release
 
 RAW_VERSION="${1}"
-NEW_VERSION="${1}+u$(echo ${VERSION_ID} | sed s#\\.##g)"
+
+if [ "${ID}" == "ubuntu" ]
+then
+    NEW_VERSION="${1}+u$(echo ${VERSION_ID} | sed s#\\.##g)"
+elif [ "${ID}" == "debian" ]
+then
+    NEW_VERSION="${1}+deb$(echo ${VERSION_ID} | sed s#\\.##g)"
+    VERSION_CODENAME=$(echo ${VERSION} | awk -F"[)(]+" '{print $2}')
+else
+    >&2 echo "Error: unhandled operating system id (${ID})!"
+    exit 1
+fi
 
 if [ "${VERSION_ID}" == "18.04" ]
 then
@@ -75,11 +92,13 @@ then
     git tag -a v${RAW_VERSION} -m "Tag for setuptools scm."
 fi
 
-# verify that the package can be built:
 debuild -us -uc
 
-debuild -S
-dput ppa:m-luescher/edi-snapshots ../edi_${NEW_VERSION}_source.changes
+if [ "${ID}" == "ubuntu" ]
+then
+    debuild -S
+    dput ppa:m-luescher/edi-snapshots ../edi_${NEW_VERSION}_source.changes
+fi
 
 git push origin ${GIT_BRANCH}
 git push --tags
