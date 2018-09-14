@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -o errexit
+set -o nounset
+
+if [ "$#" -eq 1 ] && [ "$1" == "--version" ]
+then
+    echo "2.18.0"
+else
+    echo "Fake $0 environment."
+fi
