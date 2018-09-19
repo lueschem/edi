@@ -6,7 +6,7 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-. /etc/lsb-release
+. /etc/os-release
 
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd ${SCRIPTDIR}/..
@@ -20,7 +20,7 @@ TESTUSERHOME=/home/${TESTUSER}
 adduser --disabled-password --gecos "" ${TESTUSER}
 addgroup  ${TESTUSER} adm
 
-apt-get --no-install-recommends -y install git lxd
+apt-get --no-install-recommends -y install git
 
 if ! git diff --exit-code --quiet
 then
@@ -37,7 +37,7 @@ fi
 sudo -u ${TESTUSER} git clone .git ${TESTUSERHOME}/edi
 
 apt-get -y --no-install-recommends install git-buildpackage dh-make equivs lintian
-if [ "${DISTRIB_CODENAME}" == "xenial" ]
+if [ "${VERSION_ID}" == "16.04" ]
 then
     # Ansible >= 2.1 is required
     apt-get -y --no-install-recommends install ansible/xenial-backports

@@ -2,12 +2,12 @@ sudo: required
 services:
   - docker
 install:
+  - docker pull debian:stretch
   - docker pull ubuntu:16.04
-  - docker pull ubuntu:17.10
   - docker pull ubuntu:18.04
 script:
+  - docker run -v $(pwd):/data/edi debian:stretch bash -c "/data/edi/tests/travis-tests"
   - docker run -v $(pwd):/data/edi ubuntu:16.04 bash -c "/data/edi/tests/travis-tests"
-  - docker run -v $(pwd):/data/edi ubuntu:17.10 bash -c "/data/edi/tests/travis-tests"
   - docker run -v $(pwd):/data/edi ubuntu:18.04 bash -c "/data/edi/tests/travis-tests"
 
 branches:
