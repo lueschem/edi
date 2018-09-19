@@ -39,7 +39,7 @@ def test_output_node(datadir, capsys):
     assert second_command.get('parameters').get('bingo') == 'bongo'
     assert second_command.get('parameters').get('message') == 'Foo, bar or baz?'
     assert second_command.get('path') == 'postprocessing_commands/sample_command/some_command'
-    assert not err
+    assert not err or 'is shallow and may cause errors' in err
 
     # with overlay
     cli_args = parser.parse_args(['image', 'create', '--config', os.path.join(str(datadir), 'output-node.yml')])
@@ -52,4 +52,4 @@ def test_output_node(datadir, capsys):
     assert second_command.get('parameters').get('bingo') == 'bongo'
     assert second_command.get('parameters').get('message') == 'Foo and baz!'
     assert second_command.get('path') == 'postprocessing_commands/sample_command/custom_command'
-    assert not err
+    assert not err or 'is shallow and may cause errors' in err

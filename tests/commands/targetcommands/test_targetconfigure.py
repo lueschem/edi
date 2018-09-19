@@ -55,4 +55,4 @@ def test_target_configure(config_files, monkeypatch, capsys):
 
         out, err = capsys.readouterr()
         print(out)
-        assert not err
+        assert not err or 'is shallow and may cause errors' in err
