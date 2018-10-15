@@ -3,6 +3,7 @@ set -e
 
 case "$1" in
     configure)
+        mkdir -p /etc/bash_completion.d
         register-python-argcomplete3 edi > /etc/bash_completion.d/edi
     ;;
 
