@@ -1,3 +1,12 @@
+edi (0.12.2+u1804) bionic; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Updated travis tests for Debian stretch.
+  * Add eventually missing bash_completion.d folder during postinst.
+  * Updated getting started with Debian instructions.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Tue, 16 Oct 2018 22:28:04 +0200
+
 edi (0.12.1+u1804) bionic; urgency=medium
 
   [ Matthias Lüscher ]
