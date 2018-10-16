@@ -44,7 +44,7 @@ def get_install_requires():
 setup(
     name='edi',
 
-    version='0.12.2+u1804',
+    version='0.12.2+deb9',
 
     description='Embedded Development Infrastructure - edi',
     long_description=long_description,

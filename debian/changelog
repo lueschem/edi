@@ -1,3 +1,9 @@
+edi (0.12.2+deb9) stretch; urgency=medium
+
+  * Release for Debian stretch. 
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Tue, 16 Oct 2018 20:32:11 +0000
+
 edi (0.12.2+u1804) bionic; urgency=medium
 
   [ Matthias Lüscher ]
