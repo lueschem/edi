@@ -12,8 +12,8 @@ To achieve this goal, edi leverages top-notch open source technologies:
   LXD is a great choice too.
 - Yaml_ and Jinja2_ are the consistent way to write edi configuration files and Ansible playbooks.
 - Python_ is the language and ecosystem that makes the system integration efficient.
-- edi is supposed to be used on the popular `Ubuntu Linux`_ distribution.
-- By default, edi generates Debian_ based target systems.
+- edi is supposed to be used on the `Ubuntu Linux`_ or `Debian Linux`_ distribution.
+- By default, edi generates `Debian Linux`_ based target systems.
 
 .. _Ansible: https://www.ansible.com
 .. _LXD: https://www.linuxcontainers.org
@@ -21,7 +21,7 @@ To achieve this goal, edi leverages top-notch open source technologies:
 .. _Jinja2: http://jinja.pocoo.org/
 .. _Python: https://www.python.org
 .. _Ubuntu Linux: https://www.ubuntu.com
-.. _Debian: https://www.debian.org
+.. _Debian Linux: https://www.debian.org
 
 ----
 
