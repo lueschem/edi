@@ -4,10 +4,14 @@
 
 - name: Remove unused packages.
   command: apt-get -y autoremove
+  args:
+    warn: no
   when: edi_create_distributable_image
 
 - name: Clean apt cache.
   command: apt-get -y clean
+  args:
+    warn: no
   when: edi_create_distributable_image
 
 - name: Identify apt lists.

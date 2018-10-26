@@ -7,20 +7,20 @@
 - name: Identify openssh-server keys.
   find: paths=/etc/ssh patterns="ssh_host_*_key*"
   register: openssh_server_keys
-  when: openssh_server_installed|succeeded
+  when: openssh_server_installed is succeeded
 
 - name: Remove openssh-server keys.
   file: path="{{ item.path }}" state=absent
-  when: openssh_server_installed|succeeded
+  when: openssh_server_installed is succeeded
   with_items:
     - "{{ openssh_server_keys.files }}"
 
 - name: Add a systemd service that re-generates the openssh-server keys.
   copy: src=openssh-server-key-generator.service dest=/lib/systemd/system/
-  when: openssh_server_installed|succeeded
+  when: openssh_server_installed is succeeded
 
 - name: Enable the systemd service that re-generates the openssh-server keys.
   service: name=openssh-server-key-generator enabled=true
-  when: openssh_server_installed|succeeded
+  when: openssh_server_installed is succeeded
   
 
