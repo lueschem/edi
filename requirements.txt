@@ -1,7 +1,0 @@
-argcomplete
-jinja2
-packaging
-python-debian
-python-gnupg
-pyyaml
-requests
