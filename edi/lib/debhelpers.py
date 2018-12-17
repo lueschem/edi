@@ -112,8 +112,8 @@ class PackageDownloader():
 
         logging.info(output.stdout)
 
-        goodsig = re.search('''^\[GNUPG:\] GOODSIG''', output.stdout, re.MULTILINE)
-        validsig = re.search('''^\[GNUPG:\] VALIDSIG''', output.stdout, re.MULTILINE)
+        goodsig = re.search(r'^\[GNUPG:\] GOODSIG', output.stdout, re.MULTILINE)
+        validsig = re.search(r'^\[GNUPG:\] VALIDSIG', output.stdout, re.MULTILINE)
 
         if goodsig and validsig:
             logging.info('Signature check ok!')
@@ -154,7 +154,7 @@ class PackageDownloader():
     def _find_package_in_package_files(self, package_name, package_files):
         downloaded_package_prefix = []
         for package_file in package_files:
-            match = re.match('^(.*)Packages\.*([a-z2]{1,3})$', package_file['name'])
+            match = re.match(r'^(.*)Packages\.*([a-z2]{1,3})$', package_file['name'])
             if not match or not len(match.groups()) <= 2:
                 raise FatalError('Error parsing package name string {}.'.format(package_file['name']))
 

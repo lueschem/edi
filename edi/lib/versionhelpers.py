@@ -55,7 +55,7 @@ def get_stripped_version(version):
     :param version: Version string that needs to be parsed
     :return: a stripped version string of the format MAJOR[.MINOR[.PATCH]]
     """
-    result = re.match('\d+(\.\d+){0,2}', version)
+    result = re.match(r'\d+(\.\d+){0,2}', version)
     if result:
         return result.group(0)
     else:
