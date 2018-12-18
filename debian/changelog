@@ -1,3 +1,13 @@
+edi (0.12.3+u1804) bionic; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Get rid of Ansible (deprecation) warnings. Closes #37.
+  * Removed python-pip dependency. Fixes #38.
+  * Get rid of "W605 invalid escape sequence" warnings.
+  * Added Ubuntu cosmic to travis tests.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Tue, 18 Dec 2018 12:40:03 +0100
+
 edi (0.12.2+u1804) bionic; urgency=medium
 
   [ Matthias Lüscher ]
