@@ -1,3 +1,9 @@
+edi (0.12.4+u1810) cosmic; urgency=medium
+
+  * Ubuntu cosmic build. 
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Tue, 18 Dec 2018 12:24:32 +0000
+
 edi (0.12.4+u1804) bionic; urgency=medium
 
   [ Matthias Lüscher ]
