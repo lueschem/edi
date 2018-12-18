@@ -27,6 +27,7 @@ from tests.libtesting.helpers import get_random_string, get_project_root
 from edi.lib.shellhelpers import run, get_debian_architecture
 from edi.lib.helpers import get_artifact_dir
 from edi.lib.configurationparser import get_base_dictionary
+from edi.lib.proxyhelpers import ProxySetup
 from edi.commands.lxccommands.lxcconfigure import Configure
 from edi.commands.clean import Clean
 from edi.lib.lxchelpers import lxc_exec
@@ -93,6 +94,8 @@ def get_container_ip_addr(container_name, interface):
 @requires_sudo
 def test_build_stretch_container(capsys, datadir):
     with workspace():
+        ProxySetup(clear_cache=True)
+
         edi_exec = os.path.join(get_project_root(), 'bin', 'edi')
         project_name = 'pytest-{}'.format(get_random_string(6))
         config_command = [edi_exec, 'config', 'init', project_name,

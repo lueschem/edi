@@ -25,6 +25,7 @@ from tests.libtesting.contextmanagers.workspace import workspace
 import os
 from tests.libtesting.helpers import get_random_string, get_project_root
 from edi.lib.shellhelpers import run, get_debian_architecture
+from edi.lib.proxyhelpers import ProxySetup
 from edi.lib.lxchelpers import (get_server_image_compression_algorithm, lxc_exec,
                                 get_file_extension_from_image_compression_algorithm)
 from edi.commands.imagecommands.create import Create
@@ -40,6 +41,8 @@ import subprocess
 def test_create_jessie_image(capsys):
     print(os.getcwd())
     with workspace():
+        ProxySetup(clear_cache=True)
+
         edi_exec = os.path.join(get_project_root(), 'bin', 'edi')
         project_name = 'pytest-{}'.format(get_random_string(6))
         config_command = [edi_exec, 'config', 'init', project_name,
