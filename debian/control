@@ -23,7 +23,6 @@ Build-Depends: ansible,
                python3-setuptools-scm,
                python3-sphinx,
                python3-yaml,
-               qemu-user-static,
                sudo,
                zstd,
 Maintainer: Matthias Luescher <lueschem@gmail.com>
