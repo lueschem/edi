@@ -105,5 +105,71 @@ will automatically be turned into privileged mode.
 Ansible Playbooks
 +++++++++++++++++
 
+edi ships with a few Ansible_ playbooks that can be re-used in many projects. This playbooks can also serve
+as an example if you want to write a custom playbook for your own project.
 
+Please take a look at the comprehensive documentation_ of Ansible if you want to write your own playbook.
 
+Here is a description of the built-in playbooks including the parameters that can be used to fine tune them:
+
+.. _Ansible: https://www.ansible.com
+.. _documentation: https://docs.ansible.com/
+
+Base System
+^^^^^^^^^^^
+
+The base system playbook tackles the following tasks:
+
+- Setup the lxc container network interface (optional).
+- Inherit the proxy settings from the host computer (optional).
+- Perform a basic apt setup.
+- Add a default user (optional).
+- Install an openssh server (optional).
+
+The following code snippet adds the base system playbook to your configuration.
+
+.. code-block:: yaml
+  :caption: Configuration Example
+
+  playbooks:
+    ...
+    100_base_system:
+      parameters:
+        create_default_user: true
+        install_openssh_server: true
+      path: playbooks/debian/base_system/main.yml
+    ...
+
+The playbook can be fine tuned as follows:
+
+.. list-table::
+   :widths: 20 80
+   :header-rows: 1
+
+   * - key
+     - description
+   * - apply_proxy_settings
+     - With this boolean value you can specify if the target system shall get a proxy setup.
+       The default value is :code:`True` and the standard behavior is that the target system will
+       inherit the proxy settings of the host system. However, the proxy settings can be customized
+       according to the table below.
+       If you specify :code:`False` the target system proxy setup will remain untouched.
+   * - configure_lxc_network_interface
+     - By default (boolean value :code:`True`) the playbook will add a lxc network interface to the container.
+       If this behavior is not desired, change the setting to :code:`False`.
+   * - create_default_user
+     - By default (boolean value :code:`False`) no additional user gets created. If you need an additional user
+       switch this value to :code:`True` and fine tune the default user according to the table below.
+   * - install_openssh_server
+     - By default (boolean value :code:`False`), no ssh server will be installed on the target system.
+       Switch this value to :code:`True` if you would like to access the system using ssh.
+   * - disable_ssh_password_authentication
+     - :code:`True`
+   * - authorize_current_user
+     - :code:`True`
+   * - ssh_pub_key_directory
+     - :code:`{{ edi_project_directory }}/ssh_pub_keys`
+   * - install_documentation
+     - :code:`True`
+   * - translations_filter
+     - :code:`""`
