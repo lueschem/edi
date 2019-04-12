@@ -69,6 +69,9 @@ edi supports the following settings:
      - The target system user that will be used for configuration management tasks. |br|
        Please note that direct lxc container management uses the root user. |br|
        If unspecified edi will name the configuration management user :code:`edicfgmgmt`.
+   * - parameters
+     - Optional general parameters that are globally visible for all plugins. Parameters need to be
+       specified as key value pairs.
 
 :code:`bootstrap` Section
 +++++++++++++++++++++++++

@@ -57,6 +57,9 @@ sample_file = """
 general:
     edi_compression:        gz
     edi_lxc_stop_timeout:   130
+    parameters:
+        param1: keep
+        param2: do_overwrite
 
 shared_folders:
     skip_me:
@@ -85,6 +88,7 @@ playbooks:
         parameters:
             kernel_package: linux-image-amd64
             message:        some message
+            param3:         customized
     20_networking:
         path:               playbooks/bar.yml
 
@@ -103,6 +107,11 @@ postprocessing_commands:
 """
 
 sample_global_file = """
+general:
+    parameters:
+        param2: overwritten
+        param3: new
+
 shared_folders:
     other_folder:
         folder:             invalid_folder

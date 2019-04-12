@@ -94,6 +94,9 @@ def test_plugins(monkeypatch, config_files, capsys, command, command_args, has_t
             assert 'plugins/playbooks/foo.yml' in base_system.get('path')
             assert base_system.get('dictionary').get('kernel_package') == 'linux-image-amd64-rt'
             assert base_system.get('dictionary').get('edi_project_directory') == os.path.dirname(config_files)
+            assert base_system.get('dictionary').get("param1") == "keep"
+            assert base_system.get('dictionary').get("param2") == "overwritten"
+            assert base_system.get('dictionary').get("param3") == "customized"
         else:
             assert not result.get('playbooks')
 

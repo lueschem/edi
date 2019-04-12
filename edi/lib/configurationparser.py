@@ -173,6 +173,9 @@ class ConfigurationParser:
             raise FatalError('''The value of 'edi_lxc_stop_timeout' must be an integer.''')
         return timeout
 
+    def get_general_parameters(self):
+        return self._get_general_item("parameters", {})
+
     def get_ordered_path_items(self, section):
         citems = self._get_config().get(section, {})
         ordered_items = collections.OrderedDict(sorted(citems.items()))
@@ -292,6 +295,13 @@ class ConfigurationParser:
                           ] = self._merge_key_value_node(base, overlay,
                                                          element)
 
+        general_base = base.get("general", {})
+        general_overlay = overlay.get("general", {})
+        if general_base and general_overlay:
+            merged_config["general"]["parameters"] = self._merge_key_value_node(general_base,
+                                                                                general_overlay,
+                                                                                "parameters")
+
         nested_elements = ["playbooks", "postprocessing_commands", "lxc_templates",
                            "lxc_profiles", "shared_folders"]
         for element in nested_elements:
@@ -300,7 +310,8 @@ class ConfigurationParser:
                                                       element)
         return merged_config
 
-    def _merge_key_value_node(self, base, overlay, node_name):
+    @staticmethod
+    def _merge_key_value_node(base, overlay, node_name):
         base_node = base.get(node_name, {})
         overlay_node = overlay.get(node_name, {})
         if base_node is None and overlay_node is None:
@@ -363,6 +374,10 @@ class ConfigurationParser:
         node_dict["edi_config_management_user_name"] = self._get_general_item("edi_config_management_user_name",
                                                                               "edicfgmgmt")
         node_dict['edi_bootstrap_architecture'] = self.get_bootstrap_architecture()
+
+        general_parameters = self.get_general_parameters()
+        if general_parameters:
+            node_dict = dict(node_dict, **general_parameters)
 
         parameters = node.get("parameters", None)
 

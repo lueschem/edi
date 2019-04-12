@@ -36,6 +36,15 @@ def test_global_configuration_overlay(config_files):
         assert parser.get_lxc_stop_timeout() == 130
 
 
+def test_general_parameters(config_files):
+    with open(config_files, "r") as main_file:
+        parser = ConfigurationParser(main_file)
+        parameters = parser.get_general_parameters()
+        assert parameters.get("param1") == "keep"
+        assert parameters.get("param2") == "overwritten"
+        assert parameters.get("param3") == "new"
+
+
 def test_bootstrap_overlay(config_files):
     with open(config_files, "r") as main_file:
         parser = ConfigurationParser(main_file)
