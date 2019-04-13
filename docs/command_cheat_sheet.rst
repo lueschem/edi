@@ -83,8 +83,8 @@ Initial personalization of git:
 
 ::
 
-  git config --global user.email "lueschem@gmail.com"
-  git config --global user.name "Matthias Luescher"
+  git config --global user.email "johndoe@example.com"
+  git config --global user.name "John Doe"
 
 
 

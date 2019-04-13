@@ -165,21 +165,21 @@ The playbook can be fine tuned as follows:
        Switch this value to :code:`True` if you would like to access the system using ssh.
    * - disable_ssh_password_authentication
      - By default password authentication is disabled for ssh (boolean value :code:`True`). If you want to
-       allow password based authentication then switch this value to `False` but make sure to use a non standard
+       allow password based authentication then switch this value to :code:`False` but make sure to use a non standard
        password.
    * - authorize_current_user
      - By default (boolean value :code:`True`) the current host user will be authorized to ssh into the account
-       of the default user. Switch this value to `False` if the current user shall not be authorized.
+       of the default user. Switch this value to :code:`False` if the current user shall not be authorized.
    * - ssh_pub_key_directory
-     - All the public keys (ending with .pub) contained in the folder `ssh_pub_key_directory` (defaults to
+     - All the public keys (ending with .pub) contained in the folder :code:`ssh_pub_key_directory` (defaults to
        :code:`{{ edi_project_directory }}/ssh_pub_keys`) will be added to the list of authorized ssh keys of the
        default user.
    * - install_documentation
      - By default (boolean value :code:`True`) the documentation of every Debian package will get installed.
-       Switch this value to `False` if you want to deploy an image with a minimal footprint.
+       Switch this value to :code:`False` if you want to deploy an image with a minimal footprint.
    * - translations_filter
      - By default all translations contained in Debian packages will get installed (empty filter: :code:`""`).
-       To reduce the footprint the resulting artifacts the number of installed languages can be limited.
+       To reduce the footprint of the resulting artifacts the number of installed languages can be limited.
        By choosing the builtin filter :code:`"en_translations_only"` you can make sure that only English
        translations will get installed.
 
@@ -225,7 +225,7 @@ The default user can be fine tuned as follows:
      - The groups of the default user (default is :code:`adm,sudo`).
    * - default_user_password
      - The initially set password of the default user
-       (default is :code:`password=ChangeMe!`).
+       (default is :code:`ChangeMe!`).
 
 Base System Cleanup
 ^^^^^^^^^^^^^^^^^^^
@@ -234,7 +234,7 @@ The base system cleanup playbook makes sure that we get a clean distributable im
 doing the following tasks:
 
 - It removes the openssh server keys (they shall be unique per system).
-- It removes cached apt date to reduce the artifact footprint.
+- It removes cached apt data to reduce the artifact footprint.
 - It finalizes the proxy setup.
 - It sets the final hostname.
 
@@ -337,7 +337,7 @@ A typical post processing command can be configured as follows:
     ...
 
 :code:`edi` will render the file :code:`postprocessing_commands/rootfs/lxd2rootfs.edi` using the Jinja2 template
-engine and then execute it. It is a good practice to use this file as a small shim between :code:`edi` and the scripts
+engine and then execute it. It is a good practice to use this file as a thin shim between :code:`edi` and the scripts
 that do the heavy lifting.
 
 The statement :code:`require_root: True` tells edi that a privileged user (sudo) is needed to execute the command.
