@@ -189,6 +189,8 @@ The proxy settings can be customized as follows:
    :widths: 20 80
    :header-rows: 1
 
+   * - key
+     - description
    * - target_http_proxy
      - The http proxy that gets applied to the target system (defaults to :code:`{{ edi_host_http_proxy }}`).
    * - target_https_proxy
@@ -207,6 +209,8 @@ The default user can be fine tuned as follows:
    :widths: 20 80
    :header-rows: 1
 
+   * - key
+     - description
    * - default_user_group_name
      - The group name of the default user (default is :code:`edi`).
    * - default_user_gid
@@ -253,6 +257,8 @@ The playbook can be fine tuned as follows:
    :widths: 20 80
    :header-rows: 1
 
+   * - key
+     - description
    * - hostname
      - Set the hostname within the final artifact (default is :code:`edi`).
    * - regenerate_openssh_server_keys
@@ -271,6 +277,8 @@ The final proxy settings can be customized as follows:
    :widths: 20 80
    :header-rows: 1
 
+   * - key
+     - description
    * - target_http_proxy
      - The final http proxy settings (defaults to :code:`""`).
    * - target_https_proxy
@@ -341,3 +349,8 @@ The specified output can be either a single file or a folder (if multiple files 
 
 The variable :code:`edi_input_artifact` can be used to locate the artifact that got generated before the post
 processing commands get called. It contains typically the artifact created by the :code:`edi lxc export` command.
+
+The post processing commands are implemented in a very generic way and to get an idea of what they can
+do please take a look at the the edi-pi_ configuration.
+
+.. _edi-pi: https://github.com/lueschem/edi-pi

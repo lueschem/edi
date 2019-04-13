@@ -1,6 +1,29 @@
 Reference List
 ==============
 
+edi Blog
+++++++++
+
+The following blog posts complement this documentation:
+
+- `Compiling For Embedded Debian Target Systems`_
+- `Cross Compiling For Raspbian`_
+- `A New Approach To Operating System Image Generation`_
+- `Secure By Default Ssh Setup`_
+- `11 Traps To Avoid When Building Debian Images`_
+- `Running Gui Applications Within Lxd Container`_
+- `Booting Debian with U-Boot`_
+- `Updating a Debian Based IoT Fleet with Mender`_
+
+.. _Compiling For Embedded Debian Target Systems: https://www.get-edi.io/Compiling-for-Embedded-Debian-Target-Systems/
+.. _Cross Compiling For Raspbian: https://www.get-edi.io/Cross-Compiling-for-Raspbian/
+.. _A New Approach To Operating System Image Generation: https://www.get-edi.io/A-new-Approach-to-Operating-System-Image-Generation/
+.. _Secure By Default Ssh Setup: https://www.get-edi.io/Secure-by-Default-ssh-Setup/
+.. _11 Traps To Avoid When Building Debian Images: https://www.get-edi.io/11-Traps-to-Avoid-When-Building-Debian-Images/
+.. _Running Gui Applications Within Lxd Container: https://www.get-edi.io/Running-GUI-Applications-Within-LXD-Container/
+.. _Booting Debian with U-Boot: https://www.get-edi.io/Booting-Debian-with-U-Boot/
+.. _Updating a Debian Based IoT Fleet with Mender: https://www.get-edi.io/Updating-a-Debian-Based-IoT-Fleet/
+
 Debian
 ++++++
 
