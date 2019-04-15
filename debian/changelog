@@ -1,3 +1,9 @@
+edi (1.0.0+u1604) xenial; urgency=medium
+
+  * Release for Ubuntu 16.04. 
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Mon, 15 Apr 2019 20:22:31 +0000
+
 edi (1.0.0+u1804) bionic; urgency=medium
 
   [ Matthias Lüscher ]
