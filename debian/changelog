@@ -1,3 +1,11 @@
+edi (1.0.0+u1804) bionic; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Updated documentation.
+  * Added general parameters node. Closes #40.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Mon, 15 Apr 2019 22:19:17 +0200
+
 edi (0.12.4+u1804) bionic; urgency=medium
 
   [ Matthias Lüscher ]
