@@ -38,7 +38,7 @@ import subprocess
 @requires_ansible
 @requires_debootstrap
 @requires_sudo
-def test_create_jessie_image(capsys):
+def test_create_stretch_image(capsys):
     print(os.getcwd())
     with workspace():
         ProxySetup(clear_cache=True)
@@ -46,7 +46,7 @@ def test_create_jessie_image(capsys):
         edi_exec = os.path.join(get_project_root(), 'bin', 'edi')
         project_name = 'pytest-{}'.format(get_random_string(6))
         config_command = [edi_exec, 'config', 'init', project_name,
-                          'debian-jessie-{}'.format(get_debian_architecture())]
+                          'debian-stretch-{}'.format(get_debian_architecture())]
         run(config_command)  # run as non root
 
         parser = edi._setup_command_line_interface()
