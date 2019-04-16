@@ -1,3 +1,9 @@
+edi (1.0.0+u1904) disco; urgency=medium
+
+  * Release for Ubuntu disco. 
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Tue, 16 Apr 2019 19:52:30 +0000
+
 edi (1.0.0+u1804) bionic; urgency=medium
 
   [ Matthias Lüscher ]
