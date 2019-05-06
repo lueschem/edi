@@ -28,7 +28,7 @@ import edi
 from edi.commands.imagecommands.bootstrap import Bootstrap
 from edi.commands.imagecommands.create import Create
 from edi.commands.lxccommands.export import Export
-from edi.commands.lxccommands.lxcprepare import Lxc
+from edi.commands.lxccommands.lxcprepare import Prepare
 from edi.commands.lxccommands.importcmd import Import
 from edi.commands.lxccommands.launch import Launch
 from edi.commands.lxccommands.lxcconfigure import Configure
@@ -42,7 +42,7 @@ from edi.lib.shellhelpers import mockablerun
 
 @pytest.mark.parametrize("command, command_args", [
     (Bootstrap, ['image', 'bootstrap', '--config']),
-    (Lxc, ['image', 'lxc', '--config']),
+    (Prepare, ['lxc', 'prepare', '--config']),
     (Create, ['image', 'create', '--config']),
     (Export, ['lxc', 'export', '--config']),
     (Import, ['lxc', 'import', '--config']),

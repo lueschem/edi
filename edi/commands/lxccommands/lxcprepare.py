@@ -29,7 +29,7 @@ import shutil
 import glob
 from jinja2 import Template
 from codecs import open
-from edi.commands.image import Image
+from edi.commands.lxc import Lxc
 from edi.commands.imagecommands.bootstrap import Bootstrap
 from edi.lib.yamlhelpers import LiteralString, normalize_yaml
 from edi.lib.helpers import chown_to_user, print_success, get_workdir, get_artifact_dir, create_artifact_dir
@@ -37,7 +37,7 @@ from edi.lib.shellhelpers import get_debian_architecture
 from edi.lib.configurationparser import remove_passwords, command_context
 
 
-class Lxc(Image):
+class Prepare(Lxc):
 
     def __init__(self):
         super().__init__()

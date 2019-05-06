@@ -118,7 +118,7 @@ def test_build_stretch_container(capsys, datadir):
 
         images = [
             os.path.join(get_artifact_dir(), '{}-develop_edicommand_image_bootstrap.tar.gz'.format(project_name)),
-            os.path.join(get_artifact_dir(), '{}-develop_edicommand_image_lxc.tar.gz'.format(project_name))
+            os.path.join(get_artifact_dir(), '{}-develop_edicommand_lxc_prepare.tar.gz'.format(project_name))
         ]
         for image in images:
             assert os.path.isfile(image)

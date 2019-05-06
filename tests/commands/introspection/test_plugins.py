@@ -29,7 +29,7 @@ import edi
 from edi.commands.imagecommands.bootstrap import Bootstrap
 from edi.commands.imagecommands.create import Create
 from edi.commands.lxccommands.export import Export
-from edi.commands.lxccommands.lxcprepare import Lxc
+from edi.commands.lxccommands.lxcprepare import Prepare
 from edi.commands.lxccommands.importcmd import Import
 from edi.commands.lxccommands.launch import Launch
 from edi.commands.lxccommands.lxcconfigure import Configure
@@ -45,7 +45,7 @@ from tests.libtesting.contextmanagers.mocked_executable import mocked_executable
 @pytest.mark.parametrize(("command, command_args, has_templates, "
                           "has_profiles, has_playbooks, has_postprocessing_commands"), [
     (Bootstrap, ['image', 'bootstrap', '--plugins'], False, False, False, False),
-    (Lxc, ['image', 'lxc', '--plugins'], True, False, False, False),
+    (Prepare, ['lxc', 'prepare', '--plugins'], True, False, False, False),
     (Create, ['image', 'create', '--plugins'], True, True, True, True),
     (Export, ['lxc', 'export', '--plugins'], True, True, True, False),
     (Import, ['lxc', 'import', '--plugins'], True, False, False, False),

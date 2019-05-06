@@ -22,7 +22,7 @@
 import logging
 
 from edi.commands.lxc import Lxc
-from edi.commands.lxccommands.lxcprepare import Lxc as LxcImageCommand
+from edi.commands.lxccommands.lxcprepare import Prepare
 from edi.lib.helpers import print_success
 from edi.lib.lxchelpers import is_in_image_store, import_image, delete_image
 from edi.lib.configurationparser import command_context
@@ -47,7 +47,7 @@ class Import(Lxc):
         return self._dispatch(config_file, run_method=self._dry_run)
 
     def _dry_run(self):
-        return LxcImageCommand().dry_run(self.config.get_base_config_file())
+        return Prepare().dry_run(self.config.get_base_config_file())
 
     def run(self, config_file):
         return self._dispatch(config_file, run_method=self._run)
@@ -59,7 +59,7 @@ class Import(Lxc):
                           ).format(self._result()))
             return self._result()
 
-        image = LxcImageCommand().run(self.config.get_base_config_file())
+        image = Prepare().run(self.config.get_base_config_file())
 
         print("Going to import lxc image into image store.")
 
@@ -87,7 +87,7 @@ class Import(Lxc):
             print_success("Removed {} from image store.".format(self._result()))
 
         if self.clean_depth > 0:
-            LxcImageCommand().clean_recursive(self.config.get_base_config_file(), self.clean_depth - 1)
+            Prepare().clean_recursive(self.config.get_base_config_file(), self.clean_depth - 1)
 
     def _dispatch(self, config_file, run_method):
         self._setup_parser(config_file)
