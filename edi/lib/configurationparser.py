@@ -155,6 +155,9 @@ class ConfigurationParser:
     def get_bootstrap_repository_key(self):
         return self._get_bootstrap_item("repository_key", None)
 
+    def get_bootstrap_additional_packages(self):
+        return self._get_bootstrap_item("additional_packages", None)
+
     def get_qemu_repository(self):
         return self._get_qemu_item("repository", None)
 

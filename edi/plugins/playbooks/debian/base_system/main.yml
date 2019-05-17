@@ -2,6 +2,7 @@
   vars:
     apply_proxy_settings: True
     configure_lxc_network_interface: True
+    force_lxc_network_interface_startup: False
     create_default_user: False
     install_openssh_server: False
     disable_ssh_password_authentication: True

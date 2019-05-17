@@ -1,0 +1,5 @@
+name: suppress_init
+config:
+  raw.lxc: lxc.init.cmd=/usr/bin/dumb-init -- sleep infinity
+description: Suppress init system startup.
+devices: {}

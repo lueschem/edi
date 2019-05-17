@@ -127,13 +127,20 @@ class Bootstrap(Image):
     def _run_debootstrap(self, tempdir, keyring_file, qemu_executable):
         # Ansible uses python on the target system
         # sudo is needed for privilege escalation
-        additional_packages = ("python,sudo,netbase,net-tools,iputils-ping,ifupdown,isc-dhcp-client,"
-                               "resolvconf,systemd,systemd-sysv,gnupg")
+        additional_packages_list = self.config.get_bootstrap_additional_packages()
+        if additional_packages_list:
+            additional_packages = ','.join(additional_packages_list)
+        else:
+            # Ansible uses python on the target system
+            # sudo is needed for privilege escalation
+            additional_packages = ("python,sudo,netbase,net-tools,iputils-ping,ifupdown,isc-dhcp-client,"
+                                   "resolvconf,systemd,systemd-sysv,gnupg")
+
         rootfs = os.path.join(tempdir, "rootfs")
         bootstrap_source = SourceEntry(self.config.get_bootstrap_repository())
         components = ",".join(bootstrap_source.comps)
 
-        cmd = []
+        cmd = list()
         cmd.append("debootstrap")
         cmd.append("--arch={0}".format(self.config.get_bootstrap_architecture()))
         if qemu_executable:

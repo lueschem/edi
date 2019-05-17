@@ -19,8 +19,3 @@
   copy: src=openssh-server-key-generator.service dest=/lib/systemd/system/
   when: openssh_server_installed is succeeded
 
-- name: Enable the systemd service that re-generates the openssh-server keys.
-  service: name=openssh-server-key-generator enabled=true
-  when: openssh_server_installed is succeeded
-  
-

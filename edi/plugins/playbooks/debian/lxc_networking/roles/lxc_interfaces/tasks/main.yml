@@ -3,5 +3,5 @@
   register: default_interface_result
 
 - name: Bring up default interface.
-  command: bash -c "ifup {{ edi_lxc_network_interface_name }} || sleep 30 && ifup {{ edi_lxc_network_interface_name }}" # try twice to avoid timing issue on jessie
-  when: default_interface_result.changed
+  command: bash -c "ip link set dev {{ edi_lxc_network_interface_name }} up && dhclient || sleep 30 && ip link set dev {{ edi_lxc_network_interface_name }} up && dhclient" # try twice to avoid timing issue on jessie
+  when: default_interface_result.changed or force_lxc_network_interface_startup
