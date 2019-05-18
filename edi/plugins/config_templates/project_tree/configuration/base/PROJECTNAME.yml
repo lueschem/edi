@@ -20,6 +20,12 @@ bootstrap:
 {% endif %}
     tool: debootstrap
 
+{% if edi_use_buster_qemu is defined and edi_use_buster_qemu %}
+qemu:
+    repository: deb http://deb.debian.org/debian/ buster main
+    repository_key: https://ftp-master.debian.org/keys/archive-key-8.asc
+{% endif %}
+
 lxc_profiles:
     100_lxc_networking:
         path: lxc_profiles/general/lxc_networking/default_interface.yml
