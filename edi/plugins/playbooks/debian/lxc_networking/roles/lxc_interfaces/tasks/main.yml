@@ -2,6 +2,11 @@
   template: src=default_interface.j2 dest=/etc/network/interfaces.d/{{ edi_lxc_network_interface_name }}
   register: default_interface_result
 
-- name: Bring up default interface.
-  command: bash -c "ip link set dev {{ edi_lxc_network_interface_name }} up && dhclient || sleep 30 && ip link set dev {{ edi_lxc_network_interface_name }} up && dhclient" # try twice to avoid timing issue on jessie
-  when: default_interface_result.changed or force_lxc_network_interface_startup
+- name: Bring up default interface on jessie.
+   # try twice to avoid timing issue on jessie, force_lxc_network_interface_startup is not supported
+  command: bash -c "ifup {{ edi_lxc_network_interface_name }} || sleep 30 && ifup {{ edi_lxc_network_interface_name }}"
+  when: ansible_distribution_release == "jessie" and default_interface_result.changed
+
+- name: Bring up default interface on newer releases.
+  command: bash -c "ip link set dev {{ edi_lxc_network_interface_name }} up && dhclient"
+  when: ansible_distribution_release != "jessie" and (default_interface_result.changed or force_lxc_network_interface_startup)
