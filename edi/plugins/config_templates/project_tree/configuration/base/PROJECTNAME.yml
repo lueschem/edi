@@ -58,11 +58,6 @@ playbooks:
         parameters:
             create_default_user: True
             install_openssh_server: True
-{% if edi_setup_dumb_init is defined and edi_setup_dumb_init %}
-{% raw %}
-            force_lxc_network_interface_startup: {{ edi_create_distributable_image }}
-{% endraw %}
-{% endif %}
     200_development_user_facilities:
         path: playbooks/debian/development_user_facilities/main.yml
     300_sample_playbook:

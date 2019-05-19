@@ -2,11 +2,16 @@
   template: src=default_interface.j2 dest=/etc/network/interfaces.d/{{ edi_lxc_network_interface_name }}
   register: default_interface_result
 
-- name: Bring up default interface on jessie.
-   # try twice to avoid timing issue on jessie, force_lxc_network_interface_startup is not supported
-  command: bash -c "ifup {{ edi_lxc_network_interface_name }} || sleep 30 && ifup {{ edi_lxc_network_interface_name }}"
-  when: ansible_distribution_release == "jessie" and default_interface_result.changed
+- name: Get name of pid 1 process.
+  command: ps -p 1 -o comm=
+  changed_when: false
+  register: pid1_process_result
 
-- name: Bring up default interface on newer releases.
-  command: bash -c "ip link set dev {{ edi_lxc_network_interface_name }} up && dhclient"
-  when: ansible_distribution_release != "jessie" and (default_interface_result.changed or force_lxc_network_interface_startup)
+- name: Bring up default interface (full init system).
+   # try twice to avoid timing issue on jessie
+  command: bash -c "ifup {{ edi_lxc_network_interface_name }} || sleep 30 && ifup {{ edi_lxc_network_interface_name }}"
+  when: pid1_process_result.stdout != "dumb-init" and default_interface_result.changed
+
+- name: Bring up default interface (dumb-init init system).
+  command: bash -c "ip link set {{ edi_lxc_network_interface_name }} up && dhclient {{ edi_lxc_network_interface_name }}"
+  when: pid1_process_result.stdout == "dumb-init"
