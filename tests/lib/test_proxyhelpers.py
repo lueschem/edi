@@ -22,10 +22,20 @@
 
 import os
 import subprocess
+from contextlib import contextmanager
 import edi.lib.helpers
 from tests.libtesting.helpers import get_command, get_command_parameter, get_sub_command
 from edi.lib.proxyhelpers import get_gsettings_value, ProxySetup
 from edi.lib import mockablerun
+
+
+@contextmanager
+def clear_proxy_setup_cache():
+    try:
+        ProxySetup(clear_cache=True)
+        yield
+    finally:
+        ProxySetup(clear_cache=True)
 
 
 def with_gsettings(monkeypatch):
@@ -90,12 +100,13 @@ def test_proxy_setup_no_gsettings_no_env(monkeypatch):
     intercept_proxy_environment(monkeypatch, 'manual',
                                 '''['localhost', '127.0.0.0/8', '::1']''', '3128',
                                 '', '')
-    proxy_setup = ProxySetup(clear_cache=True)
-    assert proxy_setup.get('no_proxy', default='') == ''
-    assert proxy_setup.get('http_proxy', default='') == ''
-    assert proxy_setup.get('https_proxy', default='') == ''
-    assert proxy_setup.get('ftp_proxy', default='') == ''
-    assert proxy_setup.get('all_proxy', default='') == ''
+    with clear_proxy_setup_cache():
+        proxy_setup = ProxySetup()
+        assert proxy_setup.get('no_proxy', default='') == ''
+        assert proxy_setup.get('http_proxy', default='') == ''
+        assert proxy_setup.get('https_proxy', default='') == ''
+        assert proxy_setup.get('ftp_proxy', default='') == ''
+        assert proxy_setup.get('all_proxy', default='') == ''
 
 
 def test_proxy_setup_gsettings_env(monkeypatch):
@@ -103,12 +114,13 @@ def test_proxy_setup_gsettings_env(monkeypatch):
     intercept_proxy_environment(monkeypatch, 'manual',
                                 '''['localhost', '127.0.0.0/8', '::1']''', '3128',
                                 'protocol://proxy-xy', '1.2.3.4,5.6.7.8,example.com')
-    proxy_setup = ProxySetup(clear_cache=True)
-    assert proxy_setup.get('no_proxy', default='') == '1.2.3.4,5.6.7.8,example.com'
-    assert proxy_setup.get('http_proxy', default='') == 'protocol://proxy-xy'
-    assert proxy_setup.get('https_proxy', default='') == 'protocol://proxy-xy'
-    assert proxy_setup.get('ftp_proxy', default='') == 'protocol://proxy-xy'
-    assert proxy_setup.get('all_proxy', default='') == 'protocol://proxy-xy'
+    with clear_proxy_setup_cache():
+        proxy_setup = ProxySetup()
+        assert proxy_setup.get('no_proxy', default='') == '1.2.3.4,5.6.7.8,example.com'
+        assert proxy_setup.get('http_proxy', default='') == 'protocol://proxy-xy'
+        assert proxy_setup.get('https_proxy', default='') == 'protocol://proxy-xy'
+        assert proxy_setup.get('ftp_proxy', default='') == 'protocol://proxy-xy'
+        assert proxy_setup.get('all_proxy', default='') == 'protocol://proxy-xy'
 
 
 def test_proxy_setup_gsettings_no_env(monkeypatch):
@@ -116,12 +128,13 @@ def test_proxy_setup_gsettings_no_env(monkeypatch):
     intercept_proxy_environment(monkeypatch, 'manual',
                                 '''['localhost', '127.0.0.0/8', '::1']''', '3128',
                                 '', '')
-    proxy_setup = ProxySetup(clear_cache=True)
-    assert proxy_setup.get('no_proxy', default='') == 'localhost,127.0.0.0/8,::1'
-    assert proxy_setup.get('http_proxy', default='') == 'http://foo:bar@example.com:3128/'
-    assert proxy_setup.get('https_proxy', default='') == 'http://foo:bar@example.com:3128/'
-    assert proxy_setup.get('ftp_proxy', default='') == 'http://foo:bar@example.com:3128/'
-    assert proxy_setup.get('all_proxy', default='') == 'socks://foo:bar@example.com:3128/'
+    with clear_proxy_setup_cache():
+        proxy_setup = ProxySetup()
+        assert proxy_setup.get('no_proxy', default='') == 'localhost,127.0.0.0/8,::1'
+        assert proxy_setup.get('http_proxy', default='') == 'http://foo:bar@example.com:3128/'
+        assert proxy_setup.get('https_proxy', default='') == 'http://foo:bar@example.com:3128/'
+        assert proxy_setup.get('ftp_proxy', default='') == 'http://foo:bar@example.com:3128/'
+        assert proxy_setup.get('all_proxy', default='') == 'socks://foo:bar@example.com:3128/'
 
 
 def test_proxy_setup_gsettings_auto_no_env(monkeypatch):
@@ -129,12 +142,14 @@ def test_proxy_setup_gsettings_auto_no_env(monkeypatch):
     intercept_proxy_environment(monkeypatch, 'auto',
                                 '''['localhost', '127.0.0.0/8', '::1']''', '3128',
                                 '', '')
-    proxy_setup = ProxySetup(clear_cache=True)
-    assert proxy_setup.get('no_proxy', default='') == ''
-    assert proxy_setup.get('http_proxy', default='') == ''
-    assert proxy_setup.get('https_proxy', default='') == ''
-    assert proxy_setup.get('ftp_proxy', default='') == ''
-    assert proxy_setup.get('all_proxy', default='') == ''
+
+    with clear_proxy_setup_cache():
+        proxy_setup = ProxySetup()
+        assert proxy_setup.get('no_proxy', default='') == ''
+        assert proxy_setup.get('http_proxy', default='') == ''
+        assert proxy_setup.get('https_proxy', default='') == ''
+        assert proxy_setup.get('ftp_proxy', default='') == ''
+        assert proxy_setup.get('all_proxy', default='') == ''
 
 
 def test_proxy_setup_gsettings_none_no_env(monkeypatch):
@@ -142,12 +157,14 @@ def test_proxy_setup_gsettings_none_no_env(monkeypatch):
     intercept_proxy_environment(monkeypatch, 'none',
                                 '''['localhost', '127.0.0.0/8', '::1']''', '3128',
                                 '', '')
-    proxy_setup = ProxySetup(clear_cache=True)
-    assert proxy_setup.get('no_proxy', default='') == ''
-    assert proxy_setup.get('http_proxy', default='') == ''
-    assert proxy_setup.get('https_proxy', default='') == ''
-    assert proxy_setup.get('ftp_proxy', default='') == ''
-    assert proxy_setup.get('all_proxy', default='') == ''
+
+    with clear_proxy_setup_cache():
+        proxy_setup = ProxySetup()
+        assert proxy_setup.get('no_proxy', default='') == ''
+        assert proxy_setup.get('http_proxy', default='') == ''
+        assert proxy_setup.get('https_proxy', default='') == ''
+        assert proxy_setup.get('ftp_proxy', default='') == ''
+        assert proxy_setup.get('all_proxy', default='') == ''
 
 
 def test_proxy_setup_gsettings_manual_edge_case_no_env(monkeypatch):
@@ -155,12 +172,14 @@ def test_proxy_setup_gsettings_manual_edge_case_no_env(monkeypatch):
     intercept_proxy_environment(monkeypatch, 'manual',
                                 '@as []', '0',
                                 '', '')
-    proxy_setup = ProxySetup(clear_cache=True)
-    assert proxy_setup.get('no_proxy') is None
-    assert proxy_setup.get('http_proxy') is None
-    assert proxy_setup.get('https_proxy') is None
-    assert proxy_setup.get('ftp_proxy') is None
-    assert proxy_setup.get('all_proxy') is None
+
+    with clear_proxy_setup_cache():
+        proxy_setup = ProxySetup()
+        assert proxy_setup.get('no_proxy') is None
+        assert proxy_setup.get('http_proxy') is None
+        assert proxy_setup.get('https_proxy') is None
+        assert proxy_setup.get('ftp_proxy') is None
+        assert proxy_setup.get('all_proxy') is None
 
 
 def test_get_requests_proxy_dict_with_proxy(monkeypatch):
@@ -168,24 +187,27 @@ def test_get_requests_proxy_dict_with_proxy(monkeypatch):
     intercept_proxy_environment(monkeypatch, 'manual',
                                 '''['localhost', '127.0.0.0/8', '::1']''', '3128',
                                 '', '')
-    proxy_dict = ProxySetup(clear_cache=True).get_requests_dict()
-    assert proxy_dict.get('http') == 'http://foo:bar@example.com:3128/'
-    assert proxy_dict.get('https') == 'http://foo:bar@example.com:3128/'
-    assert proxy_dict.get('no_proxy') == 'localhost,127.0.0.0/8,::1'
+    with clear_proxy_setup_cache():
+        proxy_dict = ProxySetup().get_requests_dict()
+        assert proxy_dict.get('http') == 'http://foo:bar@example.com:3128/'
+        assert proxy_dict.get('https') == 'http://foo:bar@example.com:3128/'
+        assert proxy_dict.get('no_proxy') == 'localhost,127.0.0.0/8,::1'
 
-    # test cache
-    proxy_dict = ProxySetup().get_requests_dict()
-    assert proxy_dict.get('http') == 'http://foo:bar@example.com:3128/'
+        # test cache
+        proxy_dict = ProxySetup().get_requests_dict()
+        assert proxy_dict.get('http') == 'http://foo:bar@example.com:3128/'
 
 
 def test_get_requests_proxy_dict_without_proxy(monkeypatch):
     with_gsettings(monkeypatch)
     intercept_proxy_environment(monkeypatch, 'manual',
                                 '', '', '', '')
-    proxy_dict = ProxySetup(clear_cache=True).get_requests_dict()
-    assert proxy_dict.get('http') is None
-    assert proxy_dict.get('https') is None
-    assert proxy_dict.get('no_proxy') is None
+
+    with clear_proxy_setup_cache():
+        proxy_dict = ProxySetup().get_requests_dict()
+        assert proxy_dict.get('http') is None
+        assert proxy_dict.get('https') is None
+        assert proxy_dict.get('no_proxy') is None
 
 
 def test_get_environment_with_proxy(monkeypatch):
@@ -193,21 +215,25 @@ def test_get_environment_with_proxy(monkeypatch):
     intercept_proxy_environment(monkeypatch, 'manual',
                                 '''['localhost', '127.0.0.0/8', '::1']''', '3128',
                                 '', '')
-    env = ProxySetup(clear_cache=True).get_environment()
-    assert env.get('http_proxy') == 'http://foo:bar@example.com:3128/'
-    assert env.get('https_proxy') == 'http://foo:bar@example.com:3128/'
-    assert env.get('ftp_proxy') == 'http://foo:bar@example.com:3128/'
-    assert env.get('all_proxy') == 'socks://foo:bar@example.com:3128/'
-    assert env.get('no_proxy') == 'localhost,127.0.0.0/8,::1'
+
+    with clear_proxy_setup_cache():
+        env = ProxySetup().get_environment()
+        assert env.get('http_proxy') == 'http://foo:bar@example.com:3128/'
+        assert env.get('https_proxy') == 'http://foo:bar@example.com:3128/'
+        assert env.get('ftp_proxy') == 'http://foo:bar@example.com:3128/'
+        assert env.get('all_proxy') == 'socks://foo:bar@example.com:3128/'
+        assert env.get('no_proxy') == 'localhost,127.0.0.0/8,::1'
 
 
 def test_get_environment_without_proxy(monkeypatch):
     with_gsettings(monkeypatch)
     intercept_proxy_environment(monkeypatch, 'manual',
                                 '', '', '', '')
-    env = ProxySetup(clear_cache=True).get_environment()
-    assert env.get('http_proxy') == ''
-    assert env.get('https_proxy') == ''
-    assert env.get('ftp_proxy') == ''
-    assert env.get('all_proxy') == ''
-    assert env.get('no_proxy') == ''
+
+    with clear_proxy_setup_cache():
+        env = ProxySetup().get_environment()
+        assert env.get('http_proxy') == ''
+        assert env.get('https_proxy') == ''
+        assert env.get('ftp_proxy') == ''
+        assert env.get('all_proxy') == ''
+        assert env.get('no_proxy') == ''
