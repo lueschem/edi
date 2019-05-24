@@ -106,18 +106,20 @@ def patch_lxd_get_version(monkeypatch, fake_version):
 
 def test_invalid_version(monkeypatch):
     patch_lxd_get_version(monkeypatch, '2.2.0')
-    with clear_lxd_version_check_cache():
-        check_method = LxdVersion.check
+    with mocked_executable('lxc'):
+        with clear_lxd_version_check_cache():
+            check_method = LxdVersion.check
 
-        with pytest.raises(FatalError) as error:
-            check_method()
+            with pytest.raises(FatalError) as error:
+                check_method()
 
-        assert '2.2.0' in error.value.message
-        assert '>=3.0.0' in error.value.message
-        assert 'xenial-backports' in error.value.message
+            assert '2.2.0' in error.value.message
+            assert '>=3.0.0' in error.value.message
+            assert 'xenial-backports' in error.value.message
 
 
 def test_valid_version(monkeypatch):
     patch_lxd_get_version(monkeypatch, '3.0.0+bingo')
-    with clear_lxd_version_check_cache():
-        LxdVersion.check()
+    with mocked_executable('lxc'):
+        with clear_lxd_version_check_cache():
+            LxdVersion.check()
