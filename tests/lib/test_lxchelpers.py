@@ -106,7 +106,7 @@ def patch_lxd_get_version(monkeypatch, fake_version):
 
 def test_invalid_version(monkeypatch):
     patch_lxd_get_version(monkeypatch, '2.2.0')
-    with mocked_executable('lxc'):
+    with mocked_executable('lxd', '/here/is/no/lxd'):
         with clear_lxd_version_check_cache():
             check_method = LxdVersion.check
 
@@ -120,6 +120,6 @@ def test_invalid_version(monkeypatch):
 
 def test_valid_version(monkeypatch):
     patch_lxd_get_version(monkeypatch, '3.0.0+bingo')
-    with mocked_executable('lxc'):
+    with mocked_executable('lxd', '/here/is/no/lxd'):
         with clear_lxd_version_check_cache():
             LxdVersion.check()
