@@ -6,6 +6,8 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
+# there is no VERSION_ID in sid
+VERSION_ID=""
 . /etc/os-release
 
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
