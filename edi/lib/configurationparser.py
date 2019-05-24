@@ -156,7 +156,12 @@ class ConfigurationParser:
         return self._get_bootstrap_item("repository_key", None)
 
     def get_bootstrap_additional_packages(self):
-        return self._get_bootstrap_item("additional_packages", None)
+        # Ansible uses python on the target system
+        # sudo is needed for privilege escalation
+        default_packages = ['python', 'sudo', 'netbase', 'net-tools', 'iputils-ping', 'ifupdown', 'isc-dhcp-client',
+                            'resolvconf', 'systemd', 'systemd-sysv', 'gnupg']
+
+        return self._get_bootstrap_item("additional_packages", default_packages)
 
     def get_qemu_repository(self):
         return self._get_qemu_item("repository", None)
