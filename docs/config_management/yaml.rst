@@ -102,6 +102,10 @@ This section tells edi how the initial system shall be bootstrapped. The followi
      - The tool that will be used for the bootstrap process. |br|
        Currently only :code:`debootstrap` is supported. |br|
        If unspecified, edi will choose :code:`debootstrap`.
+   * - additional_packages
+     - A list of additional packages that will be installed during bootstrapping. |br|
+       If unspecified, edi will use the following default list: :code:`['python', 'sudo', 'netbase', 'net-tools',
+       'iputils-ping', 'ifupdown', 'isc-dhcp-client', 'resolvconf', 'systemd', 'systemd-sysv', 'gnupg']`.
 
 Please note that edi will automatically do cross bootstrapping if required. This means that you can for instance bootstrap
 an armhf system on an amd64 host.

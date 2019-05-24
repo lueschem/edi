@@ -102,6 +102,38 @@ This profile will make sure that the container is running in privileged mode.
 Please note that if a container has one or more :ref:`shared folders<shared folders>` configured it
 will automatically be turned into privileged mode.
 
+Suppress Init
+^^^^^^^^^^^^^
+
+This profile will make sure that the container does not start using systemd but instead uses
+dumb-init_. This is especially useful during the build of a distributable image. During such a build
+you just want to assemble the image without starting any services.
+
+The following configuration snippet will conditionally enable the usage of dumb-init:
+
+.. code-block:: yaml
+  :caption: Configuration Example
+
+  lxc_profiles:
+    ...
+    400_suppress_init:
+      path: lxc_profiles/general/suppress_init/suppress_init.yml
+      skip: {{ not edi_create_distributable_image }}
+    ...
+
+dumb-init is not part of the default package set during bootstrapping. For this reason you have to add
+it within the bootstrap section (otherwise the launching of the container will fail):
+
+.. code-block:: yaml
+  :caption: Configuration Example
+
+  bootstrap:
+    ...
+    additional_packages: ["python", "sudo", "netbase", "net-tools", "iputils-ping", "ifupdown", "isc-dhcp-client", "resolvconf", "systemd", "systemd-sysv", "gnupg", "dumb-init"]
+    ...
+
+.. _dumb-init: https://github.com/Yelp/dumb-init
+
 Ansible Playbooks
 +++++++++++++++++
 
