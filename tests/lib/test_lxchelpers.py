@@ -22,11 +22,12 @@
 
 import subprocess
 import pytest
+from contextlib import contextmanager
 from edi.lib.helpers import FatalError
 from tests.libtesting.optins import requires_lxc
 from edi.lib.lxchelpers import (get_server_image_compression_algorithm,
                                 get_file_extension_from_image_compression_algorithm,
-                                get_lxd_version)
+                                get_lxd_version, LxdVersion)
 from edi.lib.shellhelpers import mockablerun
 from tests.libtesting.helpers import get_command, get_sub_command
 from tests.libtesting.contextmanagers.mocked_executable import mocked_executable
@@ -73,3 +74,49 @@ def test_get_file_extension_from_image_compression_algorithm_failure():
 def test_get_lxd_version():
     version = get_lxd_version()
     assert '.' in version
+
+
+@contextmanager
+def clear_lxd_version_check_cache():
+    try:
+        LxdVersion(clear_cache=True)
+        yield
+    finally:
+        LxdVersion(clear_cache=True)
+
+
+@requires_lxc
+def test_lxd_version_check():
+    with clear_lxd_version_check_cache():
+        check_method = LxdVersion.check
+        check_method()
+
+
+def patch_lxd_get_version(monkeypatch, fake_version):
+    def fake_lxd_version_command(*popenargs, **kwargs):
+        if get_command(popenargs).endswith('lxd') and get_sub_command(popenargs) == '--version':
+            return subprocess.CompletedProcess("fakerun", 0,
+                                               stdout='{}\n'.format(fake_version))
+        else:
+            return subprocess.run(*popenargs, **kwargs)
+
+    monkeypatch.setattr(mockablerun, 'run_mockable', fake_lxd_version_command)
+
+
+def test_invalid_version(monkeypatch):
+    patch_lxd_get_version(monkeypatch, '2.2.0')
+    with clear_lxd_version_check_cache():
+        check_method = LxdVersion.check
+
+        with pytest.raises(FatalError) as error:
+            check_method()
+
+        assert '2.2.0' in error.value.message
+        assert '>=3.0.0' in error.value.message
+        assert 'xenial-backports' in error.value.message
+
+
+def test_valid_version(monkeypatch):
+    patch_lxd_get_version(monkeypatch, '3.0.0+bingo')
+    with clear_lxd_version_check_cache():
+        LxdVersion.check()

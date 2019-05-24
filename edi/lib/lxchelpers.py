@@ -23,7 +23,9 @@ import subprocess
 import yaml
 import logging
 import hashlib
+from packaging.version import Version
 from edi.lib.helpers import FatalError
+from edi.lib.versionhelpers import get_stripped_version
 from edi.lib.shellhelpers import run, Executables, require
 
 
@@ -220,6 +222,30 @@ def get_lxd_version():
         return result.stderr.strip('\n')
     else:
         return result.stdout.strip('\n')
+
+
+class LxdVersion:
+    """
+    Make sure that the lxc/lxd version is >= 3.0.0.
+    """
+    _check_done = False
+    _required_minimal_version = '3.0.0'
+
+    def __init__(self, clear_cache=False):
+        if clear_cache:
+            LxdVersion._check_done = False
+
+    @staticmethod
+    def check():
+        if LxdVersion._check_done:
+            return
+
+        if Version(get_stripped_version(get_lxd_version())) < Version(LxdVersion._required_minimal_version):
+            raise FatalError(('The current lxd installation ({}) does not meet the minimal requirements (>={}).\n'
+                              'Please update your lxd installation using snaps or xenial-backports!'
+                              ).format(get_lxd_version(), LxdVersion._required_minimal_version))
+        else:
+            LxdVersion._check_done = True
 
 
 def try_delete_container(container_name, timeout):
