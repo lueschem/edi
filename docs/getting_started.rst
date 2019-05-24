@@ -20,7 +20,7 @@ Prerequisites
    .. code-block:: bash
       :caption: Ubuntu 16.04
 
-      sudo apt install lxd/xenial-backports lxcfs/xenial-backports lxd-client/xenial-backports
+      sudo apt install lxd/xenial-backports lxcfs/xenial-backports lxd-client/xenial-backports liblxc1/xenial-backports
 
    .. code-block:: bash
       :caption: Ubuntu >= 18.04
