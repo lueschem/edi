@@ -36,181 +36,6 @@ def lxc_exec():
     return Executables.get('lxc')
 
 
-@require('lxc', lxd_install_hint)
-def is_in_image_store(name):
-    cmd = [lxc_exec(), "image", "show", "local:{}".format(name)]
-    result = run(cmd, check=False, stderr=subprocess.PIPE)
-    return result.returncode == 0
-
-
-@require('lxc', lxd_install_hint)
-def import_image(image, image_name):
-    cmd = [lxc_exec(), "image", "import", image, "local:", "--alias", image_name]
-    run(cmd)
-
-
-@require('lxc', lxd_install_hint)
-def export_image(image_name, image_without_extension):
-    cmd = [lxc_exec(), "image", "export", image_name, image_without_extension]
-    run(cmd)
-
-
-@require('lxc', lxd_install_hint)
-def publish_container(container_name, image_name):
-    cmd = [lxc_exec(), "publish", container_name, "--alias", image_name]
-    run(cmd)
-
-
-@require('lxc', lxd_install_hint)
-def delete_image(name):
-    cmd = [lxc_exec(), "image", "delete", "local:{}".format(name)]
-    run(cmd)
-
-
-@require('lxc', lxd_install_hint)
-def is_container_existing(name):
-    cmd = [lxc_exec(), "info", name]
-    result = run(cmd, check=False, stderr=subprocess.PIPE)
-    return result.returncode == 0
-
-
-@require('lxc', lxd_install_hint)
-def is_container_running(name):
-    cmd = [lxc_exec(), "list", "--format=json", "^{}$".format(name)]
-    result = run(cmd, stdout=subprocess.PIPE)
-
-    try:
-        parsed_result = yaml.load(result.stdout)
-        if len(parsed_result) != 1:
-            return False
-        else:
-            status = parsed_result[0].get("status", "")
-            if status == "Running":
-                return True
-            else:
-                return False
-    except yaml.YAMLError as exc:
-        raise FatalError("Unable to parse lxc output ({}).".format(exc))
-
-
-@require('lxc', lxd_install_hint)
-def launch_container(image, name, profiles):
-    cmd = [lxc_exec(), "launch", "local:{}".format(image), name]
-    for profile in profiles:
-        cmd.extend(["-p", profile])
-    result = run(cmd, check=False, stderr=subprocess.PIPE, log_threshold=logging.INFO)
-    if result.returncode != 0:
-        if 'Missing parent' in result.stderr and 'lxdbr0' in result.stderr:
-            raise FatalError(('''Launching image '{}' failed with the following message:\n{}'''
-                              'Please make sure that lxdbr0 is available. Use one of the following commands to '
-                              'create lxdbr0:\n'
-                              'lxd init\n'
-                              'or (for lxd >= 2.3)\n'
-                              'lxc network create lxdbr0').format(image, result.stderr))
-        else:
-            raise FatalError(('''Launching image '{}' failed with the following message:\n{}'''
-                              ).format(image, result.stderr))
-
-
-@require('lxc', lxd_install_hint)
-def start_container(name):
-    cmd = [lxc_exec(), "start", name]
-
-    run(cmd, log_threshold=logging.INFO)
-
-
-@require('lxc', lxd_install_hint)
-def stop_container(name, timeout=120):
-    cmd = [lxc_exec(), "stop", name]
-
-    try:
-        run(cmd, log_threshold=logging.INFO, timeout=timeout)
-    except subprocess.TimeoutExpired:
-        logging.warning(("Timeout ({} seconds) expired while stopping container {}.\n"
-                         "Forcing container shutdown!").format(timeout, name))
-        cmd = [lxc_exec(), "stop", "-f", name]
-        run(cmd, log_threshold=logging.INFO)
-
-
-@require('lxc', lxd_install_hint)
-def delete_container(name):
-    # needs to be stopped first!
-    cmd = [lxc_exec(), "delete", name]
-
-    run(cmd, log_threshold=logging.INFO)
-
-
-@require('lxc', lxd_install_hint)
-def apply_profiles(name, profiles):
-    cmd = [lxc_exec(), 'profile', 'apply', name, ','.join(profiles)]
-    run(cmd)
-
-
-@require('lxc', lxd_install_hint)
-def is_profile_existing(name):
-    cmd = [lxc_exec(), "profile", "show", name]
-    result = run(cmd, check=False, stderr=subprocess.PIPE)
-    return result.returncode == 0
-
-
-@require('lxc', lxd_install_hint)
-def write_lxc_profile(profile_text):
-    new_profile = False
-    profile_yaml = yaml.load(profile_text)
-    profile_hash = hashlib.sha256(profile_text.encode()
-                                  ).hexdigest()[:20]
-    profile_name = profile_yaml.get("name", "anonymous")
-    ext_profile_name = "{}_{}".format(profile_name,
-                                      profile_hash)
-    profile_yaml["name"] = ext_profile_name
-    profile_content = yaml.dump(profile_yaml,
-                                default_flow_style=False)
-
-    if not is_profile_existing(ext_profile_name):
-        create_cmd = [lxc_exec(), "profile", "create", ext_profile_name]
-        run(create_cmd)
-        new_profile = True
-
-    edit_cmd = [lxc_exec(), "profile", "edit", ext_profile_name]
-    run(edit_cmd, input=profile_content)
-
-    return ext_profile_name, new_profile
-
-
-@require('lxc', lxd_install_hint)
-def get_server_image_compression_algorithm():
-    cmd = [lxc_exec(), 'config', 'get', 'images.compression_algorithm']
-    algorithm = run(cmd, stdout=subprocess.PIPE).stdout.strip('\n')
-    if not algorithm:
-        return 'gzip'
-    else:
-        return algorithm
-
-
-def get_file_extension_from_image_compression_algorithm(algorithm):
-    mapping = {
-        'bzip2': '.tar.bz2',
-        'gzip': '.tar.gz',
-        'lzma': '.tar.lzma',
-        'xz': '.tar.xz',
-        'none': '.tar',
-    }
-
-    extension = mapping.get(algorithm, None)
-    if not extension:
-        raise FatalError(('''Unhandled lxc image compression algorithm '{}'.'''
-                          ).format(algorithm))
-
-    return extension
-
-
-@require('lxc', lxd_install_hint)
-def get_container_profiles(name):
-    cmd = [lxc_exec(), 'config', 'show', name]
-    result = run(cmd, stdout=subprocess.PIPE)
-    return yaml.load(result.stdout).get('profiles', [])
-
-
 def get_lxd_version():
     if not Executables.has('lxd'):
         return '0.0.0'
@@ -246,6 +71,181 @@ class LxdVersion:
                               ).format(get_lxd_version(), LxdVersion._required_minimal_version))
         else:
             LxdVersion._check_done = True
+
+
+@require('lxc', lxd_install_hint, LxdVersion.check)
+def is_in_image_store(name):
+    cmd = [lxc_exec(), "image", "show", "local:{}".format(name)]
+    result = run(cmd, check=False, stderr=subprocess.PIPE)
+    return result.returncode == 0
+
+
+@require('lxc', lxd_install_hint, LxdVersion.check)
+def import_image(image, image_name):
+    cmd = [lxc_exec(), "image", "import", image, "local:", "--alias", image_name]
+    run(cmd)
+
+
+@require('lxc', lxd_install_hint, LxdVersion.check)
+def export_image(image_name, image_without_extension):
+    cmd = [lxc_exec(), "image", "export", image_name, image_without_extension]
+    run(cmd)
+
+
+@require('lxc', lxd_install_hint, LxdVersion.check)
+def publish_container(container_name, image_name):
+    cmd = [lxc_exec(), "publish", container_name, "--alias", image_name]
+    run(cmd)
+
+
+@require('lxc', lxd_install_hint, LxdVersion.check)
+def delete_image(name):
+    cmd = [lxc_exec(), "image", "delete", "local:{}".format(name)]
+    run(cmd)
+
+
+@require('lxc', lxd_install_hint, LxdVersion.check)
+def is_container_existing(name):
+    cmd = [lxc_exec(), "info", name]
+    result = run(cmd, check=False, stderr=subprocess.PIPE)
+    return result.returncode == 0
+
+
+@require('lxc', lxd_install_hint, LxdVersion.check)
+def is_container_running(name):
+    cmd = [lxc_exec(), "list", "--format=json", "^{}$".format(name)]
+    result = run(cmd, stdout=subprocess.PIPE)
+
+    try:
+        parsed_result = yaml.load(result.stdout)
+        if len(parsed_result) != 1:
+            return False
+        else:
+            status = parsed_result[0].get("status", "")
+            if status == "Running":
+                return True
+            else:
+                return False
+    except yaml.YAMLError as exc:
+        raise FatalError("Unable to parse lxc output ({}).".format(exc))
+
+
+@require('lxc', lxd_install_hint, LxdVersion.check)
+def launch_container(image, name, profiles):
+    cmd = [lxc_exec(), "launch", "local:{}".format(image), name]
+    for profile in profiles:
+        cmd.extend(["-p", profile])
+    result = run(cmd, check=False, stderr=subprocess.PIPE, log_threshold=logging.INFO)
+    if result.returncode != 0:
+        if 'Missing parent' in result.stderr and 'lxdbr0' in result.stderr:
+            raise FatalError(('''Launching image '{}' failed with the following message:\n{}'''
+                              'Please make sure that lxdbr0 is available. Use one of the following commands to '
+                              'create lxdbr0:\n'
+                              'lxd init\n'
+                              'or (for lxd >= 2.3)\n'
+                              'lxc network create lxdbr0').format(image, result.stderr))
+        else:
+            raise FatalError(('''Launching image '{}' failed with the following message:\n{}'''
+                              ).format(image, result.stderr))
+
+
+@require('lxc', lxd_install_hint, LxdVersion.check)
+def start_container(name):
+    cmd = [lxc_exec(), "start", name]
+
+    run(cmd, log_threshold=logging.INFO)
+
+
+@require('lxc', lxd_install_hint, LxdVersion.check)
+def stop_container(name, timeout=120):
+    cmd = [lxc_exec(), "stop", name]
+
+    try:
+        run(cmd, log_threshold=logging.INFO, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        logging.warning(("Timeout ({} seconds) expired while stopping container {}.\n"
+                         "Forcing container shutdown!").format(timeout, name))
+        cmd = [lxc_exec(), "stop", "-f", name]
+        run(cmd, log_threshold=logging.INFO)
+
+
+@require('lxc', lxd_install_hint, LxdVersion.check)
+def delete_container(name):
+    # needs to be stopped first!
+    cmd = [lxc_exec(), "delete", name]
+
+    run(cmd, log_threshold=logging.INFO)
+
+
+@require('lxc', lxd_install_hint, LxdVersion.check)
+def apply_profiles(name, profiles):
+    cmd = [lxc_exec(), 'profile', 'apply', name, ','.join(profiles)]
+    run(cmd)
+
+
+@require('lxc', lxd_install_hint, LxdVersion.check)
+def is_profile_existing(name):
+    cmd = [lxc_exec(), "profile", "show", name]
+    result = run(cmd, check=False, stderr=subprocess.PIPE)
+    return result.returncode == 0
+
+
+@require('lxc', lxd_install_hint, LxdVersion.check)
+def write_lxc_profile(profile_text):
+    new_profile = False
+    profile_yaml = yaml.load(profile_text)
+    profile_hash = hashlib.sha256(profile_text.encode()
+                                  ).hexdigest()[:20]
+    profile_name = profile_yaml.get("name", "anonymous")
+    ext_profile_name = "{}_{}".format(profile_name,
+                                      profile_hash)
+    profile_yaml["name"] = ext_profile_name
+    profile_content = yaml.dump(profile_yaml,
+                                default_flow_style=False)
+
+    if not is_profile_existing(ext_profile_name):
+        create_cmd = [lxc_exec(), "profile", "create", ext_profile_name]
+        run(create_cmd)
+        new_profile = True
+
+    edit_cmd = [lxc_exec(), "profile", "edit", ext_profile_name]
+    run(edit_cmd, input=profile_content)
+
+    return ext_profile_name, new_profile
+
+
+@require('lxc', lxd_install_hint, LxdVersion.check)
+def get_server_image_compression_algorithm():
+    cmd = [lxc_exec(), 'config', 'get', 'images.compression_algorithm']
+    algorithm = run(cmd, stdout=subprocess.PIPE).stdout.strip('\n')
+    if not algorithm:
+        return 'gzip'
+    else:
+        return algorithm
+
+
+def get_file_extension_from_image_compression_algorithm(algorithm):
+    mapping = {
+        'bzip2': '.tar.bz2',
+        'gzip': '.tar.gz',
+        'lzma': '.tar.lzma',
+        'xz': '.tar.xz',
+        'none': '.tar',
+    }
+
+    extension = mapping.get(algorithm, None)
+    if not extension:
+        raise FatalError(('''Unhandled lxc image compression algorithm '{}'.'''
+                          ).format(algorithm))
+
+    return extension
+
+
+@require('lxc', lxd_install_hint, LxdVersion.check)
+def get_container_profiles(name):
+    cmd = [lxc_exec(), 'config', 'show', name]
+    result = run(cmd, stdout=subprocess.PIPE)
+    return yaml.load(result.stdout).get('profiles', [])
 
 
 def try_delete_container(container_name, timeout):

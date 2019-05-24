@@ -23,6 +23,7 @@
 import os
 from contextlib import contextmanager
 from edi.lib.shellhelpers import Executables
+from edi.lib.lxchelpers import LxdVersion
 
 
 @contextmanager
@@ -39,3 +40,12 @@ def mocked_executable(executable, mock=str(os.path.join(os.sep, 'bin', 'true')))
         yield mock
     finally:
         del Executables._cache[executable]
+
+
+@contextmanager
+def mocked_lxd_version_check():
+    LxdVersion._check_done = True
+    try:
+        yield
+    finally:
+        LxdVersion._check_done = False

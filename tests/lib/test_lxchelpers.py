@@ -30,7 +30,7 @@ from edi.lib.lxchelpers import (get_server_image_compression_algorithm,
                                 get_lxd_version, LxdVersion)
 from edi.lib.shellhelpers import mockablerun
 from tests.libtesting.helpers import get_command, get_sub_command
-from tests.libtesting.contextmanagers.mocked_executable import mocked_executable
+from tests.libtesting.contextmanagers.mocked_executable import mocked_executable, mocked_lxd_version_check
 
 
 @requires_lxc
@@ -41,15 +41,16 @@ def test_get_server_image_compression():
 
 def test_get_server_image_compression_bzip2(monkeypatch):
     with mocked_executable('lxc', '/here/is/no/lxc'):
-        def fake_lxc_config_command(*popenargs, **kwargs):
-            if get_command(popenargs).endswith('lxc') and get_sub_command(popenargs) == 'config':
-                return subprocess.CompletedProcess("fakerun", 0, stdout='bzip2')
-            else:
-                return subprocess.run(*popenargs, **kwargs)
+        with mocked_lxd_version_check():
+            def fake_lxc_config_command(*popenargs, **kwargs):
+                if get_command(popenargs).endswith('lxc') and get_sub_command(popenargs) == 'config':
+                    return subprocess.CompletedProcess("fakerun", 0, stdout='bzip2')
+                else:
+                    return subprocess.run(*popenargs, **kwargs)
 
-        monkeypatch.setattr(mockablerun, 'run_mockable', fake_lxc_config_command)
-        result = get_server_image_compression_algorithm()
-        assert result is 'bzip2'
+            monkeypatch.setattr(mockablerun, 'run_mockable', fake_lxc_config_command)
+            result = get_server_image_compression_algorithm()
+            assert result is 'bzip2'
 
 
 @pytest.mark.parametrize("algorithm, expected_extension", [

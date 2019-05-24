@@ -18,7 +18,12 @@ Prerequisites
 #. Install lxd:
 
    .. code-block:: bash
-      :caption: Ubuntu
+      :caption: Ubuntu 16.04
+
+      sudo apt install lxd/xenial-backports lxcfs/xenial-backports lxd-client/xenial-backports
+
+   .. code-block:: bash
+      :caption: Ubuntu >= 18.04
 
       sudo apt install lxd
 

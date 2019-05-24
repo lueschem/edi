@@ -39,7 +39,7 @@ from edi.commands.lxccommands.stop import Stop
 from edi.commands.qemucommands.fetch import Fetch
 from edi.commands.targetcommands.targetconfigure import Configure as TargetConfigure
 from edi.lib.shellhelpers import mockablerun
-from tests.libtesting.contextmanagers.mocked_executable import mocked_executable
+from tests.libtesting.contextmanagers.mocked_executable import mocked_executable, mocked_lxd_version_check
 
 
 @pytest.mark.parametrize(("command, command_args, has_templates, "
@@ -60,47 +60,48 @@ from tests.libtesting.contextmanagers.mocked_executable import mocked_executable
 def test_plugins(monkeypatch, config_files, capsys, command, command_args, has_templates,
                  has_profiles, has_playbooks, has_postprocessing_commands):
     with mocked_executable('lxc'):
-        def fake_lxc_config_command(*popenargs, **kwargs):
-            if 'images.compression_algorithm' in popenargs[0]:
-                return subprocess.CompletedProcess("fakerun", 0, '')
+        with mocked_lxd_version_check():
+            def fake_lxc_config_command(*popenargs, **kwargs):
+                if 'images.compression_algorithm' in popenargs[0]:
+                    return subprocess.CompletedProcess("fakerun", 0, '')
+                else:
+                    return subprocess.run(*popenargs, **kwargs)
+
+            monkeypatch.setattr(mockablerun, 'run_mockable', fake_lxc_config_command)
+
+            parser = edi._setup_command_line_interface()
+            command_args.append(config_files)
+            cli_args = parser.parse_args(command_args)
+
+            command().run_cli(cli_args)
+            out, err = capsys.readouterr()
+
+            assert err == ''
+            result = yaml.load(out)
+
+            if has_templates:
+                assert result.get('lxc_templates')
             else:
-                return subprocess.run(*popenargs, **kwargs)
+                assert not result.get('lxc_templates')
 
-        monkeypatch.setattr(mockablerun, 'run_mockable', fake_lxc_config_command)
+            if has_profiles:
+                assert result.get('lxc_profiles')
+            else:
+                assert not result.get('lxc_profiles')
 
-        parser = edi._setup_command_line_interface()
-        command_args.append(config_files)
-        cli_args = parser.parse_args(command_args)
+            if has_playbooks:
+                assert len(result.get('playbooks')) == 3
+                base_system = result.get('playbooks')[0].get('10_base_system')
+                assert 'plugins/playbooks/foo.yml' in base_system.get('path')
+                assert base_system.get('dictionary').get('kernel_package') == 'linux-image-amd64-rt'
+                assert base_system.get('dictionary').get('edi_project_directory') == os.path.dirname(config_files)
+                assert base_system.get('dictionary').get("param1") == "keep"
+                assert base_system.get('dictionary').get("param2") == "overwritten"
+                assert base_system.get('dictionary').get("param3") == "customized"
+            else:
+                assert not result.get('playbooks')
 
-        command().run_cli(cli_args)
-        out, err = capsys.readouterr()
-
-        assert err == ''
-        result = yaml.load(out)
-
-        if has_templates:
-            assert result.get('lxc_templates')
-        else:
-            assert not result.get('lxc_templates')
-
-        if has_profiles:
-            assert result.get('lxc_profiles')
-        else:
-            assert not result.get('lxc_profiles')
-
-        if has_playbooks:
-            assert len(result.get('playbooks')) == 3
-            base_system = result.get('playbooks')[0].get('10_base_system')
-            assert 'plugins/playbooks/foo.yml' in base_system.get('path')
-            assert base_system.get('dictionary').get('kernel_package') == 'linux-image-amd64-rt'
-            assert base_system.get('dictionary').get('edi_project_directory') == os.path.dirname(config_files)
-            assert base_system.get('dictionary').get("param1") == "keep"
-            assert base_system.get('dictionary').get("param2") == "overwritten"
-            assert base_system.get('dictionary').get("param3") == "customized"
-        else:
-            assert not result.get('playbooks')
-
-        if has_postprocessing_commands:
-            assert result.get('postprocessing_commands')
-        else:
-            assert not result.get('postprocessing_commands')
+            if has_postprocessing_commands:
+                assert result.get('postprocessing_commands')
+            else:
+                assert not result.get('postprocessing_commands')
