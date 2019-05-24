@@ -172,12 +172,13 @@ class Executables:
             return None
 
 
-def require(executable, installation_command=None):
+def require(executable, installation_command=None, version_check=None):
     """
     Make sure that a certain executable is available.
     Use this method as a decorator.
     :param executable: The required executable.
     :param installation_command: A suggested installation command if the executable is missing.
+    :param version_check: A method to check the installed executable (e.g. required minimal version).
     :return:
     """
     def require_decorator(func):
@@ -190,6 +191,9 @@ def require(executable, installation_command=None):
                 raise FatalError(("Missing executable '{0}'.\n"
                                   "Use e.g. {1} to install it.").format(executable,
                                                                         installation_hint))
+            elif version_check:
+                version_check()
+
             return func(*args, **kwargs)
 
         return func_wrapper

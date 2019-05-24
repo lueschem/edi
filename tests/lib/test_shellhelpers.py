@@ -121,6 +121,15 @@ def other_decorated_function(arg1, arg2):
     return arg1 + arg2
 
 
+def _failing_check():
+    raise FatalError("check failed")
+
+
+@require('ls', 'some command', _failing_check)
+def decorated_function_with_failing_check():
+    pass
+
+
 class SomeClass:
     def __init__(self):
         self.some_name = "foo"
@@ -147,3 +156,10 @@ def test_require():
 
     assert 'apt or snap' in error.value.message
     assert 'does-really-not-exist' in error.value.message
+
+
+def test_require_with_failing_check():
+    with pytest.raises(FatalError) as error:
+        decorated_function_with_failing_check()
+
+    assert 'check failed' in error.value.message
