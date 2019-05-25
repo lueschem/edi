@@ -1,3 +1,15 @@
+edi (1.1.0+u1804) bionic; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Added helpers for dumb-init based startup.
+  * Use latest qemu for emulated architectures.
+  * Added buster configuration templates.
+  * Documented the usage of dumb-init.
+  * Added LXD version check (LXD >= 3.0.0 is now required).
+  * Adjusted installation instructions for Ubuntu 16.04.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Sat, 25 May 2019 14:21:52 +0200
+
 edi (1.0.0+u1804) bionic; urgency=medium
 
   [ Matthias Lüscher ]
