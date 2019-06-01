@@ -28,7 +28,7 @@ import os
 from contextlib import contextmanager
 from os.path import dirname, abspath, basename, splitext, isfile, join
 import logging
-from edi.lib.helpers import (get_user, get_user_gid, get_user_uid, get_workdir,
+from edi.lib.helpers import (get_user, get_user_group, get_user_gid, get_user_uid, get_workdir,
                              get_hostname, get_edi_plugin_directory, FatalError)
 from edi.lib.proxyhelpers import ProxySetup
 from edi.lib.sshkeyhelpers import get_user_ssh_pub_keys
@@ -59,6 +59,7 @@ def get_base_dictionary():
     base_dict = {}
     current_user_name = get_user()
     base_dict["edi_current_user_name"] = current_user_name
+    base_dict["edi_current_user_group_name"] = get_user_group()
     base_dict["edi_current_user_ssh_pub_keys"] = get_user_ssh_pub_keys()
     base_dict["edi_current_user_uid"] = get_user_uid()
     base_dict["edi_current_user_gid"] = get_user_gid()

@@ -22,6 +22,7 @@
 import sys
 import os
 from pwd import getpwnam
+from grp import getgrgid
 import socket
 import logging
 import shutil
@@ -76,6 +77,10 @@ def get_user_uid():
 
 def get_user_gid():
     return getpwnam(get_user()).pw_gid
+
+
+def get_user_group():
+    return getgrgid(get_user_gid()).gr_name
 
 
 def get_hostname():
