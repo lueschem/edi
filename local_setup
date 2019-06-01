@@ -47,7 +47,7 @@ then
 fi
 
 # load additional completion wrapper when SHELL == zsh
-if [[ "$(basename "${SHELL}")" == "zsh" ]]
+if [ -n "$ZSH_VERSION" ]
 then
     autoload -U bashcompinit
     bashcompinit
