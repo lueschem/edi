@@ -5,16 +5,25 @@
     enforced_uid: "{{ edi_current_user_uid }}"
   when: not edi_configure_remote_target
 
+- name: Check whether the group already exists
+  shell: grep ":{{ enforced_gid }}:" /etc/group
+  register: group_exists
+
 - name: Add a group for the current user.
   group:
     name: "{{ edi_current_user_name }}"
     gid: "{{ enforced_gid | default(omit) }}"
     state: present
+  when: group_exists.rc == 1
+
+- name: Get the users group name
+  shell: grep ":{{ enforced_gid }}:" /etc/group | cut -d":" -f1
+  register: user_group_name
 
 - name: Add the current user (password=ChangeMe!).
   user:
     name: "{{ edi_current_user_name }}"
-    group: "{{ edi_current_user_name }}"
+    group: "{{ user_group_name.stdout }}"
     uid: "{{ enforced_uid | default(omit) }}"
     shell: /bin/bash
     groups: adm,sudo
