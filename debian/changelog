@@ -1,3 +1,11 @@
+edi (1.1.1+u1804) bionic; urgency=medium
+
+  [ Benj Fassbind ]
+  * Fixed local_setup for zsh.
+  * Fixed development user setup if user name is not equal to group name.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Tue, 04 Jun 2019 09:46:30 +0200
+
 edi (1.1.0+u1804) bionic; urgency=medium
 
   [ Matthias Lüscher ]
