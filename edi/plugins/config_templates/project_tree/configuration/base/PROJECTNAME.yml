@@ -26,7 +26,7 @@ bootstrap:
 {% if edi_use_buster_qemu is defined and edi_use_buster_qemu %}
 qemu:
     repository: deb http://deb.debian.org/debian/ buster main
-    repository_key: https://ftp-master.debian.org/keys/archive-key-8.asc
+    repository_key: https://ftp-master.debian.org/keys/archive-key-9.asc
 {% endif %}
 
 lxc_profiles:

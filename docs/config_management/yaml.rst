@@ -90,14 +90,14 @@ This section tells edi how the initial system shall be bootstrapped. The followi
        :code:`amd64`, :code:`armel` or :code:`armhf`.
    * - repository
      - The repository specification where the initial image will get bootstrapped from. |br|
-       A valid value looks like this: :code:`deb http://deb.debian.org/debian/ stretch main`.
+       A valid value looks like this: :code:`deb http://deb.debian.org/debian/ buster main`.
    * - repository_key
      - The signature key for the repository. |br|
        *Attention*: If you do not specify a key the downloaded packages
        will not be verified during the bootstrap process. |br|
        *Hint*: It is a good practice to download such a key from a
        https server. |br|
-       A valid repository key value is: :code:`https://ftp-master.debian.org/keys/archive-key-8.asc`.
+       A valid repository key value is: :code:`https://ftp-master.debian.org/keys/archive-key-9.asc`.
    * - tool
      - The tool that will be used for the bootstrap process. |br|
        Currently only :code:`debootstrap` is supported. |br|
