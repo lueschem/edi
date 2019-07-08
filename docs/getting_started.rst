@@ -23,12 +23,12 @@ Prerequisites
       sudo apt install lxd/xenial-backports lxcfs/xenial-backports lxd-client/xenial-backports liblxc1/xenial-backports
 
    .. code-block:: bash
-      :caption: Ubuntu >= 18.04
+      :caption: Ubuntu 18.04
 
       sudo apt install lxd
 
    .. code-block:: bash
-      :caption: Debian
+      :caption: Debian or Ubuntu >= 19.04
 
       sudo apt install snapd
       sudo snap install lxd
@@ -39,12 +39,12 @@ Prerequisites
 #. Initialize lxd:
 
    .. code-block:: bash
-      :caption: Ubuntu
+      :caption: Ubuntu 16.04 or Ubuntu 18.04
 
       sudo lxd init
 
    .. code-block:: bash
-      :caption: Debian
+      :caption: Debian or Ubuntu >= 19.04
 
       sudo /snap/bin/lxd init
 
