@@ -71,7 +71,7 @@ For your convenience, you can directly install edi from a ppa (Ubuntu) or a cust
 
       sudo apt install apt-transport-https
       wget -qO - https://get-edi.github.io/edi-repository/debian/repo.key | sudo apt-key add -
-      echo "deb https://get-edi.github.io/edi-repository/debian stretch main" | sudo tee /etc/apt/sources.list.d/edi-repository.list
+      echo "deb https://get-edi.github.io/edi-repository/debian $(source /etc/os-release && echo ${VERSION_CODENAME}) main" | sudo tee /etc/apt/sources.list.d/edi-repository.list
       sudo apt update
 
 #. Install edi:
