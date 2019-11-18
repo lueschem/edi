@@ -19,4 +19,4 @@ Contents:
    upgrade_notes
    reference_list
    command_cheat_sheet
-
+   presentations
