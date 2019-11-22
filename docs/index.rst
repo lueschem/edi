@@ -17,6 +17,7 @@ Contents:
    config_management/index
    command_pipeline
    upgrade_notes
+   performance_tuning
    reference_list
    command_cheat_sheet
    presentations
