@@ -50,7 +50,7 @@ def test_get_server_image_compression_bzip2(monkeypatch):
 
             monkeypatch.setattr(mockablerun, 'run_mockable', fake_lxc_config_command)
             result = get_server_image_compression_algorithm()
-            assert result is 'bzip2'
+            assert result == 'bzip2'
 
 
 @pytest.mark.parametrize("algorithm, expected_extension", [
