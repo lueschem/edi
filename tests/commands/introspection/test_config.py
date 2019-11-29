@@ -71,5 +71,5 @@ def test_config(monkeypatch, config_files, capsys, command, command_args):
     out, err = capsys.readouterr()
 
     assert err == ''
-    merged_config = yaml.load(out)
+    merged_config = yaml.safe_load(out)
     assert merged_config.get('bootstrap').get('architecture') == 'i386'

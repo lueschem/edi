@@ -40,7 +40,7 @@ def normalize_yaml(yaml_string):
     :param yaml_string: string in yaml format
     :return: string in yaml format with pyyaml default_flow_style=False
     """
-    return yaml.dump(yaml.load(yaml_string), default_flow_style=False)
+    return yaml.dump(yaml.safe_load(yaml_string), default_flow_style=False)
 
 
 def annotated_yaml_load(stream, context_hint):
@@ -52,6 +52,6 @@ def annotated_yaml_load(stream, context_hint):
     :return: The content of the yaml as a Python object.
     """
     try:
-        return yaml.load(stream)
+        return yaml.safe_load(stream)
     except yaml.parser.ParserError as e:
         raise FatalError("Invalid yaml configuration '{}':\n{}".format(context_hint, str(e))) from e

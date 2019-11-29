@@ -151,7 +151,7 @@ class Prepare(Lxc):
                                    yaml.dump(remove_passwords(dictionary),
                                              default_flow_style=False)))
 
-            sub_node = yaml.load(template)
+            sub_node = yaml.safe_load(template)
             template_node = dict(template_node, **sub_node)
 
             templates_src = os.path.dirname(path)

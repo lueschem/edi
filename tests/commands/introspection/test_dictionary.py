@@ -72,6 +72,6 @@ def test_dictionary(monkeypatch, config_files, capsys, command, command_args):
     out, err = capsys.readouterr()
 
     assert err == ''
-    dictionary = yaml.load(out)
+    dictionary = yaml.safe_load(out)
     assert dictionary.get('edi_project_directory') == os.path.dirname(config_files)
     assert dictionary.get('edi_project_plugin_directory') == os.path.join(os.path.dirname(config_files), 'plugins')

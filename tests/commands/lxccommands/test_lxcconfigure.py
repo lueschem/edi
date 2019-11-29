@@ -57,7 +57,7 @@ def verify_shared_folder(container_name):
 def modify_develop_overlay(project_name):
     overlay_file = os.path.join('configuration', 'overlay', '{}-develop.global.yml'.format(project_name))
     with open(overlay_file, mode='r') as overlay:
-        overlay_config = yaml.load(overlay.read())
+        overlay_config = yaml.safe_load(overlay.read())
 
     base_system_mod = {'playbooks': {
         '100_base_system': {

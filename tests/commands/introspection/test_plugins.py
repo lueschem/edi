@@ -77,7 +77,7 @@ def test_plugins(monkeypatch, config_files, capsys, command, command_args, has_t
             out, err = capsys.readouterr()
 
             assert err == ''
-            result = yaml.load(out)
+            result = yaml.safe_load(out)
 
             if has_templates:
                 assert result.get('lxc_templates')

@@ -37,7 +37,7 @@ def verify_inventory(file):
 def verify_extra_vars(file):
     print(file)
     with open(file, encoding='utf-8') as f:
-        extra_vars = yaml.load(f)
+        extra_vars = yaml.safe_load(f)
         assert extra_vars['edi_config_management_user_name'] == 'edicfgmgmt'
         mountpoints = extra_vars['edi_shared_folder_mountpoints']
         assert len(mountpoints) == 2

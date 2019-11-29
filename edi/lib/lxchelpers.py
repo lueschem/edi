@@ -117,7 +117,7 @@ def is_container_running(name):
     result = run(cmd, stdout=subprocess.PIPE)
 
     try:
-        parsed_result = yaml.load(result.stdout)
+        parsed_result = yaml.safe_load(result.stdout)
         if len(parsed_result) != 1:
             return False
         else:
@@ -193,7 +193,7 @@ def is_profile_existing(name):
 @require('lxc', lxd_install_hint, LxdVersion.check)
 def write_lxc_profile(profile_text):
     new_profile = False
-    profile_yaml = yaml.load(profile_text)
+    profile_yaml = yaml.safe_load(profile_text)
     profile_hash = hashlib.sha256(profile_text.encode()
                                   ).hexdigest()[:20]
     profile_name = profile_yaml.get("name", "anonymous")
@@ -245,7 +245,7 @@ def get_file_extension_from_image_compression_algorithm(algorithm):
 def get_container_profiles(name):
     cmd = [lxc_exec(), 'config', 'show', name]
     result = run(cmd, stdout=subprocess.PIPE)
-    return yaml.load(result.stdout).get('profiles', [])
+    return yaml.safe_load(result.stdout).get('profiles', [])
 
 
 def try_delete_container(container_name, timeout):

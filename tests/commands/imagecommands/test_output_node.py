@@ -32,7 +32,7 @@ def test_output_node(datadir, capsys):
     cli_args = parser.parse_args(['image', 'create', '--config', os.path.join(str(datadir), 'output-node-base.yml')])
     Create().run_cli(cli_args)
     out, err = capsys.readouterr()
-    config = yaml.load(out)
+    config = yaml.safe_load(out)
     second_command = config.get('postprocessing_commands').get('120_second_command')
     assert second_command.get('output').get('output1') == 'foo.result'
     assert second_command.get('output').get('output2') == 'bar.result'
@@ -45,7 +45,7 @@ def test_output_node(datadir, capsys):
     cli_args = parser.parse_args(['image', 'create', '--config', os.path.join(str(datadir), 'output-node.yml')])
     Create().run_cli(cli_args)
     out, err = capsys.readouterr()
-    config = yaml.load(out)
+    config = yaml.safe_load(out)
     second_command = config.get('postprocessing_commands').get('120_second_command')
     assert second_command.get('output').get('output1') == 'foo.result'
     assert second_command.get('output').get('output2') == 'baz.result'

@@ -132,7 +132,7 @@ class ConfigurationTemplate():
     @staticmethod
     def _replace_edilink(path, **_):
         with open(path, mode='r', encoding='utf-8') as link_file:
-            link_target = yaml.load(link_file.read()).get('link')
+            link_target = yaml.safe_load(link_file.read()).get('link')
 
         new_link, _ = os.path.splitext(path)
         os.remove(path)
