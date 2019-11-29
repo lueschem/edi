@@ -19,10 +19,11 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
-from edi.commands.imagecommands import *  # noqa: ignore=F401,F403
-from edi.commands.lxccommands import *  # noqa: ignore=F401,F403
-from edi.commands.configcommands import *  # noqa: ignore=F401,F403
-from edi.commands.targetcommands import *  # noqa: ignore=F401,F403
-from edi.commands.qemucommands import *  # noqa: ignore=F401,F403
+from edi.commands.imagecommands import bootstrap, create, imageclean  # noqa: ignore=F401
+from edi.commands.lxccommands import (export, importcmd, launch, lxcclean, lxcconfigure,  # noqa: ignore=F401
+                                      lxcprepare, profile, publish, stop)  # noqa: ignore=F401
+from edi.commands.configcommands import configclean, configinit  # noqa: ignore=F401
+from edi.commands.targetcommands import targetconfigure  # noqa: ignore=F401
+from edi.commands.qemucommands import fetch, qemuclean  # noqa: ignore=F401
 
 __all__ = ["config", "image", "lxc", "version", "clean", "target", "qemu"]
