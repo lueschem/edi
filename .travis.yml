@@ -8,11 +8,11 @@ install:
   - docker pull ubuntu:18.04
   - docker pull ubuntu:19.10
 script:
-  - docker run -v $(pwd):/data/edi debian:stretch bash -c "/data/edi/tests/travis-tests"
-  - docker run -v $(pwd):/data/edi debian:buster bash -c "/data/edi/tests/travis-tests"
-  - docker run -v $(pwd):/data/edi ubuntu:16.04 bash -c "/data/edi/tests/travis-tests"
-  - docker run -v $(pwd):/data/edi ubuntu:18.04 bash -c "/data/edi/tests/travis-tests"
-  - docker run -v $(pwd):/data/edi ubuntu:19.10 bash -c "/data/edi/tests/travis-tests"
+  - docker run -v $(pwd):/data/edi debian:stretch bash -c "/data/edi/travis/travis-build"
+  - docker run -v $(pwd):/data/edi debian:buster bash -c "/data/edi/travis/travis-build"
+  - docker run -v $(pwd):/data/edi ubuntu:16.04 bash -c "/data/edi/travis/travis-build"
+  - docker run -v $(pwd):/data/edi ubuntu:18.04 bash -c "/data/edi/travis/travis-build"
+  - docker run -v $(pwd):/data/edi ubuntu:19.10 bash -c "/data/edi/travis/travis-build"
 
 branches:
   except:
