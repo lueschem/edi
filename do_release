@@ -2,7 +2,7 @@
 
 # Create a new edi release that can be uploaded to a repository.
 #
-# usage: do_release 0.2.0
+# usage: do_release 1.2.1
 
 set -e
 set -o errexit
@@ -19,9 +19,9 @@ set -o nounset
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd ${SCRIPTDIR}
 
-if [ "$(git rev-parse --abbrev-ref HEAD)" != "master" ]
+if [ "$(git rev-parse --abbrev-ref HEAD)" != "develop" ]
 then
-    >&2 echo "Error: please switch to the master branch before doing a release!"
+    >&2 echo "Error: please switch to the develop branch before doing a release!"
     exit 1
 fi
 
@@ -41,27 +41,7 @@ git clean -dxf
 
 source /etc/os-release
 
-RAW_VERSION="${1}"
-
-if [ "${ID}" == "ubuntu" ]
-then
-    NEW_VERSION="${1}+u$(echo ${VERSION_ID} | sed s#\\.##g)"
-elif [ "${ID}" == "debian" ]
-then
-    NEW_VERSION="${1}+deb$(echo ${VERSION_ID} | sed s#\\.##g)"
-    VERSION_CODENAME=$(echo ${VERSION} | awk -F"[)(]+" '{print $2}')
-else
-    >&2 echo "Error: unhandled operating system id (${ID})!"
-    exit 1
-fi
-
-if [ "${VERSION_ID}" == "18.04" ]
-then
-    GIT_BRANCH="master"
-else
-    GIT_BRANCH="${NEW_VERSION}"
-    git checkout -b ${GIT_BRANCH}
-fi
+NEW_VERSION="${1}"
 
 SETUP_PY="setup.py"
 sed -i "s/^    version=.*/    version='${NEW_VERSION}',/g" ${SETUP_PY}
@@ -76,31 +56,15 @@ VERSION_HELPERS="edi/lib/versionhelpers.py"
 sed -i "s/^edi_fallback_version =.*/edi_fallback_version = '${NEW_VERSION}'/g" ${VERSION_HELPERS}
 git add ${VERSION_HELPERS}
 
-if [ "${GIT_BRANCH}" == "master" ]
-then
-    gbp dch --new-version ${NEW_VERSION} --release --distribution ${VERSION_CODENAME} --debian-branch ${GIT_BRANCH} --debian-tag v%\(version\)s
-else
-    dch -b --newversion ${NEW_VERSION} --distribution ${VERSION_CODENAME}
-fi
+gbp dch --new-version ${NEW_VERSION} --release --distribution ${VERSION_CODENAME} --debian-branch develop --debian-tag v%\(version\)s
 
 git add debian/changelog
 git commit -m "New version ${NEW_VERSION}."
-git tag -a v${NEW_VERSION} -m "New version ${NEW_VERSION}."
 
-if [ "${GIT_BRANCH}" == "master" ]
-then
-    git tag -a v${RAW_VERSION} -m "Tag for setuptools scm."
-fi
+git flow release start ${NEW_VERSION}
+git flow release finish
 
-debuild -us -uc
-
-if [ "${ID}" == "ubuntu" ]
-then
-    debuild -S
-    dput ppa:m-luescher/edi-snapshots ../edi_${NEW_VERSION}_source.changes
-fi
-
-git push origin ${GIT_BRANCH}
+git push origin master
+git push origin develop
 git push --tags
-git checkout master
 
