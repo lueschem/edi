@@ -18,7 +18,11 @@ htmlcov/
 docs/_build/
 
 # travis
-travis/build-output-*
+edi_*dsc
+edi_*xz
+edi_*deb
+edi_*build
+edi_*changes
 
 # eclipse
 .settings/
