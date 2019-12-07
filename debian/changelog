@@ -1,3 +1,10 @@
+edi (1.1.5) bionic; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Do not cleanup the built artifacts.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Sat, 07 Dec 2019 23:36:14 +0100
+
 edi (1.1.4) bionic; urgency=medium
 
   [ Matthias Lüscher ]
