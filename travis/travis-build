@@ -1,0 +1,113 @@
+#!/bin/bash
+
+# Run build on Travis CI within a virgin Ubuntu/Debian container.
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+# there is no VERSION_ID in sid
+VERSION_ID=""
+. /etc/os-release
+
+SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd ${SCRIPTDIR}/..
+
+export DEBIAN_FRONTEND=noninteractive
+apt-get update
+apt-get --no-install-recommends -y install sudo
+
+TESTUSER=ediuser
+TESTUSERHOME=/home/${TESTUSER}
+adduser --disabled-password --gecos "" ${TESTUSER}
+addgroup  ${TESTUSER} adm
+
+apt-get --no-install-recommends -y install git
+
+git config --system user.email "lueschem@gmail.com"
+git config --system user.name "Matthias Luescher"
+
+if ! git diff --exit-code --quiet
+then
+    >&2 echo "Error: there are unstaged changes!"
+    exit 1
+fi
+
+if ! git diff --cached --exit-code --quiet
+then
+    >&2 echo "Error: there are uncommitted changes!"
+    exit 1
+fi
+
+sudo -u ${TESTUSER} git clone .git ${TESTUSERHOME}/edi
+
+apt-get -y --no-install-recommends install git-buildpackage dh-make equivs lintian
+if [ "${VERSION_ID}" == "16.04" ]
+then
+    # Ansible >= 2.1 is required
+    apt-get -y --no-install-recommends install ansible/xenial-backports
+fi
+
+cd ${TESTUSERHOME}/edi
+
+RAW_VERSION="$(dpkg-parsechangelog --show-field Version | cut -d'+' -f1)"
+
+if [ "${ID}" == "ubuntu" ]
+then
+    NEW_VERSION="${RAW_VERSION}+u$(echo ${VERSION_ID} | sed s#\\.##g)"
+elif [ "${ID}" == "debian" ]
+then
+    NEW_VERSION="${RAW_VERSION}+deb$(echo ${VERSION_ID} | sed s#\\.##g)"
+    VERSION_CODENAME=$(echo ${VERSION} | awk -F"[)(]+" '{print $2}')
+else
+    >&2 echo "Error: unhandled operating system id (${ID})!"
+    exit 1
+fi
+
+SETUP_PY="setup.py"
+sed -i "s/^    version=.*/    version='${NEW_VERSION}',/g" ${SETUP_PY}
+sudo -u ${TESTUSER} git add ${SETUP_PY}
+
+SPHINX_CONFIG="docs/conf.py"
+sed -i "s/^version =.*/version = '${NEW_VERSION}'/g" ${SPHINX_CONFIG}
+sed -i "s/^release =.*/release = '${NEW_VERSION}'/g" ${SPHINX_CONFIG}
+sudo -u ${TESTUSER} git add ${SPHINX_CONFIG}
+
+VERSION_HELPERS="edi/lib/versionhelpers.py"
+sed -i "s/^edi_fallback_version =.*/edi_fallback_version = '${NEW_VERSION}'/g" ${VERSION_HELPERS}
+sudo -u ${TESTUSER} git add ${VERSION_HELPERS}
+
+dch -b --newversion ${NEW_VERSION} --distribution ${VERSION_CODENAME} -m "Automatic ${VERSION_CODENAME} build."
+
+sudo -u ${TESTUSER} git add debian/changelog
+sudo -u ${TESTUSER} git commit -m "New version ${NEW_VERSION}."
+sudo -u ${TESTUSER} git tag -a v${NEW_VERSION} -m "New version ${NEW_VERSION}."
+
+mk-build-deps -i debian/control -t "apt-get -y"
+
+sudo -u ${TESTUSER} py.test-3
+
+sudo -u ${TESTUSER} git clean -dxf
+
+sudo -u ${TESTUSER} debuild -us -uc
+
+dpkg -i ../edi_*_all.deb || true
+apt-get -y --no-install-recommends install -f
+
+EDIVERSION=$(edi version)
+CHANGELOGVERSION=$(dpkg-parsechangelog --show-field Version)
+
+if [ "${EDIVERSION}" != "${CHANGELOGVERSION}" ]
+then
+    >&2 echo -e "\nError: edi version does not match changelog version (${EDIVERSION} != ${CHANGELOGVERSION})."
+    exit 1
+fi
+
+BUILD_OUTPUT="${SCRIPTDIR}/build-output-${VERSION_CODENAME}"
+mkdir -p ${BUILD_OUTPUT}
+
+cp -f ../edi_${NEW_VERSION}* ${BUILD_OUTPUT}
+
+echo "========"
+echo "Success!"
+echo "========"

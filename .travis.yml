@@ -1,19 +1,33 @@
-sudo: required 
+sudo: required
 services:
-  - docker
+- docker
 install:
-  - docker pull debian:stretch
-  - docker pull debian:buster
-  - docker pull ubuntu:16.04
-  - docker pull ubuntu:18.04
-  - docker pull ubuntu:19.10
+- docker pull debian:stretch
+- docker pull debian:buster
+- docker pull ubuntu:16.04
+- docker pull ubuntu:18.04
+- docker pull ubuntu:19.10
 script:
-  - docker run -v $(pwd):/data/edi debian:stretch bash -c "/data/edi/tests/travis-tests"
-  - docker run -v $(pwd):/data/edi debian:buster bash -c "/data/edi/tests/travis-tests"
-  - docker run -v $(pwd):/data/edi ubuntu:16.04 bash -c "/data/edi/tests/travis-tests"
-  - docker run -v $(pwd):/data/edi ubuntu:18.04 bash -c "/data/edi/tests/travis-tests"
-  - docker run -v $(pwd):/data/edi ubuntu:19.10 bash -c "/data/edi/tests/travis-tests"
-
+- docker run -v $(pwd):/data/edi debian:stretch bash -c "/data/edi/travis/travis-build"
+- docker run -v $(pwd):/data/edi debian:buster bash -c "/data/edi/travis/travis-build"
+- docker run -v $(pwd):/data/edi ubuntu:16.04 bash -c "/data/edi/travis/travis-build"
+- docker run -v $(pwd):/data/edi ubuntu:18.04 bash -c "/data/edi/travis/travis-build"
+- docker run -v $(pwd):/data/edi ubuntu:19.10 bash -c "/data/edi/travis/travis-build"
 branches:
   except:
   - drawings
+deploy:
+- provider: packagecloud
+  repository: debian
+  username: get-edi
+  token:
+    secure: g+7WMKuAXb1OqXD+h5uuxOJYvtMre7c3jEsIA4gmOlEd1ndEWZwmjFishsPDdxLM3c0PoKgo10DFy8gkTWNVYJIeFMuG/mxuxgek5fMMzLEDvbeEfgM31bBOh6IX/OAPSlmDjCb9idR65Mt6ZcQ19V86D4UAVcDoDNoB6KFfL2Ak1Fapp773D9jlns61JkeHqPZ6YmHu7r81GHo01ZYcQLCZ1kwqjTGya4gxppNyNtqps2d3X/4/kK1lJAGD3LnRgmdIflm5aqWoz4mDNRK2opKnzY4AlS9uQZbfOzLAgHMo/uCjNz0n99PMSHStFb9j/S8Em+1n5/eV53cKChqcrp3WnHmOl2wpHsrEAImcbfMr3okc6d5eqxqN9ZIEMJ0TXTNSUBhp8RZT4GY0G6e6atOxDX9cGSyJAO/ULjrB5xb7DpTdXtA5PxW4F3ly4i10kgkmR3csCnv3VTJ70UeDmiUmviCKq+ouhhD0lgYINLDFecn2jUSTChki94+PGr822pgWPIN2EKa0ciLzWi4kSuWE+KrFHjZujyefJGwOzg5VhFSuL02GpNd2OnIpjxe7hlOYY+bs1ZCsROxbE408FTyypBV36PEfUlQLiAZqpm26lAp/Rodm+Pl2lkv2ai/MSKrtjfkXIaVjfGuy1u6J2SyNlOwN4ro878Cd6LnnZe4=
+  dist: debian/stretch
+  local-dir: travis/build-output-stretch
+- provider: packagecloud
+  repository: debian
+  username: get-edi
+  token:
+    secure: g+7WMKuAXb1OqXD+h5uuxOJYvtMre7c3jEsIA4gmOlEd1ndEWZwmjFishsPDdxLM3c0PoKgo10DFy8gkTWNVYJIeFMuG/mxuxgek5fMMzLEDvbeEfgM31bBOh6IX/OAPSlmDjCb9idR65Mt6ZcQ19V86D4UAVcDoDNoB6KFfL2Ak1Fapp773D9jlns61JkeHqPZ6YmHu7r81GHo01ZYcQLCZ1kwqjTGya4gxppNyNtqps2d3X/4/kK1lJAGD3LnRgmdIflm5aqWoz4mDNRK2opKnzY4AlS9uQZbfOzLAgHMo/uCjNz0n99PMSHStFb9j/S8Em+1n5/eV53cKChqcrp3WnHmOl2wpHsrEAImcbfMr3okc6d5eqxqN9ZIEMJ0TXTNSUBhp8RZT4GY0G6e6atOxDX9cGSyJAO/ULjrB5xb7DpTdXtA5PxW4F3ly4i10kgkmR3csCnv3VTJ70UeDmiUmviCKq+ouhhD0lgYINLDFecn2jUSTChki94+PGr822pgWPIN2EKa0ciLzWi4kSuWE+KrFHjZujyefJGwOzg5VhFSuL02GpNd2OnIpjxe7hlOYY+bs1ZCsROxbE408FTyypBV36PEfUlQLiAZqpm26lAp/Rodm+Pl2lkv2ai/MSKrtjfkXIaVjfGuy1u6J2SyNlOwN4ro878Cd6LnnZe4=
+  dist: debian/buster
+  local-dir: travis/build-output-buster

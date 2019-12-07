@@ -17,6 +17,9 @@ htmlcov/
 # sphinx
 docs/_build/
 
+# travis
+travis/build-output-*
+
 # eclipse
 .settings/
 
