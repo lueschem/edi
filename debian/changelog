@@ -1,3 +1,10 @@
+edi (1.1.7) bionic; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Fetch Debian packages from packagecloud.
+
+ -- Matthias Luescher <lueschem@gmail.com>  Mon, 09 Dec 2019 18:44:07 +0100
+
 edi (1.1.6) bionic; urgency=medium
 
   [ Matthias Lüscher ]

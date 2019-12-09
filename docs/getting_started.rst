@@ -56,7 +56,7 @@ Prerequisites
 Installing edi from the Archive
 +++++++++++++++++++++++++++++++
 
-For your convenience, you can directly install edi from a ppa (Ubuntu) or a custom apt repository (Debian):
+For your convenience, you can directly install edi from a `ppa`_ (Ubuntu) or `packagecloud`_ (Debian):
 
 #. Add the edi repository to your setup:
 
@@ -69,19 +69,16 @@ For your convenience, you can directly install edi from a ppa (Ubuntu) or a cust
    .. code-block:: bash
       :caption: Debian
 
-      sudo apt install apt-transport-https
-      wget -qO - https://get-edi.github.io/edi-repository/debian/repo.key | sudo apt-key add -
-      echo "deb https://get-edi.github.io/edi-repository/debian $(source /etc/os-release && echo ${VERSION_CODENAME}) main" | sudo tee /etc/apt/sources.list.d/edi-repository.list
-      sudo apt update
+      curl -s https://packagecloud.io/install/repositories/get-edi/debian/script.deb.sh | sudo bash
+
+.. _`ppa`: https://launchpad.net/~m-luescher/+archive/ubuntu/edi-snapshots
+.. _`packagecloud`: https://packagecloud.io/get-edi/debian
 
 #. Install edi:
 
    .. code-block:: bash
 
       sudo apt install edi
-
-.. _`edi-snapshots`: https://launchpad.net/~m-luescher/+archive/ubuntu/edi-snapshots
-
 
 Setting up ssh Keys
 +++++++++++++++++++
