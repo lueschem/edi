@@ -1,3 +1,11 @@
+edi (1.1.8) bionic; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Added automatic upload to launchpad.
+  * Added encrypted gpg key for Travis build.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Fri, 13 Dec 2019 18:17:23 +0100
+
 edi (1.1.7) bionic; urgency=medium
 
   [ Matthias Lüscher ]
