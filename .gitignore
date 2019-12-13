@@ -38,7 +38,7 @@ debian/files
 .pybuild/
 
 # edi results
-*.tar.*
+artifacts/*.tar.*
 
 # Ansible
 *.retry
