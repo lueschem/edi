@@ -48,7 +48,8 @@ then
     apt-get -y --no-install-recommends install ansible/xenial-backports
 fi
 
-cd ${TESTUSERHOME}/edi
+CONTAINER_WORK="${TESTUSERHOME}/edi"
+cd ${CONTAINER_WORK}
 
 RAW_VERSION="$(dpkg-parsechangelog --show-field Version | cut -d'+' -f1)"
 
@@ -103,9 +104,47 @@ then
     exit 1
 fi
 
-BUILD_OUTPUT="${SCRIPTDIR}/../"
+if [ "${ID}" == "ubuntu" ]
+then
+    GPG_MAJOR_VERSION=$(gpg --version | head -n1 | cut -d' ' -f3 | cut -d'.' -f1)
 
-cp -f ../edi_${NEW_VERSION}* ${BUILD_OUTPUT}
+    GPG_OPTIONS="--pinentry-mode loopback"
+    if [ "${GPG_MAJOR_VERSION}" == "1" ]
+    then
+        GPG_OPTIONS="--batch --yes --no-use-agent"
+    fi
+
+    GPG_ARCHIVE="${SCRIPTDIR}/travis-key.tar"
+
+    if [ ! -f "${GPG_ARCHIVE}" ]
+    then
+        >&2 echo "Error: Missing ${GPG_ARCHIVE}." 
+    fi
+
+    sudo -u ${TESTUSER} git clean -dxf
+    sudo -u ${TESTUSER} tar -xf ${GPG_ARCHIVE} -C ${CONTAINER_WORK}/travis/
+
+    GPG_KEY="${CONTAINER_WORK}/travis/travis-key.asc"
+    GPG_KEY_PASSPHRASE="${CONTAINER_WORK}/travis/travis-key.passphrase"
+    gpg ${GPG_OPTIONS} --passphrase-file ${GPG_KEY_PASSPHRASE} --import ${GPG_KEY}
+
+    sudo -u ${TESTUSER} debuild -S -us -uc    
+
+    RESULT="${CONTAINER_WORK}/../edi_${NEW_VERSION}_source.changes"
+    debsign -p"gpg ${GPG_OPTIONS} --passphrase-file ${GPG_KEY_PASSPHRASE}" -S -kB6D5610F601C6B6E4A880C93AA6945FE5AAFB25D ${RESULT}
+
+    GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+    if [ "${GIT_BRANCH}" == "master" ]
+    then
+        dput ppa:m-luescher/edi-snapshots ${RESULT}
+    else
+        echo "Skipping deployment on ${GIT_BRANCH} branch."
+    fi
+else
+    BUILD_OUTPUT="${SCRIPTDIR}/../"
+
+    cp -f ../edi_${NEW_VERSION}* ${BUILD_OUTPUT}
+fi
 
 echo "========"
 echo "Success!"

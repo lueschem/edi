@@ -45,3 +45,6 @@ debian/files
 
 # development IDEs
 .idea/
+travis/travis-key.tar
+travis/travis-key.asc
+travis/travis-key.passphrase
