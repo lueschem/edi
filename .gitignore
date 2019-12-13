@@ -38,10 +38,13 @@ debian/files
 .pybuild/
 
 # edi results
-*.tar.*
+artifacts/*.tar.*
 
 # Ansible
 *.retry
 
 # development IDEs
 .idea/
+travis/travis-key.tar
+travis/travis-key.asc
+travis/travis-key.passphrase
