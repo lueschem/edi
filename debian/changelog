@@ -1,3 +1,10 @@
+edi (1.1.10) bionic; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Fixed language setting for dput.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Sat, 14 Dec 2019 22:38:46 +0100
+
 edi (1.1.9) bionic; urgency=medium
 
   [ Matthias Lüscher ]
