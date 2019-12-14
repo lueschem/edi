@@ -1,3 +1,10 @@
+edi (1.1.12) bionic; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Skip dput on travis.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Sun, 15 Dec 2019 00:29:05 +0100
+
 edi (1.1.11) bionic; urgency=medium
 
   [ Matthias Lüscher ]

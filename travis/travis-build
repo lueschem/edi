@@ -134,14 +134,17 @@ then
     debsign -p"gpg ${GPG_OPTIONS} --passphrase-file ${GPG_KEY_PASSPHRASE}" -S -kB6D5610F601C6B6E4A880C93AA6945FE5AAFB25D ${RESULT}
 
     GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-    if [ "${GIT_BRANCH}" == "master" ]
+    TRAVIS="${TRAVIS:-false}"
+
+    if [ "${GIT_BRANCH}" == "master" ] && [ "${TRAVIS}" == "false" ]
     then
         apt-get --no-install-recommends -y install dput locales
         locale-gen en_US.UTF-8
         export LANG=en_US.UTF-8
+        # ftp upload on travis does not work
         dput --unchecked ppa:m-luescher/edi-snapshots ${RESULT}
     else
-        echo "Skipping deployment on ${GIT_BRANCH} branch."
+        echo "Skipping deployment (branch=${GIT_BRANCH}, travis=${TRAVIS})."
     fi
 else
     BUILD_OUTPUT="${SCRIPTDIR}/../"
