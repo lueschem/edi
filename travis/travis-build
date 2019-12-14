@@ -139,7 +139,7 @@ then
         apt-get --no-install-recommends -y install dput locales
         locale-gen en_US.UTF-8
         export LANG=en_US.UTF-8
-        dput ppa:m-luescher/edi-snapshots ${RESULT}
+        dput --unchecked ppa:m-luescher/edi-snapshots ${RESULT}
     else
         echo "Skipping deployment on ${GIT_BRANCH} branch."
     fi
