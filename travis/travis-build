@@ -136,6 +136,7 @@ then
     GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
     if [ "${GIT_BRANCH}" == "master" ]
     then
+        apt-get --no-install-recommends -y install dput
         dput ppa:m-luescher/edi-snapshots ${RESULT}
     else
         echo "Skipping deployment on ${GIT_BRANCH} branch."
