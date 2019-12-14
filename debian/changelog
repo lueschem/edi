@@ -1,3 +1,10 @@
+edi (1.1.9) bionic; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Fix master build for Ubuntu.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Sat, 14 Dec 2019 01:44:49 +0100
+
 edi (1.1.8) bionic; urgency=medium
 
   [ Matthias Lüscher ]
