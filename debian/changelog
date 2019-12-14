@@ -1,3 +1,10 @@
+edi (1.1.13) bionic; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Remove dput from travis build.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Sun, 15 Dec 2019 00:54:26 +0100
+
 edi (1.1.12) bionic; urgency=medium
 
   [ Matthias Lüscher ]
