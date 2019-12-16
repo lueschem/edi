@@ -87,13 +87,13 @@ sudo -u ${TESTUSER} git add debian/changelog
 sudo -u ${TESTUSER} git commit -m "New version ${NEW_VERSION}."
 sudo -u ${TESTUSER} git tag -a v${NEW_VERSION} -m "New version ${NEW_VERSION}."
 
-mk-build-deps -i debian/control -t "apt-get -y"
+mk-build-deps -i debian/control -t "apt-get -y" > /dev/null
 
 sudo -u ${TESTUSER} py.test-3
 
 sudo -u ${TESTUSER} git clean -dxf
 
-sudo -u ${TESTUSER} debuild -us -uc
+sudo -u ${TESTUSER} debuild -us -uc > /dev/null
 
 dpkg -i ../edi_*_all.deb || true
 apt-get -y --no-install-recommends install -f
@@ -131,7 +131,7 @@ then
     GPG_KEY_PASSPHRASE="${CONTAINER_WORK}/travis/travis-key.passphrase"
     gpg ${GPG_OPTIONS} --passphrase-file ${GPG_KEY_PASSPHRASE} --import ${GPG_KEY}
 
-    sudo -u ${TESTUSER} debuild -S -us -uc    
+    sudo -u ${TESTUSER} debuild -S -us -uc > /dev/null
 
     RESULT="${CONTAINER_WORK}/../edi_${NEW_VERSION}_source.changes"
     debsign -p"gpg ${GPG_OPTIONS} --passphrase-file ${GPG_KEY_PASSPHRASE}" -S -kB6D5610F601C6B6E4A880C93AA6945FE5AAFB25D ${RESULT}
