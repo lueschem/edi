@@ -14,15 +14,15 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd ${SCRIPTDIR}/..
 
 export DEBIAN_FRONTEND=noninteractive
-apt-get update
-apt-get --no-install-recommends -y install sudo
+apt-get update -qq
+apt-get --no-install-recommends -y -qq install sudo
 
 TESTUSER=ediuser
 TESTUSERHOME=/home/${TESTUSER}
 adduser --disabled-password --gecos "" ${TESTUSER}
 addgroup  ${TESTUSER} adm
 
-apt-get --no-install-recommends -y install git
+apt-get --no-install-recommends -y -qq install git
 
 git config --system user.email "lueschem@gmail.com"
 git config --system user.name "Matthias Luescher"
@@ -43,12 +43,12 @@ sudo -u ${TESTUSER} git clone .git ${TESTUSERHOME}/edi
 
 DPUT_LIBRARIES="python3-paramiko"
 
-apt-get -y --no-install-recommends install git-buildpackage dh-make equivs lintian
+apt-get -y --no-install-recommends -qq install git-buildpackage dh-make equivs lintian
 if [ "${VERSION_ID}" == "16.04" ]
 then
     # Ansible >= 2.1 is required
     DPUT_LIBRARIES="python-paramiko python-bzrlib"
-    apt-get -y --no-install-recommends install ansible/xenial-backports
+    apt-get -y --no-install-recommends -qq install ansible/xenial-backports
 fi
 
 CONTAINER_WORK="${TESTUSERHOME}/edi"
@@ -148,7 +148,11 @@ then
         cp ${CONTAINER_WORK}/travis/known_hosts ${SSH_FOLDER}/
         chmod -R 0600 ${SSH_FOLDER}/*
 
-        apt-get --no-install-recommends -y install dput locales ${DPUT_LIBRARIES}
+        apt-get --no-install-recommends -y -qq install openssh-client dput locales ${DPUT_LIBRARIES}
+        ssh-keyscan ppa.launchpad.net >> ${SSH_FOLDER}/known_hosts
+        echo "Host key of ppa.launchpad.net:" 
+        ssh-keygen -H -F ppa.launchpad.net
+
         locale-gen en_US.UTF-8
         export LANG=en_US.UTF-8
         dput --unchecked --config ${CONTAINER_WORK}/travis/dput.cf ppa:m-luescher/edi-snapshots ${RESULT}

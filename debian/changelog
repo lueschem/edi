@@ -1,3 +1,10 @@
+edi (1.1.15) bionic; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Fixed host key verification for dput.
+
+ -- Matthias Luescher <lueschem@gmail.com>  Mon, 16 Dec 2019 18:06:29 +0100
+
 edi (1.1.14) bionic; urgency=medium
 
   [ Matthias Lüscher ]
