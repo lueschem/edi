@@ -34,5 +34,6 @@ deploy:
   dist: debian/buster
   package_glob: "*deb10*"
 before_install:
-- openssl aes-256-cbc -K $encrypted_49f585df465b_key -iv $encrypted_49f585df465b_iv
+- openssl aes-256-cbc -K $encrypted_02151f0b5fd0_key -iv $encrypted_02151f0b5fd0_iv
   -in travis-key.tar.enc -out travis/travis-key.tar -d
+

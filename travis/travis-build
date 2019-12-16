@@ -41,10 +41,13 @@ fi
 
 sudo -u ${TESTUSER} git clone .git ${TESTUSERHOME}/edi
 
+DPUT_LIBRARIES="python3-paramiko"
+
 apt-get -y --no-install-recommends install git-buildpackage dh-make equivs lintian
 if [ "${VERSION_ID}" == "16.04" ]
 then
     # Ansible >= 2.1 is required
+    DPUT_LIBRARIES="python-paramiko python-bzrlib"
     apt-get -y --no-install-recommends install ansible/xenial-backports
 fi
 
@@ -132,10 +135,30 @@ then
 
     RESULT="${CONTAINER_WORK}/../edi_${NEW_VERSION}_source.changes"
     debsign -p"gpg ${GPG_OPTIONS} --passphrase-file ${GPG_KEY_PASSPHRASE}" -S -kB6D5610F601C6B6E4A880C93AA6945FE5AAFB25D ${RESULT}
+	
+    GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+    if [ "${GIT_BRANCH}" == "master" ]
+    then
+        SSH_FOLDER=/root/.ssh
+        mkdir ${SSH_FOLDER}
+        chmod 0700 ${SSH_FOLDER}
+
+        cp ${CONTAINER_WORK}/travis/id_rsa ${SSH_FOLDER}/
+        cp ${CONTAINER_WORK}/travis/id_rsa.pub ${SSH_FOLDER}/
+        cp ${CONTAINER_WORK}/travis/known_hosts ${SSH_FOLDER}/
+        chmod -R 0600 ${SSH_FOLDER}/*
+
+        apt-get --no-install-recommends -y install dput locales ${DPUT_LIBRARIES}
+        locale-gen en_US.UTF-8
+        export LANG=en_US.UTF-8
+        dput --unchecked --config ${CONTAINER_WORK}/travis/dput.cf ppa:m-luescher/edi-snapshots ${RESULT}
+    else
+        echo "Skipping deployment on ${GIT_BRANCH} branch."
+    fi
+else
+    BUILD_OUTPUT="${SCRIPTDIR}/../"
+    cp -f ../edi_${NEW_VERSION}* ${BUILD_OUTPUT}
 fi
-    
-BUILD_OUTPUT="${SCRIPTDIR}/../"
-cp -f ../edi_${NEW_VERSION}* ${BUILD_OUTPUT}
 
 echo "========"
 echo "Success!"
