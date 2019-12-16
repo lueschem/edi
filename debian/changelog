@@ -1,3 +1,10 @@
+edi (1.1.17) bionic; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Silence build output.
+
+ -- Matthias Luescher <lueschem@gmail.com>  Mon, 16 Dec 2019 18:30:46 +0100
+
 edi (1.1.16) bionic; urgency=medium
 
   [ Matthias Lüscher ]
