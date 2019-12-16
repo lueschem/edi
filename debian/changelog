@@ -1,3 +1,10 @@
+edi (1.1.16) bionic; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Another attempt to fix sftp package upload.
+
+ -- Matthias Luescher <lueschem@gmail.com>  Mon, 16 Dec 2019 18:19:45 +0100
+
 edi (1.1.15) bionic; urgency=medium
 
   [ Matthias Lüscher ]
