@@ -121,7 +121,8 @@ then
 
     if [ ! -f "${GPG_ARCHIVE}" ]
     then
-        >&2 echo "Error: Missing ${GPG_ARCHIVE}." 
+        >&2 echo -e "\nError: Missing credential archive ${GPG_ARCHIVE}."
+        exit 1
     fi
 
     sudo -u ${TESTUSER} git clean -dxf
