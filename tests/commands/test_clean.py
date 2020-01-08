@@ -23,8 +23,10 @@
 from tests.libtesting.contextmanagers.workspace import workspace
 from edi.commands.clean import Clean
 from tests.libtesting.helpers import suppress_chown_during_debuild
+from tests.libtesting.optins import requires_lxc
 
 
+@requires_lxc
 def test_clean_empty_config(empty_config_file, monkeypatch):
     suppress_chown_during_debuild(monkeypatch)
     with workspace():
