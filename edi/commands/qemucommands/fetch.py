@@ -152,6 +152,8 @@ class Fetch(Qemu):
         return 'qemu-{}-static'.format(qemu_arch)
 
     def _needs_qemu(self):
+        if not self.config.has_bootstrap_node():
+            return False
         host_architecture = get_debian_architecture()
         container_architecture = self.config.get_bootstrap_architecture()
         if host_architecture == container_architecture:

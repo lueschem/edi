@@ -385,7 +385,9 @@ class ConfigurationParser:
                                                                              "lxcif0")
         node_dict["edi_config_management_user_name"] = self._get_general_item("edi_config_management_user_name",
                                                                               "edicfgmgmt")
-        node_dict['edi_bootstrap_architecture'] = self.get_bootstrap_architecture()
+
+        if self.has_bootstrap_node():
+            node_dict['edi_bootstrap_architecture'] = self.get_bootstrap_architecture()
 
         general_parameters = self.get_general_parameters()
         if general_parameters:

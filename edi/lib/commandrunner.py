@@ -207,5 +207,7 @@ class CommandRunner():
 
         if all_artifacts:
             return all_artifacts
-        else:
+        elif self.input_artifact is not None:
             return [self.input_artifact]
+        else:
+            return []
