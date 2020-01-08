@@ -91,3 +91,15 @@ def test_create_buster_image(capsys):
         result = run(lxc_image_list_cmd, stdout=subprocess.PIPE)
         for image_store_item in image_store_items:
             assert image_store_item not in result.stdout
+
+
+def test_empty_configuration(empty_config_file):
+    with open(empty_config_file, "r") as main_file:
+        create_cmd = Create()
+        result = create_cmd.run(main_file)
+        assert result == []
+
+        result = create_cmd.dry_run(main_file)
+        assert result == {}
+
+        create_cmd.clean_recursive(main_file, 100)
