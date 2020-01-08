@@ -23,7 +23,7 @@
 from tests.libtesting.optins import requires_lxc, requires_ansible, requires_debootstrap, requires_sudo
 from tests.libtesting.contextmanagers.workspace import workspace
 import os
-from tests.libtesting.helpers import get_random_string, get_project_root
+from tests.libtesting.helpers import get_random_string, get_project_root, suppress_chown_during_debuild
 from edi.lib.shellhelpers import run, get_debian_architecture
 from edi.lib.lxchelpers import (get_server_image_compression_algorithm, lxc_exec,
                                 get_file_extension_from_image_compression_algorithm)
@@ -93,8 +93,10 @@ def test_create_buster_image(capsys):
             assert image_store_item not in result.stdout
 
 
-def test_empty_configuration(empty_config_file):
+def test_empty_configuration(empty_config_file, monkeypatch):
     with open(empty_config_file, "r") as main_file:
+        suppress_chown_during_debuild(monkeypatch)
+
         create_cmd = Create()
         result = create_cmd.run(main_file)
         assert result == []
