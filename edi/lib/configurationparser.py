@@ -121,6 +121,9 @@ class ConfigurationParser:
     def get_load_time_dictionary(self):
         return self._get_load_time_dictionary()
 
+    def has_bootstrap_node(self):
+        return self._has_node("bootstrap")
+
     def get_plugins(self, plugin_section):
         result = {}
 
@@ -412,3 +415,9 @@ class ConfigurationParser:
             raise FatalError(("'{0}' not found in the "
                               "following locations:\n{1}"
                               ).format(path, "\n".join(locations)))
+
+    def _has_node(self, node_name):
+        if self._get_config().get(node_name, {}):
+            return True
+        else:
+            return False

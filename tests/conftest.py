@@ -61,6 +61,9 @@ general:
         param1: keep
         param2: do_overwrite
 
+qemu:
+    package: qemu-user-static
+
 shared_folders:
     skip_me:
         folder:             skip

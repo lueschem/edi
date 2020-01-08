@@ -122,3 +122,15 @@ def test_command_context():
         assert ConfigurationParser.command_context.get('edi_current_context') is None
     assert ConfigurationParser.command_context.get('edi_create_distributable_image') is False
     assert ConfigurationParser.command_context.get('edi_current_context') is None
+
+
+def test_config_nodes_presence(config_files):
+    with open(config_files, "r") as main_file:
+        parser = ConfigurationParser(main_file)
+        assert parser.has_bootstrap_node()
+
+
+def test_config_nodes_absence(empty_config_file):
+    with open(empty_config_file, "r") as main_file:
+        parser = ConfigurationParser(main_file)
+        assert not parser.has_bootstrap_node()
