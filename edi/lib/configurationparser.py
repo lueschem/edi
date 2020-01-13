@@ -121,6 +121,9 @@ class ConfigurationParser:
     def get_load_time_dictionary(self):
         return self._get_load_time_dictionary()
 
+    def has_bootstrap_node(self):
+        return self._has_node("bootstrap")
+
     def get_plugins(self, plugin_section):
         result = {}
 
@@ -142,7 +145,10 @@ class ConfigurationParser:
         return self.config_id
 
     def get_bootstrap_repository(self):
-        return self._get_bootstrap_item("repository", None)
+        repository = self._get_bootstrap_item("repository", None)
+        if not repository:
+            raise FatalError('''Missing mandatory element 'repository' in section 'bootstrap'.''')
+        return repository
 
     def get_bootstrap_architecture(self):
         architecture = self._get_bootstrap_item("architecture", None)
@@ -382,7 +388,9 @@ class ConfigurationParser:
                                                                              "lxcif0")
         node_dict["edi_config_management_user_name"] = self._get_general_item("edi_config_management_user_name",
                                                                               "edicfgmgmt")
-        node_dict['edi_bootstrap_architecture'] = self.get_bootstrap_architecture()
+
+        if self.has_bootstrap_node():
+            node_dict['edi_bootstrap_architecture'] = self.get_bootstrap_architecture()
 
         general_parameters = self.get_general_parameters()
         if general_parameters:
@@ -412,3 +420,9 @@ class ConfigurationParser:
             raise FatalError(("'{0}' not found in the "
                               "following locations:\n{1}"
                               ).format(path, "\n".join(locations)))
+
+    def _has_node(self, node_name):
+        if self._get_config().get(node_name, {}):
+            return True
+        else:
+            return False

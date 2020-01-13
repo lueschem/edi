@@ -19,6 +19,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
 from edi.commands.image import Image
 from edi.commands.lxccommands.export import Export
 from edi.lib.commandrunner import CommandRunner
@@ -50,7 +51,8 @@ class Create(Image):
 
     def _dry_run(self):
         plugins = {}
-        plugins.update(Export().dry_run(self.config.get_base_config_file()))
+        if self._input_artifact() is not None:
+            plugins.update(Export().dry_run(self.config.get_base_config_file()))
         command_runner = CommandRunner(self.config, self.section, self._input_artifact())
         plugins.update(command_runner.get_plugin_report())
         return plugins
@@ -64,14 +66,18 @@ class Create(Image):
         if command_runner.require_root():
             self._require_sudo()
 
-        Export().run(self.config.get_base_config_file())
+        if self._input_artifact() is not None:
+            Export().run(self.config.get_base_config_file())
+        else:
+            logging.info("Creating new image without bootstrapping other artifacts.")
 
         print("Going to post process image - be patient.")
 
         result = command_runner.run()
 
-        print_success(("Completed the image creation post processing commands.\n"
-                       "The following artifacts are now available:\n- {}".format('\n- '.join(result))))
+        if result:
+            print_success(("Completed the image creation post processing commands.\n"
+                           "The following artifacts are now available:\n- {}".format('\n- '.join(result))))
         return result
 
     def clean_recursive(self, config_file, depth):
@@ -87,7 +93,7 @@ class Create(Image):
             self._require_sudo()
         command_runner.clean()
 
-        if self.clean_depth > 0:
+        if self.clean_depth > 0 and self._input_artifact() is not None:
             Export().clean_recursive(self.config.get_base_config_file(), self.clean_depth - 1)
 
     def _dispatch(self, config_file, run_method):
@@ -96,4 +102,7 @@ class Create(Image):
             return run_method()
 
     def _input_artifact(self):
-        return Export().result(self.config.get_base_config_file())
+        if self.config.has_bootstrap_node():
+            return Export().result(self.config.get_base_config_file())
+        else:
+            return None
