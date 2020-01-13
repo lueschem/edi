@@ -1,3 +1,10 @@
+edi (1.2.0) bionic; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Allow configurations that just have postprocessing commands.
+
+ -- Matthias Luescher <lueschem@gmail.com>  Mon, 13 Jan 2020 13:57:25 +0100
+
 edi (1.1.17) bionic; urgency=medium
 
   [ Matthias Lüscher ]
