@@ -19,6 +19,8 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
+import pytest
+from edi.lib.helpers import FatalError
 from aptsources.sourceslist import SourceEntry
 from edi.lib.configurationparser import ConfigurationParser, command_context
 
@@ -128,9 +130,17 @@ def test_config_nodes_presence(config_files):
     with open(config_files, "r") as main_file:
         parser = ConfigurationParser(main_file)
         assert parser.has_bootstrap_node()
+        assert parser.get_bootstrap_repository()
+        assert parser.get_bootstrap_architecture()
 
 
 def test_config_nodes_absence(empty_config_file):
     with open(empty_config_file, "r") as main_file:
         parser = ConfigurationParser(main_file)
         assert not parser.has_bootstrap_node()
+        with pytest.raises(FatalError) as error:
+            parser.get_bootstrap_repository()
+        assert "repository" in error.value.message
+        with pytest.raises(FatalError) as error:
+            parser.get_bootstrap_architecture()
+        assert "architecture" in error.value.message

@@ -145,7 +145,10 @@ class ConfigurationParser:
         return self.config_id
 
     def get_bootstrap_repository(self):
-        return self._get_bootstrap_item("repository", None)
+        repository = self._get_bootstrap_item("repository", None)
+        if not repository:
+            raise FatalError('''Missing mandatory element 'repository' in section 'bootstrap'.''')
+        return repository
 
     def get_bootstrap_architecture(self):
         architecture = self._get_bootstrap_item("architecture", None)
