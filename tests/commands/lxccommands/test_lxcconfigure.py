@@ -20,7 +20,7 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from tests.libtesting.optins import requires_lxc, requires_ansible, requires_debootstrap, requires_sudo
+import pytest
 from tests.libtesting.contextmanagers.workspace import workspace
 import os
 from tests.libtesting.helpers import get_random_string, get_project_root
@@ -87,10 +87,10 @@ def get_container_ip_addr(container_name, interface):
     return re.findall(r'^\s*inet\s([0-9\.]*)/.*', raw_ip_result, re.MULTILINE)[0]
 
 
-@requires_lxc
-@requires_ansible
-@requires_debootstrap
-@requires_sudo
+@pytest.mark.requires_lxc
+@pytest.mark.requires_ansible
+@pytest.mark.requires_debootstrap
+@pytest.mark.requires_sudo
 def test_build_stretch_container(capsys, datadir):
     with workspace():
         edi_exec = os.path.join(get_project_root(), 'bin', 'edi')

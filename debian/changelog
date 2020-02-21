@@ -1,3 +1,12 @@
+edi (1.2.1) bionic; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Get rid of deprecation warnings on Ubuntu 20.04.
+  * Added Ubuntu 20.04 to the travis build.
+  * Removed Ubuntu 16.04 from the travis build.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Fri, 21 Feb 2020 16:10:43 +0100
+
 edi (1.2.0) bionic; urgency=medium
 
   [ Matthias Lüscher ]
