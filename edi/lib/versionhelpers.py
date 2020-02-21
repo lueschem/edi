@@ -26,7 +26,7 @@ from edi.lib.helpers import FatalError
 
 # The do_release script will update this version!
 # During launchpad debuild neither the git version nor the package version is available.
-edi_fallback_version = '1.2.0'
+edi_fallback_version = '1.2.1'
 
 
 def get_edi_version():
