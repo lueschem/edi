@@ -49,14 +49,14 @@ def pytest_configure(config):
 def pytest_collection_modifyitems(config, items):
     for item in items:
         if "requires_lxc" in item.keywords and not (config.getoption("--lxc") or config.getoption("--all")):
-            item.add_marker(pytest.mark.skip(reason="need --lxc or --all option to run"))
+            item.add_marker(pytest.mark.skip(reason="requires --lxc or --all option to run"))
         if "requires_ansible" in item.keywords and not (config.getoption("--ansible") or config.getoption("--all")):
-            item.add_marker(pytest.mark.skip(reason="need --ansible or --all option to run"))
-        if "requires_debootstrap" in item.keywords and not not (config.getoption("--debootstrap") or
-                                                                config.getoption("--all")):
-            item.add_marker(pytest.mark.skip(reason="need --debootstrap or --all option to run"))
+            item.add_marker(pytest.mark.skip(reason="requires --ansible or --all option to run"))
+        if "requires_debootstrap" in item.keywords and not (config.getoption("--debootstrap") or
+                                                            config.getoption("--all")):
+            item.add_marker(pytest.mark.skip(reason="requires --debootstrap or --all option to run"))
         if "requires_flake8" in item.keywords and not (config.getoption("--flake8") or config.getoption("--all")):
-            item.add_marker(pytest.mark.skip(reason="need --flake8 or --all option to run"))
+            item.add_marker(pytest.mark.skip(reason="requires --flake8 or --all option to run"))
         if "requires_sudo" in item.keywords and os.getuid() != 0:
             item.add_marker(pytest.mark.skip(reason="requires sudo privileges to run"))
 
