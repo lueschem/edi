@@ -28,7 +28,6 @@ from tests.libtesting.contextmanagers.workspace import workspace
 from tests.libtesting.helpers import (get_random_string, suppress_chown_during_debuild, get_command,
                                       get_sub_command, get_command_parameter)
 from edi.lib.helpers import get_artifact_dir, create_artifact_dir, FatalError
-from tests.libtesting.optins import requires_sudo
 from edi.lib.shellhelpers import mockablerun
 import subprocess
 
@@ -61,7 +60,7 @@ def test_artifacts_folder_removal(monkeypatch):
         assert not os.path.isdir(abs_dir_name)
 
 
-@requires_sudo
+@pytest.mark.requires_sudo
 def test_artifacts_folder_removal_as_sudo():
     with workspace() as workdir:
         create_artifact_dir()

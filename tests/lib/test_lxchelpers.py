@@ -24,7 +24,6 @@ import subprocess
 import pytest
 from contextlib import contextmanager
 from edi.lib.helpers import FatalError
-from tests.libtesting.optins import requires_lxc
 from edi.lib.lxchelpers import (get_server_image_compression_algorithm,
                                 get_file_extension_from_image_compression_algorithm,
                                 get_lxd_version, LxdVersion)
@@ -33,7 +32,7 @@ from tests.libtesting.helpers import get_command, get_sub_command
 from tests.libtesting.contextmanagers.mocked_executable import mocked_executable, mocked_lxd_version_check
 
 
-@requires_lxc
+@pytest.mark.requires_lxc
 def test_get_server_image_compression():
     result = get_server_image_compression_algorithm()
     assert result in ['bzip2', 'gzip', 'lzma', 'xz', 'none']
@@ -71,7 +70,7 @@ def test_get_file_extension_from_image_compression_algorithm_failure():
     assert '42' in str(e)
 
 
-@requires_lxc
+@pytest.mark.requires_lxc
 def test_get_lxd_version():
     version = get_lxd_version()
     assert '.' in version
@@ -86,7 +85,7 @@ def clear_lxd_version_check_cache():
         LxdVersion(clear_cache=True)
 
 
-@requires_lxc
+@pytest.mark.requires_lxc
 def test_lxd_version_check():
     with clear_lxd_version_check_cache():
         check_method = LxdVersion.check

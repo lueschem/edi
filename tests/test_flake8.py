@@ -19,13 +19,13 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
-from tests.libtesting.optins import requires_flake8
+import pytest
 from edi.lib.shellhelpers import run
 import os
 import subprocess
 
 
-@requires_flake8
+@pytest.mark.requires_flake8
 def test_flake8():
     path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     cmd = ['flake8', '--max-line-length=120', path]

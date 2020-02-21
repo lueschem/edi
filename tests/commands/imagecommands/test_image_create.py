@@ -20,7 +20,7 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from tests.libtesting.optins import requires_lxc, requires_ansible, requires_debootstrap, requires_sudo
+import pytest
 from tests.libtesting.contextmanagers.workspace import workspace
 import os
 from tests.libtesting.helpers import get_random_string, get_project_root, suppress_chown_during_debuild
@@ -33,10 +33,10 @@ import edi
 import subprocess
 
 
-@requires_lxc
-@requires_ansible
-@requires_debootstrap
-@requires_sudo
+@pytest.mark.requires_lxc
+@pytest.mark.requires_ansible
+@pytest.mark.requires_debootstrap
+@pytest.mark.requires_sudo
 def test_create_buster_image(capsys):
     print(os.getcwd())
     with workspace():
