@@ -1,3 +1,10 @@
+edi (1.3.0) bionic; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Allow default user without password.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Wed, 18 Mar 2020 18:07:27 +0100
+
 edi (1.2.1) bionic; urgency=medium
 
   [ Matthias Lüscher ]
