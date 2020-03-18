@@ -11,7 +11,7 @@
     gid: "{{ enforced_gid | default(omit) }}"
     state: present
 
-- name: Add the current user (password=ChangeMe!).
+- name: Add the current user.
   user:
     name: "{{ edi_current_user_name }}"
     group: "{{ edi_current_user_group_name }}"
