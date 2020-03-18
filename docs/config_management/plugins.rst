@@ -257,7 +257,13 @@ The default user can be fine tuned as follows:
      - The groups of the default user (default is :code:`adm,sudo`).
    * - default_user_password
      - The initially set password of the default user
-       (default is :code:`ChangeMe!`).
+       (default is :code:`ChangeMe!`). You can `adjust this password`_ if needed.
+       Set this password to :code:`"*"` if
+       you would like to disable password based login. Please note that
+       the playbook will then automatically create a sudoers file to not
+       impair the :code:`sudo` command.
+
+.. _adjust this password: https://docs.ansible.com/ansible/latest/reference_appendices/faq.html#how-do-i-generate-encrypted-passwords-for-the-user-module
 
 Base System Cleanup
 ^^^^^^^^^^^^^^^^^^^

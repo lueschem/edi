@@ -16,6 +16,12 @@
     append: yes
     update_password: on_create
 
+- name: Enable sudo without password for the default user.
+  template:
+    src: no_passwd
+    dest: /etc/sudoers.d/{{ default_user_name }}
+  when: "'sudo' in default_user_groups.replace(' ', '').split(',') and default_user_password == '*'"
+
 - name: Set up authorized keys for current user.
   authorized_key:
     user: '{{ default_user_name }}'
