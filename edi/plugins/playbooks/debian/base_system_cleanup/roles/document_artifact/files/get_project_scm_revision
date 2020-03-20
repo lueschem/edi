@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+set -o nounset
+set -o errexit
+set -o pipefail
+
+print_error_and_exit()
+{
+    local MESSAGE="${1}"
+    >&2 echo -e "Error: ${MESSAGE}"
+    exit 1
+}
+
+if [[ "$#" -ne 1 ]]
+then
+    print_error_and_exit "Missing project directory.\nUsage: ${0} PROJECT_DIRECTORY"
+fi
+
+PROJECT_DIRECTORY=${1}
+
+if [[ ! -d ${PROJECT_DIRECTORY} ]]
+then
+    print_error_and_exit "Invalid project directory ${PROJECT_DIRECTORY}."
+fi
+
+if ! command -v git > /dev/null
+then
+    echo "git-not-available"
+    exit 0
+fi
+
+cd "${PROJECT_DIRECTORY}"
+
+if ! git rev-parse HEAD 2> /dev/null
+then
+    echo "not-a-git-repository"
+    exit 0
+fi
