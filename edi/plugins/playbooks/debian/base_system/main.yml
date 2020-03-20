@@ -7,7 +7,7 @@
     disable_ssh_password_authentication: True
     authorize_current_user: True
     ssh_pub_key_directory: '{{ edi_project_directory }}/ssh_pub_keys'
-    install_documentation: True
+    install_documentation: full
     translations_filter: ""
   roles:
     - role: lxc_interfaces

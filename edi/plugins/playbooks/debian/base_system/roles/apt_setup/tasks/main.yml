@@ -10,7 +10,13 @@
   script: remove_documentation {{ dpkg_no_documentation }}
   args:
     creates: "{{ dpkg_no_documentation }}"
-  when: not install_documentation
+  when: install_documentation == 'minimal' or install_documentation is sameas false
+
+- name: Prevent documentation installation and remove existing documentation but keep changelog.
+  script: remove_documentation_keep_changelog {{ dpkg_no_documentation }}
+  args:
+    creates: "{{ dpkg_no_documentation }}"
+  when: install_documentation == 'changelog'
 
 - name: Install only a subset of translations.
   script: "{{ translations_filter }} {{ dpkg_translations_filter }}"

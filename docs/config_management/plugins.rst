@@ -207,8 +207,9 @@ The playbook can be fine tuned as follows:
        :code:`{{ edi_project_directory }}/ssh_pub_keys`) will be added to the list of authorized ssh keys of the
        default user.
    * - install_documentation
-     - By default (boolean value :code:`True`) the documentation of every Debian package will get installed.
-       Switch this value to :code:`False` if you want to deploy an image with a minimal footprint.
+     - By default (value :code:`full`) the documentation of every Debian package will get installed.
+       Switch this value to :code:`minimal` if you want to deploy an image with a minimal footprint.
+       Switch this value to :code:`changelog` if you want to minimize the footprint but keep the changelog of all packages.
    * - translations_filter
      - By default all translations contained in Debian packages will get installed (empty filter: :code:`""`).
        To reduce the footprint of the resulting artifacts the number of installed languages can be limited.
