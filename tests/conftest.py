@@ -93,7 +93,7 @@ shared_folders:
         folder:             skip
         mountpoint:         me
     workspace:
-        folder:             work
+        folder:             edi_marker_work
         mountpoint:         mywork
 
 bootstrap:
@@ -173,7 +173,7 @@ postprocessing_commands:
 sample_system_file = """
 shared_folders:
     other_folder:
-        folder:             valid_folder
+        folder:             edi_marker_valid_folder
     skip_me:
         skip:               True
 

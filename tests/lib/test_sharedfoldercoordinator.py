@@ -48,7 +48,7 @@ description: Shared folder for edi lxc container
 devices:
   shared_folder_other_folder_for_{{ user }}:
     path: /foo/bar/target_mountpoint
-    source: {{ home }}/valid_folder
+    source: {{ home }}/edi_marker_valid_folder
     type: disk
 """,
     """
@@ -58,7 +58,7 @@ description: Shared folder for edi lxc container
 devices:
   shared_folder_workspace_for_{{ user }}:
     path: {{ target_home }}/mywork
-    source: {{ home }}/work
+    source: {{ home }}/edi_marker_work
     type: disk
 """]
 
@@ -220,8 +220,13 @@ def test_create_host_folders_folder_exists(config_files, monkeypatch):
 
         monkeypatch.setattr(os.path, 'isdir', fake_os_path_isdir)
 
-        def fake_os_path_exists(*_):
-            return True
+        _os_path_exists = os.path.exists
+
+        def fake_os_path_exists(path):
+            if 'edi_marker_' in path:
+                return True
+            else:
+                return _os_path_exists(path)
 
         monkeypatch.setattr(os.path, 'exists', fake_os_path_exists)
 
