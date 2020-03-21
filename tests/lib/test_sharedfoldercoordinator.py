@@ -63,6 +63,28 @@ devices:
 """]
 
 
+def patch_os_path(monkeypatch, path_is_dir, path_exists):
+    _os_path_isdir = os.path.isdir
+
+    def fake_os_path_isdir(path):
+        if 'edi_marker_' in path:
+            return path_is_dir
+        else:
+            return _os_path_isdir(path)
+
+    monkeypatch.setattr(os.path, 'isdir', fake_os_path_isdir)
+
+    _os_path_exists = os.path.exists
+
+    def fake_os_path_exists(path):
+        if 'edi_marker_' in path:
+            return path_exists
+        else:
+            return _os_path_exists(path)
+
+    monkeypatch.setattr(os.path, 'exists', fake_os_path_exists)
+
+
 def render_expected_profiles():
     user = get_user()
     dictionary = {'user': user,
@@ -215,20 +237,7 @@ def test_create_host_folders_folder_exists(config_files, monkeypatch):
 
         coordinator = SharedFolderCoordinator(parser)
 
-        def fake_os_path_isdir(*_):
-            return True
-
-        monkeypatch.setattr(os.path, 'isdir', fake_os_path_isdir)
-
-        _os_path_exists = os.path.exists
-
-        def fake_os_path_exists(path):
-            if 'edi_marker_' in path:
-                return True
-            else:
-                return _os_path_exists(path)
-
-        monkeypatch.setattr(os.path, 'exists', fake_os_path_exists)
+        patch_os_path(monkeypatch, True, True)
 
         coordinator.create_host_folders()  # nothing to do
 
@@ -239,20 +248,12 @@ def test_create_host_folders_not_a_folder(config_files, monkeypatch):
 
         coordinator = SharedFolderCoordinator(parser)
 
-        def fake_os_path_isdir(*_):
-            return False
-
-        monkeypatch.setattr(os.path, 'isdir', fake_os_path_isdir)
-
-        def fake_os_path_exists(*_):
-            return True
-
-        monkeypatch.setattr(os.path, 'exists', fake_os_path_exists)
+        patch_os_path(monkeypatch, False, True)
 
         with pytest.raises(FatalError) as error:
             coordinator.create_host_folders()  # exists but not a folder
 
-        assert 'valid_folder' in error.value.message
+        assert 'edi_marker_valid_folder' in error.value.message
 
 
 def test_no_shared_folders_for_distributable_image(config_files, monkeypatch):
@@ -264,9 +265,7 @@ def test_no_shared_folders_for_distributable_image(config_files, monkeypatch):
 
                     coordinator = SharedFolderCoordinator(parser)
 
-                    def fake_os_path_exists(*_):
-                        return False
-                    monkeypatch.setattr(os.path, 'exists', fake_os_path_exists)
+                    patch_os_path(monkeypatch, False, False)
 
                     def fake_run(*popenargs, **kwargs):
                         # We should not run anything!
@@ -287,20 +286,12 @@ def test_create_host_folders_successful_create(config_files, monkeypatch):
 
         coordinator = SharedFolderCoordinator(parser)
 
-        def fake_os_path_isdir(*_):
-            return False
-
-        monkeypatch.setattr(os.path, 'isdir', fake_os_path_isdir)
-
-        def fake_os_path_exists(*_):
-            return False
-
-        monkeypatch.setattr(os.path, 'exists', fake_os_path_exists)
+        patch_os_path(monkeypatch, False, False)
 
         def fake_mkdir_command(*popenargs, **kwargs):
             if get_command(popenargs) == 'mkdir' and get_sub_command(popenargs) == '-p':
                 folder = popenargs[0][-1]
-                assert 'valid_folder' in folder or 'work' in folder
+                assert 'edi_marker_valid_folder' in folder or 'edi_marker_work' in folder
                 return subprocess.CompletedProcess("fakerun", 0, '')
             else:
                 return subprocess.run(*popenargs, **kwargs)
@@ -316,15 +307,7 @@ def test_create_host_folders_failed_create(config_files, monkeypatch):
 
         coordinator = SharedFolderCoordinator(parser)
 
-        def fake_os_path_isdir(*_):
-            return False
-
-        monkeypatch.setattr(os.path, 'isdir', fake_os_path_isdir)
-
-        def fake_os_path_exists(*_):
-            return False
-
-        monkeypatch.setattr(os.path, 'exists', fake_os_path_exists)
+        patch_os_path(monkeypatch, False, False)
 
         def fake_mkdir_command(*popenargs, **kwargs):
             if get_command(popenargs) == 'mkdir' and get_sub_command(popenargs) == '-p':
@@ -338,5 +321,5 @@ def test_create_host_folders_failed_create(config_files, monkeypatch):
         with pytest.raises(FatalError) as error:
             coordinator.create_host_folders()  # failed mkdir
 
-        assert 'valid_folder' in error.value.message
+        assert 'edi_marker_valid_folder' in error.value.message
         assert 'no permission' in error.value.message
