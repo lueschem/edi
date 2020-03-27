@@ -10,9 +10,6 @@
     target_no_proxy: ""
     document_build_setup: False
     document_packages: False
-    documentation_directory: /usr/share/edi
-    package_documentation_command: "dpkg-query --show --showformat='${Package}:\n    architecture: ${Architecture}\n    version: \"${Version}\"\n    source_package: ${source:Package}\n    status: ${db:Status-Abbrev}\n'"
-    package_documentation_file: packages.yml
   roles:
     - role: openssh_server_keys
       become: True

@@ -16,7 +16,7 @@
 - name: Write build information file.
   template:
     src: build.yml
-    dest: "{{ documentation_directory }}/"
+    dest: "{{ documentation_directory }}/{{ build_documentation_file }}"
   when: document_build_setup
 
 - name: Generate a list of installed packages.

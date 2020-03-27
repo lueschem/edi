@@ -309,6 +309,16 @@ The playbook can be fine tuned as follows:
        (boolean value :code:`True`). If you would like to keep the same proxy settings switch this value to
        :code:`False`. When set to :code:`True`, the proxy settings can be fine tuned according to the table
        below.
+   * - document_build_setup
+     - To document the build setup of the artifact within the artifact set this value to :code:`True`.
+       As a result the file :code:`/usr/share/doc/edi/build.yml` will be generated. By default this feature is switched
+       off (boolean value :code:`False`).
+   * - document_packages
+     - To document the packages of the artifact within the artifact set this value to :code:`True`.
+       As a result the file :code:`/usr/share/doc/edi/packages.yml` will be generated. The generated file will contain a
+       list of all packages including version information. It is a snapshot of the available packages after the artifact
+       build and will not get updated when new packages get installed using :code:`dpkg` or :code:`apt`.
+       By default this feature is switched off (boolean value :code:`False`).
 
 The final proxy settings can be customized as follows:
 
