@@ -1,6 +1,6 @@
 ---
 
-install_documentation: True
+install_documentation: full
 dpkg_no_documentation: /etc/dpkg/dpkg.cfg.d/01_no_documentation
 translations_filter: ""
 dpkg_translations_filter: /etc/dpkg/dpkg.cfg.d/02_translations_filter

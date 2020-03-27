@@ -1,0 +1,4 @@
+configuration_name: "{{ edi_configuration_name }}"
+project_scm_revision: "{{ project_scm_revision.stdout.strip('\n') }}"
+edi_version: "{{ edi_edi_version }}"
+ansible_version: "{{ ansible_version.full }}"

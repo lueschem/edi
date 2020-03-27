@@ -1,0 +1,32 @@
+---
+- name: Create documentation directory within artifact.
+  file:
+    dest: "{{ documentation_directory }}"
+    state: directory
+  when: document_build_setup or document_packages
+
+- name: Get project configuration scm revision.
+  script: get_project_scm_revision {{ edi_project_directory }}
+  delegate_to: 127.0.0.1
+  register: project_scm_revision
+  changed_when: false
+  become: no
+  when: document_build_setup
+
+- name: Write build information file.
+  template:
+    src: build.yml
+    dest: "{{ documentation_directory }}/{{ build_documentation_file }}"
+  when: document_build_setup
+
+- name: Generate a list of installed packages.
+  command: "{{ package_documentation_command }}"
+  register: installed_packages
+  changed_when: false
+  when: document_packages
+
+- name: Write a file that documents the installed packages.
+  template:
+    src: packages
+    dest: "{{ documentation_directory }}/{{ package_documentation_file }}"
+  when: document_packages

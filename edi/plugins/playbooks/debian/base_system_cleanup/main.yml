@@ -8,6 +8,8 @@
     target_ftp_proxy: ""
     target_socks_proxy: ""
     target_no_proxy: ""
+    document_build_setup: False
+    document_packages: False
   roles:
     - role: openssh_server_keys
       become: True
@@ -24,4 +26,7 @@
       become: True
       become_user: root
       when: edi_create_distributable_image
+    - role: document_artifact
+      become: True
+      become_user: root
 

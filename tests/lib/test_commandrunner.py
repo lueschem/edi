@@ -37,7 +37,6 @@ def test_run_and_clean(config_files, monkeypatch):
                 print(f.read())
             return subprocess.run(*popenargs, **kwargs)
         else:
-            print("passthrough")
             return subprocess.run(*popenargs, **kwargs)
 
     monkeypatch.setattr(mockablerun, 'run_mockable', intercept_command_run)

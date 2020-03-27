@@ -207,8 +207,9 @@ The playbook can be fine tuned as follows:
        :code:`{{ edi_project_directory }}/ssh_pub_keys`) will be added to the list of authorized ssh keys of the
        default user.
    * - install_documentation
-     - By default (boolean value :code:`True`) the documentation of every Debian package will get installed.
-       Switch this value to :code:`False` if you want to deploy an image with a minimal footprint.
+     - By default (value :code:`full`) the documentation of every Debian package will get installed.
+       Switch this value to :code:`minimal` if you want to deploy an image with a minimal footprint.
+       Switch this value to :code:`changelog` if you want to minimize the footprint but keep the changelog of all packages.
    * - translations_filter
      - By default all translations contained in Debian packages will get installed (empty filter: :code:`""`).
        To reduce the footprint of the resulting artifacts the number of installed languages can be limited.
@@ -308,6 +309,16 @@ The playbook can be fine tuned as follows:
        (boolean value :code:`True`). If you would like to keep the same proxy settings switch this value to
        :code:`False`. When set to :code:`True`, the proxy settings can be fine tuned according to the table
        below.
+   * - document_build_setup
+     - To document the build setup of the artifact within the artifact set this value to :code:`True`.
+       As a result the file :code:`/usr/share/doc/edi/build.yml` will be generated. By default this feature is switched
+       off (boolean value :code:`False`).
+   * - document_packages
+     - To document the packages of the artifact within the artifact set this value to :code:`True`.
+       As a result the file :code:`/usr/share/doc/edi/packages.yml` will be generated. The generated file will contain a
+       list of all packages including version information. It is a snapshot of the available packages after the artifact
+       build and will not get updated when new packages get installed using :code:`dpkg` or :code:`apt`.
+       By default this feature is switched off (boolean value :code:`False`).
 
 The final proxy settings can be customized as follows:
 

@@ -1,0 +1,28 @@
+#!/bin/bash
+
+set -o errexit
+set -o nounset
+
+DPKG_CONTROL_FILE=$1
+
+find /usr/share/doc -depth -type f ! -name copyright ! -name changelog.Debian.gz ! -name changelog.gz |xargs rm || true
+find /usr/share/doc -empty|xargs rmdir || true
+rm -rf /usr/share/man /usr/share/groff /usr/share/info
+rm -rf /usr/share/lintian /usr/share/linda /var/cache/man
+
+cat << EOF > ${DPKG_CONTROL_FILE}
+# save disk space by excluding documentation
+path-exclude /usr/share/doc/*
+# keep copyright files for legal reasons
+path-include /usr/share/doc/*/copyright
+# keep changelog files
+path-include /usr/share/doc/*/changelog.Debian.gz
+path-include /usr/share/doc/*/changelog.gz
+path-exclude /usr/share/man/*
+path-exclude /usr/share/groff/*
+path-exclude /usr/share/info/*
+path-exclude /usr/share/lintian/*
+path-exclude /usr/share/linda/*
+EOF
+
+chmod 644 ${DPKG_CONTROL_FILE}
