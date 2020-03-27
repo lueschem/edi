@@ -1,3 +1,12 @@
+edi (1.4.0) bionic; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Added possibility to keep the changelog but remove all the remaining docs.
+  * Added possibility to document the build setup.
+  * Added possibility to document the installed packages.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Fri, 27 Mar 2020 23:13:19 +0100
+
 edi (1.3.0) bionic; urgency=medium
 
   [ Matthias Lüscher ]
