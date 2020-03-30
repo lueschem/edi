@@ -174,95 +174,83 @@ The following code snippet adds the base system playbook to your configuration:
 
 The playbook can be fine tuned as follows:
 
-.. list-table::
-   :widths: 20 80
-   :header-rows: 1
+.. topic:: Parameters
 
-   * - key
-     - description
-   * - apply_proxy_settings
-     - With this boolean value you can specify if the target system shall get a proxy setup.
-       The default value is :code:`True` and the standard behavior is that the target system will
-       inherit the proxy settings of the host system. However, the proxy settings can be customized
-       according to the table below.
-       If you specify :code:`False` the target system proxy setup will remain untouched.
-   * - configure_lxc_network_interface
-     - By default (boolean value :code:`True`) the playbook will add a lxc network interface to the container.
-       If this behavior is not desired, change the setting to :code:`False`.
-   * - create_default_user
-     - By default (boolean value :code:`False`) no additional user gets created. If you need an additional user
-       switch this value to :code:`True` and fine tune the default user according to the table below.
-   * - install_openssh_server
-     - By default (boolean value :code:`False`), no ssh server will be installed on the target system.
-       Switch this value to :code:`True` if you would like to access the system using ssh.
-   * - disable_ssh_password_authentication
-     - By default password authentication is disabled for ssh (boolean value :code:`True`). If you want to
-       allow password based authentication then switch this value to :code:`False` but make sure to use a non standard
-       password.
-   * - authorize_current_user
-     - By default (boolean value :code:`True`) the current host user will be authorized to ssh into the account
-       of the default user. Switch this value to :code:`False` if the current user shall not be authorized.
-   * - ssh_pub_key_directory
-     - All the public keys (ending with .pub) contained in the folder :code:`ssh_pub_key_directory` (defaults to
-       :code:`{{ edi_project_directory }}/ssh_pub_keys`) will be added to the list of authorized ssh keys of the
-       default user.
-   * - install_documentation
-     - By default (value :code:`full`) the documentation of every Debian package will get installed.
-       Switch this value to :code:`minimal` if you want to deploy an image with a minimal footprint.
-       Switch this value to :code:`changelog` if you want to minimize the footprint but keep the changelog of all packages.
-   * - translations_filter
-     - By default all translations contained in Debian packages will get installed (empty filter: :code:`""`).
-       To reduce the footprint of the resulting artifacts the number of installed languages can be limited.
-       By choosing the builtin filter :code:`"en_translations_only"` you can make sure that only English
-       translations will get installed.
+  *apply_proxy_settings:*
+     With this boolean value you can specify if the target system shall get a proxy setup.
+     The default value is :code:`True` and the standard behavior is that the target system will
+     inherit the proxy settings of the host system. However, the proxy settings can be customized
+     according to the table below.
+     If you specify :code:`False` the target system proxy setup will remain untouched.
+  *configure_lxc_network_interface:*
+     By default (boolean value :code:`True`) the playbook will add a lxc network interface to the container.
+     If this behavior is not desired, change the setting to :code:`False`.
+  *create_default_user:*
+     By default (boolean value :code:`False`) no additional user gets created. If you need an additional user
+     switch this value to :code:`True` and fine tune the default user according to the table below.
+  *install_openssh_server:*
+     By default (boolean value :code:`False`), no ssh server will be installed on the target system.
+     Switch this value to :code:`True` if you would like to access the system using ssh.
+  *disable_ssh_password_authentication:*
+     By default password authentication is disabled for ssh (boolean value :code:`True`). If you want to
+     allow password based authentication then switch this value to :code:`False` but make sure to use a non standard
+     password.
+  *authorize_current_user:*
+     By default (boolean value :code:`True`) the current host user will be authorized to ssh into the account
+     of the default user. Switch this value to :code:`False` if the current user shall not be authorized.
+  *ssh_pub_key_directory:*
+     All the public keys (ending with .pub) contained in the folder :code:`ssh_pub_key_directory` (defaults to
+     :code:`{{ edi_project_directory }}/ssh_pub_keys`) will be added to the list of authorized ssh keys of the
+     default user.
+  *install_documentation:*
+     By default (value :code:`full`) the documentation of every Debian package will get installed.
+     Switch this value to :code:`minimal` if you want to deploy an image with a minimal footprint.
+     Switch this value to :code:`changelog` if you want to minimize the footprint but keep the changelog of all packages.
+  *translations_filter:*
+     By default all translations contained in Debian packages will get installed (empty filter: :code:`""`).
+     To reduce the footprint of the resulting artifacts the number of installed languages can be limited.
+     By choosing the builtin filter :code:`"en_translations_only"` you can make sure that only English
+     translations will get installed.
 
 The proxy settings can be customized as follows:
 
-.. list-table::
-   :widths: 20 80
-   :header-rows: 1
+.. topic:: Parameters
 
-   * - key
-     - description
-   * - target_http_proxy
-     - The http proxy that gets applied to the target system (defaults to :code:`{{ edi_host_http_proxy }}`).
-   * - target_https_proxy
-     - The https proxy that gets applied to the target system (defaults to :code:`{{ edi_host_https_proxy }}`).
-   * - target_ftp_proxy
-     - The ftp proxy that gets applied to the target system (defaults to :code:`{{ edi_host_ftp_proxy }}`).
-   * - target_socks_proxy
-     - The socks proxy that gets applied to the target system (defaults to :code:`{{ edi_host_socks_proxy }}`).
-   * - target_no_proxy
-     - The proxy exception list that gets applied to the target system
-       (defaults to :code:`{{ edi_host_no_proxy }}`).
+  *target_http_proxy:*
+     The http proxy that gets applied to the target system (defaults to :code:`{{ edi_host_http_proxy }}`).
+  *target_https_proxy:*
+     The https proxy that gets applied to the target system (defaults to :code:`{{ edi_host_https_proxy }}`).
+  *target_ftp_proxy:*
+     The ftp proxy that gets applied to the target system (defaults to :code:`{{ edi_host_ftp_proxy }}`).
+  *target_socks_proxy:*
+     The socks proxy that gets applied to the target system (defaults to :code:`{{ edi_host_socks_proxy }}`).
+  *target_no_proxy:*
+     The proxy exception list that gets applied to the target system
+     (defaults to :code:`{{ edi_host_no_proxy }}`).
 
 The default user can be fine tuned as follows:
 
-.. list-table::
-   :widths: 20 80
-   :header-rows: 1
+.. topic:: Parameters
 
-   * - key
-     - description
-   * - default_user_group_name
-     - The group name of the default user (default is :code:`edi`).
-   * - default_user_gid
-     - The group id of the default user (default is :code:`2000`).
-   * - default_user_name
-     - The user name of the default user (default is :code:`edi`).
-   * - default_user_uid
-     - The user id of the default user (default is :code:`2000`).
-   * - default_user_shell
-     - The shell of the default user (default is :code:`/bin/bash`).
-   * - default_user_groups
-     - The groups of the default user (default is :code:`adm,sudo`).
-   * - default_user_password
-     - The initially set password of the default user
-       (default is :code:`ChangeMe!`). You can `adjust this password`_ if needed.
-       Set this password to :code:`"*"` if
-       you would like to disable password based login. Please note that
-       the playbook will then automatically create a sudoers file to not
-       impair the :code:`sudo` command.
+  *default_user_group_name:*
+     The group name of the default user (default is :code:`edi`).
+  *default_user_gid:*
+     The group id of the default user (default is :code:`2000`).
+  *default_user_name:*
+     The user name of the default user (default is :code:`edi`).
+  *default_user_uid:*
+     The user id of the default user (default is :code:`2000`).
+  *default_user_shell:*
+     The shell of the default user (default is :code:`/bin/bash`).
+  *default_user_groups:*
+     The groups of the default user (default is :code:`adm,sudo`).
+  *default_user_password:*
+     The initially set password of the default user
+     (default is :code:`ChangeMe!`). You can `adjust this password`_ if needed.
+     Set this password to :code:`"*"` if
+     you would like to disable password based login. Please note that
+     the playbook will then automatically create a sudoers file to not
+     impair the :code:`sudo` command.
 
 .. _adjust this password: https://docs.ansible.com/ansible/latest/reference_appendices/faq.html#how-do-i-generate-encrypted-passwords-for-the-user-module
 
@@ -292,52 +280,44 @@ The following code snippet adds the base system cleanup playbook to your configu
 
 The playbook can be fine tuned as follows:
 
-.. list-table::
-   :widths: 20 80
-   :header-rows: 1
+.. topic:: Parameters
 
-   * - key
-     - description
-   * - hostname
-     - Set the hostname within the final artifact (default is :code:`edi`).
-   * - regenerate_openssh_server_keys
-     - By default the playbook will make sure that the openssh server keys get regenerated
-       (boolean value :code:`True`). Switch this value to :code:`False` if you would like to keep the same
-       openssh server keys for all instances that will receive this artifact.
-   * - cleanup_proxy_settings
-     - By default the proxy settings of the resulting artifact will get cleaned up
-       (boolean value :code:`True`). If you would like to keep the same proxy settings switch this value to
-       :code:`False`. When set to :code:`True`, the proxy settings can be fine tuned according to the table
-       below.
-   * - document_build_setup
-     - To document the build setup of the artifact within the artifact set this value to :code:`True`.
-       As a result the file :code:`/usr/share/doc/edi/build.yml` will be generated. By default this feature is switched
-       off (boolean value :code:`False`).
-   * - document_packages
-     - To document the packages of the artifact within the artifact set this value to :code:`True`.
-       As a result the file :code:`/usr/share/doc/edi/packages.yml` will be generated. The generated file will contain a
-       list of all packages including version information. It is a snapshot of the available packages after the artifact
-       build and will not get updated when new packages get installed using :code:`dpkg` or :code:`apt`.
-       By default this feature is switched off (boolean value :code:`False`).
+  *hostname:*
+     Set the hostname within the final artifact (default is :code:`edi`).
+  *regenerate_openssh_server_keys:*
+     By default the playbook will make sure that the openssh server keys get regenerated
+     (boolean value :code:`True`). Switch this value to :code:`False` if you would like to keep the same
+     openssh server keys for all instances that will receive this artifact.
+  *cleanup_proxy_settings:*
+     By default the proxy settings of the resulting artifact will get cleaned up
+     (boolean value :code:`True`). If you would like to keep the same proxy settings switch this value to
+     :code:`False`. When set to :code:`True`, the proxy settings can be fine tuned according to the table
+     below.
+  *document_build_setup:*
+     To document the build setup of the artifact within the artifact set this value to :code:`True`.
+     As a result the file :code:`/usr/share/doc/edi/build.yml` will be generated. By default this feature is switched
+     off (boolean value :code:`False`).
+  *document_packages:*
+     To document the packages of the artifact within the artifact set this value to :code:`True`.
+     As a result the file :code:`/usr/share/doc/edi/packages.yml` will be generated. The generated file will contain a
+     list of all packages including version information. It is a snapshot of the available packages after the artifact
+     build and will not get updated when new packages get installed using :code:`dpkg` or :code:`apt`.
+     By default this feature is switched off (boolean value :code:`False`).
 
 The final proxy settings can be customized as follows:
 
-.. list-table::
-   :widths: 20 80
-   :header-rows: 1
+.. topic:: Parameters
 
-   * - key
-     - description
-   * - target_http_proxy
-     - The final http proxy settings (defaults to :code:`""`).
-   * - target_https_proxy
-     - The final https proxy settings (defaults to :code:`""`).
-   * - target_ftp_proxy
-     - The final ftp proxy settings (defaults to :code:`""`).
-   * - target_socks_proxy
-     - The final socks proxy settings (defaults to :code:`""`).
-   * - target_no_proxy
-     - The final proxy exception list (defaults to :code:`""`).
+  *target_http_proxy:*
+     The final http proxy settings (defaults to :code:`""`).
+  *target_https_proxy:*
+     The final https proxy settings (defaults to :code:`""`).
+  *target_ftp_proxy:*
+     The final ftp proxy settings (defaults to :code:`""`).
+  *target_socks_proxy:*
+     The final socks proxy settings (defaults to :code:`""`).
+  *target_no_proxy:*
+     The final proxy exception list (defaults to :code:`""`).
 
 
 Development User Facilities
