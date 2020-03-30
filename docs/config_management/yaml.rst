@@ -1,7 +1,3 @@
-.. |br| raw:: html
-
-   <br />
-
 .. _yaml:
 
 Yaml Based Configuration
@@ -42,70 +38,62 @@ The general section contains the information that might affect all other section
 
 edi supports the following settings:
 
-.. list-table::
-   :widths: 20 80
-   :header-rows: 1
+.. topic:: Settings
 
-   * - key
-     - description
-   * - edi_compression
-     - The compression that will be used for edi (intermediate) artifacts. |br|
-       Possible values are :code:`gz` (fast but not very small), |br|
-       :code:`bz2` or :code:`xz` (slower but minimal required space). |br|
-       If not specified, edi uses :code:`xz` compression.
-   * - edi_lxc_stop_timeout
-     - The maximum time in seconds that edi will wait until |br|
-       it forces the shutdown of the lxc container. |br|
-       The default timeout is :code:`120` seconds.
-   * - edi_required_minimal_edi_version
-     - Defines the minimal edi version that is required for the given configuration.  |br|
-       If the edi executable does not meet the required minimal version, it will exit with an error. |br|
-       If not specified, edi will not enforce a certain minimal version. |br|
-       A valid version string value looks like :code:`0.5.2`.
-   * - edi_lxc_network_interface_name
-     - The default network interface that will be used for the lxc container. |br|
-       If unspecified edi will name the container interface :code:`lxcif0`.
-   * - edi_config_management_user_name
-     - The target system user that will be used for configuration management tasks. |br|
-       Please note that direct lxc container management uses the root user. |br|
-       If unspecified edi will name the configuration management user :code:`edicfgmgmt`.
-   * - parameters
-     - Optional general parameters that are globally visible for all plugins. Parameters need to be
-       specified as key value pairs.
+   *edi_compression:*
+      The compression that will be used for edi (intermediate) artifacts.
+      Possible values are :code:`gz` (fast but not very small),
+      :code:`bz2` or :code:`xz` (slower but minimal required space).
+      If not specified, edi uses :code:`xz` compression.
+   *edi_lxc_stop_timeout:*
+      The maximum time in seconds that edi will wait until
+      it forces the shutdown of the lxc container.
+      The default timeout is :code:`120` seconds.
+   *edi_required_minimal_edi_version:*
+      Defines the minimal edi version that is required for the given configuration.
+      If the edi executable does not meet the required minimal version, it will exit with an error.
+      If not specified, edi will not enforce a certain minimal version.
+      A valid version string value looks like :code:`0.5.2`.
+   *edi_lxc_network_interface_name:*
+      The default network interface that will be used for the lxc container.
+      If unspecified edi will name the container interface :code:`lxcif0`.
+   *edi_config_management_user_name:*
+      The target system user that will be used for configuration management tasks.
+      Please note that direct lxc container management uses the root user.
+      If unspecified edi will name the configuration management user :code:`edicfgmgmt`.
+   *parameters:*
+      Optional general parameters that are globally visible for all plugins. Parameters need to be
+      specified as key value pairs.
 
 :code:`bootstrap` Section
 +++++++++++++++++++++++++
 
 This section tells edi how the initial system shall be bootstrapped. The following settings are supported:
 
-.. list-table::
-   :widths: 20 80
-   :header-rows: 1
+.. topic:: Settings
 
-   * - key
-     - description
-   * - architecture
-     - The architecture of the target system. |br|
-       For Debian possible values are any supported architecture such as
-       :code:`amd64`, :code:`armel` or :code:`armhf`.
-   * - repository
-     - The repository specification where the initial image will get bootstrapped from. |br|
-       A valid value looks like this: :code:`deb http://deb.debian.org/debian/ buster main`.
-   * - repository_key
-     - The signature key for the repository. |br|
-       *Attention*: If you do not specify a key the downloaded packages
-       will not be verified during the bootstrap process. |br|
-       *Hint*: It is a good practice to download such a key from a
-       https server. |br|
-       A valid repository key value is: :code:`https://ftp-master.debian.org/keys/archive-key-9.asc`.
-   * - tool
-     - The tool that will be used for the bootstrap process. |br|
-       Currently only :code:`debootstrap` is supported. |br|
-       If unspecified, edi will choose :code:`debootstrap`.
-   * - additional_packages
-     - A list of additional packages that will be installed during bootstrapping. |br|
-       If unspecified, edi will use the following default list: :code:`['python', 'sudo', 'netbase', 'net-tools',
-       'iputils-ping', 'ifupdown', 'isc-dhcp-client', 'resolvconf', 'systemd', 'systemd-sysv', 'gnupg']`.
+   *architecture:*
+        - The architecture of the target system.
+          For Debian possible values are any supported architecture such as
+          :code:`amd64`, :code:`armel` or :code:`armhf`.
+   *repository:*
+        - The repository specification where the initial image will get bootstrapped from.
+          A valid value looks like this: :code:`deb http://deb.debian.org/debian/ buster main`.
+   *repository_key:*
+        - The signature key for the repository.
+          *Attention*: If you do not specify a key the downloaded packages
+          will not be verified during the bootstrap process.
+          *Hint*: It is a good practice to download such a key from a
+          https server.
+          A valid repository key value is: :code:`https://ftp-master.debian.org/keys/archive-key-9.asc`.
+   *tool:*
+        - The tool that will be used for the bootstrap process.
+          Currently only :code:`debootstrap` is supported.
+          If unspecified, edi will choose :code:`debootstrap`.
+   *additional_packages:*
+        - A list of additional packages that will be installed during bootstrapping.
+          If unspecified, edi will use the following default list: :code:`['python', 'sudo', 'netbase', 'net-tools',
+          'iputils-ping', 'ifupdown', 'isc-dhcp-client', 'resolvconf', 'systemd', 'systemd-sysv', 'gnupg']`.
 
 Please note that edi will automatically do cross bootstrapping if required. This means that you can for instance bootstrap
 an armhf system on an amd64 host.
@@ -125,25 +113,21 @@ edi automatically detects the necessity of an architecture emulation and takes t
 As QEMU evolves quickly it is often desirable to point edi to a very recent version of QEMU. The QEMU section allows
 you to do this. The following settings are available:
 
-.. list-table::
-   :widths: 20 80
-   :header-rows: 1
+.. topic:: Settings
 
-   * - key
-     - description
-   * - package
-     - The name of the qemu package that should get downloaded. |br|
-       If not specified edi assumes that the package is named :code:`qemu-user-static`.
-   * - repository
-     - The repository specification where QEMU will get downloaded from. |br|
-       A valid value looks like this: :code:`deb http://deb.debian.org/debian/ stretch main`. |br|
-       If unspecified, edi will try to download QEMU from the repository indicated in the bootstrap section.
-   * - repository_key
-     - The signature key for the QEMU repository. |br|
-       *Attention*: If you do not specify a key the downloaded QEMU package will not be verified. |br|
-       *Hint*: It is a good practice to download such a key from a
-       https server. |br|
-       A valid repository key value is: :code:`https://ftp-master.debian.org/keys/archive-key-8.asc`.
+   *package:*
+      The name of the qemu package that should get downloaded.
+      If not specified edi assumes that the package is named :code:`qemu-user-static`.
+   *repository:*
+      The repository specification where QEMU will get downloaded from.
+      A valid value looks like this: :code:`deb http://deb.debian.org/debian/ stretch main`.
+      If unspecified, edi will try to download QEMU from the repository indicated in the bootstrap section.
+   *repository_key:*
+      The signature key for the QEMU repository.
+      *Attention*: If you do not specify a key the downloaded QEMU package will not be verified.
+      *Hint*: It is a good practice to download such a key from a
+      https server.
+      A valid repository key value is: :code:`https://ftp-master.debian.org/keys/archive-key-8.asc`.
 
 
 .. _ordered_node_section:
@@ -198,24 +182,20 @@ A typical node looks like this:
 
 Such nodes accept the following settings:
 
-.. list-table::
-   :widths: 20 80
-   :header-rows: 1
+.. topic:: Settings
 
-   * - key
-     - description
-   * - path
-     - A relative or absolute path. |br|
-       Relative paths are first searched within :code:`edi_project_plugin_directory` and |br|
-       if nothing is found the search falls back to :code:`edi_edi_plugin_directory`. |br|
-       The values of the plugin and project
-       directory can be retrieved as follows: |br|
-       :code:`edi lxc configure --dictionary SOME-CONTAINER SOME_CONFIG.yml`.
-   * - parameters
-     - An optional list of parameters that will be used to parametrize the given plugin.
-   * - skip
-     - :code:`True` or :code:`False`. If :code:`True` the plugin will not get applied. |br|
-       If unspecified, the plugin will get applied.
+   *path:*
+      A relative or absolute path.
+      Relative paths are first searched within :code:`edi_project_plugin_directory` and
+      if nothing is found the search falls back to :code:`edi_edi_plugin_directory`.
+      The values of the plugin and project
+      directory can be retrieved as follows:
+      :code:`edi lxc configure --dictionary SOME-CONTAINER SOME_CONFIG.yml`.
+   *parameters:*
+      An optional list of parameters that will be used to parametrize the given plugin.
+   *skip:*
+      :code:`True` or :code:`False`. If :code:`True` the plugin will not get applied.
+      If unspecified, the plugin will get applied.
 
 To learn more about plugins please read the chapter :ref:`plugins`.
 
@@ -276,20 +256,16 @@ Let us assume that the name of the current development user is :code:`johndoe` a
 
 The shared folder nodes accept the the following settings:
 
-.. list-table::
-   :widths: 20 80
-   :header-rows: 1
+.. topic:: Settings
 
-   * - key
-     - description
-   * - folder
-     - The name of the host folder within the home directory of the current user. |br|
-       If the folder does not exist, edi will create it.
-   * - mountpoint
-     - The name of the mount point within the container home directory of the current user. |br|
-       If the mount point does not exist edi will display an error. |br|
-       *Hint*: It is assumed that the mount points within the container will get created using an appropriate playbook. |br|
-       The development_user_facilities playbook plugin will for instance take care of mount point creation.
-   * - skip
-     - :code:`True` or :code:`False`. If :code:`True` the folder will not be shared. |br|
-       If unspecified, the folder will get shared.
+   *folder:*
+      The name of the host folder within the home directory of the current user.
+      If the folder does not exist, edi will create it.
+   *mountpoint:*
+      The name of the mount point within the container home directory of the current user.
+      If the mount point does not exist edi will display an error.
+      *Hint*: It is assumed that the mount points within the container will get created using an appropriate playbook.
+      The development_user_facilities playbook plugin will for instance take care of mount point creation.
+   *skip:*
+      :code:`True` or :code:`False`. If :code:`True` the folder will not be shared.
+      If unspecified, the folder will get shared.
