@@ -37,6 +37,7 @@ from edi.commands.lxccommands.profile import Profile
 from edi.commands.lxccommands.publish import Publish
 from edi.commands.lxccommands.stop import Stop
 from edi.commands.qemucommands.fetch import Fetch
+from edi.commands.documentationcommands.render import Render
 from edi.commands.targetcommands.targetconfigure import Configure as TargetConfigure
 from edi.lib.shellhelpers import mockablerun
 from tests.libtesting.contextmanagers.mocked_executable import mocked_executable, mocked_lxd_version_check
@@ -56,6 +57,7 @@ from tests.libtesting.contextmanagers.mocked_executable import mocked_executable
     (Stop, ['lxc', 'stop', '--plugins'], True, True, True, False),
     (Fetch, ['qemu', 'fetch', '--plugins'], False, False, False, False),
     (TargetConfigure, ['target', 'configure', '--plugins', '1.2.3.4'], False, False, True, False),
+    (Render, ['documentation', 'render', '--plugins', 'foo.tar.gz'], False, False, False, False),
 ])
 def test_plugins(monkeypatch, config_files, capsys, command, command_args, has_templates,
                  has_profiles, has_playbooks, has_postprocessing_commands):
