@@ -57,7 +57,7 @@ from tests.libtesting.contextmanagers.mocked_executable import mocked_executable
     (Stop, ['lxc', 'stop', '--plugins'], True, True, True, False),
     (Fetch, ['qemu', 'fetch', '--plugins'], False, False, False, False),
     (TargetConfigure, ['target', 'configure', '--plugins', '1.2.3.4'], False, False, True, False),
-    (Render, ['documentation', 'render', '--plugins', 'foo.tar.gz'], False, False, False, False),
+    (Render, ['documentation', 'render', '--plugins', 'some/input/dir', 'some/output/dir'], False, False, False, False),
 ])
 def test_plugins(monkeypatch, config_files, capsys, command, command_args, has_templates,
                  has_profiles, has_playbooks, has_postprocessing_commands):

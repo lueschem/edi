@@ -1,1 +1,1 @@
-__all__ = ["documentationclean", "render"]
+__all__ = ["render"]
