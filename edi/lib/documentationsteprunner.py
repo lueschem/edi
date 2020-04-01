@@ -23,7 +23,7 @@ import logging
 import tempfile
 import yaml
 from edi.lib.helpers import chown_to_user
-from edi.lib.helpers import get_user, get_workdir
+from edi.lib.helpers import get_workdir
 from edi.lib.configurationparser import remove_passwords
 
 

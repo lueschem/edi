@@ -20,9 +20,31 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import argparse
 from edi.commands.documentation import Documentation
 from edi.lib.helpers import print_success
 from edi.lib.documentationsteprunner import DocumentationStepRunner
+
+
+def readable_directory(directory):
+    if not os.path.isdir(directory):
+        raise argparse.ArgumentTypeError("directory '{}' does not exist".format(directory))
+    if not os.access(directory, os.R_OK):
+        raise argparse.ArgumentTypeError("directory '{}' is not readable".format(directory))
+    return directory
+
+
+def valid_output_file(target_path):
+    if os.path.exists(target_path):
+        raise argparse.ArgumentTypeError("'{}' already exists".format(target_path))
+
+    directory = os.path.dirname(os.path.abspath(target_path))
+    if not os.path.isdir(directory):
+        raise argparse.ArgumentTypeError("output directory '{}' does not exist".format(directory))
+    if not os.access(directory, os.W_OK):
+        raise argparse.ArgumentTypeError("output directory '{}' is not writable".format(directory))
+
+    return target_path
 
 
 class Render(Documentation):
@@ -40,8 +62,8 @@ class Render(Documentation):
                                        help=help_text,
                                        description=description_text)
         cls._offer_options(parser, introspection=True, clean=False)
-        parser.add_argument('raw_input')
-        parser.add_argument('rendered_output')
+        parser.add_argument('raw_input', type=readable_directory)
+        parser.add_argument('rendered_output', type=valid_output_file)
         cls._require_config_file(parser)
 
     @staticmethod
@@ -70,9 +92,9 @@ class Render(Documentation):
 
     def _dispatch(self, raw_input, rendered_output, config_file, run_method):
         self._setup_parser(config_file)
-        self.raw_input = raw_input
-        self.rendered_output = rendered_output
+        self.raw_input = os.path.abspath(raw_input)
+        self.rendered_output = os.path.abspath(rendered_output)
         return run_method()
 
     def _result(self):
-        return os.path.abspath(self.rendered_output)
+        return self.rendered_output
