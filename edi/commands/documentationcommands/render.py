@@ -22,6 +22,7 @@
 import os
 from edi.commands.documentation import Documentation
 from edi.lib.helpers import print_success
+from edi.lib.documentationsteprunner import DocumentationStepRunner
 
 
 class Render(Documentation):
@@ -54,7 +55,7 @@ class Render(Documentation):
         return self._dispatch(raw_input, rendered_output, config_file, run_method=self._dry_run)
 
     def _dry_run(self):
-        plugins = {}
+        plugins = DocumentationStepRunner(self.config, self.raw_input, self._result()).get_plugin_report()
         return plugins
 
     def run(self, raw_input, rendered_output, config_file):
@@ -62,7 +63,8 @@ class Render(Documentation):
 
     def _run(self):
         print("Going to render project documentation to '{}'.".format(self._result()))
-
+        documentation_step_runner = DocumentationStepRunner(self.config, self.raw_input, self._result())
+        documentation_step_runner.run_all()
         print_success("Rendered project documentation to '{}'.".format(self._result()))
         return self._result()
 
