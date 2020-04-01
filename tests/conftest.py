@@ -131,6 +131,21 @@ postprocessing_commands:
         path:               commands/does_not_exist
         output:
             second_output_file: overwrite_me.txt
+
+documentation_steps:
+    10_first_step:
+        path:               documentation_steps/first.j2
+        parameters:
+            message:        "first step"
+    20_second_step:
+        path:               documentation_steps/second.j2
+        parameters:
+            edi_doc_packages: ['a','b','c']
+    30_last_step:
+        path:               path/to/last.j2
+        skip:               True
+        parameters:
+            message:        "skipping first step"
 """
 
 sample_global_file = """
@@ -168,6 +183,11 @@ postprocessing_commands:
         require_root:       False
         output:
             last_output_file: last.txt
+
+documentation_steps:
+    20_second_step:
+        parameters:
+            edi_doc_packages: ['x','y','z']
 """
 
 sample_system_file = """
@@ -292,6 +312,14 @@ def config_files(tmpdir_factory):
     commands = [('first', first_command), ('second', second_command), ('last', last_command), ]
     for name, content in commands:
         with open(str(commands_dir.join(name)), "w") as file:
+            file.write(content)
+
+    documentation_steps_dir = dir_name.join("plugins", "documentation_steps")
+    os.makedirs(str(documentation_steps_dir))
+
+    steps = [('first.j2', 't1'), ('second.j2', 't2'), ]
+    for name, content in steps:
+        with open(str(documentation_steps_dir.join(name)), "w") as file:
             file.write(content)
 
     return str(dir_name.join(main_file))

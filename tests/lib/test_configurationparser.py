@@ -82,6 +82,20 @@ def test_playbooks_overlay(config_files, monkeypatch):
                 assert path.endswith("playbooks/foo.yml")
 
 
+def test_documentation_steps_overlay(config_files, monkeypatch):
+    with open(config_files, "r") as main_file:
+        parser = ConfigurationParser(main_file)
+        documentation_steps = parser.get_ordered_path_items("documentation_steps")
+        assert len(documentation_steps) == 2
+        expected_steps = ["10_first_step", "20_second_step"]
+        for step, expected in zip(documentation_steps, expected_steps):
+            name, path, parameters, _ = step
+            assert name == expected
+            if name == "20_second_step":
+                value = parameters.get("edi_doc_packages")
+                assert value == ['x', 'y', 'z']
+
+
 def test_empty_overlay_file(empty_overlay_config_file):
     with open(empty_overlay_config_file, "r") as main_file:
         parser = ConfigurationParser(main_file)
