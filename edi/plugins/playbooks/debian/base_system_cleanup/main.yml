@@ -9,7 +9,7 @@
     target_socks_proxy: ""
     target_no_proxy: ""
     document_build_setup: False
-    document_packages: False
+    document_installed_packages: False
   roles:
     - role: openssh_server_keys
       become: True

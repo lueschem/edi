@@ -297,7 +297,7 @@ The playbook can be fine tuned as follows:
      To document the build setup of the artifact within the artifact set this value to :code:`True`.
      As a result the file :code:`/usr/share/doc/edi/build.yml` will be generated. By default this feature is switched
      off (boolean value :code:`False`).
-  *document_packages:*
+  *document_installed_packages:*
      To document the packages of the artifact within the artifact set this value to :code:`True`.
      As a result the file :code:`/usr/share/doc/edi/packages.yml` will be generated. The generated file will contain a
      list of all packages including version information. It is a snapshot of the available packages after the artifact
