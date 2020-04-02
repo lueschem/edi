@@ -36,26 +36,36 @@ class DocumentationStepRunner():
         self.rendered_output = rendered_output
         self.config_section = 'documentation_steps'
         self.build_setup = dict()
+        self.installed_packages = dict()
+
+    def fetch_artifact_setup(self):
+        self.build_setup = self._get_build_setup()
+        self.installed_packages = self._get_installed_packages()
+
+    def augment_step_parameters(self, parameters):
+        augmented_parameters = parameters.copy()
+        augmented_parameters['edi_build_setup'] = self.build_setup
+        augmented_parameters['edi_doc_packages'] = self._get_documentation_step_packages(parameters)
+        return augmented_parameters
 
     def run_all(self):
+        self.fetch_artifact_setup()
+
         workdir = get_workdir()
-
-        self.build_setup = self._get_build_setup()
-
         applied_documentation_steps = []
         with tempfile.TemporaryDirectory(dir=workdir) as tempdir:
             chown_to_user(tempdir)
 
             for name, path, parameters, in self._get_documentation_steps():
-                parameters['edi_build_setup'] = self.build_setup
+                augmented_parameters = self.augment_step_parameters(parameters)
 
                 logging.info(("Running documentation step {} located in "
                               "{} with parameters:\n{}"
                               ).format(name, path,
-                                       yaml.dump(remove_passwords(parameters),
+                                       yaml.dump(remove_passwords(augmented_parameters),
                                                  default_flow_style=False)))
 
-                self._run_documentation_step(path, parameters, tempdir)
+                self._run_documentation_step(path, augmented_parameters, tempdir)
                 applied_documentation_steps.append(name)
 
         return applied_documentation_steps
@@ -71,14 +81,16 @@ class DocumentationStepRunner():
     def get_plugin_report(self):
         result = dict()
 
+        self.fetch_artifact_setup()
+
         documentation_steps = self._get_documentation_steps()
 
         if documentation_steps:
             result[self.config_section] = []
 
         for name, path, parameters in documentation_steps:
-            plugin_info = {name: {'path': path, 'dictionary': parameters}}
-
+            augmented_parameters = self.augment_step_parameters(parameters)
+            plugin_info = {name: {'path': path, 'dictionary': augmented_parameters}}
             result[self.config_section].append(plugin_info)
 
         return result
@@ -93,6 +105,26 @@ class DocumentationStepRunner():
         logging.debug("Found build setup file '{}'.".format(build_info_file))
         with open(build_info_file, mode='r') as f:
             return yaml.safe_load(f.read())
+
+    def _get_installed_packages(self):
+        installed_packages_file = os.path.join(self.raw_input, 'edi', 'packages.yml')
+
+        if not os.path.isfile(installed_packages_file):
+            logging.warning("No file describing the installed packages found in '{}'.".format(installed_packages_file))
+            return dict()
+
+        logging.debug("Found file describing the installed packages in '{}'.".format(installed_packages_file))
+        with open(installed_packages_file, mode='r') as f:
+            return yaml.safe_load(f.read())
+
+    def _get_documentation_step_packages(self, parameters):
+        installed_packages = set(self.installed_packages.keys())
+        include_packages = set(parameters.get('edi_doc_include_packages', installed_packages))
+        step_packages = installed_packages.intersection(include_packages)
+        exclude_packages = set(parameters.get('edi_doc_exclude_packages', []))
+        step_packages = step_packages - exclude_packages
+        step_packages_dict = {package: self.installed_packages[package] for package in step_packages}
+        return step_packages_dict
 
     def _run_documentation_step(self, path, parameters, tempdir):
         pass

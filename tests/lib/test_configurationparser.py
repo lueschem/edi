@@ -92,7 +92,7 @@ def test_documentation_steps_overlay(config_files, monkeypatch):
             name, path, parameters, _ = step
             assert name == expected
             if name == "20_second_step":
-                value = parameters.get("edi_doc_packages")
+                value = parameters.get("edi_doc_include_packages")
                 assert value == ['x', 'y', 'z']
 
 

@@ -140,7 +140,7 @@ documentation_steps:
     20_second_step:
         path:               documentation_steps/second.j2
         parameters:
-            edi_doc_packages: ['a','b','c']
+            edi_doc_include_packages: ['a','b','c']
     30_last_step:
         path:               path/to/last.j2
         skip:               True
@@ -187,7 +187,7 @@ postprocessing_commands:
 documentation_steps:
     20_second_step:
         parameters:
-            edi_doc_packages: ['x','y','z']
+            edi_doc_include_packages: ['x','y','z']
 """
 
 sample_system_file = """
