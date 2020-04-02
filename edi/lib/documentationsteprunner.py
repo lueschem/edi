@@ -22,6 +22,7 @@
 import logging
 import tempfile
 import yaml
+import os
 from edi.lib.helpers import chown_to_user
 from edi.lib.helpers import get_workdir
 from edi.lib.configurationparser import remove_passwords
@@ -34,15 +35,20 @@ class DocumentationStepRunner():
         self.raw_input = raw_input
         self.rendered_output = rendered_output
         self.config_section = 'documentation_steps'
+        self.build_setup = dict()
 
     def run_all(self):
         workdir = get_workdir()
+
+        self.build_setup = self._get_build_setup()
 
         applied_documentation_steps = []
         with tempfile.TemporaryDirectory(dir=workdir) as tempdir:
             chown_to_user(tempdir)
 
             for name, path, parameters, in self._get_documentation_steps():
+                parameters['edi_build_setup'] = self.build_setup
+
                 logging.info(("Running documentation step {} located in "
                               "{} with parameters:\n{}"
                               ).format(name, path,
@@ -76,6 +82,17 @@ class DocumentationStepRunner():
             result[self.config_section].append(plugin_info)
 
         return result
+
+    def _get_build_setup(self):
+        build_info_file = os.path.join(self.raw_input, 'edi', 'build.yml')
+
+        if not os.path.isfile(build_info_file):
+            logging.warning("No build setup file found in '{}'.".format(build_info_file))
+            return dict()
+
+        logging.debug("Found build setup file '{}'.".format(build_info_file))
+        with open(build_info_file, mode='r') as f:
+            return yaml.safe_load(f.read())
 
     def _run_documentation_step(self, path, parameters, tempdir):
         pass
