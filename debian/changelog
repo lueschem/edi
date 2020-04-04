@@ -1,3 +1,10 @@
+edi (1.4.3) bionic; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Document packages as list instead of dictionary.
+
+ -- Matthias Luescher <lueschem@gmail.com>  Sat, 04 Apr 2020 22:56:46 +0200
+
 edi (1.4.2) bionic; urgency=medium
 
   [ Matthias Lüscher ]
