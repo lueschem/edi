@@ -43,7 +43,7 @@ class DocumentationStepRunner():
         self.rendered_output = rendered_output
         self.config_section = 'documentation_steps'
         self.build_setup = dict()
-        self.installed_packages = dict()
+        self.installed_packages = list()
 
     def fetch_artifact_setup(self):
         self.build_setup = self._get_build_setup()
@@ -124,16 +124,27 @@ class DocumentationStepRunner():
 
         logging.debug("Found file describing the installed packages in '{}'.".format(installed_packages_file))
         with open(installed_packages_file, mode='r') as f:
-            return yaml.safe_load(f.read())
+            installed_packages = yaml.safe_load(f.read())
+            if not isinstance(installed_packages, list):
+                raise FatalError("'{}' should contain a list of installed packages.".format(installed_packages_file))
+            return installed_packages
+
+    @staticmethod
+    def _get_package_name(package_dict):
+        package_name = package_dict.get('package')
+        if not package_name:
+            raise FatalError("Missing 'package' key in dictionary of installed package.")
+        return package_name
 
     def _get_documentation_step_packages(self, parameters):
-        installed_packages = set(self.installed_packages.keys())
+        installed_packages = set([self._get_package_name(package) for package in self.installed_packages])
         include_packages = set(parameters.get('edi_doc_include_packages', installed_packages))
         step_packages = installed_packages.intersection(include_packages)
         exclude_packages = set(parameters.get('edi_doc_exclude_packages', []))
         step_packages = step_packages - exclude_packages
-        step_packages_dict = {package: self.installed_packages[package] for package in step_packages}
-        return step_packages_dict
+        step_package_list = [package for package in self.installed_packages
+                             if self._get_package_name(package) in step_packages]
+        return step_package_list
 
     def _add_changelog(self, package, baseline_date):
         # TODO: evaluate baseline by package
@@ -193,28 +204,27 @@ class DocumentationStepRunner():
             baseline_date = self._parse_date(parameters.get('edi_doc_changelog_baseline',
                                                             'Thu, 01 Jan 1970 00:00:00 +0000'))
             # chunk size is currently 1
-            ordered_packages = collections.OrderedDict(sorted(step_packages.items()))
-            first_package = next(iter(ordered_packages))
-            last_package = next(reversed(ordered_packages))
+            first_package = self._get_package_name(step_packages[0])
+            last_package = self._get_package_name(step_packages[-1])
 
-            for package in ordered_packages.items():
+            for package in step_packages:
                 context = parameters.copy()
-                if package[0] == first_package:
+                name = self._get_package_name(package)
+                if name == first_package:
                     context['edi_doc_first_chunk'] = True
                 else:
                     context['edi_doc_first_chunk'] = False
-                if package[0] == last_package:
+                if name == last_package:
                     context['edi_doc_last_chunk'] = True
                 else:
                     context['edi_doc_last_chunk'] = False
 
-                package_dict = package[1].copy()
-                package_dict['package'] = package[0]
+                package_context = package.copy()
 
                 if add_changelog:
-                    self._add_changelog(package_dict, baseline_date)
+                    self._add_changelog(package_context, baseline_date)
 
-                context['edi_doc_packages'] = [package_dict]
+                context['edi_doc_packages'] = [package_context]
 
                 self._render_chunk(template_path, context, outfile)
 
