@@ -2,6 +2,6 @@
 document_build_setup: False
 document_installed_packages: False
 documentation_directory: /usr/share/doc/edi
-package_documentation_command: "dpkg-query --show --showformat='${Package}:\n    architecture: ${Architecture}\n    version: \"${Version}\"\n    source_package: ${source:Package}\n    status: ${db:Status-Abbrev}\n'"
+package_documentation_command: "dpkg-query --show --showformat='- package: ${Package}\n  architecture: ${Architecture}\n  version: \"${Version}\"\n  source_package: ${source:Package}\n  status: ${db:Status-Abbrev}\n'"
 package_documentation_file: packages.yml
 build_documentation_file: build.yml
