@@ -39,21 +39,21 @@ class ChangesAnnotator():
     def __init__(self, package):
         self._pattern_lookup = [
             # level 0: fallback
-            [(r'.*', 'li', self._report_parser_warning)],  # fallback
+            [('li', r'.*', self._report_parser_warning, [])],
             # level 1: author, list item or empty line
-            [(r'[ ]{2}\[[ ]*', 'a', self._trim_author),  # author
-             (r'^[ ]{2}[+-\\*] ', 'li', self._trim_list_item),  # list item
-             (r'^$', 'el', self._nop)],  # empty line
+            [('a', r'[ ]{2}\[[ ]*', self._trim_author, []),
+             ('li', r'^[ ]{2}[+-\\*] ', self._trim_list_item, []),
+             ('el', r'^$', self._nop, [])],
             # level 2: sub list item, list item continuation, empty line
-            [(r'^[ ]{3,4}[+-\\*] ', 'sli', ChangesAnnotator._trim_list_item),  # sub list item
-             (r'^[ ]{4}', 'lic', self._trim_list_item_continuation),  # list item continuation
-             (r'^$', 'el', ChangesAnnotator._nop)],  # empty line
+            [('sli', r'^[ ]{3,4}[+-\\*] ', ChangesAnnotator._trim_list_item, []),
+             ('lic', r'^[ ]{4}', self._trim_list_item_continuation, ['li', 'lic']),
+             ('el', r'^$', ChangesAnnotator._nop, [])],
             # level 3: sub sub list item, sub list item continuation or empty line
-            [(r'^[ ]{6}[+-\\*] ', 'ssli', self._trim_list_item),  # sub sub list item
-             (r'^[ ]{5,6}', 'slic', ChangesAnnotator._trim_list_item_continuation),  # sub list item continuation
-             (r'^$', 'el', self._nop)],  # empty line
+            [('ssli', r'^[ ]{6}[+-\\*] ', self._trim_list_item, []),
+             ('slic', r'^[ ]{5,6}', ChangesAnnotator._trim_list_item_continuation, ['sli', 'slic']),
+             ('el', r'^$', self._nop, [])],
             # level 4: sub sub list item continuation
-            [(r'^[ ]{8}', 'sslic', ChangesAnnotator._trim_list_item_continuation)],  # sub sub list item continuation
+            [('sslic', r'^[ ]{8}', ChangesAnnotator._trim_list_item_continuation, ['ssli', 'sslic'])],
             # level 5: sentinel
             []
         ]
@@ -67,11 +67,17 @@ class ChangesAnnotator():
         for change in changes:
             match_found = False
             for level in range(self._current_level + 1, -1, -1):
-                for expression, annotation, modification in self._pattern_lookup[level]:
+                for annotation, expression, modification, compatibility in self._pattern_lookup[level]:
                     if re.match(expression, change):
                         match_found = True
                         self._current_level = level
-                        annotated_changes.append((annotation, modification(change)))
+                        current_change = modification(change)
+
+                        if annotated_changes and annotated_changes[-1][0] in compatibility:
+                            previous_annotation, previous_change = annotated_changes[-1]
+                            annotated_changes[-1] = (previous_annotation, " ".join([previous_change, current_change]))
+                        else:
+                            annotated_changes.append((annotation, current_change))
                         break
 
                 if match_found:
