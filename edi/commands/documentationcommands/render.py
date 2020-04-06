@@ -22,7 +22,7 @@
 import os
 import argparse
 from edi.commands.documentation import Documentation
-from edi.lib.helpers import print_success
+from edi.lib.helpers import print_success, FatalError
 from edi.lib.documentationsteprunner import DocumentationStepRunner
 
 
@@ -35,9 +35,6 @@ def readable_directory(directory):
 
 
 def valid_output_file(target_path):
-    if os.path.exists(target_path):
-        raise argparse.ArgumentTypeError("'{}' already exists".format(target_path))
-
     directory = os.path.dirname(os.path.abspath(target_path))
     if not os.path.isdir(directory):
         raise argparse.ArgumentTypeError("output directory '{}' does not exist".format(directory))
@@ -85,6 +82,9 @@ class Render(Documentation):
 
     def _run(self):
         print("Going to render project documentation to '{}'.".format(self._result()))
+        if os.path.exists(self._result()):
+            raise FatalError("Output file '{}' already exists.".format(self._result()))
+
         documentation_step_runner = DocumentationStepRunner(self.config, self.raw_input, self._result())
         documentation_step_runner.run_all()
         print_success("Rendered project documentation to '{}'.".format(self._result()))
