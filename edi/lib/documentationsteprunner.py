@@ -211,7 +211,25 @@ class DocumentationStepRunner():
                              if self._get_package_name(package) in step_packages]
         return step_package_list
 
-    def _add_changelog(self, package, baseline_date):
+    @staticmethod
+    def _get_replacements(parameters):
+        replacements = parameters.get('edi_doc_replacements', [])
+        if not isinstance(replacements, list):
+            raise FatalError("'edi_doc_replacements' should contain a list of replacement instructions.")
+        return replacements
+
+    @staticmethod
+    def _apply_replacements(string_list, replacements):
+        result = []
+        for item in string_list:
+            for replacement in replacements:
+                item = re.sub(replacement.get('pattern',''), replacement.get('replacement',''), item)
+
+            result. append(item)
+
+        return result
+
+    def _add_changelog(self, package, baseline_date, replacements):
         # TODO: evaluate baseline by package
         package_changelog_path = None
         package_name = package.get('package')
@@ -243,7 +261,8 @@ class DocumentationStepRunner():
                     block_dict['package'] = change_block.package
                     block_dict['distributions'] = change_block.distributions
                     block_dict['urgency'] = change_block.urgency
-                    block_dict['changes'] = ChangesAnnotator(package_name).annotate(change_block.changes())
+                    changes = self._apply_replacements(change_block.changes(), replacements)
+                    block_dict['changes'] = ChangesAnnotator(package_name).annotate(changes)
                     change_blocks.append(block_dict)
 
                 package_dict['change_blocks'] = change_blocks
@@ -259,6 +278,7 @@ class DocumentationStepRunner():
 
     def _run_documentation_step(self, template_path, parameters, outfile):
         step_packages = self._get_documentation_step_packages(parameters)
+        step_replacements = self._get_replacements(parameters)
 
         if not step_packages:
             context = parameters.copy()
@@ -288,7 +308,7 @@ class DocumentationStepRunner():
                 package_context = package.copy()
 
                 if add_changelog:
-                    self._add_changelog(package_context, baseline_date)
+                    self._add_changelog(package_context, baseline_date, step_replacements)
 
                 context['edi_doc_packages'] = [package_context]
 
