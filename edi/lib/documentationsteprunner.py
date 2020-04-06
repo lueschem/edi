@@ -23,11 +23,11 @@ import logging
 import tempfile
 import yaml
 import os
+import re
 import jinja2
 import shutil
 import traceback
 import gzip
-import collections
 from dateutil import parser
 from debian.changelog import Changelog
 from edi.lib.helpers import chown_to_user, FatalError
@@ -35,8 +35,73 @@ from edi.lib.helpers import get_workdir
 from edi.lib.configurationparser import remove_passwords
 
 
-class DocumentationStepRunner():
+class ChangesAnnotator():
+    def __init__(self, package):
+        self._pattern_lookup = [
+            # level 0: fallback
+            [(r'.*', 'li', self._report_parser_warning)],  # fallback
+            # level 1: author, list item or empty line
+            [(r'[ ]{2}\[[ ]*', 'a', self._trim_author),  # author
+             (r'^[ ]{2}[+-\\*] ', 'li', self._trim_list_item),  # list item
+             (r'^$', 'el', self._nop)],  # empty line
+            # level 2: sub list item, list item continuation, empty line
+            [(r'^[ ]{3,4}[+-\\*] ', 'sli', ChangesAnnotator._trim_list_item),  # sub list item
+             (r'^[ ]{4}', 'lic', self._trim_list_item_continuation),  # list item continuation
+             (r'^$', 'el', ChangesAnnotator._nop)],  # empty line
+            # level 3: sub sub list item, sub list item continuation or empty line
+            [(r'^[ ]{6}[+-\\*] ', 'ssli', self._trim_list_item),  # sub sub list item
+             (r'^[ ]{5,6}', 'slic', ChangesAnnotator._trim_list_item_continuation),  # sub list item continuation
+             (r'^$', 'el', self._nop)],  # empty line
+            # level 4: sub sub list item continuation
+            [(r'^[ ]{8}', 'sslic', ChangesAnnotator._trim_list_item_continuation)],  # sub sub list item continuation
+            # level 5: sentinel
+            []
+        ]
+        self._current_level = 0
+        self._package = package
 
+    def annotate(self, changes):
+        annotated_changes = list()
+        self._current_level = 0
+
+        for change in changes:
+            match_found = False
+            for level in range(self._current_level + 1, -1, -1):
+                for expression, annotation, modification in self._pattern_lookup[level]:
+                    if re.match(expression, change):
+                        match_found = True
+                        self._current_level = level
+                        annotated_changes.append((annotation, modification(change)))
+                        break
+
+                if match_found:
+                    break
+
+        return annotated_changes
+
+    @staticmethod
+    def _trim_author(text):
+        return re.sub(r'^[ ]*\[(.*)\]$', r'\1', text).strip()
+
+    @staticmethod
+    def _trim_list_item(text):
+        return re.sub(r'^[ ]*[*+-] (.*)$', r'\1', text)
+
+    @staticmethod
+    def _trim_list_item_continuation(text):
+        return text.strip()
+
+    @staticmethod
+    def _nop(text):
+        return text
+
+    def _report_parser_warning(self, text):
+        logging.warning("For package '{}': Failed to parse '{}' at level {}!".format(
+            self._package, text, self._current_level))
+        return text
+
+
+class DocumentationStepRunner():
     def __init__(self, config, raw_input, rendered_output):
         self.config = config
         self.raw_input = raw_input
@@ -178,6 +243,7 @@ class DocumentationStepRunner():
                     block_dict['package'] = change_block.package
                     block_dict['distributions'] = change_block.distributions
                     block_dict['urgency'] = change_block.urgency
+                    block_dict['changes'] = ChangesAnnotator(package_name).annotate(change_block.changes())
                     change_blocks.append(block_dict)
 
                 package_dict['change_blocks'] = change_blocks
