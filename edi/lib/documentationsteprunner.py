@@ -38,24 +38,21 @@ from edi.lib.configurationparser import remove_passwords
 class ChangesAnnotator():
     def __init__(self, package):
         self._pattern_lookup = [
-            # level 0: fallback
-            [('li', r'.*', self._report_parser_warning, [])],
-            # level 1: author, list item or empty line
-            [('a', r'[ ]{2}\[[ ]*', self._trim_author, []),
-             ('li', r'^[ ]{2}[+-\\*] ', self._trim_list_item, []),
-             ('el', r'^$', self._nop, [])],
-            # level 2: sub list item, list item continuation, empty line
-            [('sli', r'^[ ]{3,4}[+-\\*] ', ChangesAnnotator._trim_list_item, []),
-             ('lic', r'^[ ]{4}', self._trim_list_item_continuation, ['li', 'lic']),
-             ('el', r'^$', ChangesAnnotator._nop, [])],
-            # level 3: sub sub list item, sub list item continuation or empty line
-            [('ssli', r'^[ ]{6}[+-\\*] ', self._trim_list_item, []),
-             ('slic', r'^[ ]{5,6}', ChangesAnnotator._trim_list_item_continuation, ['sli', 'slic']),
-             ('el', r'^$', self._nop, [])],
-            # level 4: sub sub list item continuation
-            [('sslic', r'^[ ]{8}', ChangesAnnotator._trim_list_item_continuation, ['ssli', 'sslic'])],
+            # level 0: author, empty line or fallback
+            [('a', r'^[ ]{2}\[[ ]*', self._trim_author, []),
+             ('el', r'^$', self._nop, []),
+             ('li', r'.*', self._report_parser_warning, [])],
+            # level 1: list item, list item continuation or empty line
+            [('li', r'^[ ]{2}[*+-] ', self._trim_list_item, []),
+             ('lic', r'^[ ]{2,4}[^[]', self._trim_list_item_continuation, ['li', 'lic'])],
+            # level 2: sub list item, sub list item continuation or empty line
+            [('sli', r'^[ ]{3,4}[*+-] ', ChangesAnnotator._trim_list_item, []),
+             ('slic', r'^[ ]{5,6}', ChangesAnnotator._trim_list_item_continuation, ['sli', 'slic'])],
+            # level 3: sub sub list item, sub sub list item continuation or empty line
+            [('ssli', r'^[ ]{6}[*+-] ', self._trim_list_item, []),
+             ('sslic', r'^[ ]{8}', ChangesAnnotator._trim_list_item_continuation, ['ssli', 'sslic'])],
             # level 5: sentinel
-            []
+            [],
         ]
         self._current_level = 0
         self._package = package
@@ -78,6 +75,9 @@ class ChangesAnnotator():
                             annotated_changes[-1] = (previous_annotation, " ".join([previous_change, current_change]))
                         else:
                             annotated_changes.append((annotation, current_change))
+                        break
+
+                    if level == self._current_level + 1:
                         break
 
                 if match_found:
@@ -229,7 +229,7 @@ class DocumentationStepRunner():
         result = []
         for item in string_list:
             for replacement in replacements:
-                item = re.sub(replacement.get('pattern',''), replacement.get('replacement',''), item)
+                item = re.sub(replacement.get('pattern', ''), replacement.get('replacement', ''), item)
 
             result. append(item)
 
@@ -252,17 +252,20 @@ class DocumentationStepRunner():
                 package_dict = dict()
                 package_dict['author'] = changelog.author
                 package_dict['date'] = changelog.date
+                package_dict['short_date'] = self._parse_date(changelog.date).strftime("%d. %B %Y")
                 package_dict['version'] = str(changelog.get_version())
                 package_dict['package'] = changelog.package
 
                 change_blocks = list()
                 for change_block in changelog:
-                    if self._parse_date(change_block.date) < baseline_date:
+                    changeblock_date = self._parse_date(change_block.date)
+                    if changeblock_date < baseline_date:
                         break
 
                     block_dict = dict()
                     block_dict['author'] = change_block.author
                     block_dict['date'] = change_block.date
+                    block_dict['short_date'] = changeblock_date.strftime("%d. %B %Y")
                     block_dict['version'] = str(change_block.version)
                     block_dict['package'] = change_block.package
                     block_dict['distributions'] = change_block.distributions
