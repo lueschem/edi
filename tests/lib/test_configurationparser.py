@@ -89,11 +89,12 @@ def test_documentation_steps_overlay(config_files, monkeypatch):
         assert len(documentation_steps) == 2
         expected_steps = ["10_first_step", "20_second_step"]
         for step, expected in zip(documentation_steps, expected_steps):
-            name, path, parameters, _ = step
+            name, path, parameters, raw_node = step
             assert name == expected
             if name == "20_second_step":
                 value = parameters.get("edi_doc_include_packages")
                 assert value == ['x', 'y', 'z']
+                assert raw_node.get('output', {}).get('file') == 'foo.rst'
 
 
 def test_empty_overlay_file(empty_overlay_config_file):

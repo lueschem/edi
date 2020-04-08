@@ -135,6 +135,8 @@ postprocessing_commands:
 documentation_steps:
     10_first_step:
         path:               documentation_steps/first.j2
+        output:
+            file:           bingo.rst
         parameters:
             message:        "first step"
     20_second_step:
@@ -144,6 +146,8 @@ documentation_steps:
     30_last_step:
         path:               path/to/last.j2
         skip:               True
+        output:
+            file:           bongo.rst
         parameters:
             message:        "skipping first step"
 """
@@ -186,6 +190,8 @@ postprocessing_commands:
 
 documentation_steps:
     20_second_step:
+        output:
+            file:           foo.rst
         parameters:
             edi_doc_include_packages: ['x','y','z']
 """
