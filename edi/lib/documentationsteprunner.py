@@ -30,7 +30,7 @@ import traceback
 import gzip
 from dateutil import parser
 from debian.changelog import Changelog
-from edi.lib.helpers import chown_to_user, FatalError
+from edi.lib.helpers import print_success, FatalError
 from edi.lib.helpers import get_workdir
 from edi.lib.configurationparser import remove_passwords
 
@@ -125,36 +125,64 @@ class DocumentationStepRunner():
         augmented_parameters['edi_build_setup'] = self.build_setup
         return augmented_parameters
 
+    def check_for_absence_of_output_files(self):
+        for name, _, _, raw_node in self._get_documentation_steps():
+            file = self._get_output_file(name, raw_node)
+
+            file_path = os.path.join(self.rendered_output, file)
+            if os.path.exists(file_path):
+                raise FatalError("Output file '{}' already exists.".format(file_path))
+
     def run_all(self):
         self.fetch_artifact_setup()
 
         workdir = get_workdir()
         applied_documentation_steps = []
         with tempfile.TemporaryDirectory(dir=workdir) as tempdir:
-            chown_to_user(tempdir)
-            temp_output_path = os.path.join(tempdir, os.path.basename(self.rendered_output))
-            with open(temp_output_path, encoding="UTF-8", mode="w") as output:
-                chown_to_user(temp_output_path)
-                for name, path, parameters, in self._get_documentation_steps():
+            temp_output_file_paths = set()
+            for name, path, parameters, raw_node in self._get_documentation_steps():
+                output_file = self._get_output_file(name, raw_node)
+                temp_output_path = os.path.join(tempdir, output_file)
+                temp_output_file_paths.add(temp_output_path)
+                with open(temp_output_path, encoding="UTF-8", mode="a") as output:
                     augmented_parameters = self.augment_step_parameters(parameters)
 
                     logging.info(("Running documentation step {} located in "
-                                  "{} with parameters:\n{}"
+                                  "{} with parameters:\n{}\n"
+                                  "Writing output to {}."
                                   ).format(name, path,
                                            yaml.dump(remove_passwords(augmented_parameters),
-                                                     default_flow_style=False)))
+                                                     default_flow_style=False),
+                                           os.path.join(self.rendered_output, output_file)))
 
                     self._run_documentation_step(path, augmented_parameters, output)
                     applied_documentation_steps.append(name)
-                shutil.move(temp_output_path, self.rendered_output)
+
+            for temp_output_file_path in temp_output_file_paths:
+                shutil.move(temp_output_file_path, os.path.join(self.rendered_output,
+                                                                os.path.basename(temp_output_file_path)))
 
         return applied_documentation_steps
+
+    def clean(self):
+        for name, _, _, raw_node in self._get_documentation_steps():
+            file = self._get_output_file(name, raw_node)
+
+            file_path = os.path.join(self.rendered_output, file)
+            if os.path.exists(file_path):
+                logging.info("Removing '{}'.".format(file_path))
+                try:
+                    os.remove(file_path)
+                except Exception as e:
+                    raise FatalError("Failed to delete {}:\n{}".format(file_path, e))
+
+                print_success("Removed documentation file {}.".format(file_path))
 
     def _get_documentation_steps(self):
         step_list = []
         documentation_step_list = self.config.get_ordered_path_items(self.config_section)
-        for name, path, parameters, _ in documentation_step_list:
-            step_list.append((name, path, parameters))
+        for name, path, parameters, raw_node in documentation_step_list:
+            step_list.append((name, path, parameters, raw_node))
 
         return step_list
 
@@ -168,9 +196,10 @@ class DocumentationStepRunner():
         if documentation_steps:
             result[self.config_section] = []
 
-        for name, path, parameters in documentation_steps:
+        for name, path, parameters, raw_node in documentation_steps:
             augmented_parameters = self.augment_step_parameters(parameters)
-            plugin_info = {name: {'path': path, 'dictionary': augmented_parameters}}
+            plugin_info = {name: {'path': path, 'dictionary': augmented_parameters,
+                                  'output': raw_node.get('output', {})}}
             result[self.config_section].append(plugin_info)
 
         return result
@@ -206,6 +235,13 @@ class DocumentationStepRunner():
         if not package_name:
             raise FatalError("Missing 'package' key in dictionary of installed package.")
         return package_name
+
+    @staticmethod
+    def _get_output_file(name, node):
+        file = node.get('output', {}).get('file')
+        if not file:
+            raise FatalError('Missing output file for {}.'.format(name))
+        return file
 
     def _get_documentation_step_packages(self, parameters):
         installed_packages = set([self._get_package_name(package) for package in self.installed_packages])

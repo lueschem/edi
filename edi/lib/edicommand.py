@@ -123,6 +123,7 @@ class EdiCommand(metaclass=CommandFactory):
                                help='clean the artifacts that got produced by this command')
             group.add_argument('--recursive-clean', type=int, metavar='N',
                                help='clean the artifacts that got produced by this and the preceding N commands')
+        return group
 
     @staticmethod
     def _unpack_cli_args(cli_args):
