@@ -1,0 +1,22 @@
+{%- set indent = ({"a":"", "el":"" ,"li": "* ", "lic": "  ", "sli": "  - ", "slic": "    ", "ssli": "    + ", "sslic": "      "}) %}
+{%- if not title is defined %}{% set title = "Packages" %}{% endif %}
+{%- if edi_doc_first_chunk %}
+{{ title }}
+{{ '*' * title|length }}
+{% endif %}
+{% for package in edi_doc_packages %}
+{%- if package.changelog.change_blocks %}
+{{ package.package }}
+{{ '+' * package.package|length }}
+
+{% for change_block in package.changelog.change_blocks %}
+{{ change_block.version + ' - ' + change_block.short_date }}
+{{ '-' * (change_block.version + ' - ' + change_block.short_date)|length }}
+{% for change in change_block.changes %}
+{{ indent[change[0]] }}{{ change[1] }}
+{% endfor %}
+{% endfor %}
+{%- endif %}
+{% endfor %}
+{%- if edi_doc_last_chunk %}
+{%- endif %}
