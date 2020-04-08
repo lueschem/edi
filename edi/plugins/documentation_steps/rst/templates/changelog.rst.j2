@@ -1,8 +1,20 @@
-{%- set indent = ({"a":"", "el":"" ,"li": "* ", "lic": "  ", "sli": "  - ", "slic": "    ", "ssli": "    + ", "sslic": "      "}) %}
-{%- if not title is defined %}{% set title = "Packages" %}{% endif %}
+{%- if not title is defined %}{% set title = "Changelog" %}{% endif %}
+{%- if not introduction is defined %}{% set introduction = "" %}{% endif %}
+{%- set indent = ({
+"a": "",
+"el": "" ,
+"li": "* ",
+"lic": "  ",
+"sli": "  - ",
+"slic": "    ",
+"ssli": "    + ",
+"sslic": "      "})
+%}
 {%- if edi_doc_first_chunk %}
 {{ title }}
 {{ '*' * title|length }}
+
+{{ introduction }}
 {% endif %}
 {% for package in edi_doc_packages %}
 {%- if package.changelog.change_blocks %}

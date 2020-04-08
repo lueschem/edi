@@ -1,0 +1,28 @@
+{%- if not title is defined %}{% set title = "Setup" %}{% endif %}
+{%- if not table_title is defined %}{% set table_title = "" %}{% endif %}
+{%- if not introduction is defined %}{% set introduction = "" %}{% endif %}
+{%- set translate_component = ({
+"configuration_name": "Configuration",
+"ansible_version": "Ansible ",
+"project_scm_revision": "Project SCM revision",
+"edi_version": "edi"
+}) %}
+{%- if edi_doc_first_chunk %}
+{{ title }}
+{{ '*' * title|length }}
+
+{{ introduction }}
+
+.. list-table:: {{ table_title }}
+   :widths: 50 50
+   :header-rows: 1
+
+   * - Component
+     - Setup
+{%- for component, setup in edi_build_setup.items() %}
+   * - {{ translate_component[component] or component }}
+     - {{ setup }}
+{%- endfor %}
+{%- endif %}
+{%- if edi_doc_last_chunk %}
+{% endif %}

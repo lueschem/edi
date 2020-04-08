@@ -1,0 +1,22 @@
+{%- if not title is defined %}{% set title = "Versions" %}{% endif %}
+{%- if not table_title is defined %}{% set table_title = "" %}{% endif %}
+{%- if not introduction is defined %}{% set introduction = "" %}{% endif %}
+{%- if edi_doc_first_chunk %}
+{{ title }}
+{{ '*' * title|length }}
+
+{{ introduction }}
+
+.. list-table:: {{ table_title }}
+   :widths: 50 50
+   :header-rows: 1
+
+   * - Package
+     - Version
+{%- endif %}
+{%- for package in edi_doc_packages %}
+   * - {{ package.package }}
+     - {{ package.version }}
+{%- endfor %}
+{%- if edi_doc_last_chunk %}
+{% endif %}
