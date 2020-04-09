@@ -1,14 +1,14 @@
 {%- if not title is defined %}{% set title = "Changelog" %}{% endif %}
 {%- if not introduction is defined %}{% set introduction = "" %}{% endif %}
 {%- set indent = ({
-"a": "",
-"el": "" ,
-"li": "* ",
-"lic": "  ",
-"sli": "  - ",
-"slic": "    ",
-"ssli": "    + ",
-"sslic": "      "})
+"author": "",
+"empty_line": "" ,
+"list_item": "* ",
+"list_item_continuation": "  ",
+"sub_list_item": "  - ",
+"sub_list_item_continuation": "    ",
+"sub_sub_list_item": "    + ",
+"sub_sub_list_item_continuation": "      "})
 %}
 {%- if edi_doc_first_chunk %}
 {{ title }}

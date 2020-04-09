@@ -40,18 +40,21 @@ class ChangesAnnotator():
     def __init__(self, package):
         self._pattern_lookup = [
             # level 0: author, empty line or fallback
-            [('a', r'^[ ]{2}\[[ ]*', self._trim_author, []),
-             ('el', r'^$', self._nop, []),
-             ('li', r'.*', self._report_parser_warning, [])],
+            [('author', r'^[ ]{2}\[[ ]*', self._trim_author, []),
+             ('empty_line', r'^$', self._nop, []),
+             ('list_item', r'.*', self._report_parser_warning, [])],
             # level 1: list item, list item continuation or empty line
-            [('li', r'^[ ]{2}[*+-] ', self._trim_list_item, []),
-             ('lic', r'^[ ]{2,4}[^[]', self._trim_list_item_continuation, ['li', 'lic'])],
+            [('list_item', r'^[ ]{2}[*+-] ', self._trim_list_item, []),
+             ('list_item_continuation', r'^[ ]{2,4}[^[]', self._trim_list_item_continuation,
+              ['list_item', 'list_item_continuation'])],
             # level 2: sub list item, sub list item continuation or empty line
-            [('sli', r'^[ ]{3,4}[*+-] ', ChangesAnnotator._trim_list_item, []),
-             ('slic', r'^[ ]{5,6}', ChangesAnnotator._trim_list_item_continuation, ['sli', 'slic'])],
+            [('sub_list_item', r'^[ ]{3,4}[*+-] ', ChangesAnnotator._trim_list_item, []),
+             ('sub_list_item_continuation', r'^[ ]{5,6}', ChangesAnnotator._trim_list_item_continuation,
+              ['sub_list_item', 'sub_list_item_continuation'])],
             # level 3: sub sub list item, sub sub list item continuation or empty line
-            [('ssli', r'^[ ]{6}[*+-] ', self._trim_list_item, []),
-             ('sslic', r'^[ ]{8}', ChangesAnnotator._trim_list_item_continuation, ['ssli', 'sslic'])],
+            [('sub_sub_list_item', r'^[ ]{6}[*+-] ', self._trim_list_item, []),
+             ('sub_sub_list_item_continuation', r'^[ ]{8}', ChangesAnnotator._trim_list_item_continuation,
+              ['sub_sub_list_item', 'sub_sub_list_item_continuation'])],
             # level 5: sentinel
             [],
         ]
