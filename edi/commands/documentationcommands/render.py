@@ -21,8 +21,9 @@
 
 import os
 import argparse
+import logging
 from edi.commands.documentation import Documentation
-from edi.lib.helpers import print_success, FatalError
+from edi.lib.helpers import print_success
 from edi.lib.documentationsteprunner import DocumentationStepRunner
 
 
@@ -105,7 +106,7 @@ class Render(Documentation):
         self.rendered_output = os.path.abspath(rendered_output)
 
         if os.getuid() == 0:
-            raise FatalError('Do not use the render command as root!')
+            logging.warning('You should not not use the render command as root!')
 
         return run_method()
 
