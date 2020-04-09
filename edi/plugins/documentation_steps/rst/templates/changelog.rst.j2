@@ -1,0 +1,34 @@
+{%- if not title is defined %}{% set title = "Changelog" %}{% endif %}
+{%- if not introduction is defined %}{% set introduction = "" %}{% endif %}
+{%- set indent = ({
+"author": "",
+"empty_line": "" ,
+"list_item": "* ",
+"list_item_continuation": "  ",
+"sub_list_item": "  - ",
+"sub_list_item_continuation": "    ",
+"sub_sub_list_item": "    + ",
+"sub_sub_list_item_continuation": "      "})
+%}
+{%- if edi_doc_first_chunk %}
+{{ title }}
+{{ '*' * title|length }}
+
+{{ introduction }}
+{% endif %}
+{% for package in edi_doc_packages %}
+{%- if package.changelog and package.changelog.change_blocks %}
+{{ package.package }}
+{{ '+' * package.package|length }}
+
+{% for change_block in package.changelog.change_blocks %}
+{{ change_block.version + ' - ' + change_block.short_date }}
+{{ '-' * (change_block.version + ' - ' + change_block.short_date)|length }}
+{% for change in change_block.changes %}
+{{ indent[change[0]] }}{{ change[1] }}
+{% endfor %}
+{% endfor %}
+{%- endif %}
+{% endfor %}
+{%- if edi_doc_last_chunk %}
+{%- endif %}

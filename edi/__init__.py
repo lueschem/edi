@@ -24,7 +24,7 @@ import argparse
 import argcomplete
 import logging
 import requests
-from edi.commands import clean, config, image, lxc, qemu, target, version  # noqa: ignore=F401
+from edi.commands import clean, config, image, lxc, qemu, target, version, documentation  # noqa: ignore=F401
 from edi.lib.commandfactory import get_sub_commands, get_command
 from edi.lib.helpers import print_error_and_exit, FatalError
 from edi.lib.edicommand import EdiCommand

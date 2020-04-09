@@ -319,7 +319,7 @@ class ConfigurationParser:
                                                                                 "parameters")
 
         nested_elements = ["playbooks", "postprocessing_commands", "lxc_templates",
-                           "lxc_profiles", "shared_folders"]
+                           "lxc_profiles", "shared_folders", "documentation_steps"]
         for element in nested_elements:
             merged_config[element
                           ] = self._merge_nested_node(base, overlay,

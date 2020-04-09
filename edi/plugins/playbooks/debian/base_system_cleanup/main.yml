@@ -10,6 +10,7 @@
     target_no_proxy: ""
     document_build_setup: False
     document_installed_packages: False
+    package_baseline_source_file: "{{ edi_project_directory }}/configuration/documentation/packages-baseline.yml"
   roles:
     - role: openssh_server_keys
       become: True

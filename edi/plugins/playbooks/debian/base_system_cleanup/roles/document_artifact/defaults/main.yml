@@ -5,3 +5,5 @@ documentation_directory: /usr/share/doc/edi
 package_documentation_command: "dpkg-query --show --showformat='- package: ${Package}\n  architecture: ${Architecture}\n  version: \"${Version}\"\n  source_package: ${source:Package}\n  status: ${db:Status-Abbrev}\n'"
 package_documentation_file: packages.yml
 build_documentation_file: build.yml
+package_baseline_documentation_file: packages-baseline.yml
+package_baseline_source_file: "{{ edi_project_directory }}/configuration/documentation/packages-baseline.yml"

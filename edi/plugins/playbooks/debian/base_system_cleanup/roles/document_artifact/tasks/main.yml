@@ -30,3 +30,13 @@
     src: packages
     dest: "{{ documentation_directory }}/{{ package_documentation_file }}"
   when: document_installed_packages
+
+- name: Document the packages baseline.
+  copy:
+    src: "{{ item }}"
+    dest: "{{ documentation_directory }}/{{ package_baseline_documentation_file }}"
+  with_first_found:
+    - files:
+      - "{{ package_baseline_source_file }}"
+      skip: true
+  when: document_installed_packages

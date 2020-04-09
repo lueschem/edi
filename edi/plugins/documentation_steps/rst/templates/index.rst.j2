@@ -1,0 +1,18 @@
+{%- if not title is defined %}{% set title = "Release Notes" %}{% endif %}
+{%- if not maxdepth is defined %}{% set maxdepth = "2" %}{% endif %}
+{%- if not caption is defined %}{% set caption = "Contents:" %}{% endif %}
+{%- if not toctree_items is defined %}{% set toctree_items = [] %}{% endif %}
+{%- if edi_doc_first_chunk %}
+{{ title }}
+{{ '=' * title|length }}
+
+.. toctree::
+   :maxdepth: {{ maxdepth }}
+   :caption: {{ caption }}
+{% for item in toctree_items %}
+   {{ item }}
+{%- endfor %}
+
+{%- endif %}
+{%- if edi_doc_last_chunk %}
+{% endif %}
