@@ -302,7 +302,15 @@ class DocumentationStepRunner():
 
         if package_changelog_path:
             with gzip.open(package_changelog_path) as fh:
-                changelog = Changelog(fh)
+                try:
+                    changelog = Changelog(fh)
+                except UnicodeDecodeError as e:
+                    raise FatalError("Failed to parse changelog of {}:\n{}".format(package_name, str(e)))
+
+                if not (changelog.package or changelog.date or changelog.author):
+                    logging.warning("The changelog of package '{}' is incomplete.".format(package_name))
+                    return
+
                 package_dict = dict()
                 package_dict['author'] = changelog.author
                 package_dict['date'] = changelog.date
@@ -313,6 +321,7 @@ class DocumentationStepRunner():
                 change_blocks = list()
                 for change_block in changelog:
                     changeblock_date = self._parse_date(change_block.date)
+
                     if changeblock_date <= baseline_date:
                         break
 

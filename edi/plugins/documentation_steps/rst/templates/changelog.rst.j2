@@ -17,7 +17,7 @@
 {{ introduction }}
 {% endif %}
 {% for package in edi_doc_packages %}
-{%- if package.changelog.change_blocks %}
+{%- if package.changelog and package.changelog.change_blocks %}
 {{ package.package }}
 {{ '+' * package.package|length }}
 
