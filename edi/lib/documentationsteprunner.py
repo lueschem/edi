@@ -244,7 +244,7 @@ class DocumentationStepRunner():
             baseline_packages = yaml.safe_load(f.read())
             if not isinstance(baseline_packages, list):
                 raise FatalError("'{}' should contain a list of baseline packages.".format(baseline_packages))
-            return {self._get_package_value('package', package_dict) : self._get_package_value('version', package_dict)
+            return {self._get_package_value('package', package_dict): self._get_package_value('version', package_dict)
                     for package_dict in baseline_packages}
 
     @staticmethod
@@ -316,7 +316,7 @@ class DocumentationStepRunner():
                     if changeblock_date <= baseline_date:
                         break
 
-                    if change_block.version <= Version(self.baseline_versions.get(package_name)):
+                    if change_block.version <= Version(self.baseline_versions.get(package_name, '0.0.0')):
                         break
 
                     block_dict = dict()
@@ -339,8 +339,8 @@ class DocumentationStepRunner():
     def _parse_date(date_string):
         try:
             return parser.parse(date_string)
-        except ValueError as ve:
-            raise FatalError("Failed to parse date string '{}':\n{}".format(date_string, str(ve)))
+        except Exception as e:
+            raise FatalError("Failed to parse date string '{}':\n{}".format(date_string, str(e)))
 
     def _run_documentation_step(self, template_path, parameters, outfile):
         step_packages = self._get_documentation_step_packages(parameters)
