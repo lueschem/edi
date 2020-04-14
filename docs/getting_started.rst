@@ -1,26 +1,12 @@
 Getting Started
 ===============
 
-The following setup steps have been tested on Ubuntu 16.04, on Ubuntu 18.04 and on Debian stretch.
+The following setup steps have been tested on Ubuntu 18.04, on Ubuntu 20.04 and on Debian buster.
 
 Prerequisites
 +++++++++++++
 
-#. This first step is only required on Ubuntu 16.04 and can be skipped if you are on a more recent Ubuntu or
-   Debian version. edi requires features that got introduced with Ansible 2.1. On Ubuntu 16.04 you can 
-   enable xenial-backports and then install Ansible as follows:
-
-   .. code-block:: bash
-      :caption: Ubuntu 16.04 only
-
-      sudo apt install ansible/xenial-backports
-
 #. Install lxd:
-
-   .. code-block:: bash
-      :caption: Ubuntu 16.04
-
-      sudo apt install lxd/xenial-backports lxcfs/xenial-backports lxd-client/xenial-backports liblxc1/xenial-backports
 
    .. code-block:: bash
       :caption: Ubuntu 18.04
@@ -28,7 +14,7 @@ Prerequisites
       sudo apt install lxd
 
    .. code-block:: bash
-      :caption: Debian or Ubuntu >= 19.04
+      :caption: Debian or Ubuntu >= 19.10
 
       sudo apt install snapd
       sudo snap install lxd
@@ -39,12 +25,12 @@ Prerequisites
 #. Initialize lxd:
 
    .. code-block:: bash
-      :caption: Ubuntu 16.04 or Ubuntu 18.04
+      :caption: Ubuntu 18.04
 
       sudo lxd init
 
    .. code-block:: bash
-      :caption: Debian or Ubuntu >= 19.04
+      :caption: Debian or Ubuntu >= 19.10
 
       sudo /snap/bin/lxd init
 
@@ -124,7 +110,7 @@ Building a First Container
 
    .. code-block:: bash
 
-      edi config init my-project debian-stretch-amd64
+      edi config init my-project debian-buster-amd64
 
 #. Build your first (development) lxc container named *my-first-edi-container*:
 

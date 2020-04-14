@@ -7,7 +7,7 @@ Within an empty directory the following command can be used to generate an initi
 
 .. code:: bash
 
-   edi config init my-project debian-stretch-amd64
+   edi config init my-project debian-buster-amd64
 
 
 This command generates a configuration with four placeholder use cases:
@@ -120,14 +120,14 @@ you to do this. The following settings are available:
       If not specified edi assumes that the package is named :code:`qemu-user-static`.
    *repository:*
       The repository specification where QEMU will get downloaded from.
-      A valid value looks like this: :code:`deb http://deb.debian.org/debian/ stretch main`.
+      A valid value looks like this: :code:`deb http://deb.debian.org/debian/ buster main`.
       If unspecified, edi will try to download QEMU from the repository indicated in the bootstrap section.
    *repository_key:*
       The signature key for the QEMU repository.
       *Attention*: If you do not specify a key the downloaded QEMU package will not be verified.
       *Hint*: It is a good practice to download such a key from a
       https server.
-      A valid repository key value is: :code:`https://ftp-master.debian.org/keys/archive-key-8.asc`.
+      A valid repository key value is: :code:`https://ftp-master.debian.org/keys/archive-key-9.asc`.
 
 
 .. _ordered_node_section:
