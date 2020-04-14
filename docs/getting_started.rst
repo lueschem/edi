@@ -39,8 +39,8 @@ Prerequisites
 
 .. _`the linux containers documentation`: https://linuxcontainers.org/lxd/getting-started-cli/
 
-Installing edi from the Archive
-+++++++++++++++++++++++++++++++
+Installing edi from the Package Repository
+++++++++++++++++++++++++++++++++++++++++++
 
 For your convenience, you can directly install edi from a `ppa`_ (Ubuntu) or `packagecloud`_ (Debian):
 
@@ -50,7 +50,7 @@ For your convenience, you can directly install edi from a `ppa`_ (Ubuntu) or `pa
       :caption: Ubuntu
 
       sudo add-apt-repository ppa:m-luescher/edi-snapshots
-      sudo apt-get update
+      sudo apt update
 
    .. code-block:: bash
       :caption: Debian
