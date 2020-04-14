@@ -4,6 +4,9 @@ general:
 {% endif %}
     parameters:
         ansible_pipelining: true
+{% if edi_use_python3 is defined and edi_use_python3 %}
+        ansible_python_interpreter: /usr/bin/python3
+{% endif %}
 
 bootstrap:
 {% if edi_bootstrap_architecture %}
@@ -21,8 +24,24 @@ bootstrap:
     repository_key: https://ftp-master.debian.org/keys/archive-key-8.asc
 {% endif %}
     tool: debootstrap
+    additional_packages:
+{% if edi_use_python3 is defined and edi_use_python3 %}
+    - python3
+{% else %}
+    - python
+{% endif %}
+    - sudo
+    - netbase
+    - net-tools
+    - iputils-ping
+    - ifupdown
+    - isc-dhcp-client
+    - resolvconf
+    - systemd
+    - systemd-sysv
+    - gnupg
 {% if edi_setup_dumb_init is defined and edi_setup_dumb_init %}
-    additional_packages: ["python", "sudo", "netbase", "net-tools", "iputils-ping", "ifupdown", "isc-dhcp-client", "resolvconf", "systemd", "systemd-sysv", "gnupg", "dumb-init"]
+    - dumb-init
 {% endif %}
 
 {% if edi_use_buster_qemu is defined and edi_use_buster_qemu %}
