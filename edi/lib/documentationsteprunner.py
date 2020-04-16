@@ -286,7 +286,13 @@ class DocumentationStepRunner():
         result = []
         for item in string_list:
             for replacement in replacements:
-                item = re.sub(replacement.get('pattern', ''), replacement.get('replacement', ''), item)
+                p = replacement.get('pattern', '')
+                r = replacement.get('replacement', '')
+                try:
+                    item = re.sub(p, r, item)
+                except Exception as e:
+                    raise FatalError(("Failed to apply regular expression:\n"
+                                      "pattern: {}\nreplacement: {}:\nmessage: {}").format(p, r, str(e)))
 
             result. append(item)
 
