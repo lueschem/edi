@@ -44,23 +44,23 @@ from tests.libtesting.contextmanagers.mocked_executable import mocked_executable
 
 
 @pytest.mark.parametrize(("command, command_args, has_templates, "
-                          "has_profiles, has_playbooks, has_postprocessing_commands"), [
-    (Bootstrap, ['image', 'bootstrap', '--plugins'], False, False, False, False),
-    (Prepare, ['lxc', 'prepare', '--plugins'], True, False, False, False),
-    (Create, ['image', 'create', '--plugins'], True, True, True, True),
-    (Export, ['lxc', 'export', '--plugins'], True, True, True, False),
-    (Import, ['lxc', 'import', '--plugins'], True, False, False, False),
-    (Launch, ['lxc', 'launch', '--plugins', 'cname'], True, True, False, False),
-    (Configure, ['lxc', 'configure', '--plugins', 'cname'], True, True, True, False),
-    (Profile, ['lxc', 'profile', '--plugins'], False, True, False, False),
-    (Publish, ['lxc', 'publish', '--plugins'], True, True, True, False),
-    (Stop, ['lxc', 'stop', '--plugins'], True, True, True, False),
-    (Fetch, ['qemu', 'fetch', '--plugins'], False, False, False, False),
-    (TargetConfigure, ['target', 'configure', '--plugins', '1.2.3.4'], False, False, True, False),
-    (Render, ['documentation', 'render', '--plugins', './', './'], False, False, False, False),
+                          "has_profiles, has_playbooks, has_postprocessing_commands, check_errors"), [
+    (Bootstrap, ['image', 'bootstrap', '--plugins'], False, False, False, False, True),
+    (Prepare, ['lxc', 'prepare', '--plugins'], True, False, False, False, True),
+    (Create, ['image', 'create', '--plugins'], True, True, True, True, True),
+    (Export, ['lxc', 'export', '--plugins'], True, True, True, False, True),
+    (Import, ['lxc', 'import', '--plugins'], True, False, False, False, True),
+    (Launch, ['lxc', 'launch', '--plugins', 'cname'], True, True, False, False, True),
+    (Configure, ['lxc', 'configure', '--plugins', 'cname'], True, True, True, False, True),
+    (Profile, ['lxc', 'profile', '--plugins'], False, True, False, False, True),
+    (Publish, ['lxc', 'publish', '--plugins'], True, True, True, False, True),
+    (Stop, ['lxc', 'stop', '--plugins'], True, True, True, False, True),
+    (Fetch, ['qemu', 'fetch', '--plugins'], False, False, False, False, True),
+    (TargetConfigure, ['target', 'configure', '--plugins', '1.2.3.4'], False, False, True, False, True),
+    (Render, ['documentation', 'render', '--plugins', './', './'], False, False, False, False, False),
 ])
 def test_plugins(monkeypatch, config_files, capsys, command, command_args, has_templates,
-                 has_profiles, has_playbooks, has_postprocessing_commands):
+                 has_profiles, has_playbooks, has_postprocessing_commands, check_errors):
     with mocked_executable('lxc'):
         with mocked_lxd_version_check():
             def fake_lxc_config_command(*popenargs, **kwargs):
@@ -78,7 +78,8 @@ def test_plugins(monkeypatch, config_files, capsys, command, command_args, has_t
             command().run_cli(cli_args)
             out, err = capsys.readouterr()
 
-            assert err == ''
+            if check_errors:
+                assert err == ''
             result = yaml.safe_load(out)
 
             if has_templates:

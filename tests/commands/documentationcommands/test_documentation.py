@@ -34,6 +34,7 @@ def test_documentation_all(capsys, datadir):
                                   os.path.join(str(datadir), 'all.yml')])
 
     Render().run_cli(cli_args)
+    capsys.readouterr()
 
     output_files = ['changelog.rst', 'index.rst', 'setup.rst', 'versions.rst']
 
