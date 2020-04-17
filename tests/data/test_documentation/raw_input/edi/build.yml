@@ -1,0 +1,4 @@
+configuration_name: "some_configuration"
+project_scm_revision: "42424242843adf65eb0934b3267af86cc8191f42"
+edi_version: "1.5.1"
+ansible_version: "2.5.1"
