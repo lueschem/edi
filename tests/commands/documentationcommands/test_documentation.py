@@ -27,14 +27,13 @@ from edi.commands.documentationcommands.render import Render
 from edi.lib.helpers import FatalError
 
 
-def test_documentation_all(capsys, datadir):
+def test_documentation_all(datadir):
     parser = edi._setup_command_line_interface()
     raw_input = os.path.join(str(datadir), 'raw_input')
     cli_args = parser.parse_args(['--log', 'WARNING', 'documentation', 'render', raw_input, str(datadir),
                                   os.path.join(str(datadir), 'all.yml')])
 
     Render().run_cli(cli_args)
-    capsys.readouterr()
 
     output_files = ['changelog.rst', 'index.rst', 'setup.rst', 'versions.rst']
 
@@ -46,14 +45,13 @@ def test_documentation_all(capsys, datadir):
 
     with pytest.raises(FatalError) as error:
         Render().run_cli(cli_args)
+
     assert 'already exists' in error.value.message
 
     cli_args = parser.parse_args(['documentation', 'render', '--clean', raw_input, str(datadir),
                                   os.path.join(str(datadir), 'all.yml')])
 
     Render().run_cli(cli_args)
-    out, err = capsys.readouterr()
-    assert not err
 
     for file in output_files:
         generated = os.path.join(str(datadir), file)
