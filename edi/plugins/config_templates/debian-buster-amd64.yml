@@ -3,4 +3,5 @@ parameters:
     edi_bootstrap_repository: deb http://deb.debian.org/debian/ buster main
     edi_bootstrap_repository_key: https://ftp-master.debian.org/keys/archive-key-9.asc
     edi_setup_dumb_init: true
+    edi_use_python3: true
 

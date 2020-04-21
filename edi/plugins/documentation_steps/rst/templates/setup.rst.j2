@@ -19,9 +19,9 @@
 
    * - Component
      - Setup
-{%- for component, setup in edi_build_setup.items() %}
-   * - {{ translate_component[component] or component }}
-     - {{ setup }}
+{%- for item in edi_build_setup|dictsort %}
+   * - {{ translate_component[item.0] or item.0 }}
+     - {{ item.1 }}
 {%- endfor %}
 {%- endif %}
 {%- if edi_doc_last_chunk %}

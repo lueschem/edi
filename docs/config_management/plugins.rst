@@ -303,6 +303,14 @@ The playbook can be fine tuned as follows:
      list of all packages including version information. It is a snapshot of the available packages after the artifact
      build and will not get updated when new packages get installed using :code:`dpkg` or :code:`apt`.
      By default this feature is switched off (boolean value :code:`False`).
+  *package_baseline_source_file:*
+     In order to generate a differential changelog it is possible to add a package baseline file to the resulting
+     artifact. The package baseline file has the same format as :code:`/usr/share/doc/edi/build.yml`. If a differential
+     changelog between release n and n+1 is needed, you can copy the file :code:`/usr/share/doc/edi/build.yml` from
+     release n to :code:`{{ edi_project_directory }}/configuration/documentation/packages-baseline.yml` (default value
+     for package_baseline_source_file). The playbook will then make sure that it gets added to artifact n as
+     :code:`/usr/share/doc/edi/packages-baseline.yml`. The command :code:`edi documentation render ...` will use this
+     information to restrict the changelog to changes that happened between release n and n+1.
 
 The final proxy settings can be customized as follows:
 
@@ -382,4 +390,105 @@ processing commands get called. It contains typically the artifact created by th
 The post processing commands are implemented in a very generic way and to get an idea of what they can
 do please take a look at the the edi-pi_ configuration.
 
+Documentation Steps
++++++++++++++++++++
+
+edi ships with a few Jinja2 templates that can be re-used in many projects. This templates can also serve
+as an example if you want to write custom templates for your own project.
+
+To develop custom templates and learn more about the Jinja2 rendering context the documentation command can be executed
+in debug mode:
+
+.. code:: bash
+
+   edi --log=DEBUG documentation render PATH_TO_USR_SHARE_DOC_FOLDER OUTPUT_FOLDER CONFIG.yml
+
+The output of the provided templates is reStructuredText that can be further tweaked and then be transformed into a nice
+pdf document using `Sphinx`_. For more details please take a look at the edi-pi_ example configuration.
+
+Please note that you can generate other output formats such as markdown by providing custom templates.
+
+The templates get applied chunk by chunk. The booleans :code:`edi_doc_first_chunk` and
+:code:`edi_doc_last_chunk` can be used within the templates to add a header or a footer where needed.
+
+.. _Sphinx: https://www.sphinx-doc.org/
 .. _edi-pi: https://github.com/lueschem/edi-pi
+
+Index
+^^^^^
+
+The index template can be used to generate an index file:
+
+.. code-block:: yaml
+  :caption: Configuration Example
+
+  documentation_steps:
+  ...
+    100_index:
+      path: documentation_steps/rst/templates/index.rst.j2
+      output:
+        file: index.rst
+      parameters:
+        edi_doc_include_packages: []
+        toctree_items: ['setup', 'versions', 'changelog']
+  ...
+
+Setup
+^^^^^
+
+The setup template can be used to document the build setup:
+
+.. code-block:: yaml
+  :caption: Configuration Example
+
+  documentation_steps:
+  ...
+    200_setup:
+      path: documentation_steps/rst/templates/setup.rst.j2
+      output:
+        file: setup.rst
+      parameters:
+        edi_doc_include_packages: []
+  ...
+
+Versions
+^^^^^^^^
+
+The versions template can be used to document the package versions:
+
+.. code-block:: yaml
+  :caption: Configuration Example
+
+  documentation_steps:
+  ...
+    300_versions:
+      output:
+        file: versions.rst
+      path: documentation_steps/rst/templates/versions.rst.j2
+  ...
+
+Changelog
+^^^^^^^^^
+
+The changelog template can be used to document the changes of each package:
+
+.. code-block:: yaml
+  :caption: Configuration Example
+
+  documentation_steps:
+  ...
+    400_changelog:
+      path: documentation_steps/rst/templates/changelog.rst.j2
+      output:
+        file: changelog.rst
+      parameters:
+        edi_doc_include_changelog: True
+        edi_doc_changelog_baseline: 2019-12-01 00:00:00 GMT
+        edi_doc_replacements:
+        - pattern: '(CVE-[0-9]{4}-[0-9]{4,6})'
+          replacement: '`\1 <https://cve.mitre.org/cgi-bin/cvename.cgi?name=\1>`_'
+        - pattern: '[#]*((?i)Closes:\s[#])([0-9]{6,10})'
+          replacement: '`\1\2 <https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=\2>`_'
+        - pattern: '[#]*((?i)LP:\s[#])([0-9]{6,10})'
+          replacement: '`\1\2 <https://bugs.launchpad.net/ubuntu/+source/nano/+bug/\2>`_'
+  ...

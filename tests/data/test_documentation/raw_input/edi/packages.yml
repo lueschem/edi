@@ -1,0 +1,21 @@
+- package: edi-boot-shim
+  architecture: all
+  version: "0.8.0+deb10"
+  source_package: edi-boot-shim
+  status: ii 
+- package: python3-apt
+  architecture: armhf
+  version: "1.8.4.1"
+  source_package: python-apt
+  status: ii 
+- package: sudo
+  architecture: armhf
+  version: "1.8.27-1+deb10u2"
+  source_package: sudo
+  status: ii 
+- package: systemd
+  architecture: armhf
+  version: "241-7~deb10u3"
+  source_package: systemd
+  status: ii 
+
