@@ -218,6 +218,8 @@ of :ref:`plugin nodes <plugin_node>`. Please consult the LXD documentation if yo
 The playbooks section is an :ref:`ordered node section <ordered_node_section>` consisting
 of :ref:`plugin nodes <plugin_node>`. Please consult the Ansible documentation if you want to write custom playbooks.
 
+.. _postprocessing_command:
+
 :code:`postprocessing_commands` Section
 +++++++++++++++++++++++++++++++++++++++
 
@@ -269,3 +271,70 @@ The shared folder nodes accept the the following settings:
    *skip:*
       :code:`True` or :code:`False`. If :code:`True` the folder will not be shared.
       If unspecified, the folder will get shared.
+
+.. _`documentation steps`:
+
+:code:`documentation_steps` Section
++++++++++++++++++++++++++++++++++++
+
+The documentation_steps section is an :ref:`ordered node section <ordered_node_section>` consisting
+of :ref:`plugin nodes <plugin_node>`. The documentation_steps section is being processed by the
+:code:`edi documentation render ...` command. This command is independent of the
+:ref:`command pipeline <command_pipeline>` but it can be easily integrated as a
+:ref:`postprocessing command <postprocessing_command>`. (See `edi-pi`_ for a possible implementation.)
+
+The command that renders the documentation gets executed as follows:
+
+.. code:: bash
+
+   edi documentation render PATH_TO_USR_SHARE_DOC_FOLDER OUTPUT_FOLDER CONFIG.yml
+
+From :code:`PATH_TO_USR_SHARE_DOC_FOLDER/edi` the files :code:`build.yml` (optional), :code:`packages.yml` and
+:code:`packages-baseline.yml` (optional) will be retrieved. Based on the content of this files the documentation_steps
+plugins will get executed.
+
+A documentation step can look like this:
+
+.. code::
+
+   documentation_steps:
+     ...
+     400_changelog:
+       path: documentation_steps/rst/templates/changelog.rst.j2
+       output:
+         file: changelog.rst
+       parameters:
+         edi_doc_include_changelog: True
+         edi_doc_changelog_baseline: 2019-12-01 00:00:00 GMT
+         edi_doc_replacements:
+         - pattern: '[#]*((?i)Closes:\s[#])([0-9]{6,10})'
+           replacement: '`\1\2 <https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=\2>`_'
+         - pattern: '[#]*((?i)LP:\s[#])([0-9]{6,10})'
+           replacement: '`\1\2 <https://bugs.launchpad.net/ubuntu/+source/nano/+bug/\2>`_'
+     ...
+
+:code:`path` points to a Jinja2 template that will get used to render the file declared under :code:`output/file`.
+
+The documentation steps can be fine tuned using the following parameters:
+
+.. topic:: Parameters
+
+   *edi_doc_include_packages:*
+      By default all packages retrieved from :code:`build.yml` will get documented. If the documentation step shall only
+      run over a subset of packages, then edi_doc_include_packages can be used to provide a list of packages.
+   *edi_doc_exclude_packages:*
+      If selected packages shall get excluded from the documentation step, then edi_doc_exclude_packages can be used
+      to provide a list of packages. The edi_doc_exclude_packages will be subtracted from edi_doc_include_packages or
+      all packages.
+   *edi_doc_include_changelog:*
+      Switch this parameter to :code:`True` if the documentation step shall provide changelog information while
+      rendering the Jinja2 template.
+   *edi_doc_changelog_baseline:*
+      If the changelog rendering shall not include changes that are older than a certain date then this date can be
+      provided using edi_doc_changelog_baseline. A date can look like :code:`2019-12-01 00:00:00 GMT`.
+   *edi_doc_replacements:*
+      To fine tune the changelog information a list of pattern/replacement pairs can be specified.
+      :code:`re.sub(pattern, replacement, changelog_line)` will be applied to the changelog lines in the given list
+      order.
+
+.. _edi-pi: https://www.github.com/lueschem/edi-pi

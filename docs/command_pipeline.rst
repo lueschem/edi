@@ -1,3 +1,5 @@
+.. _command_pipeline:
+
 Command Pipeline
 ================
 
