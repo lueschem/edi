@@ -22,13 +22,13 @@
 
 import os
 import pytest
+import tempfile
 from edi.lib.shellhelpers import (run, safely_remove_artifacts_folder, gpg_agent, require,
-                                  Executables, get_user_home_directory)
+                                  Executables, get_user_home_directory, mockablerun, mount_aware_tempdir)
 from tests.libtesting.contextmanagers.workspace import workspace
 from tests.libtesting.helpers import (get_random_string, suppress_chown_during_debuild, get_command,
                                       get_sub_command, get_command_parameter)
 from edi.lib.helpers import get_artifact_dir, create_artifact_dir, FatalError
-from edi.lib.shellhelpers import mockablerun
 import subprocess
 
 
@@ -162,3 +162,36 @@ def test_require_with_failing_check():
         decorated_function_with_failing_check()
 
     assert 'check failed' in error.value.message
+
+
+@pytest.mark.requires_sudo
+def test_mount_aware_tempdir():
+    work_dir = os.getcwd()
+    with mount_aware_tempdir(work_dir) as tempdir:
+        assert os.path.isdir(work_dir)
+        assert os.path.isdir(tempdir)
+
+    assert os.path.isdir(work_dir)
+    assert not os.path.isdir(tempdir)
+
+
+@pytest.mark.requires_sudo
+def test_mount_aware_tempdir_remove_mount():
+    work_dir = os.getcwd()
+    with tempfile.TemporaryDirectory(dir=work_dir) as mount_target:
+        mount_target_content = os.path.join(mount_target, 'keep_me')
+        run(['mkdir', '-p', mount_target_content], sudo=True)
+        assert os.path.isdir(mount_target_content)
+
+        with mount_aware_tempdir(work_dir, log_warning=True) as tempdir:
+            assert os.path.isdir(tempdir)
+            mount_point = os.path.join(tempdir, 'mount_point')
+            run(['mkdir', '-p', mount_point], sudo=True)
+            assert not os.path.isdir(os.path.join(tempdir, 'mount_point', 'keep_me'))
+            run(['mount', '--bind', mount_target, mount_point], sudo=True)
+            assert os.path.isdir(os.path.join(tempdir, 'mount_point', 'keep_me'))
+
+        assert not os.path.isdir(tempdir)
+        assert os.path.isdir(mount_target_content)
+
+    assert not os.path.isdir(mount_target_content)

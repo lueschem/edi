@@ -25,6 +25,7 @@ Build-Depends: ansible,
                python3-sphinx,
                python3-yaml,
                sudo,
+               util-linux,
                zstd,
 Maintainer: Matthias Luescher <lueschem@gmail.com>
 Standards-Version: 3.9.7
@@ -44,6 +45,7 @@ Depends: ${misc:Depends},
          python3-dateutil,
          qemu-user-static,
          sudo,
+         util-linux,
          zstd,
 Recommends: lxd,
 Description: Embedded Development Infrastructure - edi

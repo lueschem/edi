@@ -22,6 +22,8 @@
 import logging
 import subprocess
 import os
+from shutil import rmtree
+from tempfile import mkdtemp
 from contextlib import contextmanager
 from edi.lib.helpers import get_user, get_artifact_dir, FatalError, which
 from edi.lib import mockablerun
@@ -118,6 +120,22 @@ def safely_remove_artifacts_folder(abs_folder_path, sudo=False):
         raise FatalError(('''Refusing to delete '{}' since it contains mounted elements.'''
                           ).format(abs_folder_path))
     run(['rm', '-rf', abs_folder_path], sudo=sudo)
+
+
+@contextmanager
+def mount_aware_tempdir(parent_dir, log_warning=False):
+    directory = mkdtemp(dir=parent_dir)
+    assert str(parent_dir) in str(directory)
+    try:
+        yield directory
+    finally:
+        mount_points = run(['findmnt', '--noheadings', '--raw', '--output=target'], stdout=subprocess.PIPE)
+        for mount_point in mount_points.stdout.splitlines():
+            if str(parent_dir) in mount_point:
+                if log_warning:
+                    logging.warning("Going to unmount '{}'.".format(mount_point))
+                run(['umount', mount_point], sudo=True)
+        rmtree(directory)
 
 
 @contextmanager
