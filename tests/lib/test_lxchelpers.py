@@ -22,12 +22,13 @@
 
 import subprocess
 import pytest
+from subprocess import CalledProcessError
 from contextlib import contextmanager
 from edi.lib.helpers import FatalError
 from edi.lib.lxchelpers import (get_server_image_compression_algorithm,
-                                get_file_extension_from_image_compression_algorithm,
-                                get_lxd_version, LxdVersion)
-from edi.lib.shellhelpers import mockablerun
+                                get_file_extension_from_image_compression_algorithm, lxc_exec,
+                                get_lxd_version, LxdVersion, is_bridge_available, create_bridge)
+from edi.lib.shellhelpers import mockablerun, run
 from tests.libtesting.helpers import get_command, get_sub_command
 from tests.libtesting.contextmanagers.mocked_executable import mocked_executable, mocked_lxd_version_check
 
@@ -122,3 +123,17 @@ def test_valid_version(monkeypatch):
     with mocked_executable('lxd', '/here/is/no/lxd'):
         with clear_lxd_version_check_cache():
             LxdVersion.check()
+
+
+@pytest.mark.requires_lxc
+def test_is_bridge_available():
+    bridge_name = "edibrtesttest42"
+    assert not is_bridge_available(bridge_name)
+    create_bridge(bridge_name)
+    assert is_bridge_available(bridge_name)
+    with pytest.raises(CalledProcessError) as e:
+        create_bridge(bridge_name)
+    assert 'non-zero exit status' in str(e)
+    cmd = [lxc_exec(), "network", "delete", bridge_name]
+    run(cmd)
+    assert not is_bridge_available(bridge_name)

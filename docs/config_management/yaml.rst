@@ -57,6 +57,11 @@ edi supports the following settings:
    *edi_lxc_network_interface_name:*
       The default network interface that will be used for the lxc container.
       If unspecified edi will name the container interface :code:`lxcif0`.
+   *edi_lxc_bridge_interface_name:*
+      The bridge that the container will get attached to.
+      If unspecified edi will take the bridge :code:`lxdbr0`. If the specified bridge does not exist, :code:`edi`
+      will automatically create it.
+      Please check the chapter :ref:`default network interface <default_network_interface>` for more information.
    *edi_config_management_user_name:*
       The target system user that will be used for configuration management tasks.
       Please note that direct lxc container management uses the root user.

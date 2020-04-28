@@ -189,6 +189,9 @@ class ConfigurationParser:
             raise FatalError('''The value of 'edi_lxc_stop_timeout' must be an integer.''')
         return timeout
 
+    def get_lxc_bridge_interface_name(self):
+        return self._get_general_item("edi_lxc_bridge_interface_name", "lxdbr0")
+
     def get_general_parameters(self):
         return self._get_general_item("parameters", {})
 
@@ -387,6 +390,7 @@ class ConfigurationParser:
 
         node_dict["edi_lxc_network_interface_name"] = self._get_general_item("edi_lxc_network_interface_name",
                                                                              "lxcif0")
+        node_dict["edi_lxc_bridge_interface_name"] = self.get_lxc_bridge_interface_name()
         node_dict["edi_config_management_user_name"] = self._get_general_item("edi_config_management_user_name",
                                                                               "edicfgmgmt")
 

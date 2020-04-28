@@ -1,3 +1,3 @@
-# Switch off tx offloading on lxdbr0 to avoid dhcp issues on old or emulated containers.
+# Switch off tx offloading on edibr* to avoid dhcp issues on old or emulated containers.
 # This rule gets added by the edi package.
-ACTION=="add", SUBSYSTEM=="net", KERNEL=="lxdbr0", RUN+="/sbin/ethtool -K $env{INTERFACE} tx off"
+ACTION=="add", SUBSYSTEM=="net", KERNEL=="edibr*", RUN+="/sbin/ethtool -K $env{INTERFACE} tx off"

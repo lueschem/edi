@@ -27,7 +27,7 @@ from edi.lib.helpers import FatalError, print_success
 from edi.lib.networkhelpers import is_valid_hostname
 from edi.lib.lxchelpers import (is_container_existing, is_container_running, start_container,
                                 launch_container, get_container_profiles, stop_container,
-                                apply_profiles, try_delete_container)
+                                apply_profiles, try_delete_container, is_bridge_available, create_bridge)
 
 
 class Launch(Lxc):
@@ -50,6 +50,12 @@ class Launch(Lxc):
     @staticmethod
     def _unpack_cli_args(cli_args):
         return [cli_args.container_name, cli_args.config_file]
+
+    def _setup_bridge(self):
+        bridge_name = self.config.get_lxc_bridge_interface_name()
+        if not is_bridge_available(bridge_name):
+            print("Creating new bridge '{}'.".format(bridge_name))
+            create_bridge(bridge_name)
 
     def run_cli(self, cli_args):
         self._dispatch(*self._unpack_cli_args(cli_args), run_method=self._get_run_method(cli_args))
@@ -93,11 +99,13 @@ class Launch(Lxc):
             if not is_container_running(self._result()):
                 logging.info(("Starting existing container {0}."
                               ).format(self._result()))
+                self._setup_bridge()
                 start_container(self._result())
                 print_success("Started container {}.".format(self._result()))
         else:
             image = Import().run(self.config.get_base_config_file())
             profiles = Profile().run(self.config.get_base_config_file(), include_post_config_profiles=False)
+            self._setup_bridge()
             print("Going to launch container.")
             launch_container(image, self._result(), profiles)
             print_success("Launched container {}.".format(self._result()))

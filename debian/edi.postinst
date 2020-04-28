@@ -5,10 +5,6 @@ case "$1" in
     configure)
         mkdir -p /etc/bash_completion.d
         register-python-argcomplete3 edi > /etc/bash_completion.d/edi
-        # Switch off tx offloading on lxdbr0 to avoid dhcp issues on old or emulated containers.
-        # Errors are acceptable since lxdbr0 might not be present.
-        # If lxdbr0 gets added later, this modification will be done by an udev rule.
-        ethtool -K lxdbr0 tx off > /dev/null || true
     ;;
 
     *)
