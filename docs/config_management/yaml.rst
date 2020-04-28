@@ -307,9 +307,9 @@ A documentation step can look like this:
          edi_doc_include_changelog: True
          edi_doc_changelog_baseline: 2019-12-01 00:00:00 GMT
          edi_doc_replacements:
-         - pattern: '[#]*((?i)Closes:\s[#])([0-9]{6,10})'
+         - pattern: '(?i)[#]*(Closes:\s[#])([0-9]{6,10})'
            replacement: '`\1\2 <https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=\2>`_'
-         - pattern: '[#]*((?i)LP:\s[#])([0-9]{6,10})'
+         - pattern: '(?i)[#]*(LP:\s[#])([0-9]{6,10})'
            replacement: '`\1\2 <https://bugs.launchpad.net/ubuntu/+source/nano/+bug/\2>`_'
      ...
 
