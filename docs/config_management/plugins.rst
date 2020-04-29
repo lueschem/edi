@@ -53,21 +53,34 @@ The following profiles have proven to be useful for various projects:
 
 .. _LXD Profile Documentation: https://lxd.readthedocs.io/en/latest/profiles/
 
+.. _default_network_interface:
+
 Default Network Interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This profile adds a default network interface to the container named according to the value of
-:code:`edi_lxc_network_interface_name`. The interface is of type :code:`bridged` and its parent is
-:code:`lxdbr0`.
+:code:`edi_lxc_network_interface_name`. The interface is of type :code:`bridged` and its default parent is
+:code:`lxdbr0`. To properly deal with legacy or emulated containers please use :code:`edibr0` instead of
+:code:`lxdbr0` by setting the general parameter :code:`edi_lxc_bridge_interface_name`:
 
 .. code-block:: yaml
   :caption: Configuration Example
+
+  general:
+    ...
+    edi_lxc_bridge_interface_name: edibr0
+    ...
+
+  ...
 
   lxc_profiles:
     ...
     100_lxc_networking:
         path: lxc_profiles/general/lxc_networking/default_interface.yml
-    ...
+     ...
+
+On the bridges matching :code:`edibr*` checksum offloading gets disabled (e.g. :code:`ethtool -K edibr0 tx off`).
+This is to make sure that emulated and legacy containers can get an IPv4 address assigned.
 
 Default Root Device
 ^^^^^^^^^^^^^^^^^^^
@@ -487,8 +500,8 @@ The changelog template can be used to document the changes of each package:
         edi_doc_replacements:
         - pattern: '(CVE-[0-9]{4}-[0-9]{4,6})'
           replacement: '`\1 <https://cve.mitre.org/cgi-bin/cvename.cgi?name=\1>`_'
-        - pattern: '[#]*((?i)Closes:\s[#])([0-9]{6,10})'
+        - pattern: '(?i)[#]*(Closes:\s[#])([0-9]{6,10})'
           replacement: '`\1\2 <https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=\2>`_'
-        - pattern: '[#]*((?i)LP:\s[#])([0-9]{6,10})'
+        - pattern: '(?i)[#]*(LP:\s[#])([0-9]{6,10})'
           replacement: '`\1\2 <https://bugs.launchpad.net/ubuntu/+source/nano/+bug/\2>`_'
   ...

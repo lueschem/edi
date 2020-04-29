@@ -5,5 +5,5 @@ devices:
   {{ edi_lxc_network_interface_name }}:
     name: "{{ edi_lxc_network_interface_name }}"
     nictype: bridged
-    parent: lxdbr0
+    parent: {{ edi_lxc_bridge_interface_name or 'lxdbr0' }}
     type: nic

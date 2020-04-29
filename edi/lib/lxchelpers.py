@@ -131,22 +131,36 @@ def is_container_running(name):
 
 
 @require('lxc', lxd_install_hint, LxdVersion.check)
+def is_bridge_available(bridge_name):
+    cmd = [lxc_exec(), "network", "list", "--format=json"]
+    result = run(cmd, stdout=subprocess.PIPE)
+
+    try:
+        parsed_result = yaml.safe_load(result.stdout)
+        bridge_names = [item.get("name") for item in parsed_result]
+        if bridge_name in bridge_names:
+            return True
+        else:
+            return False
+    except yaml.YAMLError as exc:
+        raise FatalError("Unable to parse lxc output ({}).".format(exc))
+
+
+@require('lxc', lxd_install_hint, LxdVersion.check)
+def create_bridge(bridge_name):
+    cmd = [lxc_exec(), "network", "create", bridge_name]
+    run(cmd)
+
+
+@require('lxc', lxd_install_hint, LxdVersion.check)
 def launch_container(image, name, profiles):
     cmd = [lxc_exec(), "launch", "local:{}".format(image), name]
     for profile in profiles:
         cmd.extend(["-p", profile])
     result = run(cmd, check=False, stderr=subprocess.PIPE, log_threshold=logging.INFO)
     if result.returncode != 0:
-        if 'Missing parent' in result.stderr and 'lxdbr0' in result.stderr:
-            raise FatalError(('''Launching image '{}' failed with the following message:\n{}'''
-                              'Please make sure that lxdbr0 is available. Use one of the following commands to '
-                              'create lxdbr0:\n'
-                              'lxd init\n'
-                              'or (for lxd >= 2.3)\n'
-                              'lxc network create lxdbr0').format(image, result.stderr))
-        else:
-            raise FatalError(('''Launching image '{}' failed with the following message:\n{}'''
-                              ).format(image, result.stderr))
+        raise FatalError(('''Launching image '{}' failed with the following message:\n{}'''
+                          ).format(image, result.stderr))
 
 
 @require('lxc', lxd_install_hint, LxdVersion.check)

@@ -57,6 +57,11 @@ edi supports the following settings:
    *edi_lxc_network_interface_name:*
       The default network interface that will be used for the lxc container.
       If unspecified edi will name the container interface :code:`lxcif0`.
+   *edi_lxc_bridge_interface_name:*
+      The bridge that the container will get attached to.
+      If unspecified edi will take the bridge :code:`lxdbr0`. If the specified bridge does not exist, :code:`edi`
+      will automatically create it.
+      Please check the chapter :ref:`default network interface <default_network_interface>` for more information.
    *edi_config_management_user_name:*
       The target system user that will be used for configuration management tasks.
       Please note that direct lxc container management uses the root user.
@@ -307,9 +312,9 @@ A documentation step can look like this:
          edi_doc_include_changelog: True
          edi_doc_changelog_baseline: 2019-12-01 00:00:00 GMT
          edi_doc_replacements:
-         - pattern: '[#]*((?i)Closes:\s[#])([0-9]{6,10})'
+         - pattern: '(?i)[#]*(Closes:\s[#])([0-9]{6,10})'
            replacement: '`\1\2 <https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=\2>`_'
-         - pattern: '[#]*((?i)LP:\s[#])([0-9]{6,10})'
+         - pattern: '(?i)[#]*(LP:\s[#])([0-9]{6,10})'
            replacement: '`\1\2 <https://bugs.launchpad.net/ubuntu/+source/nano/+bug/\2>`_'
      ...
 

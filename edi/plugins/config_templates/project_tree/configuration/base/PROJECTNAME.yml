@@ -1,4 +1,5 @@
 general:
+    edi_lxc_bridge_interface_name: edibr0
 {% if edi_edi_version %}
     edi_required_minimal_edi_version: {{ edi_edi_version }}
 {% endif %}

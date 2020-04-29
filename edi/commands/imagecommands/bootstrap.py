@@ -19,7 +19,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
-import tempfile
 import os
 import shutil
 import logging
@@ -30,7 +29,7 @@ from edi.commands.qemucommands.fetch import Fetch
 from edi.lib.helpers import (FatalError, chown_to_user, print_success,
                              get_workdir, get_artifact_dir, create_artifact_dir)
 from edi.lib.configurationparser import command_context
-from edi.lib.shellhelpers import run, get_chroot_cmd, require
+from edi.lib.shellhelpers import run, get_chroot_cmd, require, mount_aware_tempdir
 from edi.lib.proxyhelpers import ProxySetup
 from edi.lib.keyhelpers import fetch_repository_key, build_keyring
 
@@ -78,7 +77,7 @@ class Bootstrap(Image):
 
         workdir = get_workdir()
 
-        with tempfile.TemporaryDirectory(dir=workdir) as tempdir:
+        with mount_aware_tempdir(workdir, log_warning=True) as tempdir:
             chown_to_user(tempdir)
             key_data = fetch_repository_key(self.config.get_bootstrap_repository_key())
             keyring_file = build_keyring(tempdir, "temp_keyring.gpg", key_data)
