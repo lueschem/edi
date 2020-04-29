@@ -68,6 +68,8 @@ def test_bootstrap(config_files, monkeypatch):
             elif get_command(popenargs) == 'getent' and get_sub_command(popenargs) == 'passwd':
                 return subprocess.CompletedProcess("fakerun", 0,
                                                    stdout='john:x:1000:1000:John Doe,,,:/no/such/directory:/bin/bash\n')
+            elif get_command(popenargs) == "findmnt":
+                return subprocess.CompletedProcess("fakerun", 0, '/foo/bar/baz')
             else:
                 print('Passthrough: {}'.format(get_command(popenargs)))
                 return subprocess.run(*popenargs, **kwargs)
