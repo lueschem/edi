@@ -1,3 +1,10 @@
+edi (1.6.2) bionic; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Added upgrade notes for distributions that switched to nftables.
+
+ -- Matthias Luescher <lueschem@gmail.com>  Thu, 30 Apr 2020 09:45:08 +0200
+
 edi (1.6.1) bionic; urgency=medium
 
   [ Matthias Lüscher ]
