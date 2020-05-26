@@ -40,6 +40,6 @@ Depending upon the selected command, :code:`edi` will set the following two usef
 
 :code:`edi_configure_remote_target` will be set to :code:`True` if a remote system gets configured.
 
-:code:`edi_create_distributable_image` will be set to :code:`True` it a distributable image gets created.
+:code:`edi_create_distributable_image` will be set to :code:`True` if a distributable image gets created.
 This is useful to skip certain steps shall not be applied to a distributable image or to include additional
 steps that are only needed in case of a distributable image.
