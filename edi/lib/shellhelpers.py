@@ -22,6 +22,7 @@
 import logging
 import subprocess
 import os
+import re
 from shutil import rmtree
 from tempfile import mkdtemp
 from contextlib import contextmanager
@@ -80,7 +81,7 @@ def get_chroot_cmd(rootfs):
 
 
 def get_environment_variable(name, default=None):
-    # the environment varible HOME is treated differently on Ubuntu and Debian
+    # the environment variable HOME is treated differently on Ubuntu and Debian
     # use get_user_home_directory instead
     assert name != 'HOME'
     cmd = ["printenv", name]
@@ -91,6 +92,15 @@ def get_environment_variable(name, default=None):
         return result.stdout.strip('\n')
     else:
         return default
+
+
+def get_current_display():
+    display_variable = get_environment_variable('DISPLAY', '')
+    display_no, substitutions = re.subn(r'^.*:([0-9]*)[.]?[0-9]*$', r'\1', display_variable)
+    if substitutions == 1:
+        return display_no
+    else:
+        return ''
 
 
 def get_user_home_directory(username):

@@ -33,7 +33,7 @@ from edi.lib.helpers import (get_user, get_user_group, get_user_gid, get_user_ui
 from edi.lib.proxyhelpers import ProxySetup
 from edi.lib.sshkeyhelpers import get_user_ssh_pub_keys
 from edi.lib.versionhelpers import get_edi_version, get_stripped_version
-from edi.lib.shellhelpers import get_user_home_directory
+from edi.lib.shellhelpers import get_user_home_directory, get_current_display
 from edi.lib.lxchelpers import get_lxd_version
 from packaging.version import Version
 from edi.lib.urlhelpers import obfuscate_url_password
@@ -75,6 +75,7 @@ def get_base_dictionary():
     base_dict["edi_host_no_proxy"] = proxy_setup.get('no_proxy', default='')
     base_dict["edi_edi_version"] = get_edi_version()
     base_dict["edi_lxd_version"] = get_lxd_version()
+    base_dict["edi_current_display"] = get_current_display()
     return base_dict
 
 

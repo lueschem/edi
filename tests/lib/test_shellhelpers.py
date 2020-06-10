@@ -24,7 +24,8 @@ import os
 import pytest
 import tempfile
 from edi.lib.shellhelpers import (run, safely_remove_artifacts_folder, gpg_agent, require,
-                                  Executables, get_user_home_directory, mockablerun, mount_aware_tempdir)
+                                  Executables, get_user_home_directory, mockablerun, mount_aware_tempdir,
+                                  get_current_display)
 from tests.libtesting.contextmanagers.workspace import workspace
 from tests.libtesting.helpers import (get_random_string, suppress_chown_during_debuild, get_command,
                                       get_sub_command, get_command_parameter)
@@ -195,3 +196,21 @@ def test_mount_aware_tempdir_remove_mount():
         assert os.path.isdir(mount_target_content)
 
     assert not os.path.isdir(mount_target_content)
+
+
+@pytest.mark.parametrize("env_var, result", [
+    ('localhost:1.2', '1'),
+    (':12.23', '12'),
+    (':42', '42'),
+    ('localhost:foo.bar', ''),
+    ('', ''),
+])
+def test_get_current_display(monkeypatch, env_var, result):
+    def intercept_command_run(*popenargs, **kwargs):
+        if get_command(popenargs) == 'printenv' and get_sub_command(popenargs) == 'DISPLAY':
+            return subprocess.CompletedProcess("fakerun", 0, stdout=env_var)
+        else:
+            return subprocess.run(*popenargs, **kwargs)
+
+    monkeypatch.setattr(mockablerun, 'run_mockable', intercept_command_run)
+    assert get_current_display() == result

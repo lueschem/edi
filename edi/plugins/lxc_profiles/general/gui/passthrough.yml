@@ -1,0 +1,23 @@
+name: gui_passthrough
+config: {}
+{% if edi_current_display is defined and edi_current_display %}
+{% if edi_lxd_version is defined and edi_lxd_version.split('.')[0] | int >= 4 %}
+description: edi graphical user interface passthrough
+devices:
+  host-display:
+    bind: container
+    connect: unix:@/tmp/.X11-unix/X{{ edi_current_display }}
+    listen: unix:@/tmp/.X11-unix/X0
+    security.gid: {{ edi_current_user_gid }}
+    security.uid: {{ edi_current_user_uid }}
+    type: proxy
+  host-gpu:
+    type: gpu
+{% else %}
+description: edi graphical user interface passthrough - not supported by LXD version
+devices: {}
+{% endif %}
+{% else %}
+description: edi graphical user interface passthrough - no display
+devices: {}
+{% endif %}

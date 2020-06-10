@@ -31,3 +31,9 @@
     state: present
     key: '{{ item }}'
   with_file: '{{ edi_current_user_ssh_pub_keys }}'
+
+- name: Export display.
+  lineinfile:
+    dest: /home/{{ edi_current_user_name }}/.profile
+    line: export DISPLAY=:0
+  when: export_display
