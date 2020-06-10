@@ -1,4 +1,6 @@
 - hosts: edi
+  vars:
+    export_display: False
   roles:
     - role: host_user_as_target_user
       become: True
