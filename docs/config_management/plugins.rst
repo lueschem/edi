@@ -97,6 +97,8 @@ root device. Please note that newer LXD versions (>=2.9) require the configurati
       path: lxc_profiles/general/default_root_device/default_root_device.yml
     ...
 
+.. _privileged_mode:
+
 Privileged Mode
 ^^^^^^^^^^^^^^^
 
@@ -146,6 +148,53 @@ it within the bootstrap section (otherwise the launching of the container will f
     ...
 
 .. _dumb-init: https://github.com/Yelp/dumb-init
+
+GUI Passthrough
+^^^^^^^^^^^^^^^
+
+Sometimes it is very useful to run an application with a graphical user interface (GUI) within
+a container and show it on the display of the host system. To achieve this setup a predefined
+LXC profile can be added to the configuration:
+
+.. code-block:: yaml
+  :caption: Configuration Example
+
+  lxc_profiles:
+    ...
+    500_gui_passthrough:
+        path: lxc_profiles/general/gui/passthrough.yml
+        skip: {{ edi_create_distributable_image }}
+    ...
+
+The passthrough template is a bit more complicated and looks like this:
+
+.. literalinclude:: ../../edi/plugins/lxc_profiles/general/gui/passthrough.yml
+   :caption: Passthrough Template
+
+:code:`edi` will automatically try to retrieve the current display setup from the :code:`DISPLAY`
+environment variable and pass it to the template as :code:`edi_current_display`. Please note that this
+variable might change if multiple users are logged into the same workstation. In such scenarios you
+can adjust the setup easily by re-applying the command :code:`edi lxc configure CONTAINERNAME CONFIG.yml`.
+
+Furthermore this feature is only available for installations with LXD versions greater or equal than
+4.0. On Ubuntu 18.04 you will need to upgrade your LXD installation to make use of this feature.
+
+Please also note that this feature is only available for containers that run in
+:ref:`privileged mode<privileged_mode>`.
+
+Once this profile has been successfully applied to the container, a GUI application can be launched
+as follows:
+
+.. code:: bash
+
+   ssh IP_OF_CONTAINER
+   export DISPLAY=:0
+   someguiapp
+
+To add even more convenience, the
+:ref:`development user facilities playbook<development_user_facilities>` can be configured to
+automatically add the :code:`export DISPLAY=:0` statement to the :code:`~/.profile` file of the container
+user using the :code:`export_display` parameter.
 
 Ansible Playbooks
 +++++++++++++++++
@@ -340,6 +389,7 @@ The final proxy settings can be customized as follows:
   *target_no_proxy:*
      The final proxy exception list (defaults to :code:`""`).
 
+.. _development_user_facilities:
 
 Development User Facilities
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -364,7 +414,17 @@ The following code snippet adds the development user facilities playbook to your
     ...
     200_development_user_facilities:
         path: playbooks/debian/development_user_facilities/main.yml
+        parameters:
+            export_display: True
     ...
+
+The playbook can be fine tuned as follows:
+
+.. topic:: Parameters
+
+  *export_display:*
+     If :code:`True`, add the statement :code:`export DISPLAY=:0`
+     to :code:`~/.profile` (default is :code:`False`).
 
 Postprocessing Commands
 +++++++++++++++++++++++
