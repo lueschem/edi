@@ -90,7 +90,7 @@ This section tells edi how the initial system shall be bootstrapped. The followi
           will not be verified during the bootstrap process.
           *Hint*: It is a good practice to download such a key from a
           https server.
-          A valid repository key value is: :code:`https://ftp-master.debian.org/keys/archive-key-9.asc`.
+          A valid repository key value is: :code:`https://ftp-master.debian.org/keys/archive-key-10.asc`.
    *tool:*
         - The tool that will be used for the bootstrap process.
           Currently only :code:`debootstrap` is supported.
@@ -132,7 +132,7 @@ you to do this. The following settings are available:
       *Attention*: If you do not specify a key the downloaded QEMU package will not be verified.
       *Hint*: It is a good practice to download such a key from a
       https server.
-      A valid repository key value is: :code:`https://ftp-master.debian.org/keys/archive-key-9.asc`.
+      A valid repository key value is: :code:`https://ftp-master.debian.org/keys/archive-key-10.asc`.
 
 
 .. _ordered_node_section:
