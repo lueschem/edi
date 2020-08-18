@@ -316,7 +316,7 @@ class DocumentationStepRunner():
                 except UnicodeDecodeError as e:
                     raise FatalError("Failed to parse changelog of {}:\n{}".format(package_name, str(e)))
 
-                if not (changelog.package or changelog.date or changelog.author):
+                if not changelog.package or not changelog.date or not changelog.author:
                     logging.warning("The changelog of package '{}' is incomplete.".format(package_name))
                     return
 
