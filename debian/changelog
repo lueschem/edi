@@ -1,3 +1,12 @@
+edi (1.7.2) focal; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Fixed parser robustness issue. Closes #61.
+  * Build edi for Ubuntu groovy.
+  * Switch Travis-CI to Ubuntu focal build environment.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Fri, 23 Oct 2020 15:44:21 +0200
+
 edi (1.7.1) focal; urgency=medium
 
   [ Ville Witt ]
