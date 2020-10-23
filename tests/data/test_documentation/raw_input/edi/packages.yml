@@ -13,6 +13,10 @@
   version: "1.8.27-1+deb10u2"
   source_package: sudo
   status: ii 
+- package: swift-lang
+  architecture: armhf
+  version: "5.2.5-11-debian-buster"
+  status: ii 
 - package: systemd
   architecture: armhf
   version: "241-7~deb10u3"

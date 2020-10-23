@@ -27,6 +27,8 @@ from edi.commands.documentationcommands.render import Render
 from edi.lib.helpers import FatalError
 
 
+@pytest.mark.filterwarnings("ignore:Unexpected line")
+@pytest.mark.filterwarnings("ignore:Found eof")
 def test_documentation_all(datadir):
     parser = edi._setup_command_line_interface()
     raw_input = os.path.join(str(datadir), 'raw_input')

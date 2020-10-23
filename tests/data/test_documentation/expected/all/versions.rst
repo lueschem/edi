@@ -16,5 +16,7 @@ Versions
      - 1.8.4.1
    * - sudo
      - 1.8.27-1+deb10u2
+   * - swift-lang
+     - 5.2.5-11-debian-buster
    * - systemd
      - 241-7~deb10u3
