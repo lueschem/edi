@@ -1,3 +1,10 @@
+edi (1.7.3) focal; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Also upload the package for Raspberry Pi OS (buster).
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Tue, 17 Nov 2020 22:09:02 +0100
+
 edi (1.7.2) focal; urgency=medium
 
   [ Matthias Lüscher ]
