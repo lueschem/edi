@@ -1,3 +1,10 @@
+edi (1.7.4) focal; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Fix ansible temporary file access. Closes #65.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Fri, 04 Dec 2020 22:26:24 +0100
+
 edi (1.7.3) focal; urgency=medium
 
   [ Matthias Lüscher ]
