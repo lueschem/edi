@@ -1,6 +1,10 @@
 ---
 - name: Add mount points for shared folders within the directory of the current user.
-  file: path={{ item }} state=directory
-  with_items: "{{ edi_shared_folder_mountpoints }}"
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ edi_current_user_name }}"
+    group: "{{ edi_current_user_group_name }}"
+  loop: "{{ edi_shared_folder_mountpoints }}"
   when: edi_shared_folder_mountpoints is defined
 
