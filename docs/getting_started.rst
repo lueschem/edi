@@ -11,12 +11,15 @@ Prerequisites
    .. code-block:: bash
       :caption: Ubuntu 18.04
 
+      sudo apt update
       sudo apt install lxd
 
    .. code-block:: bash
       :caption: Debian or Ubuntu >= 19.10
 
+      sudo apt update
       sudo apt install snapd
+      sudo snap install core
       sudo snap install lxd
       sudo usermod -a -G lxd $USER
 
