@@ -1,0 +1,66 @@
+#!/bin/bash
+
+# Small helper script that either provisions ssh host keys from a backup folder or
+# creates new ones.
+
+set -o nounset
+set -o errexit
+set -o pipefail
+
+restore_key()
+{
+    local SRC_FOLDER="${1}"
+    local KEY="${2}"
+    local DST_FOLDER="/etc/ssh"
+    
+    # check if valid key is already available
+    if [[ -s "${DST_FOLDER}/${KEY}" ]] && [[ -s "${DST_FOLDER}/${KEY}.pub" ]]; then return; fi
+    
+    # check if key can be restored from backup
+    if [[ ! -s "${SRC_FOLDER}/${KEY}" ]] || [[ ! -s "${SRC_FOLDER}/${KEY}.pub" ]]; then return; fi
+    
+    # try to restore the keys
+    echo "Restoring ${KEY} from backup."
+    cp "${SRC_FOLDER}/${KEY}" "${DST_FOLDER}/" && chmod 0600 "${DST_FOLDER}/${KEY}" || true
+    cp "${SRC_FOLDER}/${KEY}.pub" "${DST_FOLDER}/" && chmod 0644 "${DST_FOLDER}/${KEY}.pub" || true
+}
+
+BACKUP_FOLDER=""
+
+ssh_host_key_file_list=(
+ssh_host_dsa_key
+ssh_host_ecdsa_key
+ssh_host_ed25519_key
+ssh_host_rsa_key
+)
+
+if [[ $# -ge 2 ]]
+then
+    >&2 echo "Error: Maximum one command line argument is accepted."
+    >&2 echo "Examples:"
+    >&2 echo "    edi-ssh-host-keys"
+    >&2 echo "    edi-ssh-host-keys /path/to/ssh/keys/backup"
+   exit 1
+fi
+
+if [[ $EUID -ne 0 ]]
+then
+   >&2 echo "Error: Use root user to execute this script."
+   exit 1
+fi
+
+if [[ $# -eq 1 ]]
+then
+    BACKUP_FOLDER="${1}"
+fi
+
+if [[ -n "${BACKUP_FOLDER}" ]]
+then
+    for host_key in "${ssh_host_key_file_list[@]}"
+    do
+        restore_key "${BACKUP_FOLDER}" "${host_key}"
+    done
+fi
+
+# Create new keys in case there was no backup.
+/usr/bin/ssh-keygen -A -v
