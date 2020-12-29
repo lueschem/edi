@@ -353,7 +353,7 @@ The playbook can be fine tuned as follows:
   *ssh_host_key_backup_folder:*
      Optionally the ssh host keys can be restored from a folder on the first boot. The restore script will not
      overwrite existing valid keys in :code:`/etc/ssh/`. By default
-     this feature is turned of (ssh_host_key_backup_folder is :code:`""`). This feature is especially useful
+     this feature is turned off (ssh_host_key_backup_folder is :code:`""`). This feature is especially useful
      if ssh host keys shall be preserved during a complete OS update.
   *cleanup_proxy_settings:*
      By default the proxy settings of the resulting artifact will get cleaned up
