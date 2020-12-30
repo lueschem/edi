@@ -350,6 +350,11 @@ The playbook can be fine tuned as follows:
      By default the playbook will make sure that the openssh server keys get regenerated
      (boolean value :code:`True`). Switch this value to :code:`False` if you would like to keep the same
      openssh server keys for all instances that will receive this artifact.
+  *ssh_host_key_backup_folder:*
+     Optionally the ssh host keys can be restored from a folder on the first boot. The restore script will not
+     overwrite existing valid keys in :code:`/etc/ssh/`. By default
+     this feature is turned off (ssh_host_key_backup_folder is :code:`""`). This feature is especially useful
+     if ssh host keys shall be preserved during a complete OS update.
   *cleanup_proxy_settings:*
      By default the proxy settings of the resulting artifact will get cleaned up
      (boolean value :code:`True`). If you would like to keep the same proxy settings switch this value to

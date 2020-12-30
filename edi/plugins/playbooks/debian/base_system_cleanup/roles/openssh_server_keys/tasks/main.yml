@@ -5,17 +5,30 @@
   register: openssh_server_installed
 
 - name: Identify openssh-server keys.
-  find: paths=/etc/ssh patterns="ssh_host_*_key*"
+  find:
+    paths: /etc/ssh
+    patterns: "ssh_host_*_key*"
   register: openssh_server_keys
   when: openssh_server_installed is succeeded
 
 - name: Remove openssh-server keys.
-  file: path="{{ item.path }}" state=absent
+  file:
+    path: "{{ item.path }}"
+    state: absent
   when: openssh_server_installed is succeeded
   with_items:
     - "{{ openssh_server_keys.files }}"
 
+- name: Add script that provisions the ssh host keys.
+  copy:
+    src: edi-ssh-host-keys
+    dest: /usr/bin/edi-ssh-host-keys
+    mode: 0755
+  when: openssh_server_installed is succeeded
+
 - name: Add a systemd service that re-generates the openssh-server keys.
-  copy: src=openssh-server-key-generator.service dest=/lib/systemd/system/
+  template:
+    src: openssh-server-key-generator.service
+    dest: /lib/systemd/system/
   when: openssh_server_installed is succeeded
 
