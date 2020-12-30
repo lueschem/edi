@@ -1,3 +1,11 @@
+edi (1.8.0) focal; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Fixed LXD installation instructions for Debian.
+  * Allow restoring of ssh host keys.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Wed, 30 Dec 2020 23:34:15 +0100
+
 edi (1.7.4) focal; urgency=medium
 
   [ Matthias Lüscher ]
