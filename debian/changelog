@@ -1,3 +1,10 @@
+edi (1.8.1) focal; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Fixed travis build.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Fri, 01 Jan 2021 01:14:42 +0100
+
 edi (1.8.0) focal; urgency=medium
 
   [ Matthias Lüscher ]
