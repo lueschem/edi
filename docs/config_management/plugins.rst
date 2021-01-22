@@ -247,6 +247,11 @@ The playbook can be fine tuned as follows:
   *configure_lxc_network_interface:*
      By default (boolean value :code:`True`) the playbook will add a lxc network interface to the container.
      If this behavior is not desired, change the setting to :code:`False`.
+  *lxc_network_interface_manager:*
+     By default edi uses :code:`ifupdown` to manage the default lxc network interface.
+     Change this value to :code:`network-manager` if you prefer to setup the default lxc network interface
+     using NetworkManager. Please note that you might need to enable nesting (:code:`security.nesting: "true"`)
+     in order to get NetworkManager running properly in the lxc container.
   *create_default_user:*
      By default (boolean value :code:`False`) no additional user gets created. If you need an additional user
      switch this value to :code:`True` and fine tune the default user according to the table below.
