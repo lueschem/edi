@@ -1,9 +1,21 @@
 ---
+# Workaround for "Failed to lock apt for exclusive operation".
+- name: Initialize apt.
+  command: apt-get update
+  args:
+    warn: no
+  changed_when: false
+
 - name: Update and upgrade apt.
-  apt: update_cache=yes upgrade=dist
+  apt:
+    update_cache: yes
+    upgrade: dist
 
 - name: Prevent service startup during package installation.
-  copy: src=policy-rc.d dest=/usr/sbin/ mode=755
+  copy:
+    src: policy-rc.d
+    dest: /usr/sbin/
+    mode: 755
   when: edi_create_distributable_image
 
 - name: Prevent documentation installation and remove existing documentation.
