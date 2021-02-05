@@ -250,8 +250,9 @@ The playbook can be fine tuned as follows:
   *lxc_network_interface_manager:*
      By default edi uses :code:`ifupdown` to manage the default lxc network interface.
      Change this value to :code:`network-manager` if you prefer to setup the default lxc network interface
-     using NetworkManager. Please note that you might need to enable nesting (:code:`security.nesting: "true"`)
-     in order to get NetworkManager running properly in the lxc container.
+     using NetworkManager. Please note that NetworkManager is currently not recommended for digital twin
+     development containers as there are a few glitches that need to be ironed out. Furthermore edi
+     will bring up the lxc network interface using low level commands in case systemd is overruled by dumb-init.
   *create_default_user:*
      By default (boolean value :code:`False`) no additional user gets created. If you need an additional user
      switch this value to :code:`True` and fine tune the default user according to the table below.
