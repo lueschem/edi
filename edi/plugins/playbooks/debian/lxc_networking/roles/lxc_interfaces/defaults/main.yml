@@ -1,0 +1,2 @@
+---
+lxc_network_interface_manager: ifupdown

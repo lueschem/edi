@@ -1,4 +1,6 @@
 - hosts: edi
+  vars:
+    lxc_network_interface_manager: ifupdown
   roles:
     - role: lxc_interfaces
       become: True

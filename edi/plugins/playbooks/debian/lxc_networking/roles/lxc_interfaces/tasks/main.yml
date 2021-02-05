@@ -1,6 +1,20 @@
+- name: Check if {{ lxc_network_interface_manager }} is installed.
+  command: dpkg -s {{ lxc_network_interface_manager }}
+  ignore_errors: true
+  changed_when: false
+  register: lxc_network_interface_manager_installed
+
+- name: Stop if {{ lxc_network_interface_manager }} is missing.
+  fail:
+    msg: Please install {{ lxc_network_interface_manager }} during bootstrapping (bootstrap/additional_packages).
+  when: lxc_network_interface_manager_installed is failed
+
 - name: Add default interface to container.
-  template: src=default_interface.j2 dest=/etc/network/interfaces.d/{{ edi_lxc_network_interface_name }}
+  template:
+    src: default_interface.j2
+    dest: /etc/network/interfaces.d/{{ edi_lxc_network_interface_name }}
   register: default_interface_result
+  when: lxc_network_interface_manager == "ifupdown"
 
 - name: Get command line of init process.
   command: cat /proc/1/cmdline
@@ -10,7 +24,7 @@
 - name: Bring up default interface (full init system).
    # try twice to avoid timing issue on jessie
   command: bash -c "ifup {{ edi_lxc_network_interface_name }} || sleep 30 && ifup {{ edi_lxc_network_interface_name }}"
-  when: '"dumb-init" not in pid1_process_cmdline.stdout and default_interface_result.changed'
+  when: 'lxc_network_interface_manager == "ifupdown" and "dumb-init" not in pid1_process_cmdline.stdout and default_interface_result.changed'
 
 - name: Bring up default interface (dumb-init init system).
   command: bash -c "ip link set {{ edi_lxc_network_interface_name }} up && dhclient {{ edi_lxc_network_interface_name }}"
