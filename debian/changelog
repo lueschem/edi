@@ -1,3 +1,16 @@
+edi (1.9.0) focal; urgency=medium
+
+  [ Matthias Klein ]
+  * debian/control: depend on pycodestyle instead of pep8
+
+  [ Matthias Lüscher ]
+  * Added partial network-manager support.
+  * Added workaround for "Failed to lock apt for exclusive operation".
+  * Added documentation for lxc_network_interface_manager.
+  * Added build for Debian bullseye.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Fri, 05 Feb 2021 10:10:11 +0100
+
 edi (1.8.1) focal; urgency=medium
 
   [ Matthias Lüscher ]
