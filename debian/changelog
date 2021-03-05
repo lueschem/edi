@@ -1,3 +1,10 @@
+edi (1.9.1) focal; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Added hardware section to documentation.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Fri, 05 Mar 2021 11:22:04 +0100
+
 edi (1.9.0) focal; urgency=medium
 
   [ Matthias Klein ]
