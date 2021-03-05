@@ -13,6 +13,7 @@ Contents:
 
    introduction
    getting_started
+   hardware
    source_code
    config_management/index
    command_pipeline
