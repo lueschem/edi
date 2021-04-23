@@ -1,3 +1,10 @@
+edi (1.9.2) focal; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Added Ubuntu 21.04 build.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Fri, 23 Apr 2021 13:46:01 +0200
+
 edi (1.9.1) focal; urgency=medium
 
   [ Matthias Lüscher ]
