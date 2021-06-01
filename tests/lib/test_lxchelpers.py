@@ -131,9 +131,8 @@ def test_is_bridge_available():
     assert not is_bridge_available(bridge_name)
     create_bridge(bridge_name)
     assert is_bridge_available(bridge_name)
-    with pytest.raises(CalledProcessError) as e:
+    with pytest.raises(CalledProcessError):
         create_bridge(bridge_name)
-    assert 'non-zero exit status' in str(e)
     cmd = [lxc_exec(), "network", "delete", bridge_name]
     run(cmd)
     assert not is_bridge_available(bridge_name)

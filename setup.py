@@ -63,7 +63,7 @@ setup(
 
     keywords='embedded Linux container toolchain lxd lxc Ansible Debian',
 
-    packages=find_packages(exclude=['docs', 'debian', 'bin', '.git']),
+    packages=find_packages(exclude=['docs', 'debian', 'bin', '.git', 'venv']),
 
     install_requires=['argcomplete', 'jinja2', 'packaging', 'python-debian', 'python-gnupg', 'pyyaml', 'requests'],
 
