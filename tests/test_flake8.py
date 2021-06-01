@@ -28,7 +28,11 @@ import subprocess
 @pytest.mark.requires_flake8
 def test_flake8():
     path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-    cmd = ['flake8', '--max-line-length=120', path]
+    excluded_paths = [
+        os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'venv')),
+        os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.git'))
+        ]
+    cmd = ['flake8', '--exclude', ",".join(excluded_paths), '--max-line-length=120', path]
     result = run(cmd, check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if result.returncode != 0:
         print(result.stdout)
