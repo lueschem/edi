@@ -38,7 +38,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 setup(
     name='edi',
 
-    version='1.9.2',
+    version='1.9.3',
 
     description='Embedded Development Infrastructure - edi',
     long_description=long_description,
@@ -63,7 +63,7 @@ setup(
 
     keywords='embedded Linux container toolchain lxd lxc Ansible Debian',
 
-    packages=find_packages(exclude=['docs', 'debian', 'bin', '.git']),
+    packages=find_packages(exclude=['docs', 'debian', 'bin', '.git', 'venv']),
 
     install_requires=['argcomplete', 'jinja2', 'packaging', 'python-debian', 'python-gnupg', 'pyyaml', 'requests'],
 

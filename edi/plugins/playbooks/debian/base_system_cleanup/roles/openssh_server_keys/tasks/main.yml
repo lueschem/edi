@@ -33,3 +33,22 @@
     dest: /lib/systemd/system/
   when: openssh_server_installed is succeeded
 
+- name: Create a directory that will receive the systemd symbolic link.
+  file:
+    path: /etc/systemd/system/multi-user.target.requires
+    state: directory
+  when: openssh_server_installed is succeeded
+
+- name: Enable the systemd service that re-generates the openssh-server keys.
+  file:
+    src: /lib/systemd/system/openssh-server-key-generator.service
+    dest: /etc/systemd/system/multi-user.target.requires/openssh-server-key-generator.service
+    state: link
+  when: openssh_server_installed is succeeded
+
+# Works only with newer Ansible versions (since systemd is not running):
+#- name: Enable the systemd service that re-generates the openssh-server keys.
+#  systemd:
+#    name: openssh-server-key-generator.service
+#    enabled: yes
+#  when: openssh_server_installed is succeeded
