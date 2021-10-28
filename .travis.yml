@@ -14,11 +14,11 @@ install:
 - docker pull debian:bullseye
 - docker pull ubuntu:18.04
 - docker pull ubuntu:20.04
-- docker pull ubuntu:21.04
+- docker pull ubuntu:21.10
 script:
 - docker run -v $(pwd):/data/edi ubuntu:18.04 bash -c "/data/edi/travis/travis-build"
 - docker run -v $(pwd):/data/edi ubuntu:20.04 bash -c "/data/edi/travis/travis-build"
-- docker run -v $(pwd):/data/edi ubuntu:21.04 bash -c "/data/edi/travis/travis-build"
+- docker run -v $(pwd):/data/edi ubuntu:21.10 bash -c "/data/edi/travis/travis-build"
 - docker run -v $(pwd):/data/edi debian:stretch bash -c "/data/edi/travis/travis-build"
 - docker run -v $(pwd):/data/edi debian:buster bash -c "/data/edi/travis/travis-build"
 - docker run -v $(pwd):/data/edi debian:bullseye bash -c "/data/edi/travis/travis-build"
