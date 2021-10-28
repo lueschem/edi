@@ -1,3 +1,10 @@
+edi (1.9.4) hirsute; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Build package for Ubuntu Impish.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Thu, 28 Oct 2021 21:55:52 +0200
+
 edi (1.9.3) hirsute; urgency=medium
 
   [ Matthias Lüscher ]
