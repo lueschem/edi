@@ -11,7 +11,7 @@ Jinja2 will replace the expression :code:`{{ edi_configuration_name }}` with the
 The following command can be used to display the dictionary that is available for Jinja2 operations when loading
 the configuration :code:`my-project-develop.yml`:
 
-.. code:: bash
+.. code-block:: bash
 
    edi image create --dictionary my-project-develop.yml
 
@@ -21,7 +21,7 @@ all commands that deal with configuration.
 
 :code:`my-project-develop.yml` contains an even more complicated parametrization in the :code:`lxc_profiles` section:
 
-.. code:: yaml
+.. code-block::
 
    {% if edi_lxd_version is defined and (edi_lxd_version.split('.')[0] | int >= 3 or edi_lxd_version.split('.')[1] | int >= 9) %}
      200_default_root_device:
@@ -34,7 +34,7 @@ LXD versions.
 Plugins can even further benefit from Jinja2 since there are additional dictionary entries available. The option
 :code:`--plugins` will output the details:
 
-.. code:: bash
+.. code-block:: bash
 
    edi image create --plugins my-project-develop.yml
 
