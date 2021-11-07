@@ -1,3 +1,10 @@
+edi (1.9.5) impish; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Add explicit read the docs configuration.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Sun, 07 Nov 2021 23:01:27 +0100
+
 edi (1.9.4) hirsute; urgency=medium
 
   [ Matthias Lüscher ]
