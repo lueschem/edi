@@ -29,4 +29,14 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Pull docker container
+        run: docker pull "${DISTRIBUTION}":"${DISTRIBUTION_RELEASE}"
+        env:
+          DISTRIBUTION: ${{ matrix.distribution }}
+          DISTRIBUTION_RELEASE: ${{ matrix.distribution_release }}
+      - name: Run build job within container
+        run: docker run -v $(pwd):/data/edi "${DISTRIBUTION}":"${DISTRIBUTION_RELEASE}" bash -c "ls -al /data/edi/"
+        env:
+          DISTRIBUTION: ${{ matrix.distribution }}
+          DISTRIBUTION_RELEASE: ${{ matrix.distribution_release }}
 
