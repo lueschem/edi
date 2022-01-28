@@ -37,7 +37,7 @@ jobs:
           DISTRIBUTION: ${{ matrix.distribution }}
           DISTRIBUTION_RELEASE: ${{ matrix.distribution_release }}
       - name: Run build job within container
-        run: docker run -v $(pwd):/data/edi "${DISTRIBUTION}":"${DISTRIBUTION_RELEASE}" bash -c "ls -al /data/edi/"
+        run: docker run -v $(pwd):/data/edi "${DISTRIBUTION}":"${DISTRIBUTION_RELEASE}" bash -c "/data/edi/.github/scripts/package-build"
         env:
           DISTRIBUTION: ${{ matrix.distribution }}
           DISTRIBUTION_RELEASE: ${{ matrix.distribution_release }}
