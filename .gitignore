@@ -51,3 +51,6 @@ travis/travis-key.asc
 travis/travis-key.passphrase
 travis/id_rsa
 travis/id_rsa.pub
+
+# Github
+.github/secrets/
