@@ -54,3 +54,4 @@ travis/id_rsa.pub
 
 # Github
 .github/secrets/
+build-output/
