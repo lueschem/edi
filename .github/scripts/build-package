@@ -9,7 +9,7 @@ set -o nounset
 # there is no VERSION_ID in sid/bullseye
 VERSION_ID="11"
 VERSION="11 (bullseye)"
-. /etc/os-release
+source /etc/os-release
 
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 SECRETSDIR="/data/secrets"
