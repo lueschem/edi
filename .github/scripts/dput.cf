@@ -1,6 +1,5 @@
 [ppa]
-fqdn			= ppa.launchpad.net
-method			= sftp
-incoming		= ~%(ppa)s
-login			= m-luescher
+fqdn			   = ppa.launchpad.net
+method			   = sftp
+incoming		   = ~%(ppa)s
 
