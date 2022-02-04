@@ -36,12 +36,14 @@ jobs:
         env:
           DISTRIBUTION: ${{ matrix.distribution }}
           DISTRIBUTION_RELEASE: ${{ matrix.distribution_release }}
-      - name: Decrypt launchpad secrets
-        run: ./.github/scripts/decrypt-secret
+      - name: Decode launchpad secrets
+        run: ./.github/scripts/decode-secrets
         env:
-          LAUNCHPAD_SECRET_PASSPHRASE: ${{ secrets.LAUNCHPAD_SECRET_PASSPHRASE }}
+          LAUNCHPAD_ID_RSA_BASE64: ${{ secrets.LAUNCHPAD_ID_RSA_BASE64 }}
+          LAUNCHPAD_SIGNING_KEY_BASE64: ${{ secrets.LAUNCHPAD_SIGNING_KEY_BASE64 }}
+          LAUNCHPAD_SIGNING_KEY_PASSPHRASE_BASE64: ${{ secrets.LAUNCHPAD_SIGNING_KEY_PASSPHRASE_BASE64 }}
       - name: Run build job within container
-        run: docker run -v $(pwd):/data/runner "${DISTRIBUTION}":"${DISTRIBUTION_RELEASE}" bash -c "/data/runner/.github/scripts/build-package"
+        run: docker run -v $(pwd):/data/runner -v ${HOME}/.launchpad-secrets:/data/secrets "${DISTRIBUTION}":"${DISTRIBUTION_RELEASE}" bash -c "/data/runner/.github/scripts/build-package"
         env:
           DISTRIBUTION: ${{ matrix.distribution }}
           DISTRIBUTION_RELEASE: ${{ matrix.distribution_release }}
