@@ -1,0 +1,63 @@
+#!/bin/bash
+
+# Upload a Debian package to PackageCloud
+
+# Usage: upload-package-packagecloud GIT_BRANCH REPOSITORY_USER REPOSITORY_NAME DISTRIBUTION DISTRIBUTION_RELEASE
+# Example: upload-package-packagecloud develop get-edi debian debian buster
+
+set -o nounset
+set -o errexit
+set -o pipefail
+
+GIT_BRANCH=$1
+REPOSITORY_USER=$2
+REPOSITORY_NAME=$3
+DISTRIBUTION=$4
+DISTRIBUTION_RELEASE=$5
+
+SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+WORKDIR="${SCRIPTDIR}/../../build-output"
+
+if [[ $EUID -eq 0 ]]
+then
+    >&2 echo "Error: This script must not be run as root."
+    exit 1
+fi
+
+if [ ! -f "${WORKDIR}/build-info" ]
+then
+    >&2 echo "Error: Missing artifacts from previous build step."
+    exit 1
+fi
+
+cd "${WORKDIR}"
+
+source build-info
+
+sudo gem install package_cloud
+
+if [ "${GIT_BRANCH}" != "master" ]
+then
+    REPOSITORY_SUFFIX="-develop"
+else
+    REPOSITORY_SUFFIX=""
+fi
+
+PACKAGE="${PACKAGE_NAME}_${PACKAGE_VERSION}_all.deb"
+PACKAGE_DSC="${PACKAGE_NAME}_${PACKAGE_VERSION}.dsc"
+
+push_package()
+{
+    UPLOAD_PATH="${REPOSITORY_USER}/${REPOSITORY_NAME}${REPOSITORY_SUFFIX}/${DISTRIBUTION}/${DISTRIBUTION_RELEASE}"
+    echo "Deploying package ${PACKAGE} and ${PACKAGE_DSC} to ${UPLOAD_PATH}."
+    package_cloud push "${UPLOAD_PATH}" "${PACKAGE}"
+    package_cloud push "${UPLOAD_PATH}" "${PACKAGE_DSC}"
+}
+
+push_package
+
+if [  "${DISTRIBUTION}" == "debian" ]
+then
+    DISTRIBUTION="raspbian"
+    push_package
+fi

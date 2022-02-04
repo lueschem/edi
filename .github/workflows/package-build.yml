@@ -1,0 +1,77 @@
+name: edi package build
+on:
+  push:
+    branches:
+      - master
+      - develop
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+       include:
+         - distribution: debian
+           distribution_release: stretch
+           repository_type: packagecloud
+         - distribution: debian
+           distribution_release: buster
+           repository_type: packagecloud
+         - distribution: debian
+           distribution_release: bullseye
+           repository_type: packagecloud
+         - distribution: ubuntu
+           distribution_release: "18.04"
+           repository_type: launchpad
+         - distribution: ubuntu
+           distribution_release: "20.04"
+           repository_type: launchpad
+         - distribution: ubuntu
+           distribution_release: "21.10"
+           repository_type: launchpad
+    steps:
+      - name: Check out the source code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: '0'
+      - name: Create secrets folder.
+        run: mkdir -p "${HOME}/.launchpad-secrets"
+      - name: Decode launchpad secrets
+        run: ./.github/scripts/decode-secrets
+        env:
+          LAUNCHPAD_ID_RSA_BASE64: ${{ secrets.LAUNCHPAD_ID_RSA_BASE64 }}
+          LAUNCHPAD_SIGNING_KEY_BASE64: ${{ secrets.LAUNCHPAD_SIGNING_KEY_BASE64 }}
+          LAUNCHPAD_SIGNING_KEY_PASSPHRASE_BASE64: ${{ secrets.LAUNCHPAD_SIGNING_KEY_PASSPHRASE_BASE64 }}
+        if: matrix.repository_type == 'launchpad'
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Pull docker container
+        run: docker pull "${DISTRIBUTION}":"${DISTRIBUTION_RELEASE}"
+        env:
+          DISTRIBUTION: ${{ matrix.distribution }}
+          DISTRIBUTION_RELEASE: ${{ matrix.distribution_release }}
+      - name: Run build job within docker container
+        run: docker run -v $(pwd):/data/runner -v ${HOME}/.launchpad-secrets:/data/secrets "${DISTRIBUTION}":"${DISTRIBUTION_RELEASE}" bash -c "/data/runner/.github/scripts/build-package"
+        env:
+          DISTRIBUTION: ${{ matrix.distribution }}
+          DISTRIBUTION_RELEASE: ${{ matrix.distribution_release }}
+      - name: Upload package to launchpad repository
+        run: docker run -v $(pwd):/data/runner -v ${HOME}/.launchpad-secrets:/data/secrets "${DISTRIBUTION}":"${DISTRIBUTION_RELEASE}" bash -c "/data/runner/.github/scripts/upload-package-launchpad ${GITHUB_REF##*/} ${LAUNCHPAD_USER} ${LAUNCHPAD_REPOSITORY}"
+        env:
+          DISTRIBUTION: ${{ matrix.distribution }}
+          DISTRIBUTION_RELEASE: ${{ matrix.distribution_release }}
+          LAUNCHPAD_USER: ${{ secrets.LAUNCHPAD_USER }}
+          LAUNCHPAD_REPOSITORY: ${{ secrets.LAUNCHPAD_REPOSITORY }}
+        if: matrix.repository_type == 'launchpad'
+      - name: Upload package to packagecloud repository
+        run: ./.github/scripts/upload-package-packagecloud "${GITHUB_REF##*/}" "${PACKAGECLOUD_USER}" "${PACKAGECLOUD_REPOSITORY}" "${DISTRIBUTION}" "${DISTRIBUTION_RELEASE}"
+        env:
+          DISTRIBUTION: ${{ matrix.distribution }}
+          DISTRIBUTION_RELEASE: ${{ matrix.distribution_release }}
+          PACKAGECLOUD_USER: ${{ secrets.PACKAGECLOUD_USER }}
+          PACKAGECLOUD_REPOSITORY: ${{ secrets.PACKAGECLOUD_REPOSITORY }}
+          PACKAGECLOUD_TOKEN: ${{ secrets.PACKAGECLOUD_TOKEN }}
+        if: matrix.repository_type == 'packagecloud'

@@ -1,0 +1,72 @@
+#!/bin/bash
+
+# Upload a Debian package to Lauchchpad
+
+# Usage: upload-package-launchpad GIT_BRANCH REPOSITORY_USER REPOSITORY_NAME
+# Example: upload-package-launchpad develop m-luescher edi-snapshots
+
+set -o nounset
+set -o errexit
+set -o pipefail
+
+GIT_BRANCH=$1
+REPOSITORY_USER=$2
+REPOSITORY_NAME=$3
+
+SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+SECRETSDIR="/data/secrets"
+WORKDIR="${SCRIPTDIR}/../.."
+SSHDIR="/root/.ssh"
+
+if [[ $EUID -ne 0 ]]
+then
+    >&2 echo "Error: This script must be run as root."
+    exit 1
+fi
+
+if [ ! -d "${SECRETSDIR}" ]
+then
+    >&2 echo "Error: Missing secrets for launchpad upload - cowardly refusing to do anything!"
+    exit 1
+fi
+
+if [ ! -f "${WORKDIR}/build-output/build-info" ]
+then
+    >&2 echo "Error: Missing artifacts from previous build step."
+    exit 1
+fi
+
+if [ -d "${SSHDIR}" ]
+then
+    >&2 echo "Error: ${SSHDIR} already exists - you might want to run this script in a docker container."
+    exit 1
+fi
+
+cd "${WORKDIR}"
+source build-output/build-info
+
+apt-get update > /dev/null
+apt-get --no-install-recommends -y install openssh-client dput locales python3-paramiko > /dev/null
+locale-gen en_US.UTF-8 > /dev/null
+export LANG=en_US.UTF-8
+
+if [ "${GIT_BRANCH}" != "master" ]
+then
+    REPOSITORY_SUFFIX="-develop"
+else
+    REPOSITORY_SUFFIX=""
+fi
+
+mkdir ${SSHDIR}
+chmod 0700 ${SSHDIR}
+
+cp "${SECRETSDIR}/id_rsa" "${SSHDIR}/"
+touch "${SSHDIR}/known_hosts"
+chmod -R 0600 "${SSHDIR}"/*
+ssh-keyscan ppa.launchpad.net >> "${SSHDIR}/known_hosts"
+
+DPUTCONF="${SSHDIR}/dput.cf"
+cp "${SCRIPTDIR}/dput.cf" "${DPUTCONF}"
+echo "login = ${REPOSITORY_USER}" >> "${DPUTCONF}"
+
+dput --unchecked --config "${DPUTCONF}" "ppa:${REPOSITORY_USER}/${REPOSITORY_NAME}${REPOSITORY_SUFFIX}" "build-output/${PACKAGE_NAME}_${PACKAGE_VERSION}_source.changes"

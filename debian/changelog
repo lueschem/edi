@@ -1,3 +1,10 @@
+edi (1.9.7) impish; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Moved build from Travis to GitHub actions.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Fri, 04 Feb 2022 21:21:22 +0100
+
 edi (1.9.6) impish; urgency=medium
 
   [ Matthias Lüscher ]

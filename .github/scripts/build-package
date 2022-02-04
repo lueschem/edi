@@ -1,0 +1,155 @@
+#!/bin/bash
+
+# Run package build within a virgin Ubuntu/Debian container.
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+# there is no VERSION_ID in sid/bullseye
+VERSION_ID="11"
+VERSION="11 (bullseye)"
+source /etc/os-release
+
+SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+SECRETSDIR="/data/secrets"
+
+cd "${SCRIPTDIR}/../.."
+
+export DEBIAN_FRONTEND=noninteractive
+apt-get update > /dev/null
+apt-get --no-install-recommends -y install sudo > /dev/null
+
+TESTUSER=ediuser
+TESTUSERHOME=/home/${TESTUSER}
+adduser --disabled-password --gecos "" ${TESTUSER}
+addgroup  ${TESTUSER} adm
+
+apt-get --no-install-recommends -y install git > /dev/null
+
+git config --system user.email "lueschem@gmail.com"
+git config --system user.name "Matthias Luescher"
+
+if [[ $EUID -ne 0 ]]
+then
+   >&2 echo "Error: This script must be run as root."
+   exit 1
+fi
+
+if ! git diff --exit-code --quiet
+then
+    >&2 echo "Error: there are unstaged changes!"
+    exit 1
+fi
+
+if ! git diff --cached --exit-code --quiet
+then
+    >&2 echo "Error: there are uncommitted changes!"
+    exit 1
+fi
+
+sudo -H -u ${TESTUSER} git clone .git ${TESTUSERHOME}/edi
+
+apt-get -y --no-install-recommends install git-buildpackage dh-make equivs lintian > /dev/null
+
+CONTAINER_WORK="${TESTUSERHOME}/edi"
+cd ${CONTAINER_WORK}
+
+RAW_VERSION="$(dpkg-parsechangelog --show-field Version | cut -d'+' -f1)"
+
+if [ "${ID}" == "ubuntu" ]
+then
+    NEW_VERSION="${RAW_VERSION}+u${VERSION_ID//./}"
+elif [ "${ID}" == "debian" ]
+then
+    NEW_VERSION="${RAW_VERSION}+deb${VERSION_ID//./}"
+    VERSION_CODENAME=$(echo "${VERSION}" | awk -F"[)(]+" '{print $2}')
+else
+    >&2 echo "Error: unhandled operating system id (${ID})!"
+    exit 1
+fi
+
+GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+if [ "${GIT_BRANCH}" != "master" ]
+then
+    NEW_VERSION="${NEW_VERSION}$(git describe --always --tags 2>/dev/null | sed -r s/^v//g | sed -r 's/[0-9]+.[0-9]+.[0-9]+-([0-9]+)-(.*)/r\1\2/g')"
+fi
+
+SETUP_PY="setup.py"
+sed -i "s/^    version=.*/    version='${NEW_VERSION}',/g" ${SETUP_PY}
+sudo -H -u ${TESTUSER} git add ${SETUP_PY}
+
+SPHINX_CONFIG="docs/conf.py"
+sed -i "s/^version =.*/version = '${NEW_VERSION}'/g" ${SPHINX_CONFIG}
+sed -i "s/^release =.*/release = '${NEW_VERSION}'/g" ${SPHINX_CONFIG}
+sudo -H -u ${TESTUSER} git add ${SPHINX_CONFIG}
+
+VERSION_HELPERS="edi/lib/versionhelpers.py"
+sed -i "s/^edi_fallback_version =.*/edi_fallback_version = '${NEW_VERSION}'/g" ${VERSION_HELPERS}
+sudo -H -u ${TESTUSER} git add ${VERSION_HELPERS}
+
+dch -b --newversion "${NEW_VERSION}" --distribution "${VERSION_CODENAME}" -m "Automatic ${VERSION_CODENAME} build."
+
+sudo -H -u ${TESTUSER} git add debian/changelog
+sudo -H -u ${TESTUSER} git commit -m "New version ${NEW_VERSION}."
+sudo -H -u ${TESTUSER} git tag -a "v${NEW_VERSION}" -m "New version ${NEW_VERSION}."
+
+mk-build-deps -i debian/control -t "apt-get -y" > /dev/null
+
+sudo -H -u ${TESTUSER} py.test-3
+
+sudo -H -u ${TESTUSER} git clean -dxf
+
+sudo -H -u ${TESTUSER} debuild -us -uc > /dev/null
+
+dpkg -i ../edi_*_all.deb || true
+apt-get -y --no-install-recommends install -f
+
+EDIVERSION=$(edi version)
+CHANGELOGVERSION=$(dpkg-parsechangelog --show-field Version)
+
+if [ "${EDIVERSION}" != "${CHANGELOGVERSION}" ]
+then
+    >&2 echo -e "\nError: edi version does not match changelog version (${EDIVERSION} != ${CHANGELOGVERSION})."
+    exit 1
+fi
+
+if [ "${ID}" == "ubuntu" ]
+then
+    if [ ! -d "${SECRETSDIR}" ]
+    then
+        >&2 echo "Error: Missing secrets for launchpad signature - cowardly refusing to do anything!"
+        exit 1
+    fi
+
+    sudo -H -u ${TESTUSER} git clean -dxf
+
+    GPG_KEY="${SECRETSDIR}/launchpad-key.asc"
+    GPG_KEY_PASSPHRASE="${SECRETSDIR}/launchpad-key.passphrase"
+
+    if [[ ! -f "${GPG_KEY}" ]] || [[ ! -f "${GPG_KEY_PASSPHRASE}" ]]
+    then
+        >&2 echo -e "\nError: Missing gpg key ${GPG_KEY} or passphrase ${GPG_KEY_PASSPHRASE}."
+        exit 1
+    fi
+
+    gpg --pinentry-mode loopback --passphrase-file "${GPG_KEY_PASSPHRASE}" --import "${GPG_KEY}"
+
+    sudo -H -u ${TESTUSER} debuild -S -us -uc > /dev/null
+
+    RESULT="${CONTAINER_WORK}/../edi_${NEW_VERSION}_source.changes"
+    debsign -p"gpg --pinentry-mode loopback --passphrase-file ${GPG_KEY_PASSPHRASE}" -S -kB6D5610F601C6B6E4A880C93AA6945FE5AAFB25D "${RESULT}"
+fi
+    
+BUILD_OUTPUT="${SCRIPTDIR}/../../build-output"
+mkdir -p "${BUILD_OUTPUT}"
+cp -f ../edi_"${NEW_VERSION}"* "${BUILD_OUTPUT}"
+
+cat << EOF > "${BUILD_OUTPUT}/build-info"
+PACKAGE_NAME=edi
+PACKAGE_VERSION=${NEW_VERSION}
+EOF
+
+echo "========"
+echo "Success!"
+echo "========"
