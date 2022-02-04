@@ -1,8 +1,12 @@
 Embedded Development Infrastructure - edi
 =========================================
 
-.. image:: https://app.travis-ci.com/lueschem/edi.svg?branch=master
-    :target: https://app.travis-ci.com/lueschem/edi
+.. image:: https://github.com/lueschem/edi/actions/workflows/package-build.yml/badge.svg?branch=master
+    :target: https://github.com/lueschem/edi/actions/
+
+
+.. image:: https://github.com/lueschem/edi/actions/workflows/package-build.yml/badge.svg
+    :target: https://github.com/lueschem/edi/actions/
 
 
 .. image:: https://img.shields.io/badge/deb-packagecloud.io-844fec.svg
