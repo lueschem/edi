@@ -47,4 +47,11 @@ jobs:
         env:
           DISTRIBUTION: ${{ matrix.distribution }}
           DISTRIBUTION_RELEASE: ${{ matrix.distribution_release }}
-
+      - name: Upload package to launchpad repository
+        run: docker run -v $(pwd):/data/runner -v ${HOME}/.launchpad-secrets:/data/secrets "${DISTRIBUTION}":"${DISTRIBUTION_RELEASE}" bash -c "/data/runner/.github/scripts/upload-package-launchpad ${GITHUB_REF##*/} ${LAUNCHPAD_USER} ${LAUNCHPAD_REPOSITORY}"
+        env:
+          DISTRIBUTION: ${{ matrix.distribution }}
+          DISTRIBUTION_RELEASE: ${{ matrix.distribution_release }}
+          LAUNCHPAD_USER: ${{ secrets.LAUNCHPAD_USER }}
+          LAUNCHPAD_REPOSITORY: ${{ secrets.LAUNCHPAD_REPOSITORY }}
+        if: matrix.repository_type == 'launchpad'
