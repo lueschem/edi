@@ -30,6 +30,12 @@ apt-get --no-install-recommends -y install git > /dev/null
 git config --system user.email "lueschem@gmail.com"
 git config --system user.name "Matthias Luescher"
 
+if [[ $EUID -ne 0 ]]
+then
+   >&2 echo "Error: This script must be run as root."
+   exit 1
+fi
+
 if ! git diff --exit-code --quiet
 then
     >&2 echo "Error: there are unstaged changes!"
