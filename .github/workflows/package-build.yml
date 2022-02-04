@@ -12,14 +12,28 @@ jobs:
       matrix:
        include:
          - distribution: debian
+           distribution_release: stretch
+           repository_type: packagecloud
+         - distribution: debian
+           distribution_release: buster
+           repository_type: packagecloud
+         - distribution: debian
            distribution_release: bullseye
            repository_type: packagecloud
          - distribution: ubuntu
+           distribution_release: "18.04"
+           repository_type: launchpad
+         - distribution: ubuntu
            distribution_release: "20.04"
+           repository_type: launchpad
+         - distribution: ubuntu
+           distribution_release: "21.10"
            repository_type: launchpad
     steps:
       - name: Check out the source code
         uses: actions/checkout@v2
+        with:
+          fetch-depth: '0'
       - name: Create secrets folder.
         run: mkdir -p "${HOME}/.launchpad-secrets"
       - name: Decode launchpad secrets
