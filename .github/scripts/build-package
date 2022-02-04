@@ -116,6 +116,12 @@ fi
 
 if [ "${ID}" == "ubuntu" ]
 then
+    if [ ! -d "${SECRETSDIR}" ]
+    then
+        >&2 echo "Error: Missing secrets for launchpad signature - cowardly refusing to do anything!"
+        exit 1
+    fi
+
     sudo -H -u ${TESTUSER} git clean -dxf
 
     GPG_KEY="${SECRETSDIR}/launchpad-key.asc"
