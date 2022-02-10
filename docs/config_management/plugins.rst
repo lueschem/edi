@@ -378,8 +378,8 @@ The playbook can be fine tuned as follows:
      By default this feature is switched off (boolean value :code:`False`).
   *package_baseline_source_file:*
      In order to generate a differential changelog it is possible to add a package baseline file to the resulting
-     artifact. The package baseline file has the same format as :code:`/usr/share/doc/edi/build.yml`. If a differential
-     changelog between release n and n+1 is needed, you can copy the file :code:`/usr/share/doc/edi/build.yml` from
+     artifact. The package baseline file has the same format as :code:`/usr/share/doc/edi/packages.yml`. If a differential
+     changelog between release n and n+1 is needed, you can copy the file :code:`/usr/share/doc/edi/packages.yml` from
      release n to :code:`{{ edi_project_directory }}/configuration/documentation/packages-baseline.yml` (default value
      for package_baseline_source_file). The playbook will then make sure that it gets added to artifact n as
      :code:`/usr/share/doc/edi/packages-baseline.yml`. The command :code:`edi documentation render ...` will use this
