@@ -44,11 +44,15 @@ class FatalError(Error):
         self.message = message
 
 
-def print_error_and_exit(*args, **kwargs):
+def print_error(*args, **kwargs):
     print('\033[91m', end="", file=sys.stderr)
     print('Error: ', end="", file=sys.stderr)
     print(*args, end="", file=sys.stderr, **kwargs)
     print('\033[0m', file=sys.stderr)
+
+
+def print_error_and_exit(*args, **kwargs):
+    print_error(*args, **kwargs)
     sys.exit(1)
 
 

@@ -21,13 +21,14 @@
 
 import sys
 import argparse
-import argcomplete
 import logging
 import requests
+import argcomplete
 from edi.commands import clean, config, image, lxc, qemu, target, version, documentation  # noqa: ignore=F401
 from edi.lib.commandfactory import get_sub_commands, get_command
 from edi.lib.helpers import print_error_and_exit, FatalError
 from edi.lib.edicommand import EdiCommand
+from edi.lib.configurationparser import command_context
 from subprocess import CalledProcessError
 
 
@@ -53,6 +54,8 @@ def _setup_command_line_interface():
     parser.add_argument('--log', choices=['DEBUG', 'INFO', 'WARNING',
                                           'ERROR', 'CRITICAL'],
                         help="modify log level (default is WARNING)")
+    parser.add_argument('-d', '--debug', action="store_true",
+                        help="switch command processing into interactive debug mode (useful for playbook debugging)")
 
     subparsers = parser.add_subparsers(title='commands',
                                        dest="command_name")
@@ -74,7 +77,8 @@ def main():
 
         command_name = "{0}.{1}".format(EdiCommand._get_command_name(),
                                         cli_args.command_name)
-        get_command(command_name)().run_cli(cli_args)
+        with command_context({'edi_debug_mode': cli_args.debug}):
+            get_command(command_name)().run_cli(cli_args)
     except FatalError as fatal_error:
         print_error_and_exit(fatal_error.message)
     except KeyboardInterrupt:

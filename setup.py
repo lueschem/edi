@@ -65,7 +65,9 @@ setup(
 
     packages=find_packages(exclude=['docs', 'debian', 'bin', '.git', 'venv']),
 
-    install_requires=['argcomplete', 'jinja2', 'packaging', 'python-debian', 'python-gnupg', 'pyyaml', 'requests'],
+    install_requires=['argcomplete', 'click', 'jinja2', 'packaging', 'python-apt',
+                      'python-dateutil', 'python-debian', 'python-gnupg',
+                      'pyyaml', 'requests'],
 
     extras_require={
         # 'dev': ['check-manifest'],
