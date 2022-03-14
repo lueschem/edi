@@ -19,13 +19,15 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
+import click
 import os
 import logging
+import subprocess
 import tempfile
 import yaml
 from codecs import open
 from edi.lib.helpers import chown_to_user
-from edi.lib.helpers import get_user, get_workdir
+from edi.lib.helpers import print_error, get_user, get_workdir
 from edi.lib.shellhelpers import run, require
 from edi.lib.sharedfoldercoordinator import SharedFolderCoordinator
 from edi.lib.configurationparser import remove_passwords
@@ -110,7 +112,23 @@ class PlaybookRunner():
         ansible_env = os.environ.copy()
         ansible_env['ANSIBLE_REMOTE_TEMP'] = '/tmp/ansible-{}'.format(get_user())
 
-        run(cmd, env=ansible_env, log_threshold=logging.INFO)
+        while True:
+            try:
+                run(cmd, env=ansible_env, log_threshold=logging.INFO)
+                break
+            except subprocess.CalledProcessError as error:
+                if self.config.debug_mode():
+                    print_error("{}\nFor more information increase the log level.".format(error))
+                    click.echo('You can now fix the playbook and press "r" to retry. Hit any other key to abort: ',
+                               nl=False)
+                    input_char = click.getchar()
+                    click.echo()
+                    if input_char.lower() == 'r':
+                        pass
+                    else:
+                        raise KeyboardInterrupt
+                else:
+                    raise error
 
     def _write_inventory_file(self, tempdir):
         inventory_file = os.path.join(tempdir, "inventory")

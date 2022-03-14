@@ -38,7 +38,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 setup(
     name='edi',
 
-    version='1.9.7',
+    version='1.10.0',
 
     description='Embedded Development Infrastructure - edi',
     long_description=long_description,
@@ -65,7 +65,9 @@ setup(
 
     packages=find_packages(exclude=['docs', 'debian', 'bin', '.git', 'venv']),
 
-    install_requires=['argcomplete', 'jinja2', 'packaging', 'python-debian', 'python-gnupg', 'pyyaml', 'requests'],
+    install_requires=['argcomplete', 'click', 'jinja2', 'packaging', 'python-apt',
+                      'python-dateutil', 'python-debian', 'python-gnupg',
+                      'pyyaml', 'requests'],
 
     extras_require={
         # 'dev': ['check-manifest'],

@@ -98,6 +98,7 @@ class ConfigurationParser:
     command_context = {
         'edi_create_distributable_image': False,
         'edi_configure_remote_target': False,
+        'edi_debug_mode': False,
     }
 
     @staticmethod
@@ -107,6 +108,10 @@ class ConfigurationParser:
     @staticmethod
     def configure_remote_target():
         return ConfigurationParser.command_context.get('edi_configure_remote_target')
+
+    @staticmethod
+    def debug_mode():
+        return ConfigurationParser.command_context.get('edi_debug_mode')
 
     def get_context_suffix(self):
         if self.create_distributable_image():

@@ -1,3 +1,10 @@
+edi (1.10.0) impish; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Improved debugging efficiency for playbooks by allowing retry. Closes #62.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Mon, 14 Mar 2022 22:12:55 +0100
+
 edi (1.9.7) impish; urgency=medium
 
   [ Matthias Lüscher ]
