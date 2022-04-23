@@ -1,3 +1,11 @@
+edi (1.11.0) jammy; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Added build job for Ubuntu 22.04.
+  * Fixed build failure caused by git security upgrade.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Sat, 23 Apr 2022 13:03:37 +0200
+
 edi (1.10.0) impish; urgency=medium
 
   [ Matthias Lüscher ]
