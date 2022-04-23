@@ -29,6 +29,8 @@ apt-get --no-install-recommends -y install git > /dev/null
 
 git config --system user.email "lueschem@gmail.com"
 git config --system user.name "Matthias Luescher"
+git config --global --add safe.directory "$(pwd)"
+git config --global --add safe.directory "${TESTUSERHOME}/edi"
 
 if [[ $EUID -ne 0 ]]
 then
