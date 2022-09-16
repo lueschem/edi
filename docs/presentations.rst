@@ -1,6 +1,17 @@
 Presentations
 =============
 
+Automating and Managing an IoT Fleet Using Git
+++++++++++++++++++++++++++++++++++++++++++++++
+
+Location: Open Source Summit Europe 2022, Dublin
+
+Date: 14. September 2022
+
+Slides: `AutomatingAndManagingAnIoTFleetUsingGit.pdf`_
+
+.. _AutomatingAndManagingAnIoTFleetUsingGit.pdf: https://www.get-edi.io/assets/pdfs/AutomatingAndManagingAnIoTFleetUsingGit.pdf
+
 Efficient Usage of Debian on Embedded Devices
 +++++++++++++++++++++++++++++++++++++++++++++
 
