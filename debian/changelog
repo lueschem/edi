@@ -1,3 +1,10 @@
+edi (1.11.2) jammy; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Removed impish build.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Fri, 16 Sep 2022 17:39:42 +0200
+
 edi (1.11.1) jammy; urgency=medium
 
   [ Matthias Lüscher ]
