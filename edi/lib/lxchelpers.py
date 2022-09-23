@@ -118,14 +118,20 @@ def is_container_running(name):
 
     try:
         parsed_result = yaml.safe_load(result.stdout)
-        if len(parsed_result) != 1:
+
+        if not parsed_result:
             return False
-        else:
-            status = parsed_result[0].get("status", "")
-            if status == "Running":
-                return True
-            else:
-                return False
+
+        for item in parsed_result:
+            # workaround for https://github.com/lxc/lxd/issues/10396
+            if item.get("name", "") == name:
+                status = item.get("status", "")
+                if status == "Running":
+                    return True
+                else:
+                    return False
+
+        return False
     except yaml.YAMLError as exc:
         raise FatalError("Unable to parse lxc output ({}).".format(exc))
 
