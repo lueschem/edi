@@ -27,7 +27,8 @@ from contextlib import contextmanager
 from edi.lib.helpers import FatalError
 from edi.lib.lxchelpers import (get_server_image_compression_algorithm,
                                 get_file_extension_from_image_compression_algorithm, lxc_exec,
-                                get_lxd_version, LxdVersion, is_bridge_available, create_bridge)
+                                get_lxd_version, LxdVersion, is_bridge_available, create_bridge,
+                                is_container_running)
 from edi.lib.shellhelpers import mockablerun, run
 from tests.libtesting.helpers import get_command, get_sub_command
 from tests.libtesting.contextmanagers.mocked_executable import mocked_executable, mocked_lxd_version_check
@@ -51,6 +52,41 @@ def test_get_server_image_compression_bzip2(monkeypatch):
             monkeypatch.setattr(mockablerun, 'run_mockable', fake_lxc_config_command)
             result = get_server_image_compression_algorithm()
             assert result == 'bzip2'
+
+
+lxc_info_json = """
+[
+  {
+    "name": "debian-bullseye",
+    "status": "Stopped"
+  },
+  {
+    "name": "debian-buster",
+    "status": "Running"
+  }
+]
+"""
+
+
+@pytest.mark.parametrize("container_name, lxc_output, expected_result", [
+    ("debian-bullseye", lxc_info_json, False),
+    ("debian-buster", lxc_info_json, True),
+    ("debian", lxc_info_json, False),
+    ("debian", "", False),
+    ("debian", "[]", False),
+])
+def test_is_container_running(monkeypatch, container_name, lxc_output, expected_result):
+    with mocked_executable('lxc', '/here/is/no/lxc'):
+        with mocked_lxd_version_check():
+            def fake_lxc_info_command(*popenargs, **kwargs):
+                if get_command(popenargs).endswith('lxc') and get_sub_command(popenargs) == 'list':
+                    return subprocess.CompletedProcess("fakerun", 0, stdout=lxc_output)
+                else:
+                    return subprocess.run(*popenargs, **kwargs)
+
+            monkeypatch.setattr(mockablerun, 'run_mockable', fake_lxc_info_command)
+            result = is_container_running(container_name)
+            assert result == expected_result
 
 
 @pytest.mark.parametrize("algorithm, expected_extension", [
