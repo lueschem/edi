@@ -2,11 +2,11 @@ Embedded Development Infrastructure - edi
 =========================================
 
 .. image:: https://github.com/lueschem/edi/actions/workflows/package-build.yml/badge.svg?branch=master
-    :target: https://github.com/lueschem/edi/actions/
+    :target: https://github.com/lueschem/edi/actions?query=branch%3Amaster
 
 
-.. image:: https://github.com/lueschem/edi/actions/workflows/package-build.yml/badge.svg
-    :target: https://github.com/lueschem/edi/actions/
+.. image:: https://github.com/lueschem/edi/actions/workflows/package-build.yml/badge.svg?branch=develop
+    :target: https://github.com/lueschem/edi/actions?query=branch%3Adevelop
 
 
 .. image:: https://img.shields.io/badge/deb-packagecloud.io-844fec.svg
