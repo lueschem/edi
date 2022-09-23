@@ -1,3 +1,11 @@
+edi (1.11.3) jammy; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Added workaround for https://github.com/lxc/lxd/issues/10396. Closes #77.
+  * Improved hyperlinks to GitHub results.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Fri, 23 Sep 2022 11:28:54 +0200
+
 edi (1.11.2) jammy; urgency=medium
 
   [ Matthias Lüscher ]
