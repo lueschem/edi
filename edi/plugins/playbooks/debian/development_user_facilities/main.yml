@@ -1,4 +1,5 @@
-- hosts: edi
+- hosts: all
+  gather_facts: no
   vars:
     export_display: False
   roles:

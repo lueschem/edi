@@ -1,4 +1,5 @@
-- hosts: edi
+- hosts: all
+  gather_facts: no
   vars:
     apply_proxy_settings: True
     configure_lxc_network_interface: True

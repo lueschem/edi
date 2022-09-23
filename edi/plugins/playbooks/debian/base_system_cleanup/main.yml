@@ -1,4 +1,5 @@
-- hosts: edi
+- hosts: all
+  gather_facts: no
   vars:
     regenerate_openssh_server_keys: True 
     # revert proxy settings
