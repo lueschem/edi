@@ -4,7 +4,13 @@ set -e
 case "$1" in
     configure)
         mkdir -p /etc/bash_completion.d
-        register-python-argcomplete3 edi > /etc/bash_completion.d/edi
+        if command -v register-python-argcomplete3 > /dev/null
+        then
+            register-python-argcomplete3 edi > /etc/bash_completion.d/edi
+        else
+            # python3-argcomplete >= 2.0
+            register-python-argcomplete edi > /etc/bash_completion.d/edi
+        fi
     ;;
 
     *)
