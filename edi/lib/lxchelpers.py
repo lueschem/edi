@@ -211,6 +211,16 @@ def is_profile_existing(name):
 
 
 @require('lxc', lxd_install_hint, LxdVersion.check)
+def get_profile_description(name):
+    cmd = [lxc_exec(), "profile", "show", name]
+    result = run(cmd, check=False, stderr=subprocess.PIPE)
+    if result.returncode == 0:
+        return yaml.safe_load(result.stdout).get('description', '')
+    else:
+        return ''
+
+
+@require('lxc', lxd_install_hint, LxdVersion.check)
 def write_lxc_profile(profile_text):
     new_profile = False
     profile_yaml = yaml.safe_load(profile_text)
@@ -228,8 +238,9 @@ def write_lxc_profile(profile_text):
         run(create_cmd)
         new_profile = True
 
-    edit_cmd = [lxc_exec(), "profile", "edit", ext_profile_name]
-    run(edit_cmd, input=profile_content)
+    if get_profile_description(ext_profile_name) == "":
+        edit_cmd = [lxc_exec(), "profile", "edit", ext_profile_name]
+        run(edit_cmd, input=profile_content)
 
     return ext_profile_name, new_profile
 

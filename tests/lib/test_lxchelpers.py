@@ -28,7 +28,8 @@ from edi.lib.helpers import FatalError
 from edi.lib.lxchelpers import (get_server_image_compression_algorithm,
                                 get_file_extension_from_image_compression_algorithm, lxc_exec,
                                 get_lxd_version, LxdVersion, is_bridge_available, create_bridge,
-                                is_container_running)
+                                is_container_running, get_profile_description, is_profile_existing,
+                                write_lxc_profile)
 from edi.lib.shellhelpers import mockablerun, run
 from tests.libtesting.helpers import get_command, get_sub_command
 from tests.libtesting.contextmanagers.mocked_executable import mocked_executable, mocked_lxd_version_check
@@ -172,3 +173,36 @@ def test_is_bridge_available():
     cmd = [lxc_exec(), "network", "delete", bridge_name]
     run(cmd)
     assert not is_bridge_available(bridge_name)
+
+
+@pytest.mark.requires_lxc
+def test_is_description_empty_on_inexistent_profile():
+    assert "" == get_profile_description("this-edi-profile-does-not-exist")
+
+
+@pytest.mark.requires_lxc
+def test_is_description_empty_on_created_profile():
+    profile_name = 'this-is-an-unused-edi-pytest-profile'
+    if is_profile_existing(profile_name):
+        run([lxc_exec(), "profile", "delete", profile_name])
+
+    run([lxc_exec(), "profile", "create", profile_name])
+    assert "" == get_profile_description(profile_name)
+
+    run([lxc_exec(), "profile", "delete", profile_name])
+
+
+@pytest.mark.requires_lxc
+def test_write_profile():
+    profile_text = """
+    name: this-is-an-unused-edi-pytest-profile
+    description: Some description
+    config: {}
+    devices: {}
+    """
+
+    profile_name, _ = write_lxc_profile(profile_text)
+    assert is_profile_existing(profile_name)
+    assert "Some description" == get_profile_description(profile_name)
+    run([lxc_exec(), "profile", "delete", profile_name])
+    assert not is_profile_existing(profile_name)
