@@ -18,12 +18,12 @@ cd "${SCRIPTDIR}/../.."
 
 export DEBIAN_FRONTEND=noninteractive
 apt-get update > /dev/null
-apt-get --no-install-recommends -y install sudo > /dev/null
+apt-get --no-install-recommends -y install sudo adduser > /dev/null
 
 TESTUSER=ediuser
 TESTUSERHOME=/home/${TESTUSER}
 adduser --disabled-password --gecos "" ${TESTUSER}
-addgroup  ${TESTUSER} adm
+usermod -a -G adm ${TESTUSER}
 
 apt-get --no-install-recommends -y install git > /dev/null
 
