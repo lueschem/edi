@@ -6,9 +6,9 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-# there is no VERSION_ID in sid/bullseye
-VERSION_ID="11"
-VERSION="11 (bullseye)"
+# there is no VERSION_ID in testing/bookworm
+VERSION_ID="12"
+VERSION="12 (bookworm)"
 source /etc/os-release
 
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
