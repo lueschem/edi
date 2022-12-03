@@ -21,6 +21,7 @@
 
 import pytest
 from edi.lib.helpers import FatalError
+from edi.lib.shellhelpers import get_debian_architecture
 from aptsources.sourceslist import SourceEntry
 from edi.lib.configurationparser import ConfigurationParser, command_context
 
@@ -156,6 +157,4 @@ def test_config_nodes_absence(empty_config_file):
         with pytest.raises(FatalError) as error:
             parser.get_bootstrap_repository()
         assert "repository" in error.value.message
-        with pytest.raises(FatalError) as error:
-            parser.get_bootstrap_architecture()
-        assert "architecture" in error.value.message
+        assert parser.get_bootstrap_architecture() == get_debian_architecture()

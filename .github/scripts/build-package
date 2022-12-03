@@ -6,9 +6,9 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-# there is no VERSION_ID in sid/bullseye
-VERSION_ID="11"
-VERSION="11 (bullseye)"
+# there is no VERSION_ID in testing/bookworm
+VERSION_ID="12"
+VERSION="12 (bookworm)"
 source /etc/os-release
 
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -18,12 +18,12 @@ cd "${SCRIPTDIR}/../.."
 
 export DEBIAN_FRONTEND=noninteractive
 apt-get update > /dev/null
-apt-get --no-install-recommends -y install sudo > /dev/null
+apt-get --no-install-recommends -y install sudo adduser > /dev/null
 
 TESTUSER=ediuser
 TESTUSERHOME=/home/${TESTUSER}
 adduser --disabled-password --gecos "" ${TESTUSER}
-addgroup  ${TESTUSER} adm
+usermod -a -G adm ${TESTUSER}
 
 apt-get --no-install-recommends -y install git > /dev/null
 

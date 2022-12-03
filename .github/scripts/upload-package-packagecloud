@@ -56,7 +56,7 @@ push_package()
 
 push_package
 
-if [  "${DISTRIBUTION}" == "debian" ]
+if [ "${DISTRIBUTION}" == "debian" ] && [ "${DISTRIBUTION_RELEASE}" != "bookworm" ]
 then
     DISTRIBUTION="raspbian"
     push_package

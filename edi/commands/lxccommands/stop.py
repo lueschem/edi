@@ -87,5 +87,5 @@ class Stop(Lxc):
 
     def _result(self):
         # a generated container name
-        return 'edi-tmp-{}'.format(hashlib.sha256(self.config.get_configuration_name().encode()
-                                                  ).hexdigest()[:20])
+        return 'edi-{}-{}'.format(hashlib.sha256(self.config.get_configuration_name().encode()).hexdigest()[:8],
+                                  self.config.get_project_directory_hash())
