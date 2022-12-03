@@ -33,7 +33,7 @@ from edi.lib.helpers import (get_user, get_user_group, get_user_gid, get_user_ui
 from edi.lib.proxyhelpers import ProxySetup
 from edi.lib.sshkeyhelpers import get_user_ssh_pub_keys
 from edi.lib.versionhelpers import get_edi_version, get_stripped_version
-from edi.lib.shellhelpers import get_user_home_directory, get_current_display
+from edi.lib.shellhelpers import get_user_home_directory, get_current_display, get_debian_architecture
 from edi.lib.lxchelpers import get_lxd_version
 from packaging.version import Version
 from edi.lib.urlhelpers import obfuscate_url_password
@@ -160,7 +160,7 @@ class ConfigurationParser:
     def get_bootstrap_architecture(self):
         architecture = self._get_bootstrap_item("architecture", None)
         if not architecture:
-            raise FatalError('''Missing mandatory element 'architecture' in section 'bootstrap'.''')
+            architecture = get_debian_architecture()
         return architecture
 
     def get_bootstrap_tool(self):

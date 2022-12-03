@@ -80,7 +80,8 @@ This section tells edi how the initial system shall be bootstrapped. The followi
    *architecture:*
         - The architecture of the target system.
           For Debian possible values are any supported architecture such as
-          :code:`amd64`, :code:`armel` or :code:`armhf`.
+          :code:`amd64`, :code:`arm64` or :code:`armhf`.
+          If no architecture is specified then the architecture of the system that runs :code:`edi` will be inherited.
    *repository:*
         - The repository specification where the initial image will get bootstrapped from.
           A valid value looks like this: :code:`deb http://deb.debian.org/debian/ buster main`.
