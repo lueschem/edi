@@ -20,6 +20,7 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 import subprocess
+import logging
 
 
 def run_mockable(*popenargs, **kwargs):
@@ -30,3 +31,7 @@ def run_mockable(*popenargs, **kwargs):
     :return: passes back the result of subprocess.run()
     """
     return subprocess.run(*popenargs, **kwargs)
+
+
+def is_logging_enabled_for(log_threshold):
+    return logging.getLogger().isEnabledFor(log_threshold)

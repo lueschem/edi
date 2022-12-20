@@ -213,7 +213,7 @@ def is_profile_existing(name):
 @require('lxc', lxd_install_hint, LxdVersion.check)
 def get_profile_description(name):
     cmd = [lxc_exec(), "profile", "show", name]
-    result = run(cmd, check=False, stderr=subprocess.PIPE)
+    result = run(cmd, check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if result.returncode == 0:
         return yaml.safe_load(result.stdout).get('description', '')
     else:

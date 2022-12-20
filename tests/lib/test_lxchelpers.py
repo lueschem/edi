@@ -31,7 +31,7 @@ from edi.lib.lxchelpers import (get_server_image_compression_algorithm,
                                 is_container_running, get_profile_description, is_profile_existing,
                                 write_lxc_profile)
 from edi.lib.shellhelpers import mockablerun, run
-from tests.libtesting.helpers import get_command, get_sub_command
+from tests.libtesting.helpers import get_command, get_sub_command, log_during_run
 from tests.libtesting.contextmanagers.mocked_executable import mocked_executable, mocked_lxd_version_check
 
 
@@ -193,13 +193,16 @@ def test_is_description_empty_on_created_profile():
 
 
 @pytest.mark.requires_lxc
-def test_write_profile():
+@pytest.mark.parametrize("do_log", [True, False])
+def test_write_profile(monkeypatch, do_log):
     profile_text = """
     name: this-is-an-unused-edi-pytest-profile
     description: Some description
     config: {}
     devices: {}
     """
+
+    log_during_run(monkeypatch, do_log)
 
     profile_name, _ = write_lxc_profile(profile_text)
     assert is_profile_existing(profile_name)
