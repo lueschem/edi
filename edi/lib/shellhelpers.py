@@ -44,7 +44,7 @@ def run(popenargs, sudo=False, input=None, timeout=None, check=True, universal_n
     subprocess_stdout = stdout
 
     if subprocess_stdout == _ADAPTIVE:
-        if logging.getLogger().isEnabledFor(log_threshold):
+        if mockablerun.is_logging_enabled_for(log_threshold):
             subprocess_stdout = None
         else:
             subprocess_stdout = subprocess.PIPE
@@ -66,7 +66,7 @@ def run(popenargs, sudo=False, input=None, timeout=None, check=True, universal_n
                                       universal_newlines=universal_newlines,
                                       stdout=subprocess_stdout, **kwargs)
 
-    if (logging.getLogger().isEnabledFor(log_threshold) and
+    if (mockablerun.is_logging_enabled_for(log_threshold) and
             subprocess_stdout is subprocess.PIPE):
         logging.log(log_threshold, result.stdout)
 

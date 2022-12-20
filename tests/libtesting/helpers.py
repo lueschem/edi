@@ -24,6 +24,7 @@ import string
 import random
 import shutil
 from edi.lib.helpers import get_user
+from edi.lib import mockablerun
 
 
 def get_random_string(length):
@@ -67,3 +68,10 @@ def suppress_chown_during_debuild(monkeypatch):
 
     if get_user() == 'root':  # debuild case
         monkeypatch.setattr(shutil, 'chown', fakechown)
+
+
+def log_during_run(monkeypatch, do_log):
+    def force_logging(*_):
+        return do_log
+
+    monkeypatch.setattr(mockablerun, 'is_logging_enabled_for', force_logging)
