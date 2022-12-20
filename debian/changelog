@@ -1,3 +1,10 @@
+edi (1.13.1) jammy; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Fix get_profile_description for log level DEBUG. Closes #78.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Tue, 20 Dec 2022 18:15:48 +0100
+
 edi (1.13.0) jammy; urgency=medium
 
   [ Matthias Lüscher ]
