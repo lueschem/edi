@@ -1,3 +1,10 @@
+edi (1.13.3) jammy; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Fixed incompatibilities with new Ansible versions.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Fri, 20 Jan 2023 23:10:45 +0100
+
 edi (1.13.2) jammy; urgency=medium
 
   [ Matthias Lüscher ]

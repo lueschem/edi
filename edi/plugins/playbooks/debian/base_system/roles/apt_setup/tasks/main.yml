@@ -2,8 +2,6 @@
 # Workaround for "Failed to lock apt for exclusive operation".
 - name: Initialize apt.
   command: apt-get update
-  args:
-    warn: no
   changed_when: false
 
 - name: Update and upgrade apt.
