@@ -1,6 +1,20 @@
 Presentations
 =============
 
+Automatisiertes IoT Flottenmanagement mit Git (German)
+++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Location: Winterchaos 2022, Kriens
+
+Date: 28. December 2022
+
+Slides: `AutomatisiertesIoTFlottenmanagementMitGit.pdf`_
+
+Video: `Winterchaos_Kriens`_
+
+.. _AutomatisiertesIoTFlottenmanagementMitGit.pdf: https://www.get-edi.io/assets/pdfs/AutomatisiertesIoTFlottenmanagementMitGit.pdf
+.. _Winterchaos_Kriens: https://media.ccc.de/v/luzern-2817-automating-and-managing-an-i
+
 Automating and Managing an IoT Fleet Using Git
 ++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -10,7 +24,10 @@ Date: 14. September 2022
 
 Slides: `AutomatingAndManagingAnIoTFleetUsingGit.pdf`_
 
+Video: `OSSEU22_Dublin`_
+
 .. _AutomatingAndManagingAnIoTFleetUsingGit.pdf: https://www.get-edi.io/assets/pdfs/AutomatingAndManagingAnIoTFleetUsingGit.pdf
+.. _OSSEU22_Dublin: https://youtu.be/i8sRrpdn2Hw
 
 Efficient Usage of Debian on Embedded Devices
 +++++++++++++++++++++++++++++++++++++++++++++
