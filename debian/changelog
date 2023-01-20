@@ -1,3 +1,10 @@
+edi (1.13.2) jammy; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Added Winterchaos presentation and videos.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Fri, 20 Jan 2023 10:22:13 +0100
+
 edi (1.13.1) jammy; urgency=medium
 
   [ Matthias Lüscher ]
