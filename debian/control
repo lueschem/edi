@@ -45,7 +45,6 @@ Depends: ${misc:Depends},
          qemu-user-static,
          sudo,
          zstd,
-Recommends: lxd,
 Description: Embedded Development Infrastructure - edi
  Driven by the DevOps mindset edi helps you to streamline your embedded
  development infrastructure. To achieve this goal, edi leverages top-notch
