@@ -1,3 +1,12 @@
+edi (1.14.0) jammy; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Removed support for Debian stretch and Ubuntu Bionic.
+  * Remove lxd from recommends as the snap package is preferred even for Debian bookworm.
+  * Raise required ansible and qemu-user-static version.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Fri, 10 Feb 2023 10:32:18 +0100
+
 edi (1.13.3) jammy; urgency=medium
 
   [ Matthias Lüscher ]

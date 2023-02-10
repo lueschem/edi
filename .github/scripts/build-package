@@ -6,6 +6,12 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
+if [[ $EUID -ne 0 ]]
+then
+   >&2 echo "Error: This script must be run as root."
+   exit 1
+fi
+
 # there is no VERSION_ID in testing/bookworm
 VERSION_ID="12"
 VERSION="12 (bookworm)"
@@ -17,6 +23,12 @@ SECRETSDIR="/data/secrets"
 cd "${SCRIPTDIR}/../.."
 
 export DEBIAN_FRONTEND=noninteractive
+
+if [[ "${ID}" == "debian" ]] && [[ "${VERSION_ID}" == "10" ]]
+then
+    echo "deb http://deb.debian.org/debian/ buster-backports main" > /etc/apt/sources.list.d/buster-backports.list
+fi
+
 apt-get update > /dev/null
 apt-get --no-install-recommends -y install sudo adduser > /dev/null
 
@@ -31,12 +43,6 @@ git config --system user.email "lueschem@gmail.com"
 git config --system user.name "Matthias Luescher"
 git config --global --add safe.directory "$(pwd)"
 git config --global --add safe.directory "${TESTUSERHOME}/edi"
-
-if [[ $EUID -ne 0 ]]
-then
-   >&2 echo "Error: This script must be run as root."
-   exit 1
-fi
 
 if ! git diff --exit-code --quiet
 then
@@ -53,6 +59,11 @@ fi
 sudo -H -u ${TESTUSER} git clone .git ${TESTUSERHOME}/edi
 
 apt-get -y --no-install-recommends install git-buildpackage dh-make equivs lintian > /dev/null
+
+if [[ "${ID}" == "debian" ]] && [[ "${VERSION_ID}" == "10" ]]
+then
+    apt-get -y --no-install-recommends install ansible/buster-backports qemu-user-static/buster-backports
+fi
 
 CONTAINER_WORK="${TESTUSERHOME}/edi"
 cd ${CONTAINER_WORK}

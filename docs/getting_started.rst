@@ -1,7 +1,8 @@
 Getting Started
 ===============
 
-The following setup steps have been tested on Ubuntu 18.04, on Ubuntu 20.04 and on Debian buster.
+The following setup steps have been tested on Ubuntu 20.04, on Ubuntu 22.04, on Debian buster and on Debian bookworm.
+On Debian buster the packages :code:`ansible` and :code:`qemu-user-static` from buster-backports are required.
 
 Prerequisites
 +++++++++++++
@@ -9,13 +10,6 @@ Prerequisites
 #. Install lxd:
 
    .. code-block:: bash
-      :caption: Ubuntu 18.04
-
-      sudo apt update
-      sudo apt install lxd
-
-   .. code-block:: bash
-      :caption: Debian or Ubuntu >= 19.10
 
       sudo apt update
       sudo apt install snapd
@@ -28,12 +22,6 @@ Prerequisites
 #. Initialize lxd:
 
    .. code-block:: bash
-      :caption: Ubuntu 18.04
-
-      sudo lxd init
-
-   .. code-block:: bash
-      :caption: Debian or Ubuntu >= 19.10
 
       sudo /snap/bin/lxd init
 
