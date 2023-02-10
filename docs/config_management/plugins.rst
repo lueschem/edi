@@ -177,7 +177,7 @@ variable might change if multiple users are logged into the same workstation. In
 can adjust the setup easily by re-applying the command :code:`edi lxc configure CONTAINERNAME CONFIG.yml`.
 
 Furthermore this feature is only available for installations with LXD versions greater or equal than
-4.0. On Ubuntu 18.04 you will need to upgrade your LXD installation to make use of this feature.
+4.0.
 
 Please also note that this feature is only available for containers that run in
 :ref:`privileged mode<privileged_mode>`.
