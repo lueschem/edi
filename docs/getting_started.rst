@@ -1,7 +1,7 @@
 Getting Started
 ===============
 
-The following setup steps have been tested on Ubuntu 20.04, on Ubuntu 22.04, on Debian buster and on Debian bookworm.
+The following setup steps have been tested on Ubuntu 20.04, on Ubuntu 22.04, on Debian buster and on Debian bullseye.
 On Debian buster the packages :code:`ansible` and :code:`qemu-user-static` from buster-backports are required.
 
 Prerequisites

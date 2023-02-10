@@ -24,7 +24,7 @@ cd "${SCRIPTDIR}/../.."
 
 export DEBIAN_FRONTEND=noninteractive
 
-if [[ "${ID}" == "debian" ]] && [[ "${VERSION_ID}" == "10" ]]
+if [ "${ID}" == "debian" ] && [ "${VERSION_ID}" == "10" ]
 then
     echo "deb http://deb.debian.org/debian/ buster-backports main" > /etc/apt/sources.list.d/buster-backports.list
 fi
@@ -60,7 +60,7 @@ sudo -H -u ${TESTUSER} git clone .git ${TESTUSERHOME}/edi
 
 apt-get -y --no-install-recommends install git-buildpackage dh-make equivs lintian > /dev/null
 
-if [[ "${ID}" == "debian" ]] && [[ "${VERSION_ID}" == "10" ]]
+if [ "${ID}" == "debian" ] && [ "${VERSION_ID}" == "10" ]
 then
     apt-get -y --no-install-recommends install ansible/buster-backports qemu-user-static/buster-backports
 fi
