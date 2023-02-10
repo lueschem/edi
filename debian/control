@@ -1,7 +1,7 @@
 Source: edi
 Section: devel
 Priority: optional
-Build-Depends: ansible,
+Build-Depends: ansible (>= 2.9),
                binfmt-support,
                debhelper (>= 9),
                debootstrap,
@@ -36,13 +36,13 @@ Architecture: all
 Depends: ${misc:Depends},
          ${python3:Depends},
          ${ansible:Depends},
-         ansible (>=2.1),
+         ansible (>= 2.9),
          binfmt-support,
          debootstrap,
          ethtool,
          liblzma5,
          openssh-client,
-         qemu-user-static,
+         qemu-user-static (>= 1:4.2),
          sudo,
          zstd,
 Description: Embedded Development Infrastructure - edi
