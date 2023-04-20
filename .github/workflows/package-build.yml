@@ -27,7 +27,7 @@ jobs:
            distribution_release: "22.04"
            repository_type: launchpad
          - distribution: ubuntu
-           distribution_release: "22.10"
+           distribution_release: "23.04"
            repository_type: launchpad
     steps:
       - name: Check out the source code
