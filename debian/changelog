@@ -1,3 +1,10 @@
+edi (1.14.2) jammy; urgency=medium
+
+  [ Matthias Luescher ]
+  * Added support for Ubuntu 23.04.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Thu, 20 Apr 2023 23:23:47 +0200
+
 edi (1.14.1) jammy; urgency=medium
 
   [ Matthias Lüscher ]
