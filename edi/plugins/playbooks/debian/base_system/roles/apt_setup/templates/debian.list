@@ -1,23 +1,23 @@
 {% if ansible_distribution_release == "buster" %}
 # base system sources list rendered by edi base system playbook
-deb http://deb.debian.org/debian/ {{ ansible_distribution_release }} main
-deb-src http://deb.debian.org/debian/ {{ ansible_distribution_release }} main
+deb http://deb.debian.org/debian/ {{ ansible_distribution_release }} main non-free
+deb-src http://deb.debian.org/debian/ {{ ansible_distribution_release }} main non-free
 
-deb http://security.debian.org/debian-security {{ ansible_distribution_release }}/updates main
-deb-src http://security.debian.org/debian-security {{ ansible_distribution_release }}/updates main
+deb http://security.debian.org/debian-security {{ ansible_distribution_release }}/updates main non-free
+deb-src http://security.debian.org/debian-security {{ ansible_distribution_release }}/updates main non-free
 
-deb http://deb.debian.org/debian/ {{ ansible_distribution_release }}-updates main
-deb-src http://deb.debian.org/debian/ {{ ansible_distribution_release }}-updates main
+deb http://deb.debian.org/debian/ {{ ansible_distribution_release }}-updates main non-free
+deb-src http://deb.debian.org/debian/ {{ ansible_distribution_release }}-updates main non-free
 {% elif ansible_distribution_release == "bullseye" %}
 # base system sources list rendered by edi base system playbook
-deb http://deb.debian.org/debian/ {{ ansible_distribution_release }} main
-deb-src http://deb.debian.org/debian/ {{ ansible_distribution_release }} main
+deb http://deb.debian.org/debian/ {{ ansible_distribution_release }} main non-free
+deb-src http://deb.debian.org/debian/ {{ ansible_distribution_release }} main non-free
 
-deb http://security.debian.org/debian-security {{ ansible_distribution_release }}-security main
-deb-src http://security.debian.org/debian-security {{ ansible_distribution_release }}-security main
+deb http://security.debian.org/debian-security {{ ansible_distribution_release }}-security main non-free
+deb-src http://security.debian.org/debian-security {{ ansible_distribution_release }}-security main non-free
 
-deb http://deb.debian.org/debian/ {{ ansible_distribution_release }}-updates main
-deb-src http://deb.debian.org/debian/ {{ ansible_distribution_release }}-updates main
+deb http://deb.debian.org/debian/ {{ ansible_distribution_release }}-updates main non-free
+deb-src http://deb.debian.org/debian/ {{ ansible_distribution_release }}-updates main non-free
 {% elif ansible_distribution_release == "bookworm" %}
 # base system sources list rendered by edi base system playbook
 deb http://deb.debian.org/debian/ {{ ansible_distribution_release }} main non-free-firmware

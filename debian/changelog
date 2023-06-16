@@ -1,3 +1,10 @@
+edi (1.15.2) jammy; urgency=medium
+
+  [ Matthias Luescher ]
+  * Added non-free to standard Debian template.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Fri, 16 Jun 2023 23:11:17 +0200
+
 edi (1.15.1) jammy; urgency=medium
 
   [ Matthias Luescher ]
