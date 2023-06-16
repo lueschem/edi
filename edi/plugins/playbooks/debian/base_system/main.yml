@@ -1,5 +1,4 @@
 - hosts: all
-  gather_facts: no
   vars:
     apply_proxy_settings: True
     configure_lxc_network_interface: True
@@ -11,6 +10,7 @@
     ssh_pub_key_directory: '{{ edi_project_directory }}/ssh_pub_keys'
     install_documentation: full
     translations_filter: ""
+    base_system_sources_list_template: ""
   roles:
     - role: lxc_interfaces
       become: True

@@ -4,6 +4,18 @@
   command: apt-get update
   changed_when: false
 
+- name: Remove sources.list file that got added by debootstrap.
+  file:
+    dest: /etc/apt/sources.list
+    state: absent
+  when: base_system_sources_list_template != ""
+
+- name: Re-add sources list file according to template.
+  template:
+    src: "{{ base_system_sources_list_template }}"
+    dest: /etc/apt/sources.list.d/
+  when: base_system_sources_list_template != ""
+
 - name: Update and upgrade apt.
   apt:
     update_cache: yes
