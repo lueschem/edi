@@ -82,7 +82,7 @@ def test_bootstrap(config_files, monkeypatch):
 
         bootstrap_cmd = Bootstrap()
         with requests_mock.Mocker() as m:
-            m.get('https://ftp-master.debian.org/keys/archive-key-8.asc', text='key file mockup')
+            m.get('https://ftp-master.debian.org/keys/archive-key-11.asc', text='key file mockup')
             bootstrap_cmd.run(main_file)
 
         expected_result = bootstrap_cmd._result()

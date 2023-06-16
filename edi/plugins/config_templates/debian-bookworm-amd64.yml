@@ -1,0 +1,8 @@
+parameters:
+    edi_bootstrap_architecture: amd64
+    edi_bootstrap_repository: deb http://deb.debian.org/debian/ bookworm main
+    edi_bootstrap_repository_key: https://ftp-master.debian.org/keys/archive-key-11.asc
+    edi_setup_dumb_init: true
+    edi_use_python3: true
+    edi_base_system_sources_list_template: debian.list
+

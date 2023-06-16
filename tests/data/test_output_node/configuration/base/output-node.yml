@@ -1,9 +1,9 @@
 general:
-    edi_required_minimal_edi_version: 0.11.4
+    edi_required_minimal_edi_version: 1.4.0
 
 bootstrap:
     architecture: armhf
-    repository: deb http://archive.raspbian.org/raspbian jessie main contrib non-free
+    repository: deb http://archive.raspbian.org/raspbian buster main contrib non-free
     repository_key: https://archive.raspbian.org/raspbian.public.key
     tool: debootstrap
 

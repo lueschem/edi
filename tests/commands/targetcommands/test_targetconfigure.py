@@ -45,7 +45,7 @@ def test_target_configure(config_files, monkeypatch, capsys):
     with workspace():
         edi_exec = os.path.join(get_project_root(), 'bin', 'edi')
         project_name = 'pytest-{}'.format(get_random_string(6))
-        config_command = [edi_exec, 'config', 'init', project_name, 'debian-jessie-amd64']
+        config_command = [edi_exec, 'config', 'init', project_name, 'debian-bookworm-amd64']
         run(config_command)  # run as non root
 
         parser = edi._setup_command_line_interface()
