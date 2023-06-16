@@ -2,7 +2,7 @@ parameters:
     edi_bootstrap_architecture: armhf
     edi_bootstrap_repository: deb http://archive.raspbian.org/raspbian jessie main contrib non-free
     edi_bootstrap_repository_key: https://archive.raspbian.org/raspbian.public.key
-    edi_qemu_repository: deb http://deb.debian.org/debian/ stretch main
+    edi_qemu_repository: deb http://archive.debian.org/debian/ stretch main
     edi_qemu_repository_key: https://ftp-master.debian.org/keys/archive-key-9.asc
     edi_use_buster_qemu: true
 
