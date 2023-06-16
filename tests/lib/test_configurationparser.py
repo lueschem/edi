@@ -57,9 +57,9 @@ def test_bootstrap_overlay(config_files):
         assert "main" in boostrap_source.comps
         assert boostrap_source.uri == "http://deb.debian.org/debian/"
         # the all file shall provide this key
-        expected_key = "https://ftp-master.debian.org/keys/archive-key-8.asc"
+        expected_key = "https://ftp-master.debian.org/keys/archive-key-11.asc"
         assert parser.get_bootstrap_repository_key() == expected_key
-        assert boostrap_source.dist == "jessie"
+        assert boostrap_source.dist == "bookworm"
         assert parser.get_bootstrap_tool() == "debootstrap"
 
 

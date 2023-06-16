@@ -1,6 +1,0 @@
-parameters:
-    edi_bootstrap_architecture: armhf
-    edi_bootstrap_repository: deb http://deb.debian.org/debian/ jessie main
-    edi_bootstrap_repository_key: https://ftp-master.debian.org/keys/archive-key-8.asc
-    edi_use_buster_qemu: true
-

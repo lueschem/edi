@@ -279,6 +279,13 @@ The playbook can be fine tuned as follows:
      To reduce the footprint of the resulting artifacts the number of installed languages can be limited.
      By choosing the builtin filter :code:`"en_translations_only"` you can make sure that only English
      translations will get installed.
+  *base_system_sources_list_template:*
+     During bootstrapping a minimal :code:`/etc/apt/sources.list` file gets added to the root file system. By specifying
+     a template using :code:`base_system_sources_list_template` the initial sources list file will get removed and
+     replaced by a file containing the content of the rendered template. The new file will be written to the
+     :code:`/etc/apt/sources.list.d` subfolder. :code:`edi` provides the template :code:`debian.list` that can be chosen
+     as a good starting point. In case :code:`debian.list` does not meet the requirements a custom template
+     can be specified. By default no template gets applied.
 
 The proxy settings can be customized as follows:
 

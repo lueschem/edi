@@ -1,9 +1,9 @@
 general:
-    edi_required_minimal_edi_version: 0.11.4
+    edi_required_minimal_edi_version: 1.4.0
 
 bootstrap:
     architecture: armhf
-    repository: deb http://archive.raspbian.org/raspbian jessie main contrib non-free
+    repository: deb http://archive.raspbian.org/raspbian buster main contrib non-free
     repository_key: https://archive.raspbian.org/raspbian.public.key
     tool: debootstrap
 
@@ -52,7 +52,7 @@ postprocessing_commands:
             bingo: bongo
             message: Foo, bar or baz?
 qemu:
-    repository: deb http://deb.debian.org/debian/ stretch main
-    repository_key: https://ftp-master.debian.org/keys/archive-key-8.asc
+    repository: deb http://archive.debian.org/debian/ stretch main
+    repository_key: https://ftp-master.debian.org/keys/archive-key-9.asc
     package: qemu-user-static     
 

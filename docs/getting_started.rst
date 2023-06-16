@@ -1,7 +1,7 @@
 Getting Started
 ===============
 
-The following setup steps have been tested on Ubuntu 20.04, on Ubuntu 22.04, on Debian buster and on Debian bullseye.
+The following setup steps have been tested on Ubuntu 20.04 and 22.04 as well as on Debian buster, bullseye and bookworm.
 On Debian buster the packages :code:`ansible` and :code:`qemu-user-static` from buster-backports are required.
 
 Prerequisites
@@ -101,7 +101,7 @@ Building a First Container
 
    .. code-block:: bash
 
-      edi config init my-project debian-buster-amd64
+      edi config init my-project debian-bookworm-amd64
 
 #. Build your first (development) lxc container named *my-first-edi-container*:
 

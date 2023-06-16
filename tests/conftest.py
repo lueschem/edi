@@ -99,7 +99,7 @@ shared_folders:
 bootstrap:
     tool:                   debootstrap
     architecture:           amd64
-    repository:             deb http://deb.debian.org/debian/ jessie main
+    repository:             deb http://deb.debian.org/debian/ bookworm main
 
 lxc_templates:
     10_foo:
@@ -166,7 +166,7 @@ shared_folders:
             edi_current_user_target_home_directory: /foo/bar
 
 bootstrap:
-    repository_key:     https://ftp-master.debian.org/keys/archive-key-8.asc
+    repository_key:     https://ftp-master.debian.org/keys/archive-key-11.asc
 
 postprocessing_commands:
     20_second_command:
