@@ -16,17 +16,17 @@
     dest: /etc/apt/sources.list.d/
   when: base_system_sources_list_template != ""
 
-- name: Update and upgrade apt.
-  apt:
-    update_cache: yes
-    upgrade: dist
-
 - name: Prevent service startup during package installation.
   copy:
     src: policy-rc.d
     dest: /usr/sbin/
     mode: 755
   when: edi_create_distributable_image
+
+- name: Update and upgrade apt.
+  apt:
+    update_cache: yes
+    upgrade: dist
 
 - name: Prevent documentation installation and remove existing documentation.
   script: remove_documentation {{ dpkg_no_documentation }}
