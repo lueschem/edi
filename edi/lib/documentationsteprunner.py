@@ -239,7 +239,7 @@ class DocumentationStepRunner():
         baseline_file = os.path.join(self.raw_input, 'edi', 'packages-baseline.yml')
 
         if not os.path.isfile(baseline_file):
-            logging.info("No file describing the packages baseline found in '{}'.".format(baseline_file))
+            logging.warning("No file describing the packages baseline found in '{}'.".format(baseline_file))
             return dict()
 
         logging.debug("Found file describing the packages baseline in '{}'.".format(baseline_file))
