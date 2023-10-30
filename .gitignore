@@ -18,13 +18,6 @@ htmlcov/
 # sphinx
 docs/_build/
 
-# travis
-edi_*dsc
-edi_*xz
-edi_*deb
-edi_*build
-edi_*changes
-
 # eclipse
 .settings/
 
@@ -46,11 +39,6 @@ artifacts/*.tar.*
 
 # development IDEs
 .idea/
-travis/travis-key.tar
-travis/travis-key.asc
-travis/travis-key.passphrase
-travis/id_rsa
-travis/id_rsa.pub
 
 # Github
 .github/secrets/
