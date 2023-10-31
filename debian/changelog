@@ -1,3 +1,10 @@
+edi (1.15.6) jammy; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Updated documentation.
+
+ -- Matthias Luescher <m.luescher@datacomm.ch>  Tue, 31 Oct 2023 15:43:27 +0100
+
 edi (1.15.5) jammy; urgency=medium
 
   [ Matthias Lüscher ]
