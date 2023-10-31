@@ -1,3 +1,10 @@
+edi (1.15.8) jammy; urgency=medium
+
+  [ Matthias Luescher ]
+  * Changed header background color.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Tue, 31 Oct 2023 23:42:29 +0100
+
 edi (1.15.7) jammy; urgency=medium
 
   [ Matthias Luescher ]
