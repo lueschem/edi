@@ -1,3 +1,10 @@
+edi (1.15.4) jammy; urgency=medium
+
+  [ Matthias Lüscher ]
+  * Fixed ReadTheDocs build.
+
+ -- Matthias Luescher <m.luescher@datacomm.ch>  Tue, 31 Oct 2023 10:46:36 +0100
+
 edi (1.15.3) jammy; urgency=medium
 
   [ Matthias Lüscher ]
