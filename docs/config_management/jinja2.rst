@@ -19,6 +19,10 @@ Since the dictionary is context sensitive to the sub-command you have to specify
 option :code:`--dictionary` to display the appropriate dictionary. The option :code:`--dictionary` is available for
 all commands that deal with configuration.
 
+.. option:: --dictionary
+
+   Dumps the load time dictionary instead of running the command.
+
 :code:`my-project-develop.yml` contains an even more complicated parametrization in the :code:`lxc_profiles` section:
 
 .. code-block::
@@ -41,3 +45,7 @@ Plugins can even further benefit from Jinja2 since there are additional dictiona
 If supported for the plugin, :code:`edi` will preview the plugin rendered by Jinja2 when using the above command.
 Given the plugin is an Ansible playbook, the whole plugin dictionary will be made available to the playbook
 by means of the Ansible command line option :code:`--extra-vars`.
+
+.. option:: --plugins
+
+   Dumps the active plugins including their dictionaries instead of running the command.

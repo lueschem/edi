@@ -30,6 +30,10 @@ of the use case *develop* for the given command:
 
    edi lxc configure --config my-container my-project-develop.yml
 
+.. option:: --config
+
+   Dump the merged configuration instead of running the command.
+
 
 :code:`general` Section
 +++++++++++++++++++++++
@@ -202,6 +206,10 @@ Such nodes accept the following settings:
    *skip:*
       :code:`True` or :code:`False`. If :code:`True` the plugin will not get applied.
       If unspecified, the plugin will get applied.
+
+.. option:: --dictionary
+
+   Dumps the load time dictionary instead of running the command.
 
 To learn more about plugins please read the chapter :ref:`plugins`.
 
