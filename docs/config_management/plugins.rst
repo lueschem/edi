@@ -494,6 +494,10 @@ in debug mode:
 
    edi --log=DEBUG documentation render PATH_TO_USR_SHARE_DOC_FOLDER OUTPUT_FOLDER CONFIG.yml
 
+.. option:: --log=LEVEL
+
+   Changes the log level of the command to the desired log level (DEBUG,INFO,WARNING,ERROR,CRITICAL).
+
 The output of the provided templates is reStructuredText that can be further tweaked and then be transformed into a nice
 pdf document using `Sphinx`_. For more details please take a look at the edi-pi_ example configuration.
 

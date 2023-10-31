@@ -52,6 +52,10 @@ when doing a next build. The tool :code:`edi` supports this workflow through the
 :code:`--recursive-clean NUMBER` command line option. Please take a look at this `blog post`_ for a
 detailed example.
 
+.. option:: --recursive-clean NUMBER
+
+   Cleans the artifacts that got produced by this and the preceding N commands.
+
 .. _blog post: https://www.get-edi.io/A-new-Approach-to-Operating-System-Image-Generation/
 
 

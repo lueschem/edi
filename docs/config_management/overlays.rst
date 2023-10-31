@@ -28,3 +28,7 @@ The merged configuration can be displayed using a command like:
    edi lxc configure --config my-dev-container my-project-develop.yml
 
 The usage of overlays is optional and in any case it is not necessary to specify all possible overlays.
+
+.. option:: --config
+
+   Dump the merged configuration instead of running the command.
