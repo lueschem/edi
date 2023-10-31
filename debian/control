@@ -24,6 +24,7 @@ Build-Depends: ansible (>= 2.9),
                python3-setuptools,
                python3-setuptools-scm,
                python3-sphinx,
+               python3-sphinx-rtd-theme
                python3-yaml,
                sudo,
                zstd,
