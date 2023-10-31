@@ -1,3 +1,10 @@
+edi (1.15.7) jammy; urgency=medium
+
+  [ Matthias Luescher ]
+  * Reverted the documentation theme to rtd.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Tue, 31 Oct 2023 23:34:46 +0100
+
 edi (1.15.6) jammy; urgency=medium
 
   [ Matthias Lüscher ]
