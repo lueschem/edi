@@ -45,12 +45,6 @@ bootstrap:
     - dumb-init
 {% endif %}
 
-{% if edi_use_buster_qemu is defined and edi_use_buster_qemu %}
-qemu:
-    repository: deb http://deb.debian.org/debian/ buster main
-    repository_key: https://ftp-master.debian.org/keys/archive-key-9.asc
-{% endif %}
-
 lxc_profiles:
     100_lxc_networking:
         path: lxc_profiles/general/lxc_networking/default_interface.yml
@@ -99,14 +93,3 @@ postprocessing_commands:
 {% endraw %}
         parameters:
             message: We could do something useful within this command!
-
-{% if edi_qemu_repository %}
-qemu:
-    repository: {{ edi_qemu_repository }}
-{% if edi_qemu_repository_key %}
-    repository_key: {{ edi_qemu_repository_key }}
-{% endif %}
-    package: qemu-user-static     
-{% endif %}
-
-

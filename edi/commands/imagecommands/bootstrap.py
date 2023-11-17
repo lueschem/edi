@@ -25,11 +25,10 @@ import logging
 from codecs import open
 from aptsources.sourceslist import SourceEntry
 from edi.commands.image import Image
-from edi.commands.qemucommands.fetch import Fetch
 from edi.lib.helpers import (FatalError, chown_to_user, print_success,
                              get_workdir, get_artifact_dir, create_artifact_dir)
 from edi.lib.configurationparser import command_context
-from edi.lib.shellhelpers import run, get_chroot_cmd, require, mount_aware_tempdir
+from edi.lib.shellhelpers import run, get_chroot_cmd, require, mount_aware_tempdir, get_debian_architecture
 from edi.lib.proxyhelpers import ProxySetup
 from edi.lib.keyhelpers import fetch_repository_key, build_keyring
 
@@ -52,8 +51,9 @@ class Bootstrap(Image):
     def dry_run(self, config_file):
         return self._dispatch(config_file, run_method=self._dry_run)
 
-    def _dry_run(self):
-        return Fetch().dry_run(self.config.get_base_config_file())
+    @staticmethod
+    def _dry_run():
+        return {}
 
     def run(self, config_file):
         return self._dispatch(config_file, run_method=self._run)
@@ -67,7 +67,7 @@ class Bootstrap(Image):
 
         self._require_sudo()
 
-        qemu_executable = Fetch().run(self.config.get_base_config_file())
+        needs_qemu = self._needs_qemu()
 
         print("Going to bootstrap initial image - be patient.")
 
@@ -81,7 +81,7 @@ class Bootstrap(Image):
             chown_to_user(tempdir)
             key_data = fetch_repository_key(self.config.get_bootstrap_repository_key())
             keyring_file = build_keyring(tempdir, "temp_keyring.gpg", key_data)
-            rootfs = self._run_debootstrap(tempdir, keyring_file, qemu_executable)
+            rootfs = self._run_debootstrap(tempdir, keyring_file, needs_qemu)
             self._postprocess_rootfs(rootfs, key_data)
             archive = self._pack_image(tempdir, rootfs)
             chown_to_user(archive)
@@ -107,9 +107,6 @@ class Bootstrap(Image):
             os.remove(self._result())
             print_success("Removed bootstrap image {}.".format(self._result()))
 
-        if self.clean_depth > 0:
-            Fetch().clean_recursive(self.config.get_base_config_file(), self.clean_depth - 1)
-
     def _dispatch(self, config_file, run_method):
         self._setup_parser(config_file)
         return run_method()
@@ -123,7 +120,7 @@ class Bootstrap(Image):
         return os.path.join(get_artifact_dir(), archive_name)
 
     @require("debootstrap", "'sudo apt install debootstrap'")
-    def _run_debootstrap(self, tempdir, keyring_file, qemu_executable):
+    def _run_debootstrap(self, tempdir, keyring_file, needs_qemu):
         additional_packages = ','.join(self.config.get_bootstrap_additional_packages())
         rootfs = os.path.join(tempdir, "rootfs")
         bootstrap_source = SourceEntry(self.config.get_bootstrap_repository())
@@ -132,7 +129,7 @@ class Bootstrap(Image):
         cmd = list()
         cmd.append("debootstrap")
         cmd.append("--arch={0}".format(self.config.get_bootstrap_architecture()))
-        if qemu_executable:
+        if needs_qemu:
             cmd.append("--foreign")
         cmd.append("--variant=minbase")
         cmd.append("--include={0}".format(additional_packages))
@@ -145,9 +142,7 @@ class Bootstrap(Image):
         cmd.append(bootstrap_source.uri)
         run(cmd, sudo=True, log_threshold=logging.INFO, env=ProxySetup().get_environment())
 
-        if qemu_executable:
-            qemu_target_path = os.path.join(rootfs, "usr", "bin")
-            shutil.copy(qemu_executable, qemu_target_path)
+        if needs_qemu:
             second_stage_cmd = get_chroot_cmd(rootfs)
             second_stage_cmd.append("/debootstrap/debootstrap")
             second_stage_cmd.append("--second-stage")
@@ -180,3 +175,15 @@ class Bootstrap(Image):
         with open(sources_list, mode='w', encoding='utf-8') as f:
             f.write(('# edi bootstrap repository\n{}\n'
                      ).format(self.config.get_bootstrap_repository()))
+
+    def _needs_qemu(self):
+        if not self.config.has_bootstrap_node():
+            return False
+        host_architecture = get_debian_architecture()
+        container_architecture = self.config.get_bootstrap_architecture()
+        if host_architecture == container_architecture:
+            return False
+        elif host_architecture == 'amd64' and container_architecture == 'i386':
+            return False
+        else:
+            return True
