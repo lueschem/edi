@@ -20,7 +20,7 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 from edi.lib.configurationparser import ConfigurationParser
-from edi.lib.commandrunner import CommandRunner
+from edi.lib.commandrunner import CommandRunner, ArtifactType, Artifact
 from tests.libtesting.contextmanagers.workspace import workspace
 from tests.libtesting.helpers import get_command, suppress_chown_during_debuild
 from edi.lib import mockablerun
@@ -51,7 +51,9 @@ def test_run_and_clean(config_files, monkeypatch):
             with open(input_file, mode='w', encoding='utf-8') as i:
                 i.write("*input file*\n")
 
-            runner = CommandRunner(parser, 'postprocessing_commands', input_file)
+            runner = CommandRunner(parser, 'postprocessing_commands', Artifact(name='edi_input_artifact',
+                                                                               url=input_file,
+                                                                               type=ArtifactType.PATH))
 
             artifacts = runner.run()
 
@@ -59,11 +61,11 @@ def test_run_and_clean(config_files, monkeypatch):
             assert os.path.isfile(os.path.join('artifacts', 'last.txt'))
 
             def verify_last_artifact(artifact):
-                assert str(workdir) in str(artifact)
-                assert 'artifacts/last.txt' in str(artifact)
-                assert 'last.txt' in str(artifact)
+                assert str(workdir) in str(artifact.url)
+                assert 'artifacts/last.txt' in str(artifact.url)
+                assert 'last.txt' in str(artifact.url)
 
-                with open(artifact, mode='r') as result_file:
+                with open(artifact.url, mode='r') as result_file:
                     content = result_file.read()
                     assert "*input file*" in content
                     assert "*first step*" in content
@@ -92,7 +94,8 @@ def test_plugin_report(config_files):
 
         input_file = os.path.join(os.sep, 'fake_folder', 'input.txt')
 
-        runner = CommandRunner(parser, 'postprocessing_commands', input_file)
+        runner = CommandRunner(parser, 'postprocessing_commands', Artifact(name='edi_input_artifact',
+                                                                           url=input_file, type=ArtifactType.PATH))
 
         output = runner.get_plugin_report()
         commands = output.get('postprocessing_commands', [])
@@ -108,6 +111,7 @@ def test_require_root(config_files):
 
         input_file = os.path.join(os.sep, 'fake_folder', 'input.txt')
 
-        runner = CommandRunner(parser, 'postprocessing_commands', input_file)
+        runner = CommandRunner(parser, 'postprocessing_commands', Artifact(name='edi_input_artifact',
+                                                                           url=input_file, type=ArtifactType.PATH))
         assert not runner.require_root()
         assert not runner.require_root_for_clean()
