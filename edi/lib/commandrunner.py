@@ -49,7 +49,7 @@ Command = namedtuple("Command", "script_name, script_content, node_name, resolve
 class CommandRunner:
 
     def __init__(self, config, section, input_artifact):
-        assert type(input_artifact) is Artifact
+        assert input_artifact is None or type(input_artifact) is Artifact
         self.config = config
         self.config_section = section
         self.input_artifact = input_artifact

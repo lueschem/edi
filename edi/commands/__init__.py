@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Matthias Luescher
+# Copyright (C) 2023 Matthias Luescher
 #
 # Authors:
 #  Matthias Luescher
@@ -25,5 +25,8 @@ from edi.commands.lxccommands import (export, importcmd, launch, lxcclean, lxcco
 from edi.commands.configcommands import configclean, configinit  # noqa: ignore=F401
 from edi.commands.targetcommands import targetconfigure  # noqa: ignore=F401
 from edi.commands.documentationcommands import render  # noqa: ignore=F401
+from edi.commands.projectcommands import prepare, make, projectclean  # noqa: ignore=F401
+from edi.commands.containercommands import containerconfigure, containerclean  # noqa: ignore=F401
 
-__all__ = ["config", "image", "lxc", "version", "clean", "target", "documentation"]
+
+__all__ = ["config", "image", "lxc", "version", "clean", "target", "documentation", "container", "project"]
