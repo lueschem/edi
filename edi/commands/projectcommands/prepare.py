@@ -90,3 +90,10 @@ class Prepare(Project):
         with command_context({'edi_create_distributable_image': True}):
             self._setup_parser(config_file)
             return run_method()
+
+    def result(self, config_file):
+        return self._dispatch(config_file, run_method=self._result)
+
+    def _result(self):
+        command_runner = CommandRunner(self.config, self.section, None)
+        return command_runner.result()

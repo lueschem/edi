@@ -32,8 +32,6 @@ class Make(Project):
     def __init__(self):
         super().__init__()
         self.section = 'postprocessing_commands'
-        # TODO:
-        self.container_name = "foo"
 
     @classmethod
     def advertise(cls, subparsers):
@@ -54,7 +52,7 @@ class Make(Project):
     def _dry_run(self):
         plugins = {}
         if self._input_artifact() is not None:
-            plugins.update(Configure().dry_run(self.container_name, self.config.get_base_config_file()))
+            plugins.update(Configure().dry_run(self.config.get_base_config_file()))
         command_runner = CommandRunner(self.config, self.section, Artifact(name='edi_input_artifact',
                                                                            url=self._input_artifact(),
                                                                            type=ArtifactType.PATH))
@@ -73,7 +71,7 @@ class Make(Project):
             self._require_sudo()
 
         if self._input_artifact() is not None:
-            Configure().run(self.container_name, self.config.get_base_config_file())
+            Configure().run(self.config.get_base_config_file())
         else:
             logging.info("Creating new project without bootstrapping other artifacts.")
 
@@ -103,7 +101,7 @@ class Make(Project):
         command_runner.clean()
 
         if self.clean_depth > 0 and self._input_artifact() is not None:
-            Configure().clean_recursive(self.container_name, self.config.get_base_config_file(), self.clean_depth - 1)
+            Configure().clean_recursive(self.config.get_base_config_file(), self.clean_depth - 1)
 
     def _dispatch(self, config_file, run_method):
         with command_context({'edi_create_distributable_image': True}):
@@ -113,7 +111,6 @@ class Make(Project):
     def _input_artifact(self):
         # TODO:
         if self.config.has_bootstrap_node():
-            # return Configure().result(self.config.get_base_config_file())
-            return self.container_name
+            return Configure().result(self.config.get_base_config_file())
         else:
             return None

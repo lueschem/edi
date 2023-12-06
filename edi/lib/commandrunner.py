@@ -37,6 +37,7 @@ from edi.lib.yamlhelpers import LiteralString
 
 class ArtifactType(Enum):
     PATH = 'path'
+    BUILDAH_CONTAINER = 'buildah-container'
 
 
 Artifact = namedtuple("Artifact", "name, url, type")
@@ -132,6 +133,10 @@ class CommandRunner:
                 elif os.path.isdir(artifact.url):
                     safely_remove_artifacts_folder(artifact.url, sudo=command.config_node.get('require_root', False))
                     print_success("Removed image directory artifact {}.".format(artifact.url))
+
+    def result(self):
+        commands = self._get_commands()
+        return self._result(commands)
 
     @staticmethod
     def _run_command(command_file, require_root):
