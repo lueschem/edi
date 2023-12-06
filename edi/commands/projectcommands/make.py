@@ -21,7 +21,7 @@
 
 import logging
 from edi.commands.project import Project
-from edi.commands.containercommands.containerconfigure import Configure
+from edi.commands.projectcommands.configure import Configure
 from edi.lib.commandrunner import CommandRunner, Artifact, ArtifactType
 from edi.lib.helpers import print_success
 from edi.lib.configurationparser import command_context

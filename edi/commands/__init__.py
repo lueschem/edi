@@ -25,8 +25,7 @@ from edi.commands.lxccommands import (export, importcmd, launch, lxcclean, lxcco
 from edi.commands.configcommands import configclean, configinit  # noqa: ignore=F401
 from edi.commands.targetcommands import targetconfigure  # noqa: ignore=F401
 from edi.commands.documentationcommands import render  # noqa: ignore=F401
-from edi.commands.projectcommands import prepare, make, projectclean  # noqa: ignore=F401
-from edi.commands.containercommands import containerconfigure, containerclean  # noqa: ignore=F401
+from edi.commands.projectcommands import prepare, configure, make, clean  # noqa: ignore=F401
 
 
-__all__ = ["config", "image", "lxc", "version", "clean", "target", "documentation", "container", "project"]
+__all__ = ["config", "image", "lxc", "version", "clean", "target", "documentation", "project"]

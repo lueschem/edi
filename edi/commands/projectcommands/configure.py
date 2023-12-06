@@ -19,13 +19,13 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
-from edi.commands.container import Container
+from edi.commands.project import Project
 from edi.lib.playbookrunner import PlaybookRunner
 from edi.lib.helpers import print_success
 from edi.lib.configurationparser import command_context
 
 
-class Configure(Container):
+class Configure(Project):
 
     def __init__(self):
         super().__init__()
