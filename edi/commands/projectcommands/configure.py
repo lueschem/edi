@@ -19,6 +19,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
+import hashlib
 from edi.commands.project import Project
 from edi.commands.projectcommands.prepare import Prepare
 from edi.lib.playbookrunner import PlaybookRunner
@@ -33,12 +34,12 @@ class Configure(Project):
     def __init__(self):
         super().__init__()
         self.ansible_connection = 'buildah'
-        self.output_artifact = None
+        self.collected_results = None
 
     @classmethod
     def advertise(cls, subparsers):
-        help_text = "configure a container using Ansible playbook(s)"
-        description_text = "Configure a container."
+        help_text = "configure a buildah container using Ansible playbook(s)"
+        description_text = "Configure a buildah container."
         parser = subparsers.add_parser(cls._get_short_command_name(),
                                        help=help_text,
                                        description=description_text)
@@ -67,21 +68,30 @@ class Configure(Project):
 
     def _run(self):
         prepare_results = Prepare().run(self.config.get_base_config_file())
-        self.output_artifact = self._extract_container(prepare_results)
+        bootstrapped_rootfs = self._get_bootstrapped_rootfs(prepare_results)
 
-        print("Going to configure container {} - be patient.".format(self._result().location))
+        print(f"Going to configure buildah container {self._get_container_artifact().location} - be patient.")
 
-        playbook_runner = PlaybookRunner(self.config, self._result().location, self.ansible_connection)
+        playbook_runner = PlaybookRunner(self.config, self._get_container_artifact().location, self.ansible_connection)
         playbook_runner.run_all()
 
-        print_success("Configured container {}.".format(self._result()))
-        return self._result()
+        print_success("Configured buildah container {}.".format(self._result()))
+
+        collected_results = self._result()
+        if collected_results:
+            formatted_results = [f"{a.name}: {a.location}" for a in collected_results]
+            print_success(("Completed the project configure command.\n"
+                           "The following artifacts are now available:\n- {}".format('\n- '.join(formatted_results))))
+
+        return collected_results
 
     def clean_recursive(self, config_file, depth):
         self.clean_depth = depth
         self._dispatch(config_file, run_method=self._clean)
 
     def _clean(self):
+        # TODO: delete buildah container
+
         if self.clean_depth > 0:
             Prepare().clean_recursive(self.config.get_base_config_file(), self.clean_depth - 1)
 
@@ -91,29 +101,33 @@ class Configure(Project):
             return run_method()
 
     def _result(self):
-        if not self.output_artifact:
-            prepare_results = Prepare().result(self.config.get_base_config_file())
+        if not self.collected_results:
+            self.collected_results = Prepare().result(self.config.get_base_config_file())
+            self.collected_results.append(self._get_container_artifact())
+        return self.collected_results
 
-            self.output_artifact = self._extract_container(prepare_results)
-
-        return self.output_artifact
+    def _get_container_artifact(self):
+        container_name = "edi-{}-{}".format(
+            hashlib.sha256(self.config.get_configuration_name().encode()).hexdigest()[:8],
+            self.config.get_project_directory_hash())
+        return Artifact(name="edi_buildah_container", location=container_name, type=ArtifactType.BUILDAH_CONTAINER)
 
     @staticmethod
-    def _extract_container(prepare_results):
-        new_container = None
+    def _get_bootstrapped_rootfs(prepare_results):
+        bootstrapped_rootfs = None
+        expected_artifact = "edi_bootstrapped_rootfs"
         for result in prepare_results:
-            if new_container:
-                raise FatalError(("The project configure command expects exactly one buildah container "
-                                  "as a result of the project prepare command (found multiple)!"))
+            if result.name is expected_artifact:
+                if bootstrapped_rootfs:
+                    raise FatalError((f"The project configure command expects exactly one {expected_artifact} "
+                                      f"output artifact as a result the project prepare command (found multiple)!"))
+                bootstrapped_rootfs = result
 
-            if result.type is ArtifactType.BUILDAH_CONTAINER:
-                new_container = Artifact("configured_container", f"{result.location}_out", result.type)
+        if not bootstrapped_rootfs:
+            raise FatalError((f"The project configure command expects a {expected_artifact} "
+                              f"output artifact as a result the project prepare command!"))
 
-        if not new_container:
-            raise FatalError(("The project configure command expects a buildah container as a result of the "
-                              "project prepare command!"))
-
-        return new_container
+        return bootstrapped_rootfs
 
     def result(self, config_file):
         return self._dispatch(config_file, run_method=self._result)
