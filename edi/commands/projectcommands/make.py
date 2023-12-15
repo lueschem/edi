@@ -54,7 +54,7 @@ class Make(Project):
         if self._input_artifact() is not None:
             plugins.update(Configure().dry_run(self.config.get_base_config_file()))
         command_runner = CommandRunner(self.config, self.section, Artifact(name='edi_input_artifact',
-                                                                           url=self._input_artifact(),
+                                                                           location=self._input_artifact(),
                                                                            type=ArtifactType.PATH))
         plugins.update(command_runner.get_plugin_report())
         return plugins
@@ -64,7 +64,7 @@ class Make(Project):
 
     def _run(self):
         command_runner = CommandRunner(self.config, self.section, Artifact(name='edi_input_artifact',
-                                                                           url=self._input_artifact(),
+                                                                           location=self._input_artifact(),
                                                                            type=ArtifactType.PATH))
 
         if command_runner.require_root():
@@ -80,7 +80,7 @@ class Make(Project):
         result = command_runner.run()
 
         if result:
-            formatted_results = [f"{a.name}: {a.url}" for a in result]
+            formatted_results = [f"{a.name}: {a.location}" for a in result]
             print_success(("Completed the project creation post processing commands.\n"
                            "The following artifacts are now available:\n- {}".format('\n- '.join(formatted_results))))
         return result
@@ -94,7 +94,7 @@ class Make(Project):
 
     def _clean(self):
         command_runner = CommandRunner(self.config, self.section, Artifact(name='edi_input_artifact',
-                                                                           url=self._input_artifact(),
+                                                                           location=self._input_artifact(),
                                                                            type=ArtifactType.PATH))
         if command_runner.require_root_for_clean():
             self._require_sudo()

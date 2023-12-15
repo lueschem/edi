@@ -68,7 +68,7 @@ class Prepare(Project):
         result = command_runner.run()
 
         if result:
-            formatted_results = [f"{a.name}: {a.url}" for a in result]
+            formatted_results = [f"{a.name}: {a.location}" for a in result]
             print_success(("Completed the project preparation pre processing commands.\n"
                            "The following artifacts are now available:\n- {}".format('\n- '.join(formatted_results))))
         return result

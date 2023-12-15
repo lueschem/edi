@@ -69,9 +69,9 @@ class Configure(Project):
         prepare_results = Prepare().run(self.config.get_base_config_file())
         self.output_artifact = self._extract_container(prepare_results)
 
-        print("Going to configure container {} - be patient.".format(self._result().url))
+        print("Going to configure container {} - be patient.".format(self._result().location))
 
-        playbook_runner = PlaybookRunner(self.config, self._result().url, self.ansible_connection)
+        playbook_runner = PlaybookRunner(self.config, self._result().location, self.ansible_connection)
         playbook_runner.run_all()
 
         print_success("Configured container {}.".format(self._result()))
@@ -107,7 +107,7 @@ class Configure(Project):
                                   "as a result of the project prepare command (found multiple)!"))
 
             if result.type is ArtifactType.BUILDAH_CONTAINER:
-                new_container = Artifact("configured_container", f"{result.url}_out", result.type)
+                new_container = Artifact("configured_container", f"{result.location}_out", result.type)
 
         if not new_container:
             raise FatalError(("The project configure command expects a buildah container as a result of the "

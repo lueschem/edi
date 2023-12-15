@@ -52,7 +52,7 @@ def test_run_and_clean(config_files, monkeypatch):
                 i.write("*input file*\n")
 
             runner = CommandRunner(parser, 'postprocessing_commands', Artifact(name='edi_input_artifact',
-                                                                               url=input_file,
+                                                                               location=input_file,
                                                                                type=ArtifactType.PATH))
 
             artifacts = runner.run()
@@ -61,11 +61,11 @@ def test_run_and_clean(config_files, monkeypatch):
             assert os.path.isfile(os.path.join('artifacts', 'last.txt'))
 
             def verify_last_artifact(artifact):
-                assert str(workdir) in str(artifact.url)
-                assert 'artifacts/last.txt' in str(artifact.url)
-                assert 'last.txt' in str(artifact.url)
+                assert str(workdir) in str(artifact.location)
+                assert 'artifacts/last.txt' in str(artifact.location)
+                assert 'last.txt' in str(artifact.location)
 
-                with open(artifact.url, mode='r') as result_file:
+                with open(artifact.location, mode='r') as result_file:
                     content = result_file.read()
                     assert "*input file*" in content
                     assert "*first step*" in content
@@ -95,7 +95,7 @@ def test_plugin_report(config_files):
         input_file = os.path.join(os.sep, 'fake_folder', 'input.txt')
 
         runner = CommandRunner(parser, 'postprocessing_commands', Artifact(name='edi_input_artifact',
-                                                                           url=input_file, type=ArtifactType.PATH))
+                                                                           location=input_file, type=ArtifactType.PATH))
 
         output = runner.get_plugin_report()
         commands = output.get('postprocessing_commands', [])
@@ -112,6 +112,6 @@ def test_require_root(config_files):
         input_file = os.path.join(os.sep, 'fake_folder', 'input.txt')
 
         runner = CommandRunner(parser, 'postprocessing_commands', Artifact(name='edi_input_artifact',
-                                                                           url=input_file, type=ArtifactType.PATH))
+                                                                           location=input_file, type=ArtifactType.PATH))
         assert not runner.require_root()
         assert not runner.require_root_for_clean()
