@@ -19,9 +19,8 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 from edi.commands.project import Project
-from edi.lib.commandrunner import CommandRunner, Artifact, ArtifactType
+from edi.lib.commandrunner import CommandRunner
 from edi.lib.configurationparser import command_context
 from edi.lib.helpers import print_success
 

@@ -24,6 +24,7 @@ from edi.commands.project import Project
 from edi.commands.projectcommands.prepare import Prepare
 from edi.lib.playbookrunner import PlaybookRunner
 from edi.lib.helpers import print_success
+from edi.lib.buildahhelpers import create_container, is_container_existing
 from edi.lib.configurationparser import command_context
 from edi.lib.commandrunner import ArtifactType, Artifact
 from edi.lib.helpers import FatalError
@@ -68,14 +69,21 @@ class Configure(Project):
 
     def _run(self):
         prepare_results = Prepare().run(self.config.get_base_config_file())
+
+        container_name = self._get_container_artifact().location
         bootstrapped_rootfs = self._get_bootstrapped_rootfs(prepare_results)
 
-        print(f"Going to configure buildah container {self._get_container_artifact().location} - be patient.")
+        if not is_container_existing(container_name):
+            print(f"Going to create buildah container '{container_name}'\n"
+                  f"based on content of '{bootstrapped_rootfs}'.")
+            create_container(container_name, bootstrapped_rootfs)
+
+        print(f"Going to configure buildah container '{container_name}' - be patient.")
 
         playbook_runner = PlaybookRunner(self.config, self._get_container_artifact().location, self.ansible_connection)
         playbook_runner.run_all()
 
-        print_success("Configured buildah container {}.".format(self._result()))
+        print_success(f"Configured buildah container '{container_name}'.")
 
         collected_results = self._result()
         if collected_results:

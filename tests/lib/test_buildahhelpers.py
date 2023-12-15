@@ -22,12 +22,16 @@
 
 import subprocess
 import pytest
+import shutil
 import json
+import os
+import tempfile
 from contextlib import contextmanager
-from edi.lib.helpers import FatalError
-from edi.lib.buildahhelpers import is_container_existing, get_buildah_version, BuildahVersion
+from edi.lib.helpers import FatalError, chown_to_user
+from edi.lib.buildahhelpers import (is_container_existing, get_buildah_version, BuildahVersion, create_container,
+                                    run_buildah_unshare, delete_container)
 from edi.lib.shellhelpers import mockablerun
-from tests.libtesting.helpers import get_command, get_sub_command
+from tests.libtesting.helpers import get_command, get_sub_command, get_random_string
 from tests.libtesting.contextmanagers.mocked_executable import mocked_executable, mocked_buildah_version_check
 
 
@@ -115,3 +119,40 @@ def test_valid_buildah_version(monkeypatch):
     with mocked_executable('buildah', '/here/is/no/buildah'):
         with clear_buildah_version_check_cache():
             BuildahVersion.check()
+
+
+@pytest.mark.requires_buildah
+def test_buildah_container_creation(datadir):
+    container_name = f'edi-pytest-{get_random_string(6)}'
+    assert not is_container_existing(container_name)
+
+    work_dir = os.getcwd()
+    with tempfile.TemporaryDirectory(dir=work_dir) as archive_dir:
+        chown_to_user(archive_dir)
+        demo_rootfs_archive = os.path.join(archive_dir, 'demo_rootfs.tar')
+        shutil.copyfile(os.path.join(datadir, "demo_rootfs.tar"), demo_rootfs_archive)
+
+        create_container(container_name, demo_rootfs_archive)
+        assert is_container_existing(container_name)
+
+        with pytest.raises(FatalError) as error:
+            create_container(container_name, demo_rootfs_archive)
+
+        assert 'already exists' in error.value.message
+        assert container_name in error.value.message
+
+        result = run_buildah_unshare(container_name, r'cat ${container_root}/rootfs_test')
+        assert "nothing here" in result.stdout
+
+        delete_container(container_name)
+
+        assert not is_container_existing(container_name)
+
+
+@pytest.mark.requires_buildah
+def test_buildah_container_creation_failure():
+    with pytest.raises(FatalError) as error:
+        create_container("some-stupid-container-name", "wrong_rootfs_archive.tar")
+
+    assert 'does not exist' in error.value.message
+    assert 'wrong_rootfs_archive.tar' in error.value.message
