@@ -49,11 +49,21 @@ Command = namedtuple("Command", "script_name, script_content, node_name, resolve
 
 class CommandRunner:
 
-    def __init__(self, config, section, input_artifact):
-        assert input_artifact is None or type(input_artifact) is Artifact
+    def __init__(self, config, section, input_artifacts):
+        assert input_artifacts is None or type(input_artifacts) is Artifact or type(input_artifacts) is list
         self.config = config
         self.config_section = section
-        self.input_artifact = input_artifact
+        if not input_artifacts:
+            self._input_artifacts = list()
+        elif type(input_artifacts) is Artifact:
+            if input_artifacts.location:
+                self._input_artifacts = list()
+                self._input_artifacts.append(input_artifacts)
+            else:
+                self._input_artifacts = list()
+        else:
+            assert type(input_artifacts) is list
+            self._input_artifacts = input_artifacts
 
     def run(self):
         workdir = get_workdir()
@@ -150,8 +160,8 @@ class CommandRunner:
         commands = self.config.get_ordered_path_items(self.config_section)
         augmented_commands = []
         artifacts = dict()
-        if self.input_artifact and self.input_artifact.location:
-            artifacts[self.input_artifact.name] = self.input_artifact
+        for a in self._input_artifacts:
+            artifacts[a.name] = a
 
         for name, path, dictionary, raw_node in commands:
             output = raw_node.get('output')
@@ -229,14 +239,9 @@ class CommandRunner:
         return output_file
 
     def _result(self, commands):
-        all_artifacts = list()
+        all_artifacts = self._input_artifacts
         for command in commands:
             for _, artifact in command.output_artifacts.items():
                 all_artifacts.append(artifact)
 
-        if all_artifacts:
-            return all_artifacts
-        elif self.input_artifact is not None and self.input_artifact.location is not None:
-            return [self.input_artifact]
-        else:
-            return []
+        return all_artifacts
