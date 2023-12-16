@@ -101,7 +101,7 @@ def create_container(name, rootfs_file):
     cmd = [buildah_exec(), "--name", temp_container_name, "from", "scratch"]
     run(cmd, log_threshold=logging.INFO)
 
-    extract_command = "tar --numeric-owner --exclude=./dev -C " + r'${container_root}' + " -axf " + str(rootfs_file)
+    extract_command = "fakeroot tar --numeric-owner -C " + r'${container_root}' + " -axf " + str(rootfs_file)
 
     run_buildah_unshare(temp_container_name, extract_command)
 
