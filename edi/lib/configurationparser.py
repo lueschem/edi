@@ -318,7 +318,7 @@ class ConfigurationParser:
                                                                                 general_overlay,
                                                                                 "parameters")
 
-        nested_elements = ["playbooks", "postprocessing_commands", "lxc_templates",
+        nested_elements = ["preprocessing_commands", "playbooks", "postprocessing_commands", "lxc_templates",
                            "lxc_profiles", "shared_folders", "documentation_steps"]
         for element in nested_elements:
             merged_config[element
