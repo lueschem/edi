@@ -76,7 +76,7 @@ class Configure(Project):
         if not is_container_existing(container_name):
             print(f"Going to create buildah container '{container_name}'\n"
                   f"based on content of '{bootstrapped_rootfs}'.")
-            create_container(container_name, bootstrapped_rootfs)
+            create_container(container_name, bootstrapped_rootfs.location)
 
         print(f"Going to configure buildah container '{container_name}' - be patient.")
 
@@ -125,7 +125,7 @@ class Configure(Project):
         bootstrapped_rootfs = None
         expected_artifact = "edi_bootstrapped_rootfs"
         for result in prepare_results:
-            if result.name is expected_artifact:
+            if result.name == expected_artifact:
                 if bootstrapped_rootfs:
                     raise FatalError((f"The project configure command expects exactly one {expected_artifact} "
                                       f"output artifact as a result the project prepare command (found multiple)!"))
