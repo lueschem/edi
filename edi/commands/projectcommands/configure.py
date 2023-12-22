@@ -24,7 +24,7 @@ from edi.commands.project import Project
 from edi.commands.projectcommands.prepare import Prepare
 from edi.lib.playbookrunner import PlaybookRunner
 from edi.lib.helpers import print_success
-from edi.lib.buildahhelpers import create_container, is_container_existing
+from edi.lib.buildahhelpers import create_container, delete_container, is_container_existing
 from edi.lib.configurationparser import command_context
 from edi.lib.commandrunner import ArtifactType, Artifact
 from edi.lib.helpers import FatalError
@@ -39,8 +39,8 @@ class Configure(Project):
 
     @classmethod
     def advertise(cls, subparsers):
-        help_text = "configure a buildah container using Ansible playbook(s)"
-        description_text = "Configure a buildah container."
+        help_text = "configure a project container using Ansible playbook(s)"
+        description_text = "Configure a project container."
         parser = subparsers.add_parser(cls._get_short_command_name(),
                                        help=help_text,
                                        description=description_text)
@@ -74,16 +74,16 @@ class Configure(Project):
         bootstrapped_rootfs = self._get_bootstrapped_rootfs(prepare_results)
 
         if not is_container_existing(container_name):
-            print(f"Going to create buildah container '{container_name}'\n"
+            print(f"Going to create project container '{container_name}'\n"
                   f"based on content of '{bootstrapped_rootfs}'.")
             create_container(container_name, bootstrapped_rootfs.location)
 
-        print(f"Going to configure buildah container '{container_name}' - be patient.")
+        print(f"Going to configure project container '{container_name}' - be patient.")
 
         playbook_runner = PlaybookRunner(self.config, self._get_container_artifact().location, self.ansible_connection)
         playbook_runner.run_all()
 
-        print_success(f"Configured buildah container '{container_name}'.")
+        print_success(f"Configured project container '{container_name}'.")
 
         collected_results = self._result()
         if collected_results:
@@ -98,7 +98,10 @@ class Configure(Project):
         self._dispatch(config_file, run_method=self._clean)
 
     def _clean(self):
-        # TODO: delete buildah container
+        container_name = self._get_container_artifact().location
+        if is_container_existing(container_name):
+            delete_container(container_name)
+            print_success(f"Deleted project container '{container_name}'.")
 
         if self.clean_depth > 0:
             Prepare().clean_recursive(self.config.get_base_config_file(), self.clean_depth - 1)
@@ -118,7 +121,7 @@ class Configure(Project):
         container_name = "edi-{}-{}".format(
             hashlib.sha256(self.config.get_configuration_name().encode()).hexdigest()[:8],
             self.config.get_project_directory_hash())
-        return Artifact(name="edi_buildah_container", location=container_name, type=ArtifactType.BUILDAH_CONTAINER)
+        return Artifact(name="edi_project_container", location=container_name, type=ArtifactType.BUILDAH_CONTAINER)
 
     @staticmethod
     def _get_bootstrapped_rootfs(prepare_results):
@@ -127,12 +130,12 @@ class Configure(Project):
         for result in prepare_results:
             if result.name == expected_artifact:
                 if bootstrapped_rootfs:
-                    raise FatalError((f"The project configure command expects exactly one {expected_artifact} "
+                    raise FatalError((f"The project configure command expects exactly one '{expected_artifact}' "
                                       f"output artifact as a result the project prepare command (found multiple)!"))
                 bootstrapped_rootfs = result
 
         if not bootstrapped_rootfs:
-            raise FatalError((f"The project configure command expects a {expected_artifact} "
+            raise FatalError((f"The project configure command expects a '{expected_artifact}' "
                               f"output artifact as a result the project prepare command!"))
 
         return bootstrapped_rootfs
