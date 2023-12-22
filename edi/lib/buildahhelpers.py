@@ -86,12 +86,12 @@ def delete_container(name):
 
 
 @require('buildah', buildah_install_hint, BuildahVersion.check)
-def create_container(name, rootfs_file):
+def create_container(name, rootfs_archive):
     if is_container_existing(name):
         raise FatalError(f"The container '{name}' already exists!")
 
-    if not os.path.isfile(rootfs_file):
-        raise FatalError(f"The root file system archive '{rootfs_file}' does not exist!")
+    if not os.path.isfile(rootfs_archive):
+        raise FatalError(f"The root file system archive '{rootfs_archive}' does not exist!")
 
     temp_container_name = name + "-temp"
 
@@ -101,12 +101,24 @@ def create_container(name, rootfs_file):
     cmd = [buildah_exec(), "--name", temp_container_name, "from", "scratch"]
     run(cmd, log_threshold=logging.INFO)
 
-    extract_command = "fakeroot tar --numeric-owner -C " + r'${container_root}' + " -axf " + str(rootfs_file)
+    nested_command = "fakeroot tar --numeric-owner -C " + r'${container_root}' + " -axf " + str(rootfs_archive)
 
-    run_buildah_unshare(temp_container_name, extract_command)
+    run_buildah_unshare(temp_container_name, nested_command)
 
     cmd = [buildah_exec(), "rename", temp_container_name, name]
     run(cmd, log_threshold=logging.INFO)
+
+
+@require('buildah', buildah_install_hint, BuildahVersion.check)
+def extract_container_rootfs(name, rootfs_archive):
+    if not is_container_existing(name):
+        raise FatalError(f"The container '{name}' does not exist!")
+
+    if os.path.exists(rootfs_archive):
+        raise FatalError(f"The root file system archive '{rootfs_archive}' already exists!")
+
+    nested_command = "tar --numeric-owner -C " + r'${container_root}' + " -acf " + str(rootfs_archive) + " ."
+    run_buildah_unshare(name, nested_command)
 
 
 @require('buildah', buildah_install_hint, BuildahVersion.check)

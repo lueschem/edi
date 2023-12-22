@@ -47,6 +47,23 @@ Command = namedtuple("Command", "script_name, script_content, node_name, resolve
                                 "node_dictionary, config_node, output_artifacts")
 
 
+def find_artifact(artifact_collection, expected_artifact_name, command_name, previous_command_name):
+    identified_artifact = None
+    for artifact in artifact_collection:
+        if artifact.name == expected_artifact_name:
+            if identified_artifact:
+                raise FatalError((f"The project {command_name} command expects exactly one '{expected_artifact_name}' "
+                                  f"output artifact as a result the project {previous_command_name} command "
+                                  f"(found multiple)!"))
+            identified_artifact = artifact
+
+    if not identified_artifact:
+        raise FatalError((f"The project {command_name} command expects a '{expected_artifact_name}' "
+                          f"output artifact as a result the project {previous_command_name} command!"))
+
+    return identified_artifact
+
+
 class CommandRunner:
 
     def __init__(self, config, section, input_artifacts):
@@ -63,7 +80,7 @@ class CommandRunner:
                 self._input_artifacts = list()
         else:
             assert type(input_artifacts) is list
-            self._input_artifacts = input_artifacts
+            self._input_artifacts = input_artifacts.copy()
 
     def run(self):
         workdir = get_workdir()

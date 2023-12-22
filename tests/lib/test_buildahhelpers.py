@@ -29,7 +29,7 @@ import tempfile
 from contextlib import contextmanager
 from edi.lib.helpers import FatalError, chown_to_user
 from edi.lib.buildahhelpers import (is_container_existing, get_buildah_version, BuildahVersion, create_container,
-                                    run_buildah_unshare, delete_container)
+                                    run_buildah_unshare, delete_container, extract_container_rootfs)
 from edi.lib.shellhelpers import mockablerun
 from tests.libtesting.helpers import get_command, get_sub_command, get_random_string
 from tests.libtesting.contextmanagers.mocked_executable import mocked_executable, mocked_buildah_version_check
@@ -147,6 +147,40 @@ def test_buildah_container_creation(datadir):
         delete_container(container_name)
 
         assert not is_container_existing(container_name)
+
+
+@pytest.mark.requires_buildah
+def test_buildah_rootfs_extraction(datadir):
+    container_name = f'edi-pytest-{get_random_string(6)}'
+    assert not is_container_existing(container_name)
+
+    work_dir = os.getcwd()
+    with tempfile.TemporaryDirectory(dir=work_dir) as tempdir:
+        chown_to_user(tempdir)
+        demo_rootfs_archive = os.path.join(tempdir, 'demo_rootfs.tar')
+        shutil.copyfile(os.path.join(datadir, "demo_rootfs.tar"), demo_rootfs_archive)
+
+        extracted_rootfs_archive = os.path.join(tempdir, 'extracted_rootfs.tar')
+
+        assert not os.path.isfile(extracted_rootfs_archive)
+
+        with pytest.raises(FatalError) as error:
+            extract_container_rootfs(container_name, extracted_rootfs_archive)
+
+        assert 'does not exist' in error.value.message
+        assert container_name in error.value.message
+
+        create_container(container_name, demo_rootfs_archive)
+
+        extract_container_rootfs(container_name, extracted_rootfs_archive)
+
+        with pytest.raises(FatalError) as error:
+            extract_container_rootfs(container_name, extracted_rootfs_archive)
+
+        assert 'already exists' in error.value.message
+        assert str(extracted_rootfs_archive) in error.value.message
+
+        assert os.path.isfile(extracted_rootfs_archive)
 
 
 @pytest.mark.requires_buildah
