@@ -1,3 +1,11 @@
+edi (1.15.9) jammy; urgency=medium
+
+  * Removed obsolete QEMU handling. Closes #87.
+  * Reworked command runner.
+  * Updated readthedocs-sphinx-search as advised by Read the Docs.
+
+ -- Matthias Luescher <lueschem@gmail.com>  Tue, 16 Jan 2024 13:42:03 +0100
+
 edi (1.15.8) jammy; urgency=medium
 
   [ Matthias Luescher ]
