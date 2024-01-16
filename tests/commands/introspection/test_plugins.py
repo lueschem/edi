@@ -36,7 +36,6 @@ from edi.commands.lxccommands.lxcconfigure import Configure
 from edi.commands.lxccommands.profile import Profile
 from edi.commands.lxccommands.publish import Publish
 from edi.commands.lxccommands.stop import Stop
-from edi.commands.qemucommands.fetch import Fetch
 from edi.commands.documentationcommands.render import Render
 from edi.commands.targetcommands.targetconfigure import Configure as TargetConfigure
 from edi.lib.shellhelpers import mockablerun
@@ -55,7 +54,6 @@ from tests.libtesting.contextmanagers.mocked_executable import mocked_executable
     (Profile, ['lxc', 'profile', '--plugins'], False, True, False, False),
     (Publish, ['lxc', 'publish', '--plugins'], True, True, True, False),
     (Stop, ['lxc', 'stop', '--plugins'], True, True, True, False),
-    (Fetch, ['qemu', 'fetch', '--plugins'], False, False, False, False),
     (TargetConfigure, ['target', 'configure', '--plugins', '1.2.3.4'], False, False, True, False),
     (Render, ['documentation', 'render', '--plugins', './', './'], False, False, False, False),
 ])

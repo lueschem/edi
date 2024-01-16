@@ -177,21 +177,12 @@ class ConfigurationParser:
 
         return self._get_bootstrap_item("additional_packages", default_packages)
 
-    def get_qemu_repository(self):
-        return self._get_qemu_item("repository", None)
-
-    def get_qemu_package_name(self):
-        return self._get_qemu_item("package", "qemu-user-static")
-
-    def get_qemu_repository_key(self):
-        return self._get_qemu_item("repository_key", None)
-
     def get_compression(self):
         return self._get_general_item("edi_compression", "xz")
 
     def get_lxc_stop_timeout(self):
         timeout = self._get_general_item("edi_lxc_stop_timeout", 120)
-        if type(timeout) != int:
+        if type(timeout) is not int:
             raise FatalError('''The value of 'edi_lxc_stop_timeout' must be an integer.''')
         return timeout
 
@@ -314,7 +305,7 @@ class ConfigurationParser:
     def _merge_configurations(self, base, overlay):
         merged_config = {}
 
-        elements = ["general", "bootstrap", "qemu"]
+        elements = ["general", "bootstrap"]
         for element in elements:
             merged_config[element
                           ] = self._merge_key_value_node(base, overlay,
@@ -373,10 +364,6 @@ class ConfigurationParser:
         return self._get_config().get("bootstrap", {}
                                       ).get(item, default)
 
-    def _get_qemu_item(self, item, default):
-        return self._get_config().get("qemu", {}
-                                      ).get(item, default)
-
     def _get_general_item(self, item, default):
         return self._get_config().get("general", {}
                                       ).get(item, default)
@@ -424,9 +411,9 @@ class ConfigurationParser:
             locations = [self.get_project_plugin_directory(), get_edi_plugin_directory()]
 
             for location in locations:
-                abspath = os.path.join(location, path)
-                if os.path.isfile(abspath):
-                    return abspath
+                joined_path = os.path.join(location, path)
+                if os.path.isfile(joined_path):
+                    return joined_path
 
             raise FatalError(("'{0}' not found in the "
                               "following locations:\n{1}"

@@ -114,32 +114,6 @@ If you would like to bootstrap an image right now, you can run the following com
 
    sudo edi image bootstrap my-project-develop.yml
 
-
-:code:`qemu` Section
-++++++++++++++++++++
-
-If the target architecture does not match the host architecture edi uses QEMU to emulate the foreign architecture.
-edi automatically detects the necessity of an architecture emulation and takes the necessary steps to set up QEMU.
-As QEMU evolves quickly it is often desirable to point edi to a very recent version of QEMU. The QEMU section allows
-you to do this. The following settings are available:
-
-.. topic:: Settings
-
-   *package:*
-      The name of the qemu package that should get downloaded.
-      If not specified edi assumes that the package is named :code:`qemu-user-static`.
-   *repository:*
-      The repository specification where QEMU will get downloaded from.
-      A valid value looks like this: :code:`deb http://deb.debian.org/debian/ bookworm main`.
-      If unspecified, edi will try to download QEMU from the repository indicated in the bootstrap section.
-   *repository_key:*
-      The signature key for the QEMU repository.
-      *Attention*: If you do not specify a key the downloaded QEMU package will not be verified.
-      *Hint*: It is a good practice to download such a key from a
-      https server.
-      A valid repository key value is: :code:`https://ftp-master.debian.org/keys/archive-key-10.asc`.
-
-
 .. _ordered_node_section:
 
 Ordered Node Section

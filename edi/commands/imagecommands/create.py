@@ -22,7 +22,7 @@
 import logging
 from edi.commands.image import Image
 from edi.commands.lxccommands.export import Export
-from edi.lib.commandrunner import CommandRunner
+from edi.lib.commandrunner import CommandRunner, Artifact, ArtifactType
 from edi.lib.configurationparser import command_context
 from edi.lib.helpers import print_success
 
@@ -53,7 +53,9 @@ class Create(Image):
         plugins = {}
         if self._input_artifact() is not None:
             plugins.update(Export().dry_run(self.config.get_base_config_file()))
-        command_runner = CommandRunner(self.config, self.section, self._input_artifact())
+        command_runner = CommandRunner(self.config, self.section, Artifact(name='edi_input_artifact',
+                                                                           url=self._input_artifact(),
+                                                                           type=ArtifactType.PATH))
         plugins.update(command_runner.get_plugin_report())
         return plugins
 
@@ -61,7 +63,9 @@ class Create(Image):
         return self._dispatch(config_file, run_method=self._run)
 
     def _run(self):
-        command_runner = CommandRunner(self.config, self.section, self._input_artifact())
+        command_runner = CommandRunner(self.config, self.section, Artifact(name='edi_input_artifact',
+                                                                           url=self._input_artifact(),
+                                                                           type=ArtifactType.PATH))
 
         if command_runner.require_root():
             self._require_sudo()
@@ -76,8 +80,9 @@ class Create(Image):
         result = command_runner.run()
 
         if result:
+            formatted_results = [f"{a.name}: {a.url}" for a in result]
             print_success(("Completed the image creation post processing commands.\n"
-                           "The following artifacts are now available:\n- {}".format('\n- '.join(result))))
+                           "The following artifacts are now available:\n- {}".format('\n- '.join(formatted_results))))
         return result
 
     def clean_recursive(self, config_file, depth):
@@ -88,7 +93,9 @@ class Create(Image):
         self._dispatch(config_file, run_method=self._clean)
 
     def _clean(self):
-        command_runner = CommandRunner(self.config, self.section, self._input_artifact())
+        command_runner = CommandRunner(self.config, self.section, Artifact(name='edi_input_artifact',
+                                                                           url=self._input_artifact(),
+                                                                           type=ArtifactType.PATH))
         if command_runner.require_root_for_clean():
             self._require_sudo()
         command_runner.clean()

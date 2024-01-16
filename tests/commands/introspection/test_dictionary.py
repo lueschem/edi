@@ -36,7 +36,6 @@ from edi.commands.lxccommands.lxcconfigure import Configure
 from edi.commands.lxccommands.profile import Profile
 from edi.commands.lxccommands.publish import Publish
 from edi.commands.lxccommands.stop import Stop
-from edi.commands.qemucommands.fetch import Fetch
 from edi.commands.targetcommands.targetconfigure import Configure as TargetConfigure
 from edi.lib.shellhelpers import mockablerun
 
@@ -52,7 +51,6 @@ from edi.lib.shellhelpers import mockablerun
     (Profile, ['lxc', 'profile', '--dictionary']),
     (Publish, ['lxc', 'publish', '--dictionary']),
     (Stop, ['lxc', 'stop', '--dictionary']),
-    (Fetch, ['qemu', 'fetch', '--dictionary']),
     (TargetConfigure, ['target', 'configure', '--dictionary', '1.2.3.4']),
 ])
 def test_dictionary(monkeypatch, config_files, capsys, command, command_args):

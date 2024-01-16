@@ -26,6 +26,8 @@ import yaml
 import jinja2
 import stat
 from codecs import open
+from enum import Enum
+from collections import namedtuple
 from edi.lib.helpers import (chown_to_user, FatalError, get_workdir, get_artifact_dir,
                              create_artifact_dir, print_success)
 from edi.lib.shellhelpers import run, safely_remove_artifacts_folder
@@ -33,9 +35,21 @@ from edi.lib.configurationparser import remove_passwords
 from edi.lib.yamlhelpers import LiteralString
 
 
-class CommandRunner():
+class ArtifactType(Enum):
+    PATH = 'path'
+
+
+Artifact = namedtuple("Artifact", "name, url, type")
+
+
+Command = namedtuple("Command", "script_name, script_content, node_name, resolved_template_path, "
+                                "node_dictionary, config_node, output_artifacts")
+
+
+class CommandRunner:
 
     def __init__(self, config, section, input_artifact):
+        assert type(input_artifact) is Artifact
         self.config = config
         self.config_section = section
         self.input_artifact = input_artifact
@@ -46,40 +60,42 @@ class CommandRunner():
 
         commands = self._get_commands()
 
-        for filename, content, name, path, dictionary, raw_node, artifacts in commands:
-            if self._are_all_artifacts_available(artifacts):
+        for command in commands:
+            if self._are_all_artifacts_available(command.output_artifacts):
                 logging.info(('''Artifacts for command '{}' are already there. '''
                               '''Delete them to regenerate them.'''
-                              ).format(name))
+                              ).format(command.node_name))
             else:
                 with tempfile.TemporaryDirectory(dir=workdir) as tmpdir:
                     chown_to_user(tmpdir)
-                    require_root = raw_node.get('require_root', False)
+                    require_root = command.config_node.get('require_root', False)
 
                     logging.info(("Running command {} located in "
                                   "{} with dictionary:\n{}"
-                                  ).format(name, path,
-                                           yaml.dump(remove_passwords(dictionary),
+                                  ).format(command.node_name, command.resolved_template_path,
+                                           yaml.dump(remove_passwords(command.node_dictionary),
                                                      default_flow_style=False)))
 
-                    command_file = self._flush_command_file(tmpdir, filename, content)
+                    command_file = self._flush_command_file(tmpdir, command.script_name, command.script_content)
                     self._run_command(command_file, require_root)
-                    self._post_process_artifacts(name, artifacts)
+                    self._post_process_artifacts(command.node_name, command.output_artifacts)
 
         return self._result(commands)
 
     def require_root(self):
         commands = self._get_commands()
 
-        for _, _, _, _, _, raw_node, artifacts in commands:
-            if not self._are_all_artifacts_available(artifacts) and raw_node.get('require_root', False):
+        for command in commands:
+            if (not self._are_all_artifacts_available(command.output_artifacts)
+                    and command.config_node.get('require_root', False)):
                 return True
 
         return False
 
     def require_root_for_clean(self):
-        for _, _, _, _, _, raw_node, artifacts in self._get_commands():
-            if raw_node.get('require_root', False) and self._is_an_artifact_a_directory(artifacts):
+        for command in self._get_commands():
+            if (command.config_node.get('require_root', False)
+                    and self._is_an_artifact_a_directory(command.output_artifacts)):
                 return True
 
         return False
@@ -92,8 +108,10 @@ class CommandRunner():
         if commands:
             result[self.config_section] = []
 
-        for _, content, name, path, dictionary, _, _ in commands:
-            plugin_info = {name: {'path': path, 'dictionary': dictionary, 'result': LiteralString(content)}}
+        for command in commands:
+            plugin_info = {command.node_name: {'path': command.resolved_template_path,
+                                               'dictionary': command.node_dictionary,
+                                               'result': LiteralString(command.script_content)}}
 
             result[self.config_section].append(plugin_info)
 
@@ -101,19 +119,19 @@ class CommandRunner():
 
     def clean(self):
         commands = self._get_commands()
-        for filename, content, name, path, dictionary, raw_node, artifacts in commands:
-            for _, artifact in artifacts.items():
-                if not str(get_workdir()) in str(artifact):
+        for command in commands:
+            for _, artifact in command.output_artifacts.items():
+                if not str(get_workdir()) in str(artifact.url):
                     raise FatalError(('Output artifact {} is not within the current working directory!'
-                                      ).format(artifact))
+                                      ).format(artifact.url))
 
-                if os.path.isfile(artifact):
-                    logging.info("Removing '{}'.".format(artifact))
-                    os.remove(artifact)
-                    print_success("Removed image file artifact {}.".format(artifact))
-                elif os.path.isdir(artifact):
-                    safely_remove_artifacts_folder(artifact, sudo=raw_node.get('require_root', False))
-                    print_success("Removed image directory artifact {}.".format(artifact))
+                if os.path.isfile(artifact.url):
+                    logging.info("Removing '{}'.".format(artifact.url))
+                    os.remove(artifact.url)
+                    print_success("Removed image file artifact {}.".format(artifact.url))
+                elif os.path.isdir(artifact.url):
+                    safely_remove_artifacts_folder(artifact.url, sudo=command.config_node.get('require_root', False))
+                    print_success("Removed image directory artifact {}.".format(artifact.url))
 
     @staticmethod
     def _run_command(command_file, require_root):
@@ -122,16 +140,16 @@ class CommandRunner():
         run(cmd, log_threshold=logging.INFO, sudo=require_root)
 
     def _get_commands(self):
-        artifactdir = get_artifact_dir()
+        artifact_directory = get_artifact_dir()
         commands = self.config.get_ordered_path_items(self.config_section)
         augmented_commands = []
         artifacts = dict()
-        if self.input_artifact:
-            artifacts['edi_input_artifact'] = self.input_artifact
+        if self.input_artifact and self.input_artifact.url:
+            artifacts[self.input_artifact.name] = self.input_artifact
 
         for name, path, dictionary, raw_node in commands:
             output = raw_node.get('output')
-            if type(output) != dict:
+            if type(output) is not dict:
                 raise FatalError(('''The output specification in command node '{}' is not a key value dictionary.'''
                                   ).format(name))
 
@@ -142,20 +160,25 @@ class CommandRunner():
                                        '''command node '{}' is invalid.\n'''
                                        '''The output shall be a file or a folder (no '/' in string).''')
                                       ).format(artifact_key, name))
-                artifact_path = os.path.join(artifactdir, artifact_item)
-                new_artifacts[artifact_key] = str(artifact_path)
+                artifact_path = os.path.join(artifact_directory, artifact_item)
+                new_artifacts[artifact_key] = Artifact(name=artifact_key,
+                                                       url=str(artifact_path),
+                                                       type=ArtifactType.PATH)
 
             artifacts.update(new_artifacts)
-            dictionary.update(artifacts)
+            dictionary.update({key: val.url for key, val in artifacts.items()})
             filename, content = self._render_command_file(path, dictionary)
-            augmented_commands.append((filename, content, name, path, dictionary, raw_node, new_artifacts))
+            new_command = Command(script_name=filename, script_content=content, node_name=name,
+                                  resolved_template_path=path, node_dictionary=dictionary, config_node=raw_node,
+                                  output_artifacts=new_artifacts)
+            augmented_commands.append(new_command)
 
         return augmented_commands
 
     @staticmethod
     def _are_all_artifacts_available(artifacts):
         for _, artifact in artifacts.items():
-            if not os.path.isfile(artifact) and not os.path.isdir(artifact):
+            if not os.path.isfile(artifact.url) and not os.path.isdir(artifact.url):
                 return False
 
         return True
@@ -163,7 +186,7 @@ class CommandRunner():
     @staticmethod
     def _is_an_artifact_a_directory(artifacts):
         for _, artifact in artifacts.items():
-            if os.path.isdir(artifact):
+            if os.path.isdir(artifact.url):
                 return True
 
         return False
@@ -171,11 +194,11 @@ class CommandRunner():
     @staticmethod
     def _post_process_artifacts(command_name, expected_artifacts):
         for _, artifact in expected_artifacts.items():
-            if not os.path.isfile(artifact) and not os.path.isdir(artifact):
+            if not os.path.isfile(artifact.url) and not os.path.isdir(artifact.url):
                 raise FatalError(('''The command '{}' did not generate '''
-                                  '''the specified output artifact '{}'.'''.format(command_name, artifact)))
-            elif os.path.isfile(artifact):
-                chown_to_user(artifact)
+                                  '''the specified output artifact '{}'.'''.format(command_name, artifact.url)))
+            elif os.path.isfile(artifact.url):
+                chown_to_user(artifact.url)
 
     @staticmethod
     def _render_command_file(input_file, dictionary):
@@ -201,13 +224,13 @@ class CommandRunner():
 
     def _result(self, commands):
         all_artifacts = list()
-        for _, _, _, _, _, _, artifacts in commands:
-            for _, artifact in artifacts.items():
+        for command in commands:
+            for _, artifact in command.output_artifacts.items():
                 all_artifacts.append(artifact)
 
         if all_artifacts:
             return all_artifacts
-        elif self.input_artifact is not None:
+        elif self.input_artifact is not None and self.input_artifact.url is not None:
             return [self.input_artifact]
         else:
             return []

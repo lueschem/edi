@@ -51,8 +51,3 @@ postprocessing_commands:
         parameters:
             bingo: bongo
             message: Foo, bar or baz?
-qemu:
-    repository: deb http://archive.debian.org/debian/ stretch main
-    repository_key: https://ftp-master.debian.org/keys/archive-key-9.asc
-    package: qemu-user-static     
-

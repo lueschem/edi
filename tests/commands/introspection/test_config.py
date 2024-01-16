@@ -35,7 +35,6 @@ from edi.commands.lxccommands.lxcconfigure import Configure
 from edi.commands.lxccommands.profile import Profile
 from edi.commands.lxccommands.publish import Publish
 from edi.commands.lxccommands.stop import Stop
-from edi.commands.qemucommands.fetch import Fetch
 from edi.commands.targetcommands.targetconfigure import Configure as TargetConfigure
 from edi.lib.shellhelpers import mockablerun
 
@@ -51,7 +50,6 @@ from edi.lib.shellhelpers import mockablerun
     (Profile, ['lxc', 'profile', '--config']),
     (Publish, ['lxc', 'publish', '--config']),
     (Stop, ['lxc', 'stop', '--config']),
-    (Fetch, ['qemu', 'fetch', '--config']),
     (TargetConfigure, ['target', 'configure', '--config', '1.2.3.4']),
 ])
 def test_config(monkeypatch, config_files, capsys, command, command_args):
