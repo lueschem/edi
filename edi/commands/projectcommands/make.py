@@ -19,10 +19,9 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 from edi.commands.project import Project
-from edi.commands.projectcommands.configure import Configure
-from edi.lib.commandrunner import CommandRunner, Artifact, ArtifactType
+from edi.commands.projectcommands.snapshot import Snapshot
+from edi.lib.commandrunner import CommandRunner
 from edi.lib.helpers import print_success
 from edi.lib.configurationparser import command_context
 
@@ -51,11 +50,9 @@ class Make(Project):
 
     def _dry_run(self):
         plugins = {}
-        if self._input_artifact() is not None:
-            plugins.update(Configure().dry_run(self.config.get_base_config_file()))
-        command_runner = CommandRunner(self.config, self.section, Artifact(name='edi_input_artifact',
-                                                                           location=self._input_artifact(),
-                                                                           type=ArtifactType.PATH))
+        snapshot = Snapshot()
+        plugins.update(snapshot.dry_run(self.config.get_base_config_file()))
+        command_runner = CommandRunner(self.config, self.section, snapshot.result(self.config.get_base_config_file()))
         plugins.update(command_runner.get_plugin_report())
         return plugins
 
@@ -63,27 +60,23 @@ class Make(Project):
         return self._dispatch(config_file, run_method=self._run)
 
     def _run(self):
-        command_runner = CommandRunner(self.config, self.section, Artifact(name='edi_input_artifact',
-                                                                           location=self._input_artifact(),
-                                                                           type=ArtifactType.PATH))
+        snapshot = Snapshot()
+        command_runner = CommandRunner(self.config, self.section, snapshot.result(self.config.get_base_config_file()))
 
         if command_runner.require_root():
             self._require_sudo()
 
-        if self._input_artifact() is not None:
-            Configure().run(self.config.get_base_config_file())
-        else:
-            logging.info("Creating new project without bootstrapping other artifacts.")
+        Snapshot().run(self.config.get_base_config_file())
 
         print("Going to post process project - be patient.")
 
-        result = command_runner.run()
+        all_artifacts = command_runner.run()
 
-        if result:
-            formatted_results = [f"{a.name}: {a.location}" for a in result]
-            print_success(("Completed the project creation post processing commands.\n"
+        if all_artifacts:
+            formatted_results = [f"{a.name}: {a.location}" for a in all_artifacts]
+            print_success(("Completed the project make post processing commands.\n"
                            "The following artifacts are now available:\n- {}".format('\n- '.join(formatted_results))))
-        return result
+        return all_artifacts
 
     def clean_recursive(self, config_file, depth):
         self.clean_depth = depth
@@ -93,24 +86,19 @@ class Make(Project):
         self._dispatch(config_file, run_method=self._clean)
 
     def _clean(self):
-        command_runner = CommandRunner(self.config, self.section, Artifact(name='edi_input_artifact',
-                                                                           location=self._input_artifact(),
-                                                                           type=ArtifactType.PATH))
+        snapshot = Snapshot()
+        snapshot_artifacts = snapshot.result(self.config.get_base_config_file())
+        command_runner = CommandRunner(self.config, self.section, snapshot_artifacts)
+
         if command_runner.require_root_for_clean():
             self._require_sudo()
+
         command_runner.clean()
 
-        if self.clean_depth > 0 and self._input_artifact() is not None:
-            Configure().clean_recursive(self.config.get_base_config_file(), self.clean_depth - 1)
+        if self.clean_depth > 0:
+            Snapshot().clean_recursive(self.config.get_base_config_file(), self.clean_depth - 1)
 
     def _dispatch(self, config_file, run_method):
         with command_context({'edi_create_distributable_image': True}):
             self._setup_parser(config_file)
             return run_method()
-
-    def _input_artifact(self):
-        # TODO:
-        if self.config.has_bootstrap_node():
-            return Configure().result(self.config.get_base_config_file())
-        else:
-            return None
