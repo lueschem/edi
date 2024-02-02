@@ -115,14 +115,23 @@ class CommandRunner:
 
         for command in commands:
             if (not self._are_all_artifacts_available(command.output_artifacts)
-                    and command.config_node.get('require_root', False)):
+                    and self._require_real_root(command.config_node.get('require_root', False))):
                 return True
 
         return False
 
+    @staticmethod
+    def _require_real_root(config_value):
+        if type(config_value) is bool:
+            return config_value
+        elif config_value == "fakeroot":
+            return False
+        else:
+            raise FatalError('Invalid value for "require_root". It must be either "True", "False" or "fakeroot".')
+
     def require_real_root_for_clean(self):
         for command in self._get_commands():
-            if (command.config_node.get('require_root', False)
+            if (self._require_real_root(command.config_node.get('require_root', False))
                     and self._is_an_artifact_a_directory(command.output_artifacts)):
                 return True
 
@@ -158,8 +167,9 @@ class CommandRunner:
                     os.remove(artifact.location)
                     print_success("Removed image file artifact {}.".format(artifact.location))
                 elif os.path.isdir(artifact.location):
-                    safely_remove_artifacts_folder(artifact.location, sudo=command.config_node.get('require_root',
-                                                                                                   False))
+                    safely_remove_artifacts_folder(artifact.location,
+                                                   sudo=self._require_real_root(command.config_node.get('require_root',
+                                                                                                        False)))
                     print_success("Removed image directory artifact {}.".format(artifact.location))
 
     def result(self):
@@ -168,9 +178,11 @@ class CommandRunner:
 
     @staticmethod
     def _run_command(command_file, require_root):
-        cmd = ['sh', '-c', command_file]
-
-        run(cmd, log_threshold=logging.INFO, sudo=require_root)
+        cmd = []
+        if require_root == 'fakeroot':
+            cmd.extend(['fakeroot', '--'])
+        cmd.extend(['sh', '-c', command_file])
+        run(cmd, log_threshold=logging.INFO, sudo=CommandRunner._require_real_root(require_root))
 
     def _get_commands(self):
         artifact_directory = get_artifact_dir()
