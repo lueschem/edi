@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2017 Matthias Luescher
+# Copyright (C) 2023 Matthias Luescher
 #
 # Authors:
 #  Matthias Luescher
@@ -19,24 +19,22 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
-from edi.commands.image import Image
-from edi.commands.lxccommands.export import Export
-from edi.lib.commandrunner import CommandRunner, Artifact, ArtifactType
+from edi.commands.project import Project
+from edi.lib.commandrunner import CommandRunner
 from edi.lib.configurationparser import command_context
 from edi.lib.helpers import print_success
 
 
-class Create(Image):
+class Prepare(Project):
 
     def __init__(self):
         super().__init__()
-        self.section = 'postprocessing_commands'
+        self.section = 'preprocessing_commands'
 
     @classmethod
     def advertise(cls, subparsers):
-        help_text = "create a re-distributable image"
-        description_text = "Create a re-distributable image."
+        help_text = "EXPERIMENTAL: prepare an edi project configuration"
+        description_text = "EXPERIMENTAL: Prepare the artifacts for an edi project configuration."
         parser = subparsers.add_parser(cls._get_short_command_name(),
                                        help=help_text,
                                        description=description_text)
@@ -51,11 +49,7 @@ class Create(Image):
 
     def _dry_run(self):
         plugins = {}
-        if self._input_artifact() is not None:
-            plugins.update(Export().dry_run(self.config.get_base_config_file()))
-        command_runner = CommandRunner(self.config, self.section, Artifact(name='edi_input_artifact',
-                                                                           location=self._input_artifact(),
-                                                                           type=ArtifactType.PATH))
+        command_runner = CommandRunner(self.config, self.section, None)
         plugins.update(command_runner.get_plugin_report())
         return plugins
 
@@ -63,25 +57,18 @@ class Create(Image):
         return self._dispatch(config_file, run_method=self._run)
 
     def _run(self):
-        command_runner = CommandRunner(self.config, self.section, Artifact(name='edi_input_artifact',
-                                                                           location=self._input_artifact(),
-                                                                           type=ArtifactType.PATH))
+        command_runner = CommandRunner(self.config, self.section, None)
 
         if command_runner.require_real_root():
             self._require_sudo()
 
-        if self._input_artifact() is not None:
-            Export().run(self.config.get_base_config_file())
-        else:
-            logging.info("Creating new image without bootstrapping other artifacts.")
-
-        print("Going to post process image - be patient.")
+        print("Going to pre process project - be patient.")
 
         result = command_runner.run()
 
         if result:
             formatted_results = [f"{a.name}: {a.location}" for a in result]
-            print_success(("Completed the image creation post processing commands.\n"
+            print_success(("Completed the project preparation pre processing commands.\n"
                            "The following artifacts are now available:\n- {}".format('\n- '.join(formatted_results))))
         return result
 
@@ -93,23 +80,19 @@ class Create(Image):
         self._dispatch(config_file, run_method=self._clean)
 
     def _clean(self):
-        command_runner = CommandRunner(self.config, self.section, Artifact(name='edi_input_artifact',
-                                                                           location=self._input_artifact(),
-                                                                           type=ArtifactType.PATH))
+        command_runner = CommandRunner(self.config, self.section, None)
         if command_runner.require_real_root_for_clean():
             self._require_sudo()
         command_runner.clean()
-
-        if self.clean_depth > 0 and self._input_artifact() is not None:
-            Export().clean_recursive(self.config.get_base_config_file(), self.clean_depth - 1)
 
     def _dispatch(self, config_file, run_method):
         with command_context({'edi_create_distributable_image': True}):
             self._setup_parser(config_file)
             return run_method()
 
-    def _input_artifact(self):
-        if self.config.has_bootstrap_node():
-            return Export().result(self.config.get_base_config_file())
-        else:
-            return None
+    def result(self, config_file):
+        return self._dispatch(config_file, run_method=self._result)
+
+    def _result(self):
+        command_runner = CommandRunner(self.config, self.section, None)
+        return command_runner.result()

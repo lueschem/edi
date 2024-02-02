@@ -1,3 +1,16 @@
+edi (1.16.0) jammy; urgency=medium
+
+  [ Matthias Luescher ]
+  * Added project commands.
+  * CommandRunner: allow multiple input artifacts.
+  * Added buildah related stuff.
+  * Added parsing of preprocessing_commands section.
+  * Implemented project make command.
+  * Added possibility to run command in fakeroot environment.
+  * Removed Ubuntu 23.04.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Fri, 02 Feb 2024 22:56:50 +0100
+
 edi (1.15.9) jammy; urgency=medium
 
   * Removed obsolete QEMU handling. Closes #87.

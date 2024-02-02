@@ -2,21 +2,8 @@
 
 #DH_VERBOSE=1
 
-VERSION_ID := $(shell . /etc/os-release; echo $$VERSION_ID)
-
-ifeq ($(VERSION_ID),16.04)
-	SUBSTVARS = -Vansible:Depends=""
-else ifeq ($(VERSION_ID),9)
-	SUBSTVARS = -Vansible:Depends=""
-else
-	SUBSTVARS = -Vansible:Depends="python3-distutils"
-endif
-
 %:
 	dh $@ --with python3,sphinxdoc --buildsystem=pybuild --fail-missing
-
-override_dh_gencontrol:
-	dh_gencontrol -- $(SUBSTVARS)
 
 override_dh_installudev:
 	dh_installudev --priority=81

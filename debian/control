@@ -36,7 +36,6 @@ Package: edi
 Architecture: all
 Depends: ${misc:Depends},
          ${python3:Depends},
-         ${ansible:Depends},
          ansible (>= 2.9),
          binfmt-support,
          debootstrap,
@@ -46,6 +45,15 @@ Depends: ${misc:Depends},
          qemu-user-static (>= 1:4.2),
          sudo,
          zstd,
+Recommends: debian-archive-keyring,
+            mmdebstrap,
+Suggests: buildah,
+          distrobox,
+          dosfstools,
+          e2fsprogs,
+          genimage,
+          mtools,
+          podman,
 Description: Embedded Development Infrastructure - edi
  Driven by the DevOps mindset edi helps you to streamline your embedded
  development infrastructure. To achieve this goal, edi leverages top-notch

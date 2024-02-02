@@ -19,13 +19,20 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
-from edi.commands.imagecommands import bootstrap, create, imageclean  # noqa: ignore=F401
-from edi.commands.lxccommands import (export, importcmd, launch, lxcclean, lxcconfigure,  # noqa: ignore=F401
-                                      lxcprepare, profile, publish, stop)  # noqa: ignore=F401
-from edi.commands.configcommands import configclean, configinit  # noqa: ignore=F401
-from edi.commands.targetcommands import targetconfigure  # noqa: ignore=F401
-from edi.commands.documentationcommands import render  # noqa: ignore=F401
-from edi.commands.projectcommands import prepare, configure, make, clean  # noqa: ignore=F401
+from edi.lib.edicommand import EdiCommand
 
 
-__all__ = ["config", "image", "lxc", "version", "clean", "target", "documentation", "project"]
+class Project(EdiCommand):
+
+    @classmethod
+    def advertise(cls, subparsers):
+        help_text = "EXPERIMENTAL: handle edi projects"
+        description_text = "EXPERIMENTAL: Do processing of edi projects."
+        parser = subparsers.add_parser(cls._get_short_command_name(),
+                                       help=help_text,
+                                       description=description_text)
+
+        cls._add_sub_commands(parser)
+
+    def run_cli(self, cli_args):
+        self._run_sub_command_cli(cli_args)

@@ -24,6 +24,7 @@ import os
 from contextlib import contextmanager
 from edi.lib.shellhelpers import Executables
 from edi.lib.lxchelpers import LxdVersion
+from edi.lib.buildahhelpers import BuildahVersion
 
 
 @contextmanager
@@ -49,3 +50,12 @@ def mocked_lxd_version_check():
         yield
     finally:
         LxdVersion._check_done = False
+
+
+@contextmanager
+def mocked_buildah_version_check():
+    BuildahVersion._check_done = True
+    try:
+        yield
+    finally:
+        BuildahVersion._check_done = False
