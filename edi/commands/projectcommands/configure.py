@@ -21,10 +21,12 @@
 
 import hashlib
 import logging
+import os
 from edi.commands.project import Project
 from edi.commands.projectcommands.prepare import Prepare
 from edi.lib.playbookrunner import PlaybookRunner
-from edi.lib.helpers import print_success
+from edi.lib.helpers import print_success, get_artifact_dir
+from edi.lib.shellhelpers import run
 from edi.lib.buildahhelpers import create_container, delete_container, is_container_existing
 from edi.lib.configurationparser import command_context
 from edi.lib.commandrunner import ArtifactType, Artifact, find_artifact
@@ -83,10 +85,17 @@ class Configure(Project):
                   f"based on content of '{bootstrapped_rootfs}'.")
             create_container(container_name, bootstrapped_rootfs.location)
 
-        print(f"Going to configure project container '{container_name}' - be patient.")
+        seal_file = self._get_seal_artifact().location
 
-        playbook_runner = PlaybookRunner(self.config, container_name, self.ansible_connection)
-        playbook_runner.run_all()
+        if os.path.exists(seal_file):
+            logging.info(f"Project container {container_name} is already fully configured. "
+                         f"Delete {seal_file} to get it re-configured.")
+        else:
+            print(f"Going to configure project container '{container_name}' - be patient.")
+
+            playbook_runner = PlaybookRunner(self.config, container_name, self.ansible_connection)
+            playbook_runner.run_all()
+            run(["touch", seal_file])
 
         print_success(f"Configured project container '{container_name}'.")
 
@@ -103,13 +112,19 @@ class Configure(Project):
         self._dispatch(config_file, run_method=self._clean)
 
     def _clean(self):
-        container_name = self._get_container_artifact().location
-        if is_container_existing(container_name):
-            delete_container(container_name)
-            print_success(f"Deleted project container '{container_name}'.")
+        seal_file = self._get_seal_artifact().location
+        if os.path.exists(seal_file):
+            os.remove(seal_file)
+            print_success(f"Deleted seal file '{seal_file}'.")
 
         if self.clean_depth > 0:
-            Prepare().clean_recursive(self.config.get_base_config_file(), self.clean_depth - 1)
+            container_name = self._get_container_artifact().location
+            if is_container_existing(container_name):
+                delete_container(container_name)
+                print_success(f"Deleted project container '{container_name}'.")
+
+        if self.clean_depth > 1:
+            Prepare().clean_recursive(self.config.get_base_config_file(), self.clean_depth - 2)
 
     def _dispatch(self, config_file, run_method):
         with command_context({'edi_create_distributable_image': True}):
@@ -122,6 +137,7 @@ class Configure(Project):
 
         all_results = self._prepare_results.copy()
         all_results.append(self._get_container_artifact())
+        all_results.append(self._get_seal_artifact())
         return all_results
 
     def result(self, config_file):
@@ -132,3 +148,9 @@ class Configure(Project):
             hashlib.sha256(self.config.get_configuration_name().encode()).hexdigest()[:8],
             self.config.get_project_directory_hash())
         return Artifact(name="edi_project_container", location=container_name, type=ArtifactType.BUILDAH_CONTAINER)
+
+    def _get_seal_artifact(self):
+        seal_artifact = f"{self.config.get_configuration_name()}.seal"
+        return Artifact(name="edi_project_container_seal",
+                        location=str(os.path.join(get_artifact_dir(), seal_artifact)),
+                        type=ArtifactType.PATH)

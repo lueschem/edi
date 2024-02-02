@@ -20,7 +20,7 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 from edi.commands.project import Project
-from edi.commands.projectcommands.snapshot import Snapshot
+from edi.commands.projectcommands.configure import Configure
 from edi.lib.commandrunner import CommandRunner
 from edi.lib.helpers import print_success
 from edi.lib.configurationparser import command_context
@@ -50,9 +50,9 @@ class Make(Project):
 
     def _dry_run(self):
         plugins = {}
-        snapshot = Snapshot()
-        plugins.update(snapshot.dry_run(self.config.get_base_config_file()))
-        command_runner = CommandRunner(self.config, self.section, snapshot.result(self.config.get_base_config_file()))
+        configure = Configure()
+        plugins.update(configure.dry_run(self.config.get_base_config_file()))
+        command_runner = CommandRunner(self.config, self.section, configure.result(self.config.get_base_config_file()))
         plugins.update(command_runner.get_plugin_report())
         return plugins
 
@@ -60,13 +60,13 @@ class Make(Project):
         return self._dispatch(config_file, run_method=self._run)
 
     def _run(self):
-        snapshot = Snapshot()
-        command_runner = CommandRunner(self.config, self.section, snapshot.result(self.config.get_base_config_file()))
+        configure = Configure()
+        command_runner = CommandRunner(self.config, self.section, configure.result(self.config.get_base_config_file()))
 
         if command_runner.require_root():
             self._require_sudo()
 
-        Snapshot().run(self.config.get_base_config_file())
+        Configure().run(self.config.get_base_config_file())
 
         print("Going to post process project - be patient.")
 
@@ -86,9 +86,8 @@ class Make(Project):
         self._dispatch(config_file, run_method=self._clean)
 
     def _clean(self):
-        snapshot = Snapshot()
-        snapshot_artifacts = snapshot.result(self.config.get_base_config_file())
-        command_runner = CommandRunner(self.config, self.section, snapshot_artifacts)
+        configure = Configure()
+        command_runner = CommandRunner(self.config, self.section, configure.result(self.config.get_base_config_file()))
 
         if command_runner.require_root_for_clean():
             self._require_sudo()
@@ -96,7 +95,7 @@ class Make(Project):
         command_runner.clean()
 
         if self.clean_depth > 0:
-            Snapshot().clean_recursive(self.config.get_base_config_file(), self.clean_depth - 1)
+            configure.clean_recursive(self.config.get_base_config_file(), self.clean_depth - 1)
 
     def _dispatch(self, config_file, run_method):
         with command_context({'edi_create_distributable_image': True}):
