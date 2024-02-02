@@ -50,7 +50,7 @@ Recommends: debian-archive-keyring,
 Suggests: buildah,
           distrobox,
           dosfstools,
-          e2fsprogs
+          e2fsprogs,
           genimage,
           mtools,
           podman,
