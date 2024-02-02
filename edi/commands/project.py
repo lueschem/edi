@@ -26,8 +26,8 @@ class Project(EdiCommand):
 
     @classmethod
     def advertise(cls, subparsers):
-        help_text = "handle edi projects"
-        description_text = "Do processing of edi projects."
+        help_text = "EXPERIMENTAL: handle edi projects"
+        description_text = "EXPERIMENTAL: Do processing of edi projects."
         parser = subparsers.add_parser(cls._get_short_command_name(),
                                        help=help_text,
                                        description=description_text)

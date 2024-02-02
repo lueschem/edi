@@ -41,8 +41,8 @@ class Configure(Project):
 
     @classmethod
     def advertise(cls, subparsers):
-        help_text = "configure a project container using Ansible playbook(s)"
-        description_text = "Configure a project container."
+        help_text = "EXPERIMENTAL: configure a project container using Ansible playbook(s)"
+        description_text = "EXPERIMENTAL: Configure a project container."
         parser = subparsers.add_parser(cls._get_short_command_name(),
                                        help=help_text,
                                        description=description_text)
