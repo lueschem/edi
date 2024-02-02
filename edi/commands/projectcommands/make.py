@@ -63,7 +63,7 @@ class Make(Project):
         configure = Configure()
         command_runner = CommandRunner(self.config, self.section, configure.result(self.config.get_base_config_file()))
 
-        if command_runner.require_root():
+        if command_runner.require_real_root():
             self._require_sudo()
 
         Configure().run(self.config.get_base_config_file())
@@ -89,7 +89,7 @@ class Make(Project):
         configure = Configure()
         command_runner = CommandRunner(self.config, self.section, configure.result(self.config.get_base_config_file()))
 
-        if command_runner.require_root_for_clean():
+        if command_runner.require_real_root_for_clean():
             self._require_sudo()
 
         command_runner.clean()

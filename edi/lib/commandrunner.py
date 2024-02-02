@@ -110,7 +110,7 @@ class CommandRunner:
 
         return self._result(commands)
 
-    def require_root(self):
+    def require_real_root(self):
         commands = self._get_commands()
 
         for command in commands:
@@ -120,7 +120,7 @@ class CommandRunner:
 
         return False
 
-    def require_root_for_clean(self):
+    def require_real_root_for_clean(self):
         for command in self._get_commands():
             if (command.config_node.get('require_root', False)
                     and self._is_an_artifact_a_directory(command.output_artifacts)):

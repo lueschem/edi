@@ -113,5 +113,5 @@ def test_require_root(config_files):
 
         runner = CommandRunner(parser, 'postprocessing_commands', Artifact(name='edi_input_artifact',
                                                                            location=input_file, type=ArtifactType.PATH))
-        assert not runner.require_root()
-        assert not runner.require_root_for_clean()
+        assert not runner.require_real_root()
+        assert not runner.require_real_root_for_clean()

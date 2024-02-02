@@ -59,7 +59,7 @@ class Prepare(Project):
     def _run(self):
         command_runner = CommandRunner(self.config, self.section, None)
 
-        if command_runner.require_root():
+        if command_runner.require_real_root():
             self._require_sudo()
 
         print("Going to pre process project - be patient.")
@@ -81,7 +81,7 @@ class Prepare(Project):
 
     def _clean(self):
         command_runner = CommandRunner(self.config, self.section, None)
-        if command_runner.require_root_for_clean():
+        if command_runner.require_real_root_for_clean():
             self._require_sudo()
         command_runner.clean()
 

@@ -67,7 +67,7 @@ class Create(Image):
                                                                            location=self._input_artifact(),
                                                                            type=ArtifactType.PATH))
 
-        if command_runner.require_root():
+        if command_runner.require_real_root():
             self._require_sudo()
 
         if self._input_artifact() is not None:
@@ -96,7 +96,7 @@ class Create(Image):
         command_runner = CommandRunner(self.config, self.section, Artifact(name='edi_input_artifact',
                                                                            location=self._input_artifact(),
                                                                            type=ArtifactType.PATH))
-        if command_runner.require_root_for_clean():
+        if command_runner.require_real_root_for_clean():
             self._require_sudo()
         command_runner.clean()
 
