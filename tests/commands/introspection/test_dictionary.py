@@ -37,6 +37,9 @@ from edi.commands.lxccommands.profile import Profile
 from edi.commands.lxccommands.publish import Publish
 from edi.commands.lxccommands.stop import Stop
 from edi.commands.targetcommands.targetconfigure import Configure as TargetConfigure
+from edi.commands.projectcommands.prepare import Prepare as ProjectPrepare
+from edi.commands.projectcommands.configure import Configure as ProjectConfigure
+from edi.commands.projectcommands.make import Make
 from edi.lib.shellhelpers import mockablerun
 
 
@@ -52,6 +55,9 @@ from edi.lib.shellhelpers import mockablerun
     (Publish, ['lxc', 'publish', '--dictionary']),
     (Stop, ['lxc', 'stop', '--dictionary']),
     (TargetConfigure, ['target', 'configure', '--dictionary', '1.2.3.4']),
+    (ProjectPrepare, ['project', 'prepare', '--dictionary']),
+    (ProjectConfigure, ['project', 'configure', '--dictionary']),
+    (Make, ['project', 'make', '--dictionary']),
 ])
 def test_dictionary(monkeypatch, config_files, capsys, command, command_args):
     def fake_lxc_config_command(*popenargs, **kwargs):

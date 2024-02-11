@@ -36,6 +36,9 @@ from edi.commands.lxccommands.profile import Profile
 from edi.commands.lxccommands.publish import Publish
 from edi.commands.lxccommands.stop import Stop
 from edi.commands.targetcommands.targetconfigure import Configure as TargetConfigure
+from edi.commands.projectcommands.prepare import Prepare as ProjectPrepare
+from edi.commands.projectcommands.configure import Configure as ProjectConfigure
+from edi.commands.projectcommands.make import Make
 from edi.lib.shellhelpers import mockablerun
 
 
@@ -51,6 +54,9 @@ from edi.lib.shellhelpers import mockablerun
     (Publish, ['lxc', 'publish', '--config']),
     (Stop, ['lxc', 'stop', '--config']),
     (TargetConfigure, ['target', 'configure', '--config', '1.2.3.4']),
+    (ProjectPrepare, ['project', 'prepare', '--config']),
+    (ProjectConfigure, ['project', 'configure', '--config']),
+    (Make, ['project', 'make', '--config']),
 ])
 def test_config(monkeypatch, config_files, capsys, command, command_args):
     def fake_lxc_config_command(*popenargs, **kwargs):
