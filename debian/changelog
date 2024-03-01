@@ -1,3 +1,15 @@
+edi (1.16.1) mantic; urgency=medium
+
+  [ Matthias Luescher ]
+  * Upgraded checkout and docker login actions.
+  * Added introspection tests for new commands.
+  * Removed unused code.
+  * Fixed local setup for newer argcomplete versions.
+  * Fixed build output.
+  * Added edi_host_architecture to load time dictionary.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Fri, 01 Mar 2024 11:20:03 +0100
+
 edi (1.16.0) jammy; urgency=medium
 
   [ Matthias Luescher ]
