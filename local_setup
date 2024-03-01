@@ -56,5 +56,10 @@ then
 fi
 
 # enable bash completion
-eval "$(register-python-argcomplete3 edi)"
-
+if command -v register-python-argcomplete3 > /dev/null
+then
+    eval "$(register-python-argcomplete3 edi)"
+else
+    # python3-argcomplete >= 2.0
+    eval "$(register-python-argcomplete edi)"
+fi

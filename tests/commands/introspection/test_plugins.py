@@ -38,6 +38,9 @@ from edi.commands.lxccommands.publish import Publish
 from edi.commands.lxccommands.stop import Stop
 from edi.commands.documentationcommands.render import Render
 from edi.commands.targetcommands.targetconfigure import Configure as TargetConfigure
+from edi.commands.projectcommands.prepare import Prepare as ProjectPrepare
+from edi.commands.projectcommands.configure import Configure as ProjectConfigure
+from edi.commands.projectcommands.make import Make
 from edi.lib.shellhelpers import mockablerun
 from tests.libtesting.contextmanagers.mocked_executable import mocked_executable, mocked_lxd_version_check
 
@@ -56,6 +59,9 @@ from tests.libtesting.contextmanagers.mocked_executable import mocked_executable
     (Stop, ['lxc', 'stop', '--plugins'], True, True, True, False),
     (TargetConfigure, ['target', 'configure', '--plugins', '1.2.3.4'], False, False, True, False),
     (Render, ['documentation', 'render', '--plugins', './', './'], False, False, False, False),
+    (ProjectPrepare, ['project', 'prepare', '--plugins'], False, False, False, False,),
+    (ProjectConfigure, ['project', 'configure', '--plugins'], False, False, True, False),
+    (Make, ['project', 'make', '--plugins'], False, False, True, True),
 ])
 def test_plugins(monkeypatch, config_files, capsys, command, command_args, has_templates,
                  has_profiles, has_playbooks, has_postprocessing_commands):

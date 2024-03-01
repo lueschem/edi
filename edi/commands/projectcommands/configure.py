@@ -82,7 +82,7 @@ class Configure(Project):
                                                 "configure", "prepare")
 
             print(f"Going to create project container '{container_name}'\n"
-                  f"based on content of '{bootstrapped_rootfs}'.")
+                  f"based on content of '{bootstrapped_rootfs.location}'.")
             create_container(container_name, bootstrapped_rootfs.location)
 
         seal_file = self._get_seal_artifact().location
