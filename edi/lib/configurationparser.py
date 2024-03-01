@@ -375,6 +375,7 @@ class ConfigurationParser:
         load_dict["edi_project_plugin_directory"] = self.get_project_plugin_directory()
         load_dict['edi_log_level'] = logging.getLevelName(logging.getLogger().getEffectiveLevel())
         load_dict['edi_configuration_name'] = self.get_configuration_name()
+        load_dict['edi_host_architecture'] = get_debian_architecture()
         load_dict.update(ConfigurationParser.command_context)
         return load_dict
 
