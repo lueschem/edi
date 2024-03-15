@@ -230,9 +230,9 @@ class CommandRunner:
                               f"command node '{node_name}' must not be empty."))
 
         if artifact_type is ArtifactType.PATH:
-            if str(artifact_location) != os.path.basename(artifact_location):
+            if str(artifact_location) != str(os.path.basename(artifact_location)):
                 raise FatalError((('''The specified output artifact '{}' within the '''
-                                   '''command node '{}' is invalid.\n'''
+                                   '''command node '{}' is invalid. '''
                                    '''The output shall be a file or a folder (no '/' in string).''')
                                   ).format(artifact_key, node_name))
             artifact_location = os.path.join(get_artifact_dir(), artifact_location)
