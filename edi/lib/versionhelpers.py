@@ -20,7 +20,7 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-import pkg_resources
+import importlib.metadata
 import re
 from edi.lib.helpers import FatalError
 
@@ -43,8 +43,8 @@ def get_edi_version():
         return get_version(root=project_root)
     else:
         try:
-            return pkg_resources.get_distribution('edi').version
-        except pkg_resources.DistributionNotFound:
+            return importlib.metadata.version('edi')
+        except importlib.metadata.PackageNotFoundError:
             return edi_fallback_version
 
 

@@ -185,7 +185,6 @@ class CommandRunner:
         run(cmd, log_threshold=logging.INFO, sudo=CommandRunner._require_real_root(require_root))
 
     def _get_commands(self):
-        artifact_directory = get_artifact_dir()
         commands = self.config.get_ordered_path_items(self.config_section)
         augmented_commands = []
         artifacts = dict()
@@ -200,15 +199,7 @@ class CommandRunner:
 
             new_artifacts = dict()
             for artifact_key, artifact_item in output.items():
-                if str(artifact_item) != os.path.basename(artifact_item):
-                    raise FatalError((('''The specified output artifact '{}' within the '''
-                                       '''command node '{}' is invalid.\n'''
-                                       '''The output shall be a file or a folder (no '/' in string).''')
-                                      ).format(artifact_key, name))
-                artifact_path = os.path.join(artifact_directory, artifact_item)
-                new_artifacts[artifact_key] = Artifact(name=artifact_key,
-                                                       location=str(artifact_path),
-                                                       type=ArtifactType.PATH)
+                new_artifacts[artifact_key] = self._get_artifact(name, artifact_key, artifact_item)
 
             artifacts.update(new_artifacts)
             dictionary.update({key: val.location for key, val in artifacts.items()})
@@ -219,6 +210,34 @@ class CommandRunner:
             augmented_commands.append(new_command)
 
         return augmented_commands
+
+    @staticmethod
+    def _get_artifact(node_name, artifact_key, artifact_item):
+        if type(artifact_item) is dict:
+            artifact_location = artifact_item.get('location', '')
+            artifact_type_string = artifact_item.get('type', 'path')
+            try:
+                artifact_type = ArtifactType(artifact_type_string)
+            except ValueError:
+                raise FatalError((f"The specified output artifact '{artifact_key}' within the "
+                                  f"command node '{node_name}' has an invalid artifact type '{artifact_type_string}'."))
+        else:
+            artifact_location = artifact_item
+            artifact_type = ArtifactType.PATH
+
+        if not artifact_location:
+            raise FatalError((f"The specified output artifact '{artifact_key}' within the "
+                              f"command node '{node_name}' must not be empty."))
+
+        if artifact_type is ArtifactType.PATH:
+            if str(artifact_location) != os.path.basename(artifact_location):
+                raise FatalError((('''The specified output artifact '{}' within the '''
+                                   '''command node '{}' is invalid.\n'''
+                                   '''The output shall be a file or a folder (no '/' in string).''')
+                                  ).format(artifact_key, node_name))
+            artifact_location = os.path.join(get_artifact_dir(), artifact_location)
+
+        return Artifact(name=artifact_key, location=str(artifact_location), type=artifact_type)
 
     @staticmethod
     def _are_all_artifacts_available(artifacts):

@@ -24,9 +24,11 @@ from edi.lib.commandrunner import CommandRunner, ArtifactType, Artifact
 from tests.libtesting.contextmanagers.workspace import workspace
 from tests.libtesting.helpers import get_command, suppress_chown_during_debuild
 from edi.lib import mockablerun
+from edi.lib.helpers import FatalError
 import subprocess
 import os
 from codecs import open
+import pytest
 
 
 def test_run_and_clean(config_files, monkeypatch):
@@ -115,3 +117,27 @@ def test_require_root(config_files):
                                                                            location=input_file, type=ArtifactType.PATH))
         assert not runner.require_real_root()
         assert not runner.require_real_root_for_clean()
+
+
+@pytest.mark.parametrize("artifact_item, expected_type, expected_location", [
+    ('foo', ArtifactType.PATH, 'foo'),
+    ({'location': 'bar'}, ArtifactType.PATH, 'bar'),
+    ({'location': 'bingo:bongo', 'type': 'buildah-container'}, ArtifactType.BUILDAH_CONTAINER, 'bingo:bongo'),
+])
+def test_output_node(artifact_item, expected_type, expected_location):
+    artifact = CommandRunner._get_artifact('some_node', 'some_key', artifact_item)
+    assert artifact.type is expected_type
+    assert expected_location in artifact.location
+    assert artifact.name == 'some_key'
+
+
+@pytest.mark.parametrize("artifact_item, error_message", [
+    ('', 'must not be empty'),
+    ({'location': ''}, 'must not be empty'),
+    ({'location': 'bingo/bongo'}, 'shall be a file or a folder'),
+    ({'location': 'bingo:bongo', 'type': 'unknown-artifact'}, 'invalid artifact type'),
+])
+def test_output_node_failure(artifact_item, error_message):
+    with pytest.raises(FatalError) as error:
+        CommandRunner._get_artifact('some_node', 'some_key', artifact_item)
+    assert error_message in str(error)

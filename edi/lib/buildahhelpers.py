@@ -79,7 +79,6 @@ def is_container_existing(name):
 
 @require('buildah', buildah_install_hint, BuildahVersion.check)
 def delete_container(name):
-    # needs to be stopped first!
     cmd = [buildah_exec(), "rm", name]
 
     run(cmd, log_threshold=logging.INFO)
