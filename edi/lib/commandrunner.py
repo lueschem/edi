@@ -33,11 +33,14 @@ from edi.lib.helpers import (chown_to_user, FatalError, get_workdir, get_artifac
 from edi.lib.shellhelpers import run, safely_remove_artifacts_folder
 from edi.lib.configurationparser import remove_passwords
 from edi.lib.yamlhelpers import LiteralString
+from edi.lib.podmanhelpers import is_image_existing, try_delete_image, untag_image
 
 
 class ArtifactType(Enum):
     PATH = 'path'
     BUILDAH_CONTAINER = 'buildah-container'
+    PODMAN_IMAGE = 'podman-image'  # Owned by non-root user.
+    PODMAN_IMAGE_ROOT = 'podman-image-root'  # Owned by root.
 
 
 Artifact = namedtuple("Artifact", "name, location, type")
@@ -114,8 +117,7 @@ class CommandRunner:
         commands = self._get_commands()
 
         for command in commands:
-            if (not self._are_all_artifacts_available(command.output_artifacts)
-                    and self._require_real_root(command.config_node.get('require_root', False))):
+            if self._require_real_root(command.config_node.get('require_root', False)):
                 return True
 
         return False
@@ -132,7 +134,7 @@ class CommandRunner:
     def require_real_root_for_clean(self):
         for command in self._get_commands():
             if (self._require_real_root(command.config_node.get('require_root', False))
-                    and self._is_an_artifact_a_directory(command.output_artifacts)):
+                    and self._is_root_required_for_removal(command.output_artifacts)):
                 return True
 
         return False
@@ -158,19 +160,32 @@ class CommandRunner:
         commands = self._get_commands()
         for command in commands:
             for _, artifact in command.output_artifacts.items():
-                if not str(get_workdir()) in str(artifact.location):
-                    raise FatalError(('Output artifact {} is not within the current working directory!'
-                                      ).format(artifact.location))
+                if artifact.type is ArtifactType.PATH:
+                    if not str(get_workdir()) in str(artifact.location):
+                        raise FatalError(('Output artifact {} is not within the current working directory!'
+                                          ).format(artifact.location))
 
-                if os.path.isfile(artifact.location):
-                    logging.info("Removing '{}'.".format(artifact.location))
-                    os.remove(artifact.location)
-                    print_success("Removed image file artifact {}.".format(artifact.location))
-                elif os.path.isdir(artifact.location):
-                    safely_remove_artifacts_folder(artifact.location,
-                                                   sudo=self._require_real_root(command.config_node.get('require_root',
-                                                                                                        False)))
-                    print_success("Removed image directory artifact {}.".format(artifact.location))
+                    if os.path.isfile(artifact.location):
+                        logging.info("Removing '{}'.".format(artifact.location))
+                        os.remove(artifact.location)
+                        print_success("Removed image file artifact {}.".format(artifact.location))
+                    elif os.path.isdir(artifact.location):
+                        safely_remove_artifacts_folder(artifact.location,
+                                                       sudo=self._require_real_root(
+                                                           command.config_node.get('require_root', False)))
+                        print_success("Removed image directory artifact {}.".format(artifact.location))
+                elif artifact.type in [ArtifactType.PODMAN_IMAGE, ArtifactType.PODMAN_IMAGE_ROOT]:
+                    image_name = artifact.location
+                    require_sudo = artifact.type is ArtifactType.PODMAN_IMAGE_ROOT
+                    if is_image_existing(image_name, sudo=require_sudo):
+                        if try_delete_image(image_name, sudo=require_sudo):
+                            print_success(f"Removed podman image {artifact.location}.")
+                        else:
+                            logging.info(f"Podman image '{artifact.location}' is still in use, going to untag it.")
+                            untag_image(image_name, sudo=require_sudo)
+                            print_success(f"Untagged podman image {artifact.location}.")
+                else:
+                    raise FatalError(f"Unhandled removal of artifact type '{artifact.type}'.")
 
     def result(self):
         commands = self._get_commands()
@@ -242,15 +257,25 @@ class CommandRunner:
     @staticmethod
     def _are_all_artifacts_available(artifacts):
         for _, artifact in artifacts.items():
-            if not os.path.isfile(artifact.location) and not os.path.isdir(artifact.location):
-                return False
+            if artifact.type is ArtifactType.PATH:
+                if not os.path.isfile(artifact.location) and not os.path.isdir(artifact.location):
+                    return False
+            elif artifact.type in [ArtifactType.PODMAN_IMAGE, ArtifactType.PODMAN_IMAGE_ROOT]:
+                require_sudo = artifact.type is ArtifactType.PODMAN_IMAGE_ROOT
+                if not is_image_existing(artifact.location, sudo=require_sudo):
+                    return False
+            else:
+                raise FatalError(f"Unhandled presence checking for artifact type '{artifact.type}'.")
 
         return True
 
     @staticmethod
-    def _is_an_artifact_a_directory(artifacts):
+    def _is_root_required_for_removal(artifacts):
         for _, artifact in artifacts.items():
-            if os.path.isdir(artifact.location):
+            if artifact.type is ArtifactType.PATH and os.path.isdir(artifact.location):
+                return True
+            if artifact.type is ArtifactType.PODMAN_IMAGE_ROOT:
+                # Unable to check presence as we might not be running as root.
                 return True
 
         return False
@@ -258,11 +283,21 @@ class CommandRunner:
     @staticmethod
     def _post_process_artifacts(command_name, expected_artifacts):
         for _, artifact in expected_artifacts.items():
-            if not os.path.isfile(artifact.location) and not os.path.isdir(artifact.location):
-                raise FatalError(('''The command '{}' did not generate '''
-                                  '''the specified output artifact '{}'.'''.format(command_name, artifact.location)))
-            elif os.path.isfile(artifact.location):
-                chown_to_user(artifact.location)
+            if artifact.type is ArtifactType.PATH:
+                if not os.path.isfile(artifact.location) and not os.path.isdir(artifact.location):
+                    raise FatalError(('''The command '{}' did not generate '''
+                                      '''the specified output artifact '{}'.'''.format(command_name,
+                                                                                       artifact.location)))
+                elif os.path.isfile(artifact.location):
+                    chown_to_user(artifact.location)
+            elif artifact.type in [ArtifactType.PODMAN_IMAGE, ArtifactType.PODMAN_IMAGE_ROOT]:
+                require_sudo = artifact.type is ArtifactType.PODMAN_IMAGE_ROOT
+                if not is_image_existing(artifact.location, sudo=require_sudo):
+                    raise FatalError(('''The command '{}' did not generate '''
+                                      '''the specified podman image '{}'.'''.format(command_name,
+                                                                                    artifact.location)))
+            else:
+                raise FatalError(f"Missing postprocessing rule for artifact type '{artifact.type}'.")
 
     @staticmethod
     def _render_command_file(input_file, dictionary):

@@ -70,20 +70,20 @@ class PodmanVersion:
 
 
 @require('podman', podman_install_hint, PodmanVersion.check)
-def is_image_existing(name):
+def is_image_existing(name, sudo=False):
     cmd = [podman_exec(), "image", "exists", name]
-    result = run(cmd, check=False, stderr=subprocess.PIPE)
+    result = run(cmd, check=False, stderr=subprocess.PIPE, sudo=sudo)
     return result.returncode == 0
 
 
 @require('podman', podman_install_hint, PodmanVersion.check)
-def try_delete_image(name):
+def try_delete_image(name, sudo=False):
     cmd = [podman_exec(), "image", "rm", name]
-    result = run(cmd, check=False, stderr=subprocess.PIPE)
+    result = run(cmd, check=False, stderr=subprocess.PIPE, sudo=sudo)
     return result.returncode == 0
 
 
 @require('podman', podman_install_hint, PodmanVersion.check)
-def untag_image(name):
+def untag_image(name, sudo=False):
     cmd = [podman_exec(), "image", "untag", name]
-    run(cmd, log_threshold=logging.INFO)
+    run(cmd, log_threshold=logging.INFO, sudo=sudo)
