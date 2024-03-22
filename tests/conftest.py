@@ -32,6 +32,8 @@ def pytest_addoption(parser):
                      help="include tests that rely on lxc availability")
     parser.addoption("--buildah", action="store_true",
                      help="include tests that rely on buildah availability")
+    parser.addoption("--podman", action="store_true",
+                     help="include tests that rely on podman availability")
     parser.addoption("--ansible", action="store_true",
                      help="include tests that rely on ansible availability")
     parser.addoption("--debootstrap", action="store_true",
@@ -43,6 +45,7 @@ def pytest_addoption(parser):
 def pytest_configure(config):
     config.addinivalue_line("markers", "requires_lxc: mark test as requiring lxc to run")
     config.addinivalue_line("markers", "requires_buildah: mark test as requiring buildah to run")
+    config.addinivalue_line("markers", "requires_podman: mark test as requiring podman to run")
     config.addinivalue_line("markers", "requires_ansible: mark test as requiring ansible to run")
     config.addinivalue_line("markers", "requires_debootstrap: mark test as requiring debootstrap to run")
     config.addinivalue_line("markers", "requires_flake8: mark test as requiring flake8 to run")
@@ -55,6 +58,8 @@ def pytest_collection_modifyitems(config, items):
             item.add_marker(pytest.mark.skip(reason="requires --lxc or --all option to run"))
         if "requires_buildah" in item.keywords and not (config.getoption("--buildah") or config.getoption("--all")):
             item.add_marker(pytest.mark.skip(reason="requires --buildah or --all option to run"))
+        if "requires_podman" in item.keywords and not (config.getoption("--podman") or config.getoption("--all")):
+            item.add_marker(pytest.mark.skip(reason="requires --podman or --all option to run"))
         if "requires_ansible" in item.keywords and not (config.getoption("--ansible") or config.getoption("--all")):
             item.add_marker(pytest.mark.skip(reason="requires --ansible or --all option to run"))
         if "requires_debootstrap" in item.keywords and not (config.getoption("--debootstrap") or
@@ -188,7 +193,9 @@ postprocessing_commands:
             message:        "*last step*"
         require_root:       False
         output:
-            last_output_file: last.txt
+            last_output_file:
+                location: last.txt
+                type: path
 
 documentation_steps:
     20_second_step:

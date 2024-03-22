@@ -182,6 +182,8 @@ def test_buildah_rootfs_extraction(datadir):
 
         assert os.path.isfile(extracted_rootfs_archive)
 
+        delete_container(container_name)
+
 
 @pytest.mark.requires_buildah
 def test_buildah_container_creation_failure():

@@ -1,3 +1,11 @@
+edi (1.17.0) mantic; urgency=medium
+
+  [ Matthias Luescher ]
+  * Removed Debian buster build.
+  * Added handling for podman images within command runner.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Fri, 22 Mar 2024 14:41:55 +0100
+
 edi (1.16.1) mantic; urgency=medium
 
   [ Matthias Luescher ]

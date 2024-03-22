@@ -12,9 +12,6 @@ jobs:
       matrix:
        include:
          - distribution: debian
-           distribution_release: buster
-           repository_type: packagecloud
-         - distribution: debian
            distribution_release: bullseye
            repository_type: packagecloud
          - distribution: debian

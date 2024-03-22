@@ -25,20 +25,21 @@ from contextlib import contextmanager
 from edi.lib.shellhelpers import Executables
 from edi.lib.lxchelpers import LxdVersion
 from edi.lib.buildahhelpers import BuildahVersion
+from edi.lib.podmanhelpers import PodmanVersion
 
 
 @contextmanager
-def mocked_executable(executable, mock=str(os.path.join(os.sep, 'bin', 'true'))):
+def mocked_executable(executable, executable_mock=str(os.path.join(os.sep, 'bin', 'true'))):
     """
     Mocks away an executable that gets fetched using the Executables class.
     :param executable: The executable to be mocked.
-    :param mock: The replacement for the mocked executable.
+    :param executable_mock: The replacement for the mocked executable.
     :return: The mock.
     """
-    Executables._cache[executable] = mock
+    Executables._cache[executable] = executable_mock
 
     try:
-        yield mock
+        yield executable_mock
     finally:
         del Executables._cache[executable]
 
@@ -59,3 +60,12 @@ def mocked_buildah_version_check():
         yield
     finally:
         BuildahVersion._check_done = False
+
+
+@contextmanager
+def mocked_podman_version_check():
+    PodmanVersion._check_done = True
+    try:
+        yield
+    finally:
+        PodmanVersion._check_done = False

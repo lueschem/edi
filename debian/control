@@ -3,7 +3,7 @@ Section: devel
 Priority: optional
 Build-Depends: ansible (>= 2.9),
                binfmt-support,
-               debhelper (>= 9),
+               debhelper (>= 10),
                debootstrap,
                dh-python,
                flake8,
@@ -30,7 +30,7 @@ Build-Depends: ansible (>= 2.9),
                zstd,
 Maintainer: Matthias Luescher <lueschem@gmail.com>
 Standards-Version: 3.9.7
-X-Python3-Version: >= 3.5
+X-Python3-Version: >= 3.8
 
 Package: edi
 Architecture: all
