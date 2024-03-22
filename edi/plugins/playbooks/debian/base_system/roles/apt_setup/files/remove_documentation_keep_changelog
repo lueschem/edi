@@ -8,7 +8,7 @@ DPKG_CONTROL_FILE=$1
 find /usr/share/doc -depth -type f ! -name copyright ! -name changelog.Debian.gz ! -name changelog.gz |xargs rm || true
 find /usr/share/doc -empty|xargs rmdir || true
 rm -rf /usr/share/man /usr/share/groff /usr/share/info
-rm -rf /usr/share/lintian /usr/share/linda /var/cache/man
+rm -rf /usr/share/lintian/overrides /usr/share/linda /var/cache/man
 
 cat << EOF > ${DPKG_CONTROL_FILE}
 # save disk space by excluding documentation
@@ -21,7 +21,7 @@ path-include /usr/share/doc/*/changelog.gz
 path-exclude /usr/share/man/*
 path-exclude /usr/share/groff/*
 path-exclude /usr/share/info/*
-path-exclude /usr/share/lintian/*
+path-exclude /usr/share/lintian/overrides/*
 path-exclude /usr/share/linda/*
 EOF
 
