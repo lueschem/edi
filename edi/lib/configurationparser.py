@@ -99,6 +99,7 @@ class ConfigurationParser:
         'edi_create_distributable_image': False,
         'edi_configure_remote_target': False,
         'edi_debug_mode': False,
+        'edi_start_at_task': "",
     }
 
     @staticmethod
@@ -112,6 +113,10 @@ class ConfigurationParser:
     @staticmethod
     def debug_mode():
         return ConfigurationParser.command_context.get('edi_debug_mode')
+
+    @staticmethod
+    def get_start_task():
+        return ConfigurationParser.command_context.get('edi_start_at_task')
 
     def get_context_suffix(self):
         if self.create_distributable_image():

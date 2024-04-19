@@ -26,14 +26,14 @@ import subprocess
 import tempfile
 import yaml
 from codecs import open
-from edi.lib.helpers import chown_to_user
+from edi.lib.helpers import chown_to_user, FatalError
 from edi.lib.helpers import print_error, get_user, get_workdir
 from edi.lib.shellhelpers import run, require
 from edi.lib.sharedfoldercoordinator import SharedFolderCoordinator
 from edi.lib.configurationparser import remove_passwords
 
 
-class PlaybookRunner():
+class PlaybookRunner:
 
     def __init__(self, config, target, connection):
         self.config = config
@@ -49,7 +49,13 @@ class PlaybookRunner():
             chown_to_user(tempdir)
             inventory = self._write_inventory_file(tempdir)
 
-            for name, path, extra_vars, in self._get_playbooks():
+            collected_playbooks = self._get_playbooks()
+
+            if len(collected_playbooks) > 1 and self.config.get_start_task():
+                raise FatalError("The -s/--start-at-task feature is currently only available for configurations "
+                                 "that contain just one playbook!")
+
+            for name, path, extra_vars, in collected_playbooks:
                 logging.info(("Running playbook {} located in "
                               "{} with extra vars:\n{}"
                               ).format(name, path,
@@ -100,6 +106,11 @@ class PlaybookRunner():
         if snap_path not in os.environ['PATH']:
             cmd.extend(["env", "PATH={}:{}".format(os.environ['PATH'], snap_path)])
         cmd.append("ansible-playbook")
+
+        start_task = self.config.get_start_task()
+        if start_task:
+            cmd.extend(["--start-at-task", start_task])
+
         cmd.extend(["--connection", self.connection])
         cmd.extend(["--inventory", inventory])
         cmd.extend(["--extra-vars", "@{}".format(extra_vars)])

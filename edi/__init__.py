@@ -56,6 +56,8 @@ def _setup_command_line_interface():
                         help="modify log level (default is WARNING)")
     parser.add_argument('-d', '--debug', action="store_true",
                         help="switch command processing into interactive debug mode (useful for playbook debugging)")
+    parser.add_argument('-s', '--start-at-task', type=str, default="",
+                        help="start the Ansible playbook processing at a given task (useful for playbook debugging)")
 
     subparsers = parser.add_subparsers(title='commands',
                                        dest="command_name")
@@ -77,7 +79,8 @@ def main():
 
         command_name = "{0}.{1}".format(EdiCommand._get_command_name(),
                                         cli_args.command_name)
-        with command_context({'edi_debug_mode': cli_args.debug}):
+        with command_context({'edi_debug_mode': cli_args.debug,
+                              'edi_start_at_task': cli_args.start_at_task}):
             get_command(command_name)().run_cli(cli_args)
     except FatalError as fatal_error:
         print_error_and_exit(fatal_error.message)
