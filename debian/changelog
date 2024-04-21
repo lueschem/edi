@@ -1,3 +1,10 @@
+edi (1.18.2) noble; urgency=medium
+
+  [ Matthias Luescher ]
+  * Added fakeroot build dependency to fix build on Ubuntu noble.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Sun, 21 Apr 2024 22:30:13 +0200
+
 edi (1.18.1) noble; urgency=medium
 
   [ Matthias Luescher ]
