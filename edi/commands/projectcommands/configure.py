@@ -29,7 +29,8 @@ from edi.lib.helpers import print_success, get_artifact_dir
 from edi.lib.shellhelpers import run
 from edi.lib.buildahhelpers import create_container, delete_container, is_container_existing
 from edi.lib.configurationparser import command_context
-from edi.lib.commandrunner import ArtifactType, Artifact, find_artifact
+from edi.lib.commandrunner import find_artifact
+from edi.lib.artifact import ArtifactType, Artifact
 
 
 class Configure(Project):

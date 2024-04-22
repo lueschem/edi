@@ -22,7 +22,8 @@
 import logging
 from edi.commands.image import Image
 from edi.commands.lxccommands.export import Export
-from edi.lib.commandrunner import CommandRunner, Artifact, ArtifactType
+from edi.lib.commandrunner import CommandRunner
+from edi.lib.artifact import ArtifactType, Artifact
 from edi.lib.configurationparser import command_context
 from edi.lib.helpers import print_success
 
