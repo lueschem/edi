@@ -25,8 +25,10 @@ import os
 import logging
 from packaging.version import Version
 from edi.lib.helpers import FatalError
+from edi.lib.artifact import ArtifactType
 from edi.lib.versionhelpers import get_stripped_version
 from edi.lib.shellhelpers import run, Executables, require
+from edi.lib.podmanhelpers import is_image_existing
 
 
 buildah_install_hint = "'sudo apt install buildah'"
@@ -85,24 +87,35 @@ def delete_container(name):
 
 
 @require('buildah', buildah_install_hint, BuildahVersion.check)
-def create_container(name, rootfs_archive):
+def create_container(name, source_artifact):
     if is_container_existing(name):
         raise FatalError(f"The container '{name}' already exists!")
 
-    if not os.path.isfile(rootfs_archive):
-        raise FatalError(f"The root file system archive '{rootfs_archive}' does not exist!")
+    if source_artifact.type == ArtifactType.PATH:
+        if not os.path.isfile(source_artifact.location):
+            raise FatalError(f"The root file system archive '{source_artifact.location}' does not exist!")
+    elif source_artifact.type == ArtifactType.PODMAN_IMAGE:
+        if not is_image_existing(source_artifact.location):
+            raise FatalError(f"The podman image '{source_artifact.location}' does not exist!")
+    else:
+        raise FatalError(f"Unable to create a container from '{source_artifact.type}'!")
 
     temp_container_name = name + "-temp"
 
     if is_container_existing(temp_container_name):
         delete_container(temp_container_name)
 
-    cmd = [buildah_exec(), "--name", temp_container_name, "from", "scratch"]
-    run(cmd, log_threshold=logging.INFO)
+    if source_artifact.type == ArtifactType.PATH:
+        cmd = [buildah_exec(), "--name", temp_container_name, "from", "scratch"]
+        run(cmd, log_threshold=logging.INFO)
 
-    nested_command = "fakeroot tar --numeric-owner -C " + r'${container_root}' + " -axf " + str(rootfs_archive)
+        nested_command = ("fakeroot tar --numeric-owner -C " + r'${container_root}' + " -axf " +
+                          str(source_artifact.location))
 
-    run_buildah_unshare(temp_container_name, nested_command)
+        run_buildah_unshare(temp_container_name, nested_command)
+    else:
+        cmd = [buildah_exec(), "--name", temp_container_name, "from", source_artifact.location]
+        run(cmd, log_threshold=logging.INFO)
 
     cmd = [buildah_exec(), "rename", temp_container_name, name]
     run(cmd, log_threshold=logging.INFO)

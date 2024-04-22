@@ -27,6 +27,7 @@ import json
 import os
 import logging
 import shutil
+from edi.lib.artifact import Artifact, ArtifactType
 from edi.lib.helpers import FatalError, chown_to_user
 from edi.lib.podmanhelpers import (get_podman_version, PodmanVersion, is_image_existing, try_delete_image, untag_image,
                                    podman_exec)
@@ -116,7 +117,7 @@ def test_buildah_podman_workflow(datadir):
         container_name = f'edi-pytest-{get_random_string(6)}'
         assert not is_container_existing(container_name)
 
-        create_container(container_name, demo_rootfs_archive)
+        create_container(container_name, Artifact(name='xy', location=demo_rootfs_archive, type=ArtifactType.PATH))
 
         image_name = f'edi-pytest-{get_random_string(6)}:test'.lower()
 
