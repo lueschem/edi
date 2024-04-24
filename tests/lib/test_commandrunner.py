@@ -20,7 +20,8 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 from edi.lib.configurationparser import ConfigurationParser
-from edi.lib.commandrunner import CommandRunner, ArtifactType, Artifact
+from edi.lib.commandrunner import CommandRunner
+from edi.lib.artifact import ArtifactType, Artifact
 from tests.libtesting.contextmanagers.workspace import workspace
 from tests.libtesting.helpers import get_command, suppress_chown_during_debuild
 from edi.lib import mockablerun

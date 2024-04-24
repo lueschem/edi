@@ -27,6 +27,7 @@ import json
 import os
 import tempfile
 from contextlib import contextmanager
+from edi.lib.artifact import Artifact, ArtifactType
 from edi.lib.helpers import FatalError, chown_to_user
 from edi.lib.buildahhelpers import (is_container_existing, get_buildah_version, BuildahVersion, create_container,
                                     run_buildah_unshare, delete_container, extract_container_rootfs)
@@ -132,11 +133,11 @@ def test_buildah_container_creation(datadir):
         demo_rootfs_archive = os.path.join(archive_dir, 'demo_rootfs.tar')
         shutil.copyfile(os.path.join(datadir, "demo_rootfs.tar"), demo_rootfs_archive)
 
-        create_container(container_name, demo_rootfs_archive)
+        create_container(container_name, Artifact(name='xy', location=demo_rootfs_archive, type=ArtifactType.PATH))
         assert is_container_existing(container_name)
 
         with pytest.raises(FatalError) as error:
-            create_container(container_name, demo_rootfs_archive)
+            create_container(container_name, Artifact(name='xy', location=demo_rootfs_archive, type=ArtifactType.PATH))
 
         assert 'already exists' in error.value.message
         assert container_name in error.value.message
@@ -170,7 +171,7 @@ def test_buildah_rootfs_extraction(datadir):
         assert 'does not exist' in error.value.message
         assert container_name in error.value.message
 
-        create_container(container_name, demo_rootfs_archive)
+        create_container(container_name, Artifact(name='xy', location=demo_rootfs_archive, type=ArtifactType.PATH))
 
         extract_container_rootfs(container_name, extracted_rootfs_archive)
 
@@ -188,7 +189,8 @@ def test_buildah_rootfs_extraction(datadir):
 @pytest.mark.requires_buildah
 def test_buildah_container_creation_failure():
     with pytest.raises(FatalError) as error:
-        create_container("some-stupid-container-name", "wrong_rootfs_archive.tar")
+        create_container("some-stupid-container-name",
+                         Artifact(name='xy', location="/path/to/wrong_rootfs_archive.tar", type=ArtifactType.PATH))
 
     assert 'does not exist' in error.value.message
     assert 'wrong_rootfs_archive.tar' in error.value.message

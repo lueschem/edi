@@ -377,6 +377,7 @@ class ConfigurationParser:
         load_dict = get_base_dictionary()
         load_dict["edi_work_directory"] = get_workdir()
         load_dict["edi_project_directory"] = self.project_directory
+        load_dict["edi_project_directory_hash"] = self.get_project_directory_hash()
         load_dict["edi_project_plugin_directory"] = self.get_project_plugin_directory()
         load_dict['edi_log_level'] = logging.getLevelName(logging.getLogger().getEffectiveLevel())
         load_dict['edi_configuration_name'] = self.get_configuration_name()

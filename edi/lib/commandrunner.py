@@ -26,25 +26,15 @@ import yaml
 import jinja2
 import stat
 from codecs import open
-from enum import Enum
 from collections import namedtuple
+
+from edi.lib.artifact import ArtifactType, Artifact
 from edi.lib.helpers import (chown_to_user, FatalError, get_workdir, get_artifact_dir,
                              create_artifact_dir, print_success)
 from edi.lib.shellhelpers import run, safely_remove_artifacts_folder
 from edi.lib.configurationparser import remove_passwords
 from edi.lib.yamlhelpers import LiteralString
 from edi.lib.podmanhelpers import is_image_existing, try_delete_image, untag_image
-
-
-class ArtifactType(Enum):
-    PATH = 'path'
-    BUILDAH_CONTAINER = 'buildah-container'
-    PODMAN_IMAGE = 'podman-image'  # Owned by non-root user.
-    PODMAN_IMAGE_ROOT = 'podman-image-root'  # Owned by root.
-
-
-Artifact = namedtuple("Artifact", "name, location, type")
-
 
 Command = namedtuple("Command", "script_name, script_content, node_name, resolved_template_path, "
                                 "node_dictionary, config_node, output_artifacts")
