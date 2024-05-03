@@ -37,6 +37,7 @@ class Configure(Project):
 
     def __init__(self):
         super().__init__()
+        self.clean_depth = 1
         self.ansible_connection = 'buildah'
         self._prepare_results = None
 
@@ -110,6 +111,9 @@ class Configure(Project):
 
     def clean_recursive(self, config_file, depth):
         self.clean_depth = depth
+        self._dispatch(config_file, run_method=self._clean)
+
+    def clean(self, config_file):
         self._dispatch(config_file, run_method=self._clean)
 
     def _clean(self):
