@@ -1,3 +1,10 @@
+edi (1.19.4) noble; urgency=medium
+
+  [ Matthias Luescher ]
+  * Really fix git access issue.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Fri, 28 Jun 2024 22:56:41 +0200
+
 edi (1.19.3) noble; urgency=medium
 
   [ Matthias Luescher ]
