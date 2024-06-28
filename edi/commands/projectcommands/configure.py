@@ -25,7 +25,7 @@ import os
 from edi.commands.project import Project
 from edi.commands.projectcommands.prepare import Prepare
 from edi.lib.playbookrunner import PlaybookRunner
-from edi.lib.helpers import print_success, get_artifact_dir
+from edi.lib.helpers import print_success, get_artifact_dir, create_artifact_dir
 from edi.lib.shellhelpers import run
 from edi.lib.buildahhelpers import create_container, delete_container, is_container_existing
 from edi.lib.configurationparser import command_context
@@ -97,6 +97,7 @@ class Configure(Project):
 
             playbook_runner = PlaybookRunner(self.config, container_name, self.ansible_connection)
             playbook_runner.run_all()
+            create_artifact_dir()
             run(["touch", seal_file])
 
         print_success(f"Configured project container '{container_name}'.")
