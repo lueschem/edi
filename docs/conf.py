@@ -19,6 +19,16 @@
 # sys.path.insert(0, os.path.abspath('.'))
 
 # -- General configuration ------------------------------------------------
+import os
+
+html_baseurl = os.environ.get("READTHEDOCS_CANONICAL_URL", "")
+
+# Tell Jinja2 templates the build is running on Read the Docs
+if os.environ.get("READTHEDOCS", "") == "True":
+    if "html_context" not in globals():
+        html_context = {}
+    # noinspection PyUnboundLocalVariable
+    html_context["READTHEDOCS"] = True
 
 # If your documentation needs a minimal Sphinx version, state it here.
 # needs_sphinx = '1.0'
@@ -47,7 +57,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'edi'
-copyright = '2023, Matthias Luescher'
+copyright = '2024, Matthias Luescher'
 author = 'Matthias Luescher'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -63,7 +73,7 @@ release = '1.19.4'
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = 'en'
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
@@ -281,7 +291,8 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, 'edi', 'edi Documentation',
-     author, 'edi', 'One line description of project.',
+     author, 'edi', 'edi is a generic tool that helps you to streamline '
+                    'your embedded development infrastructure.',
      'Miscellaneous'),
 ]
 
