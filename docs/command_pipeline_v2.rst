@@ -1,10 +1,10 @@
-.. _command_pipeline:
+.. _command_pipeline_v2:
 
 Command Pipeline
 ================
 
 .. note::
-   This chapter covers the LXD based workflow v1.
+   This chapter covers the Buildah based workflow v2.
 
 edi is designed to divide big tasks into small sub commands. Each sub command will
 initiate the transition into a new state of available artifacts:

@@ -1,10 +1,10 @@
-.. _jinja2:
+.. _jinja2_v2:
 
 Jinja2
 ======
 
 .. note::
-   This chapter covers the LXD based workflow v1.
+   This chapter covers the Buildah based workflow v2.
 
 A closer look at the configuration created in the previous chapter reveals some parametrization: The
 file :code:`my-project-develop.yml` contains a line that dynamically derives the name of an artifact

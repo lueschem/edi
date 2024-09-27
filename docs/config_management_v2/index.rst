@@ -2,7 +2,7 @@ Configuration Management
 ========================
 
 .. note::
-   This chapter covers the LXD based workflow v1.
+   This chapter covers the Buildah based workflow v2.
 
 .. toctree::
    :maxdepth: 2

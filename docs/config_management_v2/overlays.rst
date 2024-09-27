@@ -1,10 +1,10 @@
-.. _overlays:
+.. _overlays_v2:
 
 Overlays
 ========
 
 .. note::
-   This chapter covers the LXD based workflow v1.
+   This chapter covers the Buildah based workflow v2.
 
 As soon as a single :code:`edi` project configuration should support multiple use cases the use of overlays will
 help to get rid of duplicate configuration code. When using overlays, it is a good practice to put most of the

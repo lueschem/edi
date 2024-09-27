@@ -1,10 +1,10 @@
-.. _plugins:
+.. _plugins_v2:
 
 Plugins
 =======
 
 .. note::
-   This chapter covers the LXD based workflow v1.
+   This chapter covers the Buildah based workflow v2.
 
 edi comes with a few reusable plugins:
 
@@ -56,7 +56,7 @@ The following profiles have proven to be useful for various projects:
 
 .. _LXD Profile Documentation: https://lxd.readthedocs.io/en/latest/profiles/
 
-.. _default_network_interface:
+.. _default_network_interface_v2:
 
 Default Network Interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -100,7 +100,7 @@ root device. Please note that newer LXD versions (>=2.9) require the configurati
       path: lxc_profiles/general/default_root_device/default_root_device.yml
     ...
 
-.. _privileged_mode:
+.. _privileged_mode_v2:
 
 Privileged Mode
 ^^^^^^^^^^^^^^^
@@ -183,7 +183,7 @@ Furthermore this feature is only available for installations with LXD versions g
 4.0.
 
 Please also note that this feature is only available for containers that run in
-:ref:`privileged mode<privileged_mode>`.
+:ref:`privileged mode<privileged_mode_v2>`.
 
 Once this profile has been successfully applied to the container, a GUI application can be launched
 as follows:
@@ -195,7 +195,7 @@ as follows:
    someguiapp
 
 To add even more convenience, the
-:ref:`development user facilities playbook<development_user_facilities>` can be configured to
+:ref:`development user facilities playbook<development_user_facilities_v2>` can be configured to
 automatically add the :code:`export DISPLAY=:0` statement to the :code:`~/.profile` file of the container
 user using the :code:`export_display` parameter.
 
@@ -410,7 +410,7 @@ The final proxy settings can be customized as follows:
   *target_no_proxy:*
      The final proxy exception list (defaults to :code:`""`).
 
-.. _development_user_facilities:
+.. _development_user_facilities_v2:
 
 Development User Facilities
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^

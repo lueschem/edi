@@ -1,10 +1,10 @@
-.. _yaml:
+.. _yaml_v2:
 
 Yaml Based Configuration
 ========================
 
 .. note::
-   This chapter covers the LXD based workflow v1.
+   This chapter covers the Buildah based workflow v2.
 
 Within an empty directory the following command can be used to generate an initial edi configuration:
 
@@ -117,7 +117,7 @@ If you would like to bootstrap an image right now, you can run the following com
 
    sudo edi image bootstrap my-project-develop.yml
 
-.. _ordered_node_section:
+.. _ordered_node_section_v2:
 
 Ordered Node Section
 ++++++++++++++++++++
@@ -149,7 +149,7 @@ In both examples above the dog will first bark and then sleep because of the alp
 :code:`10_first_task` and :code:`20_second_task`. The explicit order of the nodes makes it easy to add or modify a
 certain node using :ref:`overlays`.
 
-.. _plugin_node:
+.. _plugin_node_v2:
 
 Plugin Node
 +++++++++++
@@ -194,38 +194,38 @@ To learn more about plugins please read the chapter :ref:`plugins`.
 :code:`lxc_templates` Section
 +++++++++++++++++++++++++++++
 
-The lxc_templates section is an :ref:`ordered node section <ordered_node_section>` consisting
-of :ref:`plugin nodes <plugin_node>`. Please consult the LXD documentation if you want to write custom templates.
+The lxc_templates section is an :ref:`ordered node section <ordered_node_section_v2>` consisting
+of :ref:`plugin nodes <plugin_node_v2>`. Please consult the LXD documentation if you want to write custom templates.
 
 :code:`lxc_profiles` Section
 ++++++++++++++++++++++++++++
 
-The lxc_profiles section is an :ref:`ordered node section <ordered_node_section>` consisting
-of :ref:`plugin nodes <plugin_node>`. Please consult the LXD documentation if you want to write custom profiles.
+The lxc_profiles section is an :ref:`ordered node section <ordered_node_section_v2>` consisting
+of :ref:`plugin nodes <plugin_node_v2>`. Please consult the LXD documentation if you want to write custom profiles.
 
 :code:`playbooks` Section
 +++++++++++++++++++++++++
 
-The playbooks section is an :ref:`ordered node section <ordered_node_section>` consisting
-of :ref:`plugin nodes <plugin_node>`. Please consult the Ansible documentation if you want to write custom playbooks.
+The playbooks section is an :ref:`ordered node section <ordered_node_section_v2>` consisting
+of :ref:`plugin nodes <plugin_node_v2>`. Please consult the Ansible documentation if you want to write custom playbooks.
 
-.. _postprocessing_command:
+.. _postprocessing_command_v2:
 
 :code:`postprocessing_commands` Section
 +++++++++++++++++++++++++++++++++++++++
 
-The postprocessing_commands section is an :ref:`ordered node section <ordered_node_section>` consisting
-of :ref:`plugin nodes <plugin_node>`. The post processing commands can be written in any language of choice.
+The postprocessing_commands section is an :ref:`ordered node section <ordered_node_section_v2>` consisting
+of :ref:`plugin nodes <plugin_node_v2>`. The post processing commands can be written in any language of choice.
 In contrast to the other plugin nodes the post processing command nodes require an explicit declaration of the
 generated artifacts. Please read the chapter :ref:`plugins` for more details.
 
 
-.. _`shared folders`:
+.. _`shared folders v2`:
 
 :code:`shared_folders` Section
 ++++++++++++++++++++++++++++++
 
-The shared_folders section is an :ref:`ordered node section <ordered_node_section>` that can be used to specify shared
+The shared_folders section is an :ref:`ordered node section <ordered_node_section_v2>` that can be used to specify shared
 folders between LXC containers and their host.
 
 Shared folders are very convenient for development use cases. Please note that edi will automatically turn any container
@@ -263,16 +263,16 @@ The shared folder nodes accept the the following settings:
       :code:`True` or :code:`False`. If :code:`True` the folder will not be shared.
       If unspecified, the folder will get shared.
 
-.. _`documentation steps`:
+.. _`documentation steps v2`:
 
 :code:`documentation_steps` Section
 +++++++++++++++++++++++++++++++++++
 
-The documentation_steps section is an :ref:`ordered node section <ordered_node_section>` consisting
-of :ref:`plugin nodes <plugin_node>`. The documentation_steps section is being processed by the
+The documentation_steps section is an :ref:`ordered node section <ordered_node_section_v2>` consisting
+of :ref:`plugin nodes <plugin_node_v2>`. The documentation_steps section is being processed by the
 :code:`edi documentation render ...` command. This command is independent of the
 :ref:`command pipeline <command_pipeline>` but it can be easily integrated as a
-:ref:`postprocessing command <postprocessing_command>`. (See `edi-pi`_ for a possible implementation.)
+:ref:`postprocessing command <postprocessing_command_v2>`. (See `edi-pi`_ for a possible implementation.)
 
 The command that renders the documentation gets executed as follows:
 

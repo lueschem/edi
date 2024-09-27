@@ -1,8 +1,12 @@
-Getting Started
-===============
+.. _`getting_started`:
 
-The following setup steps have been tested on Ubuntu 20.04 and 22.04 as well as on Debian buster, bullseye and bookworm.
-On Debian buster the packages :code:`ansible` and :code:`qemu-user-static` from buster-backports are required.
+Getting Started v1
+==================
+
+.. note::
+   This chapter covers the LXD based workflow v1.
+
+The following setup steps have been tested on Ubuntu 22.04 and 24.04 as well as on Debian bullseye and bookworm.
 
 Prerequisites
 +++++++++++++
