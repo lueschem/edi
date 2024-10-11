@@ -108,13 +108,13 @@ sudo -H -u ${TESTUSER} git add debian/changelog
 sudo -H -u ${TESTUSER} git commit -m "New version ${NEW_VERSION}."
 sudo -H -u ${TESTUSER} git tag -a "v${NEW_VERSION}" -m "New version ${NEW_VERSION}."
 
-mk-build-deps -i debian/control -t "apt-get -y" > /dev/null
+mk-build-deps -i debian/control -t "apt-get -y"
 
 sudo -H -u ${TESTUSER} py.test-3
 
 sudo -H -u ${TESTUSER} git clean -dxf
 
-sudo -H -u ${TESTUSER} debuild -us -uc > /dev/null
+sudo -H -u ${TESTUSER} debuild -us -uc
 
 dpkg -i ../edi_*_all.deb || true
 apt-get -y --no-install-recommends install -f
@@ -149,7 +149,7 @@ then
 
     gpg --pinentry-mode loopback --passphrase-file "${GPG_KEY_PASSPHRASE}" --import "${GPG_KEY}"
 
-    sudo -H -u ${TESTUSER} debuild -S -us -uc > /dev/null
+    sudo -H -u ${TESTUSER} debuild -S -us -uc
 
     RESULT="${CONTAINER_WORK}/../edi_${NEW_VERSION}_source.changes"
     debsign -p"gpg --pinentry-mode loopback --passphrase-file ${GPG_KEY_PASSPHRASE}" -S -kB6D5610F601C6B6E4A880C93AA6945FE5AAFB25D "${RESULT}"
