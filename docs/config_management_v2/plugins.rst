@@ -6,483 +6,74 @@ Plugins
 .. note::
    This chapter covers the Buildah based workflow v2.
 
-edi comes with a few reusable plugins:
+An edi project configuration can be modularized using reusable plugins:
 
-LXC/LXD Templates
-+++++++++++++++++
+Ansible Collections
++++++++++++++++++++
 
-During the root file system assembly edi adds templates to the container image (see
-`LXD Documentation`_).
+The edi-pi project configuration pulls in the Ansible_ collection debian_setup_ as a git submodule.
 
-The following templates are already predefined:
+Please take a look at the comprehensive documentation_ of Ansible if you want to write your own collections.
 
-.. _LXD Documentation: https://lxd.readthedocs.io/en/latest/image-handling/
-
-Hostname
-^^^^^^^^
-
-This template dynamically adds the :code:`/etc/hostname` file to the container.
-
-.. code-block:: yaml
-  :caption: Configuration Example
-
-  lxc_templates:
-    ...
-    100_etc_hostname:
-      path: lxc_templates/debian/hostname/hostname.yml
-    ...
-
-Hosts
-^^^^^
-
-This template dynamically adds the :code:`/etc/hosts` file to the container.
-
-.. code-block:: yaml
-  :caption: Configuration Example
-
-  lxc_templates:
-    ...
-    200_etc_hosts:
-      path: lxc_templates/debian/hosts/hosts.yml
-    ...
-
-LXC/LXD Profiles
-++++++++++++++++
-
-With the help of profiles a container configuration can be fine tuned in a modular way (see
-`LXD Profile Documentation`_).
-
-The following profiles have proven to be useful for various projects:
-
-.. _LXD Profile Documentation: https://lxd.readthedocs.io/en/latest/profiles/
-
-.. _default_network_interface_v2:
-
-Default Network Interface
-^^^^^^^^^^^^^^^^^^^^^^^^^
-
-This profile adds a default network interface to the container named according to the value of
-:code:`edi_lxc_network_interface_name`. The interface is of type :code:`bridged` and its default parent is
-:code:`lxdbr0`. To properly deal with legacy or emulated containers please use :code:`edibr0` instead of
-:code:`lxdbr0` by setting the general parameter :code:`edi_lxc_bridge_interface_name`:
-
-.. code-block:: yaml
-  :caption: Configuration Example
-
-  general:
-    ...
-    edi_lxc_bridge_interface_name: edibr0
-    ...
-
-  ...
-
-  lxc_profiles:
-    ...
-    100_lxc_networking:
-        path: lxc_profiles/general/lxc_networking/default_interface.yml
-     ...
-
-On the bridges matching :code:`edibr*` checksum offloading gets disabled (e.g. :code:`ethtool -K edibr0 tx off`).
-This is to make sure that emulated and legacy containers can get an IPv4 address assigned.
-
-Default Root Device
-^^^^^^^^^^^^^^^^^^^
-
-This profile makes sure that the container uses the :code:`default` storage pool as its
-root device. Please note that newer LXD versions (>=2.9) require the configuration of a storage pool.
-
-.. code-block:: yaml
-  :caption: Configuration Example
-
-  lxc_profiles:
-    ...
-    200_default_root_device:
-      path: lxc_profiles/general/default_root_device/default_root_device.yml
-    ...
-
-.. _privileged_mode_v2:
-
-Privileged Mode
-^^^^^^^^^^^^^^^
-
-This profile will make sure that the container is running in privileged mode.
-
-
-.. code-block:: yaml
-  :caption: Configuration Example
-
-  lxc_profiles:
-    ...
-    300_privileged:
-      path: lxc_profiles/general/security/privileged.yml
-    ...
-
-Please note that if a container has one or more :ref:`shared folders<shared folders>` configured it
-will automatically be turned into privileged mode.
-
-Suppress Init
-^^^^^^^^^^^^^
-
-This profile will make sure that the container does not start using systemd but instead uses
-dumb-init_. This is especially useful during the build of a distributable image. During such a build
-you just want to assemble the image without starting any services.
-
-The following configuration snippet will conditionally enable the usage of dumb-init:
-
-.. code-block:: yaml
-  :caption: Configuration Example
-
-  lxc_profiles:
-    ...
-    400_suppress_init:
-      path: lxc_profiles/general/suppress_init/suppress_init.yml
-      skip: {{ not edi_create_distributable_image }}
-    ...
-
-dumb-init is not part of the default package set during bootstrapping. For this reason you have to add
-it within the bootstrap section (otherwise the launching of the container will fail):
-
-.. code-block:: yaml
-  :caption: Configuration Example
-
-  bootstrap:
-    ...
-    additional_packages: ["python", "sudo", "netbase", "net-tools", "iputils-ping", "ifupdown", "isc-dhcp-client", "resolvconf", "systemd", "systemd-sysv", "gnupg", "dumb-init"]
-    ...
-
-.. _dumb-init: https://github.com/Yelp/dumb-init
-
-GUI Passthrough
-^^^^^^^^^^^^^^^
-
-Sometimes it is very useful to run an application with a graphical user interface (GUI) within
-a container and show it on the display of the host system. To achieve this setup a predefined
-LXC profile can be added to the configuration:
-
-.. code-block:: yaml
-  :caption: Configuration Example
-
-  lxc_profiles:
-    ...
-    500_gui_passthrough:
-        path: lxc_profiles/general/gui/passthrough.yml
-        skip: {{ edi_create_distributable_image }}
-    ...
-
-The passthrough template is a bit more complicated and looks like this:
-
-.. literalinclude:: ../../edi/plugins/lxc_profiles/general/gui/passthrough.yml
-   :caption: Passthrough Template
-
-:code:`edi` will automatically try to retrieve the current display setup from the :code:`DISPLAY`
-environment variable and pass it to the template as :code:`edi_current_display`. Please note that this
-variable might change if multiple users are logged into the same workstation. In such scenarios you
-can adjust the setup easily by re-applying the command :code:`edi lxc configure CONTAINERNAME CONFIG.yml`.
-
-Furthermore this feature is only available for installations with LXD versions greater or equal than
-4.0.
-
-Please also note that this feature is only available for containers that run in
-:ref:`privileged mode<privileged_mode_v2>`.
-
-Once this profile has been successfully applied to the container, a GUI application can be launched
-as follows:
-
-.. code:: bash
-
-   ssh IP_OF_CONTAINER
-   export DISPLAY=:0
-   someguiapp
-
-To add even more convenience, the
-:ref:`development user facilities playbook<development_user_facilities_v2>` can be configured to
-automatically add the :code:`export DISPLAY=:0` statement to the :code:`~/.profile` file of the container
-user using the :code:`export_display` parameter.
-
-Ansible Playbooks
-+++++++++++++++++
-
-edi ships with a few Ansible_ playbooks that can be re-used in many projects. This playbooks can also serve
-as an example if you want to write a custom playbook for your own project.
-
-Please take a look at the comprehensive documentation_ of Ansible if you want to write your own playbook.
-
-Here is a description of the built-in playbooks including the parameters that can be used to fine tune them:
+A project configuration can make use of multiple collections.
 
 .. _Ansible: https://www.ansible.com
 .. _documentation: https://docs.ansible.com/
+.. _debian_setup: https://github.com/lueschem/debian_setup
 
-Base System
-^^^^^^^^^^^
+Pre- and Postprocessing Commands
+++++++++++++++++++++++++++++++++
 
-The base system playbook tackles the following tasks:
-
-- Setup the lxc container network interface (optional).
-- Inherit the proxy settings from the host computer (optional).
-- Perform a basic apt setup.
-- Add a default user (optional).
-- Install an openssh server (optional).
-
-The following code snippet adds the base system playbook to your configuration:
-
-.. code-block:: yaml
-  :caption: Configuration Example
-
-  playbooks:
-    ...
-    100_base_system:
-      parameters:
-        create_default_user: true
-        install_openssh_server: true
-      path: playbooks/debian/base_system/main.yml
-    ...
-
-The playbook can be fine tuned as follows:
-
-.. topic:: Parameters
-
-  *apply_proxy_settings:*
-     With this boolean value you can specify if the target system shall get a proxy setup.
-     The default value is :code:`True` and the standard behavior is that the target system will
-     inherit the proxy settings of the host system. However, the proxy settings can be customized
-     according to the table below.
-     If you specify :code:`False` the target system proxy setup will remain untouched.
-  *configure_lxc_network_interface:*
-     By default (boolean value :code:`True`) the playbook will add a lxc network interface to the container.
-     If this behavior is not desired, change the setting to :code:`False`.
-  *lxc_network_interface_manager:*
-     By default edi uses :code:`ifupdown` to manage the default lxc network interface.
-     Change this value to :code:`network-manager` if you prefer to setup the default lxc network interface
-     using NetworkManager. Please note that NetworkManager is currently not recommended for digital twin
-     development containers as there are a few glitches that need to be ironed out. Furthermore edi
-     will bring up the lxc network interface using low level commands in case systemd is overruled by dumb-init.
-  *create_default_user:*
-     By default (boolean value :code:`False`) no additional user gets created. If you need an additional user
-     switch this value to :code:`True` and fine tune the default user according to the table below.
-  *install_openssh_server:*
-     By default (boolean value :code:`False`), no ssh server will be installed on the target system.
-     Switch this value to :code:`True` if you would like to access the system using ssh.
-  *disable_ssh_password_authentication:*
-     By default password authentication is disabled for ssh (boolean value :code:`True`). If you want to
-     allow password based authentication then switch this value to :code:`False` but make sure to use a non standard
-     password.
-  *authorize_current_user:*
-     By default (boolean value :code:`True`) the current host user will be authorized to ssh into the account
-     of the default user. Switch this value to :code:`False` if the current user shall not be authorized.
-  *ssh_pub_key_directory:*
-     All the public keys (ending with .pub) contained in the folder :code:`ssh_pub_key_directory` (defaults to
-     :code:`{{ edi_project_directory }}/ssh_pub_keys`) will be added to the list of authorized ssh keys of the
-     default user.
-  *install_documentation:*
-     By default (value :code:`full`) the documentation of every Debian package will get installed.
-     Switch this value to :code:`minimal` if you want to deploy an image with a minimal footprint.
-     Switch this value to :code:`changelog` if you want to minimize the footprint but keep the changelog of all packages.
-  *translations_filter:*
-     By default all translations contained in Debian packages will get installed (empty filter: :code:`""`).
-     To reduce the footprint of the resulting artifacts the number of installed languages can be limited.
-     By choosing the builtin filter :code:`"en_translations_only"` you can make sure that only English
-     translations will get installed.
-  *base_system_sources_list_template:*
-     During bootstrapping a minimal :code:`/etc/apt/sources.list` file gets added to the root file system. By specifying
-     a template using :code:`base_system_sources_list_template` the initial sources list file will get removed and
-     replaced by a file containing the content of the rendered template. The new file will be written to the
-     :code:`/etc/apt/sources.list.d` subfolder. :code:`edi` provides the template :code:`debian.list` that can be chosen
-     as a good starting point. In case :code:`debian.list` does not meet the requirements a custom template
-     can be specified. By default no template gets applied.
-
-The proxy settings can be customized as follows:
-
-.. topic:: Parameters
-
-  *target_http_proxy:*
-     The http proxy that gets applied to the target system (defaults to :code:`{{ edi_host_http_proxy }}`).
-  *target_https_proxy:*
-     The https proxy that gets applied to the target system (defaults to :code:`{{ edi_host_https_proxy }}`).
-  *target_ftp_proxy:*
-     The ftp proxy that gets applied to the target system (defaults to :code:`{{ edi_host_ftp_proxy }}`).
-  *target_socks_proxy:*
-     The socks proxy that gets applied to the target system (defaults to :code:`{{ edi_host_socks_proxy }}`).
-  *target_no_proxy:*
-     The proxy exception list that gets applied to the target system
-     (defaults to :code:`{{ edi_host_no_proxy }}`).
-
-The default user can be fine tuned as follows:
-
-.. topic:: Parameters
-
-  *default_user_group_name:*
-     The group name of the default user (default is :code:`edi`).
-  *default_user_gid:*
-     The group id of the default user (default is :code:`2000`).
-  *default_user_name:*
-     The user name of the default user (default is :code:`edi`).
-  *default_user_uid:*
-     The user id of the default user (default is :code:`2000`).
-  *default_user_shell:*
-     The shell of the default user (default is :code:`/bin/bash`).
-  *default_user_groups:*
-     The groups of the default user (default is :code:`adm,sudo`).
-  *default_user_password:*
-     The initially set password of the default user
-     (default is :code:`ChangeMe!`). You can `adjust this password`_ if needed.
-     Set this password to :code:`"*"` if
-     you would like to disable password based login. Please note that
-     the playbook will then automatically create a sudoers file to not
-     impair the :code:`sudo` command.
-
-.. _adjust this password: https://docs.ansible.com/ansible/latest/reference_appendices/faq.html#how-do-i-generate-encrypted-passwords-for-the-user-module
-
-Base System Cleanup
-^^^^^^^^^^^^^^^^^^^
-
-The base system cleanup playbook makes sure that we get a clean distributable image by
-doing the following tasks:
-
-- It removes the openssh server keys (they shall be unique per system).
-- It removes cached apt data to reduce the artifact footprint.
-- It finalizes the proxy setup.
-- It sets the final hostname.
-
-The following code snippet adds the base system cleanup playbook to your configuration:
-
-.. code-block:: yaml
-  :caption: Configuration Example
-
-  playbooks:
-    ...
-    900_base_system_cleanup:
-        path: playbooks/debian/base_system_cleanup/main.yml
-        parameters:
-            hostname: raspberry
-    ...
-
-The playbook can be fine tuned as follows:
-
-.. topic:: Parameters
-
-  *hostname:*
-     Set the hostname within the final artifact (default is :code:`edi`).
-  *regenerate_openssh_server_keys:*
-     By default the playbook will make sure that the openssh server keys get regenerated
-     (boolean value :code:`True`). Switch this value to :code:`False` if you would like to keep the same
-     openssh server keys for all instances that will receive this artifact.
-  *ssh_host_key_backup_folder:*
-     Optionally the ssh host keys can be restored from a folder on the first boot. The restore script will not
-     overwrite existing valid keys in :code:`/etc/ssh/`. By default
-     this feature is turned off (ssh_host_key_backup_folder is :code:`""`). This feature is especially useful
-     if ssh host keys shall be preserved during a complete OS update.
-  *cleanup_proxy_settings:*
-     By default the proxy settings of the resulting artifact will get cleaned up
-     (boolean value :code:`True`). If you would like to keep the same proxy settings switch this value to
-     :code:`False`. When set to :code:`True`, the proxy settings can be fine tuned according to the table
-     below.
-  *document_build_setup:*
-     To document the build setup of the artifact within the artifact set this value to :code:`True`.
-     As a result the file :code:`/usr/share/doc/edi/build.yml` will be generated. By default this feature is switched
-     off (boolean value :code:`False`).
-  *document_installed_packages:*
-     To document the packages of the artifact within the artifact set this value to :code:`True`.
-     As a result the file :code:`/usr/share/doc/edi/packages.yml` will be generated. The generated file will contain a
-     list of all packages including version information. It is a snapshot of the available packages after the artifact
-     build and will not get updated when new packages get installed using :code:`dpkg` or :code:`apt`.
-     By default this feature is switched off (boolean value :code:`False`).
-  *package_baseline_source_file:*
-     In order to generate a differential changelog it is possible to add a package baseline file to the resulting
-     artifact. The package baseline file has the same format as :code:`/usr/share/doc/edi/packages.yml`. If a differential
-     changelog between release n and n+1 is needed, you can copy the file :code:`/usr/share/doc/edi/packages.yml` from
-     release n to :code:`{{ edi_project_directory }}/configuration/documentation/packages-baseline.yml` (default value
-     for package_baseline_source_file). The playbook will then make sure that it gets added to artifact n as
-     :code:`/usr/share/doc/edi/packages-baseline.yml`. The command :code:`edi documentation render ...` will use this
-     information to restrict the changelog to changes that happened between release n and n+1.
-
-The final proxy settings can be customized as follows:
-
-.. topic:: Parameters
-
-  *target_http_proxy:*
-     The final http proxy settings (defaults to :code:`""`).
-  *target_https_proxy:*
-     The final https proxy settings (defaults to :code:`""`).
-  *target_ftp_proxy:*
-     The final ftp proxy settings (defaults to :code:`""`).
-  *target_socks_proxy:*
-     The final socks proxy settings (defaults to :code:`""`).
-  *target_no_proxy:*
-     The final proxy exception list (defaults to :code:`""`).
-
-.. _development_user_facilities_v2:
-
-Development User Facilities
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The development user facilities playbook adds the host user (the user that runs :code:`edi`) to the target system.
-In case the target system is an LXD container and shared folders are defined, the playbook will
-make sure that the specified folders are shared between the host system and the LXD container.
-
-The host user will automatically be authorized to ssh into the target system.
-
-The password for the user (same user name as the host user) in the target system will be :code:`ChangeMe!`.
-
-Please note that this playbook will get skipped entirely when a distributable image gets created
-(when :code:`edi_create_distributable_image` is :code:`True`).
-
-The following code snippet adds the development user facilities playbook to your configuration:
-
-.. code-block:: yaml
-  :caption: Configuration Example
-
-  playbooks:
-    ...
-    200_development_user_facilities:
-        path: playbooks/debian/development_user_facilities/main.yml
-        parameters:
-            export_display: True
-    ...
-
-The playbook can be fine tuned as follows:
-
-.. topic:: Parameters
-
-  *export_display:*
-     If :code:`True`, add the statement :code:`export DISPLAY=:0`
-     to :code:`~/.profile` (default is :code:`False`).
-
-Postprocessing Commands
-+++++++++++++++++++++++
-
-Postprocessing commands can be used to gradually transform an exported LXD container into the desired artifacts
+Preprocessing commands can be used to prepare a minimal root file system that can then be imported into Buildah.
+Postprocessing commands can be used to gradually transform a Buildah container into the desired artifacts
 (e.g. an image that can get flashed to an SD card).
 
-A typical post processing command can be configured as follows:
+A typical pre- or postprocessing command can be configured as follows:
 
 .. code-block:: yaml
   :caption: Configuration Example
 
-  postprocessing_commands:
-    ...
-    100_lxd2rootfs:
-        path: postprocessing_commands/rootfs/lxd2rootfs.edi
-        require_root: True
-        output:
-            pi3_rootfs: {{ edi_configuration_name }}_rootfs
+   postprocessing_commands:
+   ...
+     300_rootfs2image:
+       path: postprocessing_commands/genimage/rootfs2image.edi
+       require_root: "fakeroot"
+       output:
+         pp_image:
+           location: {{ edi_configuration_name }}.img
+           type: path
+         pp_partition_image:
+           location: {{ edi_configuration_name }}_rootfs.ext4
+           type: path
+       parameters:
+         hostname: raspberry
     ...
 
-:code:`edi` will render the file :code:`postprocessing_commands/rootfs/lxd2rootfs.edi` using the Jinja2 template
+:code:`edi` will render the file :code:`postprocessing_commands/genimage/rootfs2image.edi` using the Jinja2 template
 engine and then execute it. It is a good practice to use this file as a thin shim between :code:`edi` and the scripts
-that do the heavy lifting.
+or executables that do the heavy lifting.
 
-The statement :code:`require_root: True` tells edi that a privileged user (sudo) is needed to execute the command.
+The statement :code:`require_root: fakeroot` tells edi that a fakeroot environment is needed to execute the command.
 
-Each post processing command shall create at least one (intermediate) artifact that gets specified within the
-:code:`output` node. The resulting artifact can be used as an input for the next post processing command.
+Each pre- or postprocessing command shall create at least one (intermediate) artifact that gets specified within the
+:code:`output` node. The resulting artifact can be used as an input for any subsequent pre- or postprocessing command.
 
-The specified output can be either a single file or a folder (if multiple files get generated by the command).
+The specified output can be either a single file or a folder (if multiple files get generated by the command)
+(type :code:`path`), a Podman image (type :code:`podman-image`) or a Buildah container
+(type :code:`buildah-container`).
 
-The variable :code:`edi_input_artifact` can be used to locate the artifact that got generated before the post
-processing commands get called. It contains typically the artifact created by the :code:`edi lxc export` command.
+The preprocessing commands must create an artifact named :code:`edi_bootstrapped_rootfs`.
 
-The post processing commands are implemented in a very generic way and to get an idea of what they can
+The second processing step will create an output artifact named :code:`edi_project_container` of type
+:code:`buildah-container`. The :code:`edi_project_container` artifact can be used as an input for the postprocessing
+steps.
+
+The postprocessing commands are implemented in a very generic way and to get an idea of what they can
 do please take a look at the the edi-pi_ configuration.
+
+.. note::
+
+   Neither pre- nor postprocessing commands shall modify artifacts that have been generated by a previous command.
 
 Documentation Steps
 +++++++++++++++++++
@@ -581,7 +172,7 @@ The changelog template can be used to document the changes of each package:
         file: changelog.rst
       parameters:
         edi_doc_include_changelog: True
-        edi_doc_changelog_baseline: 2019-12-01 00:00:00 GMT
+        edi_doc_changelog_baseline: 2023-12-01 00:00:00 GMT
         edi_doc_replacements:
         - pattern: '(CVE-[0-9]{4}-[0-9]{4,6})'
           replacement: '`\1 <https://cve.mitre.org/cgi-bin/cvename.cgi?name=\1>`_'

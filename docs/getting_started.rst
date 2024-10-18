@@ -52,14 +52,14 @@ For your convenience, you can directly install edi from a `ppa`_ (Ubuntu) or `pa
 
       curl -s https://packagecloud.io/install/repositories/get-edi/debian/script.deb.sh | sudo bash
 
-.. _`ppa`: https://launchpad.net/~m-luescher/+archive/ubuntu/edi-snapshots
-.. _`packagecloud`: https://packagecloud.io/get-edi/debian
-
 #. Install edi:
 
    .. code-block:: bash
 
       sudo apt install edi
+
+.. _`ppa`: https://launchpad.net/~m-luescher/+archive/ubuntu/edi-snapshots
+.. _`packagecloud`: https://packagecloud.io/get-edi/debian
 
 Setting up ssh Keys
 +++++++++++++++++++

@@ -42,7 +42,7 @@ development projects.
 Instead of reinventing the wheel, edi leverages best of breed open source technologies:
 
 - Ansible_ is the tool of choice for doing the configuration management.
-- LXD_ or Podman_ allows you to run multiple OS twin instances on your development host.
+- LXD_ or Podman_ allow you to run multiple OS twin instances on your development host.
 - Yaml_ and Jinja2_ are the consistent way to write edi configuration files and Ansible playbooks.
 - Python_ is the language and ecosystem that makes the system integration efficient.
 - edi is supposed to be used on the `Ubuntu Linux`_ or `Debian Linux`_ distribution.
@@ -51,8 +51,8 @@ Instead of reinventing the wheel, edi leverages best of breed open source techno
 .. _Ansible: https://www.ansible.com
 .. _LXD: https://www.linuxcontainers.org
 .. _Podman: https://podman.io
-.. _Yaml: http://docs.ansible.com/ansible/YAMLSyntax.html
-.. _Jinja2: http://jinja.pocoo.org/
+.. _Yaml: https://docs.ansible.com/ansible/latest/reference_appendices/YAMLSyntax.html
+.. _Jinja2: https://jinja.palletsprojects.com/
 .. _Python: https://www.python.org
 .. _Ubuntu Linux: https://www.ubuntu.com
 .. _Debian Linux: https://www.debian.org

@@ -17,8 +17,9 @@ Contents:
    config_management/index
    command_pipeline
    getting_started_v2
+   rootless_workflow_v2
+   development_container
    config_management_v2/index
-   command_pipeline_v2
    hardware
    source_code
    upgrade_notes

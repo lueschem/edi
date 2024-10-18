@@ -34,8 +34,8 @@ class Make(Project):
 
     @classmethod
     def advertise(cls, subparsers):
-        help_text = "EXPERIMENTAL: make an edi project configuration"
-        description_text = "EXPERIMENTAL: Make all the artifacts of an edi project configuration."
+        help_text = "make an edi project configuration"
+        description_text = "Make all the artifacts of an edi project configuration."
         parser = subparsers.add_parser(cls._get_short_command_name(),
                                        help=help_text,
                                        description=description_text)

@@ -26,14 +26,14 @@ For your convenience, you can directly install edi from a `ppa`_ (Ubuntu) or `pa
 
       curl -s https://packagecloud.io/install/repositories/get-edi/debian/script.deb.sh | sudo bash
 
-.. _`ppa`: https://launchpad.net/~m-luescher/+archive/ubuntu/edi-snapshots
-.. _`packagecloud`: https://packagecloud.io/get-edi/debian
-
 #. Install edi:
 
    .. code-block:: bash
 
       sudo apt install edi
+
+.. _`ppa`: https://launchpad.net/~m-luescher/+archive/ubuntu/edi-snapshots
+.. _`packagecloud`: https://packagecloud.io/get-edi/debian
 
 Setting up ssh Keys
 +++++++++++++++++++
@@ -53,12 +53,7 @@ Hint: edi versions greater or equal than 0.11.0 have a secure by default setup o
 
    .. code-block:: bash
 
-      $ ssh-keygen -t rsa -b 4096 -C "you@example.com"
-      Generating public/private rsa key pair.
-      Enter file in which to save the key (/home/YOU/.ssh/id_rsa):
-      Created directory '/home/YOU/.ssh'.
-      Enter passphrase (empty for no passphrase):
-      Enter same passphrase again:
+      ssh-keygen -t ed25519 -C "you@example.com"
 
    Hint: If you decided to use a passphrase and do not want to reenter it every time, it is a good idea
    to use a `ssh-agent`.
@@ -67,6 +62,41 @@ Getting Familiar with edi
 +++++++++++++++++++++++++
 
 The best way to get to know the capabilities of edi is to play around with real hardware. If you own a Raspberry Pi
-you can get started with the `edi-pi project configuration`_.
+you can get started with the `edi-pi project configuration`_. It requires a few additional tools:
 
-.. _`edi-pi project configuration`: https://github.com/lueschem/edi-pi/blob/debian_trixie/README.md
+   .. code-block::
+
+      sudo apt install buildah containers-storage crun curl distrobox dosfstools e2fsprogs fakeroot genimage git mender-artifact mmdebstrap mtools parted python3-sphinx python3-testinfra podman rsync zerofree
+
+The edi-pi project configuration can be cloned as follows:
+
+   .. code-block::
+
+      mkdir -p ~/edi-workspace/ && cd ~/edi-workspace/
+      git clone --recursive https://github.com/lueschem/edi-pi.git
+      cd edi-pi
+
+Optional: In case the device shall connect to a hosted Mender instance, the tenant token
+(:code:`mender_tenant_token`) of that instance can be added to the Mender configuration
+(:code:`configuration/mender/mender.yml`).
+
+Now a Raspberry Pi 5 OS image can be created (other variants are available too):
+
+.. code-block::
+
+      edi -v project make pi5.yml
+
+The resulting image can be flashed to a SD card (here /dev/sdb, **everything on the SD card will be erased!**):
+
+.. code-block::
+
+      sudo umount /dev/sdb?
+      sudo dd if=artifacts/pi5.img of=/dev/sdb bs=4M conv=fsync status=progress
+
+Once the Raspberry Pi booted from that SD card, it is accessible using ssh:
+
+.. code-block::
+
+      ssh pi@IP_ADDRESS
+
+.. _`edi-pi project configuration`: https://github.com/lueschem/edi-pi/

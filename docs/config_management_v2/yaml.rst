@@ -6,32 +6,13 @@ Yaml Based Configuration
 .. note::
    This chapter covers the Buildah based workflow v2.
 
-Within an empty directory the following command can be used to generate an initial edi configuration:
-
-.. code:: bash
-
-   edi config init my-project debian-bookworm-amd64
-
-
-This command generates a configuration with four placeholder use cases:
-
- - *my-project-run.yml*: This configuration file covers the *run* use case. It is the configuration that the customer
-   will get.
- - *my-project-test.yml*: The *test* use case shall be as close as possible to the *run* use case. A few modifications
-   that enable efficient testing will differentiate this use case from the *run* use case.
- - *my-project-build.yml*: The *build* use case covers the requirements of a build server deployment.
- - *my-project-develop.yml*: The *develop* use case satisfies the requirements of the developers.
-
-Please note that the above use cases are just an initial guess. edi does not at all force you to build your project
-upon a predefined set of use cases. It just helps you to modularize your different use cases so that they do not
-diverge over time.
-
 The configuration is split into several sections. The following command will dump the merged and rendered configuration
-of the use case *develop* for the given command:
+of the Raspberry Pi 5 image build:
 
 .. code:: bash
 
-   edi lxc configure --config my-container my-project-develop.yml
+   cd edi-workspace/edi-pi
+   edi project make --config pi5.yml
 
 .. option:: --config
 
@@ -47,75 +28,15 @@ edi supports the following settings:
 
 .. topic:: Settings
 
-   *edi_compression:*
-      The compression that will be used for edi (intermediate) artifacts.
-      Possible values are :code:`gz` (fast but not very small),
-      :code:`bz2` or :code:`xz` (slower but minimal required space).
-      If not specified, edi uses :code:`xz` compression.
-   *edi_lxc_stop_timeout:*
-      The maximum time in seconds that edi will wait until
-      it forces the shutdown of the lxc container.
-      The default timeout is :code:`120` seconds.
    *edi_required_minimal_edi_version:*
       Defines the minimal edi version that is required for the given configuration.
       If the edi executable does not meet the required minimal version, it will exit with an error.
       If not specified, edi will not enforce a certain minimal version.
-      A valid version string value looks like :code:`0.5.2`.
-   *edi_lxc_network_interface_name:*
-      The default network interface that will be used for the lxc container.
-      If unspecified edi will name the container interface :code:`lxcif0`.
-   *edi_lxc_bridge_interface_name:*
-      The bridge that the container will get attached to.
-      If unspecified edi will take the bridge :code:`lxdbr0`. If the specified bridge does not exist, :code:`edi`
-      will automatically create it.
-      Please check the chapter :ref:`default network interface <default_network_interface>` for more information.
-   *edi_config_management_user_name:*
-      The target system user that will be used for configuration management tasks.
-      Please note that direct lxc container management uses the root user.
-      If unspecified edi will name the configuration management user :code:`edicfgmgmt`.
+      A valid version string value looks like :code:`1.19.6`.
    *parameters:*
       Optional general parameters that are globally visible for all plugins. Parameters need to be
       specified as key value pairs.
 
-:code:`bootstrap` Section
-+++++++++++++++++++++++++
-
-This section tells edi how the initial system shall be bootstrapped. The following settings are supported:
-
-.. topic:: Settings
-
-   *architecture:*
-        - The architecture of the target system.
-          For Debian possible values are any supported architecture such as
-          :code:`amd64`, :code:`arm64` or :code:`armhf`.
-          If no architecture is specified then the architecture of the system that runs :code:`edi` will be inherited.
-   *repository:*
-        - The repository specification where the initial image will get bootstrapped from.
-          A valid value looks like this: :code:`deb http://deb.debian.org/debian/ bookworm main`.
-   *repository_key:*
-        - The signature key for the repository.
-          *Attention*: If you do not specify a key the downloaded packages
-          will not be verified during the bootstrap process.
-          *Hint*: It is a good practice to download such a key from a
-          https server.
-          A valid repository key value is: :code:`https://ftp-master.debian.org/keys/archive-key-10.asc`.
-   *tool:*
-        - The tool that will be used for the bootstrap process.
-          Currently only :code:`debootstrap` is supported.
-          If unspecified, edi will choose :code:`debootstrap`.
-   *additional_packages:*
-        - A list of additional packages that will be installed during bootstrapping.
-          If unspecified, edi will use the following default list: :code:`['python', 'sudo', 'netbase', 'net-tools',
-          'iputils-ping', 'ifupdown', 'isc-dhcp-client', 'resolvconf', 'systemd', 'systemd-sysv', 'gnupg']`.
-
-Please note that edi will automatically do cross bootstrapping if required. This means that you can for instance bootstrap
-an armhf system on an amd64 host.
-
-If you would like to bootstrap an image right now, you can run the following command:
-
-.. code:: bash
-
-   sudo edi image bootstrap my-project-develop.yml
 
 .. _ordered_node_section_v2:
 
@@ -147,7 +68,7 @@ edi does a very similar thing in its *ordered node sections*. Here is an example
 
 In both examples above the dog will first bark and then sleep because of the alphanumerical order of the nodes
 :code:`10_first_task` and :code:`20_second_task`. The explicit order of the nodes makes it easy to add or modify a
-certain node using :ref:`overlays`.
+certain node using :ref:`overlays_v2`.
 
 .. _plugin_node_v2:
 
@@ -160,12 +81,14 @@ A typical node looks like this:
 
 .. code-block:: none
 
-   lxc_profiles:
-     10_first_profile:
-        path: path/to/profile.yml
-        parameters:
-          custom_param_1: foo
-          custom_param_2: bar
+   preprocessing_commands:
+     050_mmdebstrap:
+       output:
+         edi_bootstrapped_rootfs:
+           location: pi5_bootstrapped-rootfs.tar
+           type: path
+       path: preprocessing_commands/bootstrap/mmdebstrap.edi
+
 
 Such nodes accept the following settings:
 
@@ -177,7 +100,7 @@ Such nodes accept the following settings:
       if nothing is found the search falls back to :code:`edi_edi_plugin_directory`.
       The values of the plugin and project
       directory can be retrieved as follows:
-      :code:`edi lxc configure --dictionary SOME-CONTAINER SOME_CONFIG.yml`.
+      :code:`edi project make --dictionary pi5.yml`.
    *parameters:*
       An optional list of parameters that will be used to parametrize the given plugin.
    *skip:*
@@ -188,20 +111,15 @@ Such nodes accept the following settings:
 
    Dumps the load time dictionary instead of running the command.
 
-To learn more about plugins please read the chapter :ref:`plugins`.
+To learn more about plugins please read the chapter :ref:`plugins_v2`.
 
+:code:`preprocessing_commands` Section
++++++++++++++++++++++++++++++++++++++++
 
-:code:`lxc_templates` Section
-+++++++++++++++++++++++++++++
-
-The lxc_templates section is an :ref:`ordered node section <ordered_node_section_v2>` consisting
-of :ref:`plugin nodes <plugin_node_v2>`. Please consult the LXD documentation if you want to write custom templates.
-
-:code:`lxc_profiles` Section
-++++++++++++++++++++++++++++
-
-The lxc_profiles section is an :ref:`ordered node section <ordered_node_section_v2>` consisting
-of :ref:`plugin nodes <plugin_node_v2>`. Please consult the LXD documentation if you want to write custom profiles.
+The preprocessing_commands section is an :ref:`ordered node section <ordered_node_section_v2>` consisting
+of :ref:`plugin nodes <plugin_node_v2>`. The preprocessing commands can be written in any language of choice.
+Preprocessing command nodes require an explicit declaration of the
+generated artifacts. Please read the chapter :ref:`plugins_v2` for more details.
 
 :code:`playbooks` Section
 +++++++++++++++++++++++++
@@ -209,59 +127,19 @@ of :ref:`plugin nodes <plugin_node_v2>`. Please consult the LXD documentation if
 The playbooks section is an :ref:`ordered node section <ordered_node_section_v2>` consisting
 of :ref:`plugin nodes <plugin_node_v2>`. Please consult the Ansible documentation if you want to write custom playbooks.
 
+.. note::
+
+   For workflow v2, it is strongly recommended to use only one playbook.
+
 .. _postprocessing_command_v2:
 
 :code:`postprocessing_commands` Section
 +++++++++++++++++++++++++++++++++++++++
 
 The postprocessing_commands section is an :ref:`ordered node section <ordered_node_section_v2>` consisting
-of :ref:`plugin nodes <plugin_node_v2>`. The post processing commands can be written in any language of choice.
-In contrast to the other plugin nodes the post processing command nodes require an explicit declaration of the
-generated artifacts. Please read the chapter :ref:`plugins` for more details.
-
-
-.. _`shared folders v2`:
-
-:code:`shared_folders` Section
-++++++++++++++++++++++++++++++
-
-The shared_folders section is an :ref:`ordered node section <ordered_node_section_v2>` that can be used to specify shared
-folders between LXC containers and their host.
-
-Shared folders are very convenient for development use cases. Please note that edi will automatically turn any container
-that uses shared folders into a *privileged* container. This will facilitate the data exchange between the host and the target
-system. It is advisable to use shared folders together with the development_user_facilities playbook plugin.
-
-A shared folder section can look like this:
-
-.. code::
-
-  shared_folders:
-    edi_workspace:
-      folder: edi-workspace
-      mountpoint: edi-workspace
-
-Let us assume that the name of the current development user is :code:`johndoe` and that his home directory is
-:code:`/home/johndoe`. The development_user_facilities playbook plugin will automatically make sure that the user
-:code:`johndoe` will also exist within the container. The shared_folders section will then make sure that the host folder
-:code:`/home/johndoe/edi-workspace` (:code:`folder`) will be shared with the container using the container directory
-:code:`/home/johndoe/edi-workspace` (:code:`mountpoint`).
-
-The shared folder nodes accept the the following settings:
-
-.. topic:: Settings
-
-   *folder:*
-      The name of the host folder within the home directory of the current user.
-      If the folder does not exist, edi will create it.
-   *mountpoint:*
-      The name of the mount point within the container home directory of the current user.
-      If the mount point does not exist edi will display an error.
-      *Hint*: It is assumed that the mount points within the container will get created using an appropriate playbook.
-      The development_user_facilities playbook plugin will for instance take care of mount point creation.
-   *skip:*
-      :code:`True` or :code:`False`. If :code:`True` the folder will not be shared.
-      If unspecified, the folder will get shared.
+of :ref:`plugin nodes <plugin_node_v2>`. The postprocessing commands can be written in any language of choice.
+Postprocessing command nodes require an explicit declaration of the
+generated artifacts. Please read the chapter :ref:`plugins_v2` for more details.
 
 .. _`documentation steps v2`:
 
@@ -271,7 +149,7 @@ The shared folder nodes accept the the following settings:
 The documentation_steps section is an :ref:`ordered node section <ordered_node_section_v2>` consisting
 of :ref:`plugin nodes <plugin_node_v2>`. The documentation_steps section is being processed by the
 :code:`edi documentation render ...` command. This command is independent of the
-:ref:`command pipeline <command_pipeline>` but it can be easily integrated as a
+main workflow but it can be easily integrated as a
 :ref:`postprocessing command <postprocessing_command_v2>`. (See `edi-pi`_ for a possible implementation.)
 
 The command that renders the documentation gets executed as follows:
@@ -296,7 +174,7 @@ A documentation step can look like this:
          file: changelog.rst
        parameters:
          edi_doc_include_changelog: True
-         edi_doc_changelog_baseline: 2019-12-01 00:00:00 GMT
+         edi_doc_changelog_baseline: 2023-12-01 00:00:00 GMT
          edi_doc_replacements:
          - pattern: '(?i)[#]*(Closes:\s[#])([0-9]{6,10})'
            replacement: '`\1\2 <https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=\2>`_'
@@ -322,10 +200,14 @@ The documentation steps can be fine tuned using the following parameters:
       rendering the Jinja2 template.
    *edi_doc_changelog_baseline:*
       If the changelog rendering shall not include changes that are older than a certain date then this date can be
-      provided using edi_doc_changelog_baseline. A date can look like :code:`2019-12-01 00:00:00 GMT`.
+      provided using edi_doc_changelog_baseline. A date can look like :code:`2023-12-01 00:00:00 GMT`.
    *edi_doc_replacements:*
       To fine tune the changelog information a list of pattern/replacement pairs can be specified.
       :code:`re.sub(pattern, replacement, changelog_line)` will be applied to the changelog lines in the given list
       order.
+
+.. note::
+   For the workflow v2 the sections :code:`bootstrap`, :code:`lxc_profiles`, :code:`lxc_templates` and
+   :code:`shared_folders` are no longer relevant.
 
 .. _edi-pi: https://www.github.com/lueschem/edi-pi
