@@ -3,6 +3,9 @@
 Yaml Based Configuration
 ========================
 
+.. note::
+   This chapter covers the LXD based workflow v1.
+
 Within an empty directory the following command can be used to generate an initial edi configuration:
 
 .. code:: bash

@@ -3,6 +3,9 @@
 Plugins
 =======
 
+.. note::
+   This chapter covers the LXD based workflow v1.
+
 edi comes with a few reusable plugins:
 
 LXC/LXD Templates

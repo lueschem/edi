@@ -36,21 +36,12 @@ Debian
 Python
 ++++++
 
-Packaging
----------
-
-- `Packaging and Distributing Projects`_ using setuptools.
-- Using `setuptools_scm`_ to derive version from git tag.
-
-.. _Packaging and Distributing Projects: http://python-packaging-user-guide.readthedocs.io/en/latest/distributing/
-.. _setuptools_scm: https://github.com/pypa/setuptools_scm/
-
 Documentation
 -------------
 
 - `Sphinx`_ - a Python documentation generator.
 
-.. _Sphinx: http://www.sphinx-doc.org/en/stable/
+.. _Sphinx: https://www.sphinx-doc.org/en/stable/
 
 Libraries
 ---------
@@ -59,8 +50,8 @@ Libraries
 - `Jinja2`_ is a template engine for Python.
 
 
-.. _Requests: http://docs.python-requests.org/en/latest/index.html
-.. _Jinja2: http://jinja.pocoo.org/
+.. _Requests: https://docs.python-requests.org/en/latest/index.html
+.. _Jinja2: https://jinja.palletsprojects.com/
 
 
 LXC/LXD
@@ -77,4 +68,4 @@ Restructured Text
 - `reStructuredText Markup Specification`_.
 
 .. _Wikipedia about ReStructuredText: https://en.wikipedia.org/wiki/ReStructuredText
-.. _reStructuredText Markup Specification: http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html
+.. _reStructuredText Markup Specification: https://docutils.sourceforge.io/docs/ref/rst/restructuredtext.html

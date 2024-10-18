@@ -1,8 +1,12 @@
-Getting Started
-===============
+.. _`getting_started`:
 
-The following setup steps have been tested on Ubuntu 20.04 and 22.04 as well as on Debian buster, bullseye and bookworm.
-On Debian buster the packages :code:`ansible` and :code:`qemu-user-static` from buster-backports are required.
+Getting Started v1
+==================
+
+.. note::
+   This chapter covers the LXD based workflow v1.
+
+The following setup steps have been tested on Ubuntu 22.04 and 24.04 as well as on Debian bullseye and bookworm.
 
 Prerequisites
 +++++++++++++
@@ -48,14 +52,14 @@ For your convenience, you can directly install edi from a `ppa`_ (Ubuntu) or `pa
 
       curl -s https://packagecloud.io/install/repositories/get-edi/debian/script.deb.sh | sudo bash
 
-.. _`ppa`: https://launchpad.net/~m-luescher/+archive/ubuntu/edi-snapshots
-.. _`packagecloud`: https://packagecloud.io/get-edi/debian
-
 #. Install edi:
 
    .. code-block:: bash
 
       sudo apt install edi
+
+.. _`ppa`: https://launchpad.net/~m-luescher/+archive/ubuntu/edi-snapshots
+.. _`packagecloud`: https://packagecloud.io/get-edi/debian
 
 Setting up ssh Keys
 +++++++++++++++++++

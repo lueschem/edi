@@ -33,8 +33,8 @@ class Prepare(Project):
 
     @classmethod
     def advertise(cls, subparsers):
-        help_text = "EXPERIMENTAL: prepare an edi project configuration"
-        description_text = "EXPERIMENTAL: Prepare the artifacts for an edi project configuration."
+        help_text = "prepare an edi project configuration"
+        description_text = "Prepare the artifacts for an edi project configuration."
         parser = subparsers.add_parser(cls._get_short_command_name(),
                                        help=help_text,
                                        description=description_text)

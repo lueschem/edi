@@ -2,7 +2,7 @@ Introduction
 ============
 
 .. note::
-   This chapter covers the LXD based workflow v1.
+   This chapter covers the Buildah based workflow v2.
 
 The management of complex embedded software product line projects is a main focal point of edi.
 Such projects may be managed by many people that are spread over the world. Maintaining a reproducible environment
@@ -24,11 +24,11 @@ All involved parties have the common concern that they want to maintain consiste
 achieves this by managing the different use cases with a single project setup. The following four pillars are in place to
 enable reusability and extensibility, reduce duplicate code and guarantee consistency:
 
- - :ref:`yaml`: The whole project configuration is written in yaml. Yaml is easy to read and write for both humans and machines.
- - :ref:`jinja2`: Sometimes there is a need to parametrize parts of the configuration. The jinja2 template engine allows you to do this.
- - :ref:`overlays`: Depending on your use case you might want to change some specific aspects of the project configuration.
+ - :ref:`yaml <yaml_v2>`: The whole project configuration is written in yaml. Yaml is easy to read and write for both humans and machines.
+ - :ref:`jinja2 <jinja2_v2>`: Sometimes there is a need to parametrize parts of the configuration. The jinja2 template engine allows you to do this.
+ - :ref:`overlays <overlays_v2>`: Depending on your use case you might want to change some specific aspects of the project configuration.
    The overlays allow you to customize a use case globally, per user or per host machine.
- - :ref:`plugins`: While every embedded project is somehow different, they all share some commonalities. Plugins make the
+ - :ref:`plugins <plugins_v2>`: While every embedded project is somehow different, they all share some commonalities. Plugins make the
    commonalities shareable among multiple projects while they allow the full customization of the unique features of a project.
 
 

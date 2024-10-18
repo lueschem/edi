@@ -12,11 +12,16 @@ Contents:
    :maxdepth: 2
 
    introduction
+   workflow_selection
    getting_started
-   hardware
-   source_code
    config_management/index
    command_pipeline
+   getting_started_v2
+   rootless_workflow_v2
+   development_container
+   config_management_v2/index
+   hardware
+   source_code
    upgrade_notes
    performance_tuning
    reference_list

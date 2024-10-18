@@ -18,8 +18,8 @@ from edi.commands.project import Project
 class Clean(Project):
     @classmethod
     def advertise(cls, subparsers):
-        help_text = "EXPERIMENTAL: clean all intermediate project artifacts"
-        description_text = "EXPERIMENTAL: Clean all intermediate project artifacts."
+        help_text = "clean all intermediate project artifacts"
+        description_text = "Clean all intermediate project artifacts."
         parser = subparsers.add_parser(cls._get_short_command_name(),
                                        help=help_text,
                                        description=description_text)

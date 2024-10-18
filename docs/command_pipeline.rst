@@ -3,6 +3,9 @@
 Command Pipeline
 ================
 
+.. note::
+   This chapter covers the LXD based workflow v1.
+
 edi is designed to divide big tasks into small sub commands. Each sub command will
 initiate the transition into a new state of available artifacts:
 
