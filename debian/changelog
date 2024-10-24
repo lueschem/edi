@@ -1,3 +1,10 @@
+edi (2.0.1) noble; urgency=medium
+
+  [ Matthias Luescher ]
+  * Added upload for Raspberry Pi OS (bookworm).
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Thu, 24 Oct 2024 21:54:27 +0200
+
 edi (2.0.0) noble; urgency=medium
 
   [ Matthias Luescher ]
