@@ -17,6 +17,9 @@ jobs:
          - distribution: debian
            distribution_release: bookworm
            repository_type: packagecloud
+         - distribution: debian
+           distribution_release: trixie
+           repository_type: packagecloud
          - distribution: ubuntu
            distribution_release: "20.04"
            repository_type: launchpad

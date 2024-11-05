@@ -1,3 +1,10 @@
+edi (2.0.2) noble; urgency=medium
+
+  [ Matthias Luescher ]
+  * Added Debian trixie build.
+
+ -- Matthias Lüscher (Launchpad) <m.luescher@datacomm.ch>  Tue, 05 Nov 2024 22:11:42 +0100
+
 edi (2.0.1) noble; urgency=medium
 
   [ Matthias Luescher ]
