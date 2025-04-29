@@ -1,3 +1,9 @@
+edi (2.0.3) noble; urgency=medium
+
+  * Switched build from Ubuntu 24.10 to 25.04.
+
+ -- Matthias Luescher <lueschem@gmail.com>  Tue, 29 Apr 2025 22:00:53 +0200
+
 edi (2.0.2) noble; urgency=medium
 
   [ Matthias Luescher ]
