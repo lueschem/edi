@@ -1,3 +1,9 @@
+edi (2.1.0) noble; urgency=medium
+
+  * Allow v2 project configurations with just a postprocessing node. Closes #88.
+
+ -- Matthias Luescher <lueschem@gmail.com>  Tue, 03 Jun 2025 13:57:23 +0200
+
 edi (2.0.3) noble; urgency=medium
 
   * Switched build from Ubuntu 24.10 to 25.04.

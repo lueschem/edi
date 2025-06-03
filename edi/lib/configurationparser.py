@@ -136,6 +136,12 @@ class ConfigurationParser:
     def has_bootstrap_node(self):
         return self._has_node("bootstrap")
 
+    def has_playbooks_node(self):
+        return self._has_node("playbooks")
+
+    def has_preprocessing_commands_node(self):
+        return self._has_node("preprocessing_commands")
+
     def get_plugins(self, plugin_section):
         result = {}
 
