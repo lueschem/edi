@@ -72,35 +72,36 @@ class Configure(Project):
         return self._dispatch(config_file, run_method=self._run)
 
     def _run(self):
-        container_name = self._get_container_artifact().location
+        if self._needs_processing():
+            container_name = self._get_container_artifact().location
 
-        if is_container_existing(container_name):
-            logging.info(f"Project container {container_name} is already existing. "
-                         f"Delete the container to get it re-created from scratch.")
-        else:
-            self._prepare_results = Prepare().run(self.config.get_base_config_file())
+            if is_container_existing(container_name):
+                logging.info(f"Project container {container_name} is already existing. "
+                             f"Delete the container to get it re-created from scratch.")
+            else:
+                self._prepare_results = Prepare().run(self.config.get_base_config_file())
 
-            bootstrapped_rootfs = find_artifact(self._prepare_results, "edi_bootstrapped_rootfs",
-                                                "configure", "prepare")
+                bootstrapped_rootfs = find_artifact(self._prepare_results, "edi_bootstrapped_rootfs",
+                                                    "configure", "prepare")
 
-            print(f"Going to create project container '{container_name}'\n"
-                  f"based on content of '{bootstrapped_rootfs.location}'.")
-            create_container(container_name, bootstrapped_rootfs)
+                print(f"Going to create project container '{container_name}'\n"
+                      f"based on content of '{bootstrapped_rootfs.location}'.")
+                create_container(container_name, bootstrapped_rootfs)
 
-        seal_file = self._get_seal_artifact().location
+            seal_file = self._get_seal_artifact().location
 
-        if os.path.exists(seal_file):
-            logging.info(f"Project container {container_name} is already fully configured. "
-                         f"Delete {seal_file} to get it re-configured.")
-        else:
-            print(f"Going to configure project container '{container_name}' - be patient.")
+            if os.path.exists(seal_file):
+                logging.info(f"Project container {container_name} is already fully configured. "
+                             f"Delete {seal_file} to get it re-configured.")
+            else:
+                print(f"Going to configure project container '{container_name}' - be patient.")
 
-            playbook_runner = PlaybookRunner(self.config, container_name, self.ansible_connection)
-            playbook_runner.run_all()
-            create_artifact_dir()
-            run(["touch", seal_file])
+                playbook_runner = PlaybookRunner(self.config, container_name, self.ansible_connection)
+                playbook_runner.run_all()
+                create_artifact_dir()
+                run(["touch", seal_file])
 
-        print_success(f"Configured project container '{container_name}'.")
+            print_success(f"Configured project container '{container_name}'.")
 
         collected_results = self._result()
         if collected_results:
@@ -138,6 +139,9 @@ class Configure(Project):
             return run_method()
 
     def _result(self):
+        if not self._needs_processing():
+            return list()
+
         if not self._prepare_results:
             self._prepare_results = Prepare().result(self.config.get_base_config_file())
 
@@ -145,6 +149,9 @@ class Configure(Project):
         all_results.append(self._get_container_artifact())
         all_results.append(self._get_seal_artifact())
         return all_results
+
+    def _needs_processing(self):
+        return self.config.has_preprocessing_commands_node() or self.config.has_playbooks_node()
 
     def result(self, config_file):
         return self._dispatch(config_file, run_method=self._result)

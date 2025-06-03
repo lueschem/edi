@@ -154,6 +154,8 @@ def test_config_nodes_absence(empty_config_file):
     with open(empty_config_file, "r") as main_file:
         parser = ConfigurationParser(main_file)
         assert not parser.has_bootstrap_node()
+        assert not parser.has_preprocessing_commands_node()
+        assert not parser.has_playbooks_node()
         with pytest.raises(FatalError) as error:
             parser.get_bootstrap_repository()
         assert "repository" in error.value.message
