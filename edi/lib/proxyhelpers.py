@@ -93,6 +93,9 @@ class ProxySetup:
     def _get_value(self, environment_variable, gsettings_getter):
         env_value = get_environment_variable(environment_variable, default='')
 
+        if not env_value:
+            env_value = get_environment_variable(environment_variable.upper(), default='')
+
         if env_value:
             logging.debug('''Retrieved '{}' from environment.'''.format(environment_variable))
             return env_value

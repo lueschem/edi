@@ -53,7 +53,8 @@ def without_gsettings(monkeypatch):
 
 
 def intercept_proxy_environment(monkeypatch, gsettings_proxy_mode, gsettings_no_proxy,
-                                gsettings_proxy_port, env_value_proxy, env_value_no_proxy):
+                                gsettings_proxy_port, env_value_proxy, env_value_no_proxy, env_value_proxy_upper,
+                                env_value_no_proxy_upper):
     def intercept_command_run(*popenargs, **kwargs):
         if get_command(popenargs) == 'gsettings':
             schema = get_command_parameter(popenargs, 'get')
@@ -79,6 +80,10 @@ def intercept_proxy_environment(monkeypatch, gsettings_proxy_mode, gsettings_no_
                 return subprocess.CompletedProcess("fakerun", 0, stdout=env_value_no_proxy)
             elif env_var != 'no_proxy' and env_var.endswith('_proxy') and env_value_proxy:
                 return subprocess.CompletedProcess("fakerun", 0, stdout=env_value_proxy)
+            elif env_var == 'NO_PROXY' and env_value_no_proxy_upper:
+                return subprocess.CompletedProcess("fakerun", 0, stdout=env_value_no_proxy_upper)
+            elif env_var != 'NO_PROXY' and env_var.endswith('_PROXY') and env_value_proxy_upper:
+                return subprocess.CompletedProcess("fakerun", 0, stdout=env_value_proxy_upper)
             else:
                 return subprocess.CompletedProcess("fakerun", 1, stdout='')
         else:
@@ -90,7 +95,7 @@ def intercept_proxy_environment(monkeypatch, gsettings_proxy_mode, gsettings_no_
 def test_get_gsettings_value(monkeypatch):
     intercept_proxy_environment(monkeypatch, 'manual',
                                 '''['localhost', '127.0.0.0/8', '::1']''', '3128',
-                                '', '')
+                                '', '', '', '')
     assert get_gsettings_value('org.gnome.system.proxy', 'mode') == 'manual'
     assert get_gsettings_value('org.gnome.system.proxy', 'invalid-key', default='bingo') == 'bingo'
 
@@ -99,7 +104,7 @@ def test_proxy_setup_no_gsettings_no_env(monkeypatch):
     without_gsettings(monkeypatch)
     intercept_proxy_environment(monkeypatch, 'manual',
                                 '''['localhost', '127.0.0.0/8', '::1']''', '3128',
-                                '', '')
+                                '', '', '', '')
     with clear_proxy_setup_cache():
         proxy_setup = ProxySetup()
         assert proxy_setup.get('no_proxy', default='') == ''
@@ -113,7 +118,24 @@ def test_proxy_setup_gsettings_env(monkeypatch):
     with_gsettings(monkeypatch)
     intercept_proxy_environment(monkeypatch, 'manual',
                                 '''['localhost', '127.0.0.0/8', '::1']''', '3128',
-                                'protocol://proxy-xy', '1.2.3.4,5.6.7.8,example.com')
+                                'protocol://proxy-xy', '1.2.3.4,5.6.7.8,example.com',
+                                '', '')
+    with clear_proxy_setup_cache():
+        proxy_setup = ProxySetup()
+        assert proxy_setup.get('no_proxy', default='') == '1.2.3.4,5.6.7.8,example.com'
+        assert proxy_setup.get('http_proxy', default='') == 'protocol://proxy-xy'
+        assert proxy_setup.get('https_proxy', default='') == 'protocol://proxy-xy'
+        assert proxy_setup.get('ftp_proxy', default='') == 'protocol://proxy-xy'
+        assert proxy_setup.get('all_proxy', default='') == 'protocol://proxy-xy'
+
+
+def test_proxy_setup_gsettings_env_upper(monkeypatch):
+    with_gsettings(monkeypatch)
+    intercept_proxy_environment(monkeypatch, 'manual',
+                                '''['localhost', '127.0.0.0/8', '::1']''', '3128',
+                                '', '',
+                                'protocol://proxy-xy',
+                                '1.2.3.4,5.6.7.8,example.com')
     with clear_proxy_setup_cache():
         proxy_setup = ProxySetup()
         assert proxy_setup.get('no_proxy', default='') == '1.2.3.4,5.6.7.8,example.com'
@@ -127,7 +149,7 @@ def test_proxy_setup_gsettings_no_env(monkeypatch):
     with_gsettings(monkeypatch)
     intercept_proxy_environment(monkeypatch, 'manual',
                                 '''['localhost', '127.0.0.0/8', '::1']''', '3128',
-                                '', '')
+                                '', '', '', '')
     with clear_proxy_setup_cache():
         proxy_setup = ProxySetup()
         assert proxy_setup.get('no_proxy', default='') == 'localhost,127.0.0.0/8,::1'
@@ -141,7 +163,7 @@ def test_proxy_setup_gsettings_auto_no_env(monkeypatch):
     with_gsettings(monkeypatch)
     intercept_proxy_environment(monkeypatch, 'auto',
                                 '''['localhost', '127.0.0.0/8', '::1']''', '3128',
-                                '', '')
+                                '', '', '', '')
 
     with clear_proxy_setup_cache():
         proxy_setup = ProxySetup()
@@ -156,7 +178,7 @@ def test_proxy_setup_gsettings_none_no_env(monkeypatch):
     with_gsettings(monkeypatch)
     intercept_proxy_environment(monkeypatch, 'none',
                                 '''['localhost', '127.0.0.0/8', '::1']''', '3128',
-                                '', '')
+                                '', '', '', '')
 
     with clear_proxy_setup_cache():
         proxy_setup = ProxySetup()
@@ -171,7 +193,7 @@ def test_proxy_setup_gsettings_manual_edge_case_no_env(monkeypatch):
     with_gsettings(monkeypatch)
     intercept_proxy_environment(monkeypatch, 'manual',
                                 '@as []', '0',
-                                '', '')
+                                '', '', '', '')
 
     with clear_proxy_setup_cache():
         proxy_setup = ProxySetup()
@@ -186,7 +208,7 @@ def test_get_requests_proxy_dict_with_proxy(monkeypatch):
     with_gsettings(monkeypatch)
     intercept_proxy_environment(monkeypatch, 'manual',
                                 '''['localhost', '127.0.0.0/8', '::1']''', '3128',
-                                '', '')
+                                '', '', '', '')
     with clear_proxy_setup_cache():
         proxy_dict = ProxySetup().get_requests_dict()
         assert proxy_dict.get('http') == 'http://foo:bar@example.com:3128/'
@@ -201,7 +223,8 @@ def test_get_requests_proxy_dict_with_proxy(monkeypatch):
 def test_get_requests_proxy_dict_without_proxy(monkeypatch):
     with_gsettings(monkeypatch)
     intercept_proxy_environment(monkeypatch, 'manual',
-                                '', '', '', '')
+                                '', '', '', '',
+                                '', '')
 
     with clear_proxy_setup_cache():
         proxy_dict = ProxySetup().get_requests_dict()
@@ -214,7 +237,7 @@ def test_get_environment_with_proxy(monkeypatch):
     with_gsettings(monkeypatch)
     intercept_proxy_environment(monkeypatch, 'manual',
                                 '''['localhost', '127.0.0.0/8', '::1']''', '3128',
-                                '', '')
+                                '', '', '', '')
 
     with clear_proxy_setup_cache():
         env = ProxySetup().get_environment()
@@ -228,7 +251,8 @@ def test_get_environment_with_proxy(monkeypatch):
 def test_get_environment_without_proxy(monkeypatch):
     with_gsettings(monkeypatch)
     intercept_proxy_environment(monkeypatch, 'manual',
-                                '', '', '', '')
+                                '', '', '', '',
+                                '', '')
 
     with clear_proxy_setup_cache():
         env = ProxySetup().get_environment()
