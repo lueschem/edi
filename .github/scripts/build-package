@@ -63,7 +63,7 @@ apt-get -y --no-install-recommends install git-buildpackage dh-make equivs linti
 
 if [ "${ID}" == "debian" ] && [ "${VERSION_ID}" == "10" ]
 then
-    apt-get -y --no-install-recommends install ansible/buster-backports qemu-user-static/buster-backports
+    apt-get -y --no-install-recommends install ansible/buster-backports qemu-user/buster-backports
 fi
 
 CONTAINER_WORK="${TESTUSERHOME}/edi"
