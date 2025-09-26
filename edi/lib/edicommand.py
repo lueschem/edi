@@ -68,8 +68,8 @@ class EdiCommand(metaclass=CommandFactory):
         if command:
             command().clean(config_file)
 
-    def _setup_parser(self, config_file):
-        self.config = ConfigurationParser(config_file)
+    def _setup_parser(self, config_file, config_type=1):
+        self.config = ConfigurationParser(config_file, config_type)
 
     @classmethod
     def _get_command_name(cls):
