@@ -55,7 +55,7 @@ def remove_passwords(dictionary):
     return obfuscated_dictionary
 
 
-def get_base_dictionary():
+def get_base_dictionary(config_type=1):
     base_dict = {}
     current_user_name = get_user()
     base_dict["edi_current_user_name"] = current_user_name
@@ -74,7 +74,8 @@ def get_base_dictionary():
     base_dict["edi_host_socks_proxy"] = proxy_setup.get('all_proxy', default='')
     base_dict["edi_host_no_proxy"] = proxy_setup.get('no_proxy', default='')
     base_dict["edi_edi_version"] = get_edi_version()
-    base_dict["edi_lxd_version"] = get_lxd_version()
+    if config_type == 1:
+        base_dict["edi_lxd_version"] = get_lxd_version()
     base_dict["edi_current_display"] = get_current_display()
     return base_dict
 
@@ -242,8 +243,9 @@ class ConfigurationParser:
     def get_project_plugin_directory(self):
         return join(self.project_directory, "plugins")
 
-    def __init__(self, base_config_file):
+    def __init__(self, base_config_file, config_type=1):
         self.base_config_file = base_config_file
+        self.config_type = config_type
         self.project_directory = dirname(abspath(base_config_file.name))
         self.config_id = splitext(basename(base_config_file.name))[0]
         if not ConfigurationParser._configurations.get(self.config_id):
@@ -380,7 +382,7 @@ class ConfigurationParser:
                                       ).get(item, default)
 
     def _get_load_time_dictionary(self):
-        load_dict = get_base_dictionary()
+        load_dict = get_base_dictionary(self.config_type)
         load_dict["edi_work_directory"] = get_workdir()
         load_dict["edi_project_directory"] = self.project_directory
         load_dict["edi_project_directory_hash"] = self.get_project_directory_hash()
@@ -394,9 +396,11 @@ class ConfigurationParser:
     def _get_node_dictionary(self, node):
         node_dict = self._get_load_time_dictionary()
 
-        node_dict["edi_lxc_network_interface_name"] = self._get_general_item("edi_lxc_network_interface_name",
-                                                                             "lxcif0")
-        node_dict["edi_lxc_bridge_interface_name"] = self.get_lxc_bridge_interface_name()
+        if self.config_type == 1:
+            node_dict["edi_lxc_network_interface_name"] = self._get_general_item("edi_lxc_network_interface_name",
+                                                                                 "lxcif0")
+            node_dict["edi_lxc_bridge_interface_name"] = self.get_lxc_bridge_interface_name()
+
         node_dict["edi_config_management_user_name"] = self._get_general_item("edi_config_management_user_name",
                                                                               "edicfgmgmt")
 

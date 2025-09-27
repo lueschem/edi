@@ -135,7 +135,7 @@ class Configure(Project):
 
     def _dispatch(self, config_file, run_method):
         with command_context({'edi_create_distributable_image': True}):
-            self._setup_parser(config_file)
+            self._setup_parser(config_file, 2)
             return run_method()
 
     def _result(self):

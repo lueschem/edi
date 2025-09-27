@@ -37,13 +37,13 @@ import subprocess
 @pytest.mark.requires_ansible
 @pytest.mark.requires_debootstrap
 @pytest.mark.requires_sudo
-def test_create_buster_image(capsys):
+def test_create_bookworm_image(capsys):
     print(os.getcwd())
     with workspace():
         edi_exec = os.path.join(get_project_root(), 'bin', 'edi')
         project_name = 'pytest-{}'.format(get_random_string(6))
         config_command = [edi_exec, 'config', 'init', project_name,
-                          'debian-buster-{}'.format(get_debian_architecture())]
+                          'debian-bookworm-{}'.format(get_debian_architecture())]
         run(config_command)  # run as non root
 
         parser = edi._setup_command_line_interface()

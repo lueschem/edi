@@ -83,6 +83,25 @@ def test_playbooks_overlay(config_files, monkeypatch):
                 assert path.endswith("playbooks/foo.yml")
 
 
+@pytest.mark.parametrize("config_type,dictionary_item,presence_expected", [
+    (1, "edi_edi_version", True),
+    (2, "edi_edi_version", True),
+    (1, "edi_lxd_version", True),
+    (1, "edi_lxc_network_interface_name", True),
+    (1, "edi_lxc_bridge_interface_name", True),
+    (2, "edi_lxd_version", False),
+    (2, "edi_lxc_network_interface_name", False),
+    (2, "edi_lxc_bridge_interface_name", False),
+])
+def test_configuration_types(config_files, monkeypatch, config_type, dictionary_item, presence_expected):
+    with open(config_files, "r") as main_file:
+        parser = ConfigurationParser(main_file, config_type)
+        playbooks = parser.get_ordered_path_items("playbooks")
+        assert len(playbooks) >= 1
+        _, _, playbook_dictionary, _ = playbooks[0]
+        assert (dictionary_item in playbook_dictionary) == presence_expected
+
+
 def test_documentation_steps_overlay(config_files, monkeypatch):
     with open(config_files, "r") as main_file:
         parser = ConfigurationParser(main_file)

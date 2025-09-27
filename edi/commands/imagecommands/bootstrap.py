@@ -20,6 +20,7 @@
 # along with edi.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import subprocess
 import shutil
 import logging
 from codecs import open
@@ -152,11 +153,14 @@ class Bootstrap(Image):
 
     def _postprocess_rootfs(self, rootfs, key_data):
         if key_data:
-            key_cmd = get_chroot_cmd(rootfs)
-            key_cmd.append("apt-key")
-            key_cmd.append("add")
-            key_cmd.append("-")
-            run(key_cmd, input=key_data, sudo=True)
+            apt_key_check = get_chroot_cmd(rootfs)
+            apt_key_check.extend(["which", "apt-key"])
+            if run(apt_key_check, sudo=True, check=False, stderr=subprocess.PIPE).returncode == 0:
+                key_cmd = get_chroot_cmd(rootfs)
+                key_cmd.extend(["apt-key", "add", "-"])
+                run(key_cmd, input=key_data, sudo=True)
+            else:
+                logging.warning("Not adding the bootstrapping repository key to the target root file system!")
 
         clean_cmd = get_chroot_cmd(rootfs)
         clean_cmd.append("apt-get")

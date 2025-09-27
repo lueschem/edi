@@ -35,8 +35,8 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 master_doc = 'index'
 
-version = '2.1.2'
-release = '2.1.2'
+version = '2.1.3'
+release = '2.1.3'
 
 language = 'en'
 

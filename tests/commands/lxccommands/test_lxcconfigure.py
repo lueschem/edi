@@ -91,12 +91,12 @@ def get_container_ip_addr(container_name, interface):
 @pytest.mark.requires_ansible
 @pytest.mark.requires_debootstrap
 @pytest.mark.requires_sudo
-def test_build_stretch_container(capsys, datadir):
+def test_build_bullseye_container(capsys, datadir):
     with workspace():
         edi_exec = os.path.join(get_project_root(), 'bin', 'edi')
         project_name = 'pytest-{}'.format(get_random_string(6))
         config_command = [edi_exec, 'config', 'init', project_name,
-                          'debian-stretch-{}'.format(get_debian_architecture())]
+                          'debian-bullseye-{}'.format(get_debian_architecture())]
         run(config_command)  # run as non root
 
         # enable ssh server and create a default user
@@ -136,7 +136,7 @@ def test_build_stretch_container(capsys, datadir):
 
         verification_command = [lxc_exec(), 'exec', container_name, '--', 'cat', '/etc/os-release']
         result = run(verification_command, stdout=subprocess.PIPE)
-        assert '''VERSION_ID="9"''' in result.stdout
+        assert '''VERSION_ID="11"''' in result.stdout
         assert 'ID=debian' in result.stdout
 
         os.chmod(os.path.join(str(datadir), 'keys'), 0o700)
