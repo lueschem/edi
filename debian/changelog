@@ -1,7 +1,15 @@
+edi (2.1.4) noble; urgency=medium
+
+  * Fixed qemu package dependency. Closes #93.
+
+ -- Matthias Lüscher <lueschem@gmail.com>  Tue, 07 Oct 2025 09:41:29 +0200
+
 edi (2.1.3) trixie; urgency=medium
 
-  * Fixed failure on Debian trixie caused by removed apt-key command. Closes #91.
-  * Removed lxc related dictionary items in case of v2 configuration. Closes #92.
+  * Fixed failure on Debian trixie caused by removed apt-key
+    command. Closes #91.
+  * Removed lxc related dictionary items in case of v2
+    configuration. Closes #92.
 
  -- Matthias Lüscher <lueschem@gmail.com>  Sat, 27 Sep 2025 23:22:56 +0200
 
