@@ -1,3 +1,9 @@
+edi (2.1.5) noble; urgency=medium
+
+  * Removed Ubuntu 20.04 and 25.04, added 25.10.
+
+ -- Matthias Luescher <lueschem@gmail.com>  Fri, 10 Oct 2025 09:57:56 +0200
+
 edi (2.1.4) noble; urgency=medium
 
   * Fixed qemu package dependency. Closes #93.
