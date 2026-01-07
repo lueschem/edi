@@ -198,6 +198,8 @@ class EdiCommand(metaclass=CommandFactory):
         cmd = []
         cmd.append("tar")
         cmd.append("--numeric-owner")
+        cmd.append("--xattrs")
+        cmd.append("--xattrs-include='*'")
         cmd.extend(["-C", target_folder])
         cmd.extend(["-axf", image])
         run(cmd, sudo=True, log_threshold=logging.INFO)
