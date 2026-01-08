@@ -37,7 +37,7 @@ A typical pre- or postprocessing command can be configured as follows:
    ...
      300_rootfs2image:
        path: postprocessing_commands/genimage/rootfs2image.edi
-       require_root: "fakeroot"
+       require_root: "unshare"
        output:
          pp_image:
            location: {{ edi_configuration_name }}.img
@@ -53,7 +53,11 @@ A typical pre- or postprocessing command can be configured as follows:
 engine and then execute it. It is a good practice to use this file as a thin shim between :code:`edi` and the scripts
 or executables that do the heavy lifting.
 
-The statement :code:`require_root: fakeroot` tells edi that a fakeroot environment is needed to execute the command.
+The statement :code:`require_root: unshare` tells edi that a modified user namespace is needed to execute the command.
+The command :code:`buildah unshare` will be used to create the namespace and if the :code:`edi_project_container` is
+already available, its root file system will be mounted to :code:`${edi_project_container_root}`.
+Remark: :code:`require_root: unshare` is preferable to :code:`require_root: fakeroot` as extended attributes are not
+properly supported within a :code:`fakeroot` environment.
 
 Each pre- or postprocessing command shall create at least one (intermediate) artifact that gets specified within the
 :code:`output` node. The resulting artifact can be used as an input for any subsequent pre- or postprocessing command.
