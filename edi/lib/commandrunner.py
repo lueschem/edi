@@ -116,10 +116,11 @@ class CommandRunner:
     def _require_real_root(config_value):
         if type(config_value) is bool:
             return config_value
-        elif config_value == "fakeroot":
+        elif config_value == "fakeroot" or config_value == "unshare":
             return False
         else:
-            raise FatalError('Invalid value for "require_root". It must be either "True", "False" or "fakeroot".')
+            raise FatalError('Invalid value for "require_root". It must be either "True", "False", "fakeroot" or'
+                             ' "unshare".')
 
     def require_real_root_for_clean(self):
         for command in self._get_commands():
@@ -186,6 +187,9 @@ class CommandRunner:
         cmd = []
         if require_root == 'fakeroot':
             cmd.extend(['fakeroot', '--'])
+        elif require_root == 'unshare':
+            cmd.extend(['buildah', 'unshare', '--'])
+
         cmd.extend(['sh', '-c', command_file])
         run(cmd, log_threshold=logging.INFO, sudo=CommandRunner._require_real_root(require_root))
 
