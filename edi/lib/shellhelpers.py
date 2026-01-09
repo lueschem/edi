@@ -23,6 +23,7 @@ import logging
 import subprocess
 import os
 import re
+from pwd import getpwuid
 from shutil import rmtree
 from tempfile import mkdtemp
 from contextlib import contextmanager
@@ -50,7 +51,7 @@ def run(popenargs, sudo=False, input=None, timeout=None, check=True, universal_n
             subprocess_stdout = subprocess.PIPE
 
     all_args = list()
-    if not sudo and os.getuid() == 0:
+    if not sudo and os.getuid() == 0 and not is_running_in_user_namespace():
         current_user = get_user()
         if current_user != 'root':
             # drop privileges
@@ -71,6 +72,10 @@ def run(popenargs, sudo=False, input=None, timeout=None, check=True, universal_n
         logging.log(log_threshold, result.stdout)
 
     return result
+
+
+def is_running_in_user_namespace():
+    return getpwuid(os.stat(os.path.join(os.sep, 'etc', 'sudoers')).st_uid).pw_name == "nobody"
 
 
 def get_chroot_cmd(rootfs):

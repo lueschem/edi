@@ -24,6 +24,7 @@ import argparse
 import logging
 from edi.commands.documentation import Documentation
 from edi.lib.helpers import print_success
+from edi.lib.shellhelpers import is_running_in_user_namespace
 from edi.lib.documentationsteprunner import DocumentationStepRunner
 
 
@@ -105,7 +106,7 @@ class Render(Documentation):
         self.raw_input = os.path.abspath(raw_input)
         self.rendered_output = os.path.abspath(rendered_output)
 
-        if os.getuid() == 0:
+        if os.getuid() == 0 and not is_running_in_user_namespace():
             logging.warning('You should not not use the render command as root!')
 
         return run_method()
