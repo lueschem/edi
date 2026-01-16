@@ -26,7 +26,7 @@ import hashlib
 from packaging.version import Version
 from edi.lib.helpers import FatalError
 from edi.lib.versionhelpers import get_stripped_version
-from edi.lib.shellhelpers import run, Executables, require
+from edi.lib.shellhelpers import run, Executables, require, is_running_in_user_namespace
 
 
 lxd_install_hint = "'sudo apt install lxd' or 'sudo snap install lxd'"
@@ -37,7 +37,7 @@ def lxc_exec():
 
 
 def get_lxd_version():
-    if not Executables.has('lxd'):
+    if not Executables.has('lxd') or is_running_in_user_namespace():
         return '0.0.0'
 
     cmd = [Executables.get('lxd'), '--version']

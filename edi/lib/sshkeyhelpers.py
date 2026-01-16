@@ -24,7 +24,7 @@ import random
 import string
 import subprocess
 import re
-from edi.lib.shellhelpers import run, get_user_home_directory
+from edi.lib.shellhelpers import run, get_user_home_directory, is_running_in_user_namespace
 import edi.lib.helpers
 
 
@@ -33,7 +33,7 @@ def get_user_ssh_pub_keys():
     Search for all ssh public keys of the current user (not the root user when called with sudo).
     :return: A list of ssh public keys. The list will be empty if the tool ssh is not installed.
     """
-    if not edi.lib.helpers.which('ssh'):
+    if not edi.lib.helpers.which('ssh') or is_running_in_user_namespace():
         return []
 
     random_host = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
