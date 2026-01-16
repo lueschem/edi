@@ -25,6 +25,9 @@ import edi
 from filecmp import cmp
 from edi.commands.documentationcommands.render import Render
 from edi.lib.helpers import FatalError
+from edi.lib.shellhelpers import run
+from edi.lib.buildahhelpers import buildah_exec
+from tests.libtesting.helpers import get_project_root
 
 
 @pytest.mark.filterwarnings("ignore:Unexpected line")
@@ -58,3 +61,17 @@ def test_documentation_all(datadir):
     for file in output_files:
         generated = os.path.join(str(datadir), file)
         assert not os.path.isfile(generated)
+
+
+@pytest.mark.filterwarnings("ignore:Unexpected line")
+@pytest.mark.filterwarnings("ignore:Found eof")
+@pytest.mark.requires_buildah
+def test_documentation_in_user_namespace(datadir):
+    changelog_file = os.path.join(str(datadir), 'changelog.rst')
+    assert not os.path.isfile(changelog_file)
+    edi_exec = os.path.join(get_project_root(), 'bin', 'edi')
+    raw_input = os.path.join(str(datadir), 'raw_input')
+    cmd = [buildah_exec(), 'unshare', '--', edi_exec, 'documentation', 'render', raw_input, str(datadir),
+           os.path.join(str(datadir), 'all.yml')]
+    run(cmd)
+    assert os.path.isfile(changelog_file)
