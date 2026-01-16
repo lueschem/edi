@@ -109,8 +109,8 @@ def create_container(name, source_artifact):
         cmd = [buildah_exec(), "--name", temp_container_name, "from", "scratch"]
         run(cmd, log_threshold=logging.INFO)
 
-        nested_command = ("fakeroot tar --numeric-owner -C " + r'${container_root}' + " -axf " +
-                          str(source_artifact.location))
+        nested_command = ("fakeroot tar --numeric-owner --xattrs --xattrs-include='*' -C " + r'${container_root}' +
+                          " -axf " + str(source_artifact.location))
 
         run_buildah_unshare(temp_container_name, nested_command)
     else:
