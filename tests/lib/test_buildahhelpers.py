@@ -194,3 +194,9 @@ def test_buildah_container_creation_failure():
 
     assert 'does not exist' in error.value.message
     assert 'wrong_rootfs_archive.tar' in error.value.message
+
+
+@pytest.mark.requires_buildah
+def test_buildah_unshare():
+    result = run_buildah_unshare("","whoami")
+    assert result.stdout.strip() == "root"
