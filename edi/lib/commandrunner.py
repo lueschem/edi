@@ -28,6 +28,7 @@ import stat
 from codecs import open
 from collections import namedtuple
 
+from edi.lib.buildahhelpers import run_buildah_unshare
 from edi.lib.artifact import ArtifactType, Artifact
 from edi.lib.helpers import (chown_to_user, FatalError, get_workdir, get_artifact_dir,
                              create_artifact_dir, print_success)
@@ -116,10 +117,11 @@ class CommandRunner:
     def _require_real_root(config_value):
         if type(config_value) is bool:
             return config_value
-        elif config_value == "fakeroot":
+        elif config_value == "fakeroot" or config_value == "unshare":
             return False
         else:
-            raise FatalError('Invalid value for "require_root". It must be either "True", "False" or "fakeroot".')
+            raise FatalError('Invalid value for "require_root". It must be either "True", "False", "fakeroot" or'
+                             ' "unshare".')
 
     def require_real_root_for_clean(self):
         for command in self._get_commands():
@@ -181,13 +183,15 @@ class CommandRunner:
         commands = self._get_commands()
         return self._result(commands)
 
-    @staticmethod
-    def _run_command(command_file, require_root):
-        cmd = []
+    def _run_command(self, command_file, require_root):
         if require_root == 'fakeroot':
-            cmd.extend(['fakeroot', '--'])
-        cmd.extend(['sh', '-c', command_file])
-        run(cmd, log_threshold=logging.INFO, sudo=CommandRunner._require_real_root(require_root))
+            cmd = ['fakeroot', '--', 'sh', '-c', command_file]
+            run(cmd, log_threshold=logging.INFO)
+        elif require_root == 'unshare':
+            run_buildah_unshare(self.get_project_container_name(), command_file)
+        else:
+            cmd = ['sh', '-c', command_file]
+            run(cmd, log_threshold=logging.INFO, sudo=CommandRunner._require_real_root(require_root))
 
     def _get_commands(self):
         commands = self.config.get_ordered_path_items(self.config_section)
@@ -215,6 +219,15 @@ class CommandRunner:
             augmented_commands.append(new_command)
 
         return augmented_commands
+
+    def get_project_container_name(self):
+        container_name = ""
+        for artifact in self._input_artifacts:
+            if artifact.name == "edi_project_container":
+                assert artifact.type == ArtifactType.BUILDAH_CONTAINER
+                container_name = artifact.location
+
+        return container_name
 
     @staticmethod
     def _get_artifact(node_name, artifact_key, artifact_item):

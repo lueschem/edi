@@ -182,22 +182,19 @@ class EdiCommand(metaclass=CommandFactory):
                                           self.config.get_compression())
         archive_path = os.path.join(tempdir, tempresult)
 
-        cmd = []
-        cmd.append("tar")
-        cmd.append("--numeric-owner")
+        cmd = ["tar", "--numeric-owner", "--xattrs", "--selinux", "--acls"]
         cmd.extend(["-C", datadir])
         cmd.extend(["-acf", archive_path])
         cmd.extend(os.listdir(datadir))
         run(cmd, sudo=True, log_threshold=logging.INFO)
         return archive_path
 
-    def _unpack_image(self, image, tempdir, subfolder="rootfs"):
+    @staticmethod
+    def _unpack_image(image, tempdir, subfolder="rootfs"):
         target_folder = os.path.join(tempdir, subfolder)
         os.makedirs(target_folder, exist_ok=True)
 
-        cmd = []
-        cmd.append("tar")
-        cmd.append("--numeric-owner")
+        cmd = ["tar", "--numeric-owner", "--xattrs", "--selinux", "--acls", "--xattrs-include='*'"]
         cmd.extend(["-C", target_folder])
         cmd.extend(["-axf", image])
         run(cmd, sudo=True, log_threshold=logging.INFO)

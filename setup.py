@@ -38,7 +38,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 setup(
     name='edi',
 
-    version='2.1.5',
+    version='2.2.0',
 
     description='Embedded Development Infrastructure - edi',
     long_description=long_description,

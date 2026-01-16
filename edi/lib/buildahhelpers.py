@@ -109,7 +109,8 @@ def create_container(name, source_artifact):
         cmd = [buildah_exec(), "--name", temp_container_name, "from", "scratch"]
         run(cmd, log_threshold=logging.INFO)
 
-        nested_command = ("fakeroot tar --numeric-owner -C " + r'${container_root}' + " -axf " +
+        nested_command = ("tar --numeric-owner --xattrs --selinux --acls --xattrs-include='*' "
+                          "--exclude './dev/*' -C " + r'${edi_project_container_root}' + " -axf " +
                           str(source_artifact.location))
 
         run_buildah_unshare(temp_container_name, nested_command)
@@ -129,11 +130,15 @@ def extract_container_rootfs(name, rootfs_archive):
     if os.path.exists(rootfs_archive):
         raise FatalError(f"The root file system archive '{rootfs_archive}' already exists!")
 
-    nested_command = "tar --numeric-owner -C " + r'${container_root}' + " -acf " + str(rootfs_archive) + " ."
+    nested_command = ("tar --numeric-owner --xattrs --selinux --acls -C " + r'${edi_project_container_root}' +
+                      " -acf " + str(rootfs_archive) + " .")
     run_buildah_unshare(name, nested_command)
 
 
 @require('buildah', buildah_install_hint, BuildahVersion.check)
 def run_buildah_unshare(name, command):
-    cmd = [buildah_exec(), "unshare", "--mount", f"container_root={name}", "--", "bash", "-c", command]
+    cmd = [buildah_exec(), "unshare"]
+    if name:
+        cmd.extend(["--mount", f"edi_project_container_root={name}"])
+    cmd.extend(["--", "sh", "-c", command])
     return run(cmd, log_threshold=logging.INFO)

@@ -1,3 +1,13 @@
+edi (2.2.0) noble; urgency=medium
+
+  [ Alan Le Fol ]
+  * fix: preserve Linux capabilities during tar extraction
+
+  [ Matthias Luescher ]
+  * Enable the usage of buildah unshare to preserve extended attributes.
+
+ -- Matthias Luescher <lueschem@gmail.com>  Fri, 16 Jan 2026 11:10:53 +0100
+
 edi (2.1.5) noble; urgency=medium
 
   * Removed Ubuntu 20.04 and 25.04, added 25.10.

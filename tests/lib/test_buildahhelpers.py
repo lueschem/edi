@@ -142,7 +142,7 @@ def test_buildah_container_creation(datadir):
         assert 'already exists' in error.value.message
         assert container_name in error.value.message
 
-        result = run_buildah_unshare(container_name, r'cat ${container_root}/rootfs_test')
+        result = run_buildah_unshare(container_name, r'cat ${edi_project_container_root}/rootfs_test')
         assert "nothing here" in result.stdout
 
         delete_container(container_name)
