@@ -1,6 +1,7 @@
 #!/usr/bin/make -f
 
 #DH_VERBOSE=1
+export PYBUILD_AFTER_TEST := rm -rf {build_dir}/tests
 
 %:
 	dh $@ --with python3 --buildsystem=pybuild --fail-missing
