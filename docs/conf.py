@@ -46,8 +46,6 @@ language = 'en'
 html_theme = 'sphinx_rtd_theme'
 
 html_theme_options = {
-    'analytics_id': 'G-E0QP0DFCMC',
-    'analytics_anonymize_ip': True,
     'logo_only': False,
     'display_version': True,
     'prev_next_buttons_location': 'bottom',

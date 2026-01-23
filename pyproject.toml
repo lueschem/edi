@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "edi"
 version = "2.2.1"
 authors = [{name = "Matthias Luescher", email = "lueschem@gmail.com"}]
-license = {text = "GPLv3+"}
+#license = "GPL-3.0-or-later"
 description = "Embedded Development Infrastructure - edi"
 keywords = [
     "embedded",
