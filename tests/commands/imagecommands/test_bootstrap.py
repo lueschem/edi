@@ -32,66 +32,65 @@ _ADAPTIVE = -42
 
 
 def test_bootstrap(config_files, monkeypatch):
-    with open(config_files, "r") as main_file:
-        def fakegetuid():
-            return 0
+    def fakegetuid():
+        return 0
 
-        monkeypatch.setattr(os, 'getuid', fakegetuid)
+    monkeypatch.setattr(os, 'getuid', fakegetuid)
 
-        def fakechown(*_):
+    def fakechown(*_):
+        pass
+
+    monkeypatch.setattr(shutil, 'chown', fakechown)
+
+    def fakerun(*popenargs, **kwargs):
+        if get_command(popenargs) == "chroot":
+            rootfs_path = get_command_parameter(popenargs, "chroot")
+            if not os.path.exists(rootfs_path):
+                os.mkdir(rootfs_path)
+        elif get_command(popenargs) == "debootstrap":
+            rootfs_path = popenargs[0][-2]
+            apt_dir = os.path.join(rootfs_path, 'etc', 'apt')
+            os.makedirs(apt_dir)
             pass
-
-        monkeypatch.setattr(shutil, 'chown', fakechown)
-
-        def fakerun(*popenargs, **kwargs):
-            if get_command(popenargs) == "chroot":
-                rootfs_path = get_command_parameter(popenargs, "chroot")
-                if not os.path.exists(rootfs_path):
-                    os.mkdir(rootfs_path)
-            elif get_command(popenargs) == "debootstrap":
-                rootfs_path = popenargs[0][-2]
-                apt_dir = os.path.join(rootfs_path, 'etc', 'apt')
-                os.makedirs(apt_dir)
-                pass
-            elif get_command(popenargs) == "tar":
-                archive = get_command_parameter(popenargs, '-acf')
-                with open(archive, mode="w") as fakearchive:
-                    fakearchive.write("fake archive")
-            elif popenargs[0][-2] == "dpkg" and popenargs[0][-1] == "--print-architecture":
-                return subprocess.CompletedProcess("fakerun", 0, 'amd64')
-            elif get_command(popenargs).endswith("lxd") and get_sub_command(popenargs) == "--version":
-                return subprocess.CompletedProcess("fakerun", 0, '2.18')
-            elif get_command(popenargs) == "ssh" and get_sub_command(popenargs) == "-G":
-                return subprocess.CompletedProcess("fakerun", 0, 'ssh config')
-            elif get_command(popenargs) == "printenv":
-                return subprocess.CompletedProcess("fakerun", 0, '')
-            elif get_command(popenargs) == 'getent' and get_sub_command(popenargs) == 'passwd':
-                return subprocess.CompletedProcess("fakerun", 0,
-                                                   stdout='john:x:1000:1000:John Doe,,,:/no/such/directory:/bin/bash\n')
-            elif get_command(popenargs) == "findmnt":
-                return subprocess.CompletedProcess("fakerun", 0, '/foo/bar/baz')
-            else:
-                print('Passthrough: {}'.format(get_command(popenargs)))
-                return subprocess.run(*popenargs, **kwargs)
-
+        elif get_command(popenargs) == "tar":
+            archive = get_command_parameter(popenargs, '-acf')
+            with open(archive, mode="w") as fakearchive:
+                fakearchive.write("fake archive")
+        elif popenargs[0][-2] == "dpkg" and popenargs[0][-1] == "--print-architecture":
+            return subprocess.CompletedProcess("fakerun", 0, 'amd64')
+        elif get_command(popenargs).endswith("lxd") and get_sub_command(popenargs) == "--version":
+            return subprocess.CompletedProcess("fakerun", 0, '2.18')
+        elif get_command(popenargs) == "ssh" and get_sub_command(popenargs) == "-G":
+            return subprocess.CompletedProcess("fakerun", 0, 'ssh config')
+        elif get_command(popenargs) == "printenv":
             return subprocess.CompletedProcess("fakerun", 0, '')
+        elif get_command(popenargs) == 'getent' and get_sub_command(popenargs) == 'passwd':
+            return subprocess.CompletedProcess("fakerun", 0,
+                                               stdout='john:x:1000:1000:John Doe,,,:/no/such/directory:/bin/bash\n')
+        elif get_command(popenargs) == "findmnt":
+            return subprocess.CompletedProcess("fakerun", 0, '/foo/bar/baz')
+        else:
+            print('Passthrough: {}'.format(get_command(popenargs)))
+            return subprocess.run(*popenargs, **kwargs)
 
-        monkeypatch.setattr(mockablerun, 'run_mockable', fakerun)
+        return subprocess.CompletedProcess("fakerun", 0, '')
 
-        monkeypatch.chdir(os.path.dirname(config_files))
+    monkeypatch.setattr(mockablerun, 'run_mockable', fakerun)
 
-        bootstrap_cmd = Bootstrap()
-        with requests_mock.Mocker() as m:
-            m.get('https://ftp-master.debian.org/keys/archive-key-11.asc', text='key file mockup')
-            bootstrap_cmd.run(main_file)
+    monkeypatch.chdir(os.path.dirname(config_files))
 
-        expected_result = bootstrap_cmd._result()
-        assert os.path.exists(expected_result)
+    bootstrap_cmd = Bootstrap()
+    with requests_mock.Mocker() as m:
+        m.get('https://ftp-master.debian.org/keys/archive-key-11.asc', text='key file mockup')
+        bootstrap_cmd.run(config_files)
 
-        previous_result_text = "previous result"
-        with open(expected_result, mode="w") as previous_result:
-            previous_result.write(previous_result_text)
-        bootstrap_cmd2 = Bootstrap()
-        bootstrap_cmd2.run(main_file)
-        with open(expected_result, mode="r") as same_result:
-            assert same_result.read() == previous_result_text
+    expected_result = bootstrap_cmd._result()
+    assert os.path.exists(expected_result)
+
+    previous_result_text = "previous result"
+    with open(expected_result, mode="w") as previous_result:
+        previous_result.write(previous_result_text)
+    bootstrap_cmd2 = Bootstrap()
+    bootstrap_cmd2.run(config_files)
+    with open(expected_result, mode="r") as same_result:
+        assert same_result.read() == previous_result_text

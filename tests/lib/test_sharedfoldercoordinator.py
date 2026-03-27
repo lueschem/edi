@@ -100,107 +100,101 @@ def render_expected_profiles():
 def test_pre_config_profiles(config_files):
     expected_profiles = render_expected_profiles()
 
-    with open(config_files, "r") as main_file:
-        parser = ConfigurationParser(main_file)
+    parser = ConfigurationParser(config_files)
 
-        coordinator = SharedFolderCoordinator(parser)
-        profiles = coordinator.get_pre_config_profiles()
+    coordinator = SharedFolderCoordinator(parser)
+    profiles = coordinator.get_pre_config_profiles()
 
-        assert len(profiles) == 1
+    assert len(profiles) == 1
 
-        assert profiles[0][0] == expected_profiles[0]
+    assert profiles[0][0] == expected_profiles[0]
 
 
 def test_post_config_profiles(config_files):
     expected_profiles = render_expected_profiles()
 
-    with open(config_files, "r") as main_file:
-        parser = ConfigurationParser(main_file)
+    parser = ConfigurationParser(config_files)
 
-        coordinator = SharedFolderCoordinator(parser)
-        profiles = coordinator.get_post_config_profiles()
+    coordinator = SharedFolderCoordinator(parser)
+    profiles = coordinator.get_post_config_profiles()
 
-        assert len(profiles) == 3
+    assert len(profiles) == 3
 
-        for i in range(0, 3):
-            assert profiles[i][0] == expected_profiles[i]
+    for i in range(0, 3):
+        assert profiles[i][0] == expected_profiles[i]
 
 
 def test_get_mountpoints(config_files):
-    with open(config_files, "r") as main_file:
-        parser = ConfigurationParser(main_file)
+    parser = ConfigurationParser(config_files)
 
-        coordinator = SharedFolderCoordinator(parser)
-        mountpoints = coordinator.get_mountpoints()
-        assert mountpoints[0] == '/foo/bar/target_mountpoint'
-        assert len(mountpoints) == 2
+    coordinator = SharedFolderCoordinator(parser)
+    mountpoints = coordinator.get_mountpoints()
+    assert mountpoints[0] == '/foo/bar/target_mountpoint'
+    assert len(mountpoints) == 2
 
 
 def test_verify_container_mountpoints(config_files, monkeypatch):
     with mocked_executable('lxc', '/here/is/no/lxc'):
         with mocked_lxd_version_check():
-            with open(config_files, "r") as main_file:
-                def fake_lxc_exec_command(*popenargs, **kwargs):
-                    if get_command(popenargs).endswith('lxc') and get_sub_command(popenargs) == 'exec':
-                        return subprocess.CompletedProcess("fakerun", 0, '')
-                    else:
-                        return subprocess.run(*popenargs, **kwargs)
+            def fake_lxc_exec_command(*popenargs, **kwargs):
+                if get_command(popenargs).endswith('lxc') and get_sub_command(popenargs) == 'exec':
+                    return subprocess.CompletedProcess("fakerun", 0, '')
+                else:
+                    return subprocess.run(*popenargs, **kwargs)
 
-                monkeypatch.setattr(mockablerun, 'run_mockable', fake_lxc_exec_command)
+            monkeypatch.setattr(mockablerun, 'run_mockable', fake_lxc_exec_command)
 
-                parser = ConfigurationParser(main_file)
+            parser = ConfigurationParser(config_files)
 
-                coordinator = SharedFolderCoordinator(parser)
-                coordinator.verify_container_mountpoints('fake-container')
+            coordinator = SharedFolderCoordinator(parser)
+            coordinator.verify_container_mountpoints('fake-container')
 
 
 def test_verify_container_mountpoints_connection_failure(config_files, monkeypatch):
     with mocked_executable('lxc', '/here/is/no/lxc'):
         with mocked_lxd_version_check():
-            with open(config_files, "r") as main_file:
-                def fake_lxc_exec_command(*popenargs, **kwargs):
-                    if get_command(popenargs).endswith('lxc') and get_sub_command(popenargs) == 'exec':
-                        if get_command_parameter(popenargs, '--') == 'true':
-                            cmd = ['bash', '-c', '>&2 echo -e "lxc command failed" ; exit 1']
-                            return subprocess.run(cmd, **kwargs)
-                        else:
-                            return subprocess.CompletedProcess("fakerun", 0, '')
+            def fake_lxc_exec_command(*popenargs, **kwargs):
+                if get_command(popenargs).endswith('lxc') and get_sub_command(popenargs) == 'exec':
+                    if get_command_parameter(popenargs, '--') == 'true':
+                        cmd = ['bash', '-c', '>&2 echo -e "lxc command failed" ; exit 1']
+                        return subprocess.run(cmd, **kwargs)
                     else:
-                        return subprocess.run(*popenargs, **kwargs)
+                        return subprocess.CompletedProcess("fakerun", 0, '')
+                else:
+                    return subprocess.run(*popenargs, **kwargs)
 
-                monkeypatch.setattr(mockablerun, 'run_mockable', fake_lxc_exec_command)
+            monkeypatch.setattr(mockablerun, 'run_mockable', fake_lxc_exec_command)
 
-                parser = ConfigurationParser(main_file)
+            parser = ConfigurationParser(config_files)
 
-                coordinator = SharedFolderCoordinator(parser)
-                with pytest.raises(FatalError) as error:
-                    coordinator.verify_container_mountpoints('fake-container')
-                assert 'fake-container' in error.value.message
-                assert 'lxc command failed' in error.value.message
+            coordinator = SharedFolderCoordinator(parser)
+            with pytest.raises(FatalError) as error:
+                coordinator.verify_container_mountpoints('fake-container')
+            assert 'fake-container' in error.value.message
+            assert 'lxc command failed' in error.value.message
 
 
 def test_verify_container_mountpoints_failure(config_files, monkeypatch):
     with mocked_executable('lxc', '/here/is/no/lxc'):
         with mocked_lxd_version_check():
-            with open(config_files, "r") as main_file:
-                def fake_lxc_exec_command(*popenargs, **kwargs):
-                    if get_command(popenargs).endswith('lxc') and get_sub_command(popenargs) == 'exec':
-                        if get_command_parameter(popenargs, '--') == 'test':
-                            return subprocess.CompletedProcess("failure", 1, 'failure')
-                        else:
-                            return subprocess.CompletedProcess("fakerun", 0, '')
+            def fake_lxc_exec_command(*popenargs, **kwargs):
+                if get_command(popenargs).endswith('lxc') and get_sub_command(popenargs) == 'exec':
+                    if get_command_parameter(popenargs, '--') == 'test':
+                        return subprocess.CompletedProcess("failure", 1, 'failure')
                     else:
-                        return subprocess.run(*popenargs, **kwargs)
+                        return subprocess.CompletedProcess("fakerun", 0, '')
+                else:
+                    return subprocess.run(*popenargs, **kwargs)
 
-                monkeypatch.setattr(mockablerun, 'run_mockable', fake_lxc_exec_command)
+            monkeypatch.setattr(mockablerun, 'run_mockable', fake_lxc_exec_command)
 
-                parser = ConfigurationParser(main_file)
+            parser = ConfigurationParser(config_files)
 
-                coordinator = SharedFolderCoordinator(parser)
-                with pytest.raises(FatalError) as error:
-                    coordinator.verify_container_mountpoints('fake-container')
-                assert 'fake-container' in error.value.message
-                assert '/foo/bar/target_mountpoint' in error.value.message
+            coordinator = SharedFolderCoordinator(parser)
+            with pytest.raises(FatalError) as error:
+                coordinator.verify_container_mountpoints('fake-container')
+            assert 'fake-container' in error.value.message
+            assert '/foo/bar/target_mountpoint' in error.value.message
 
 
 def test_get_mandatory_item():
@@ -216,110 +210,104 @@ def test_get_mandatory_item():
 
 
 def test_without_shared_folders(empty_config_file):
-    with open(empty_config_file, "r") as main_file:
-        parser = ConfigurationParser(main_file)
+    parser = ConfigurationParser(empty_config_file)
 
-        coordinator = SharedFolderCoordinator(parser)
-        mountpoints = coordinator.get_mountpoints()
-        assert isinstance(mountpoints, list)
-        assert len(mountpoints) == 0
-        pre = coordinator.get_pre_config_profiles()
-        assert isinstance(pre, list)
-        assert len(pre) == 0
-        post = coordinator.get_post_config_profiles()
-        assert isinstance(post, list)
-        assert len(post) == 0
+    coordinator = SharedFolderCoordinator(parser)
+    mountpoints = coordinator.get_mountpoints()
+    assert isinstance(mountpoints, list)
+    assert len(mountpoints) == 0
+    pre = coordinator.get_pre_config_profiles()
+    assert isinstance(pre, list)
+    assert len(pre) == 0
+    post = coordinator.get_post_config_profiles()
+    assert isinstance(post, list)
+    assert len(post) == 0
 
 
 def test_create_host_folders_folder_exists(config_files, monkeypatch):
-    with open(config_files, "r") as main_file:
-        parser = ConfigurationParser(main_file)
+    parser = ConfigurationParser(config_files)
 
-        coordinator = SharedFolderCoordinator(parser)
+    coordinator = SharedFolderCoordinator(parser)
 
-        patch_os_path(monkeypatch, True, True)
+    patch_os_path(monkeypatch, True, True)
 
-        coordinator.create_host_folders()  # nothing to do
+    coordinator.create_host_folders()  # nothing to do
 
 
 def test_create_host_folders_not_a_folder(config_files, monkeypatch):
-    with open(config_files, "r") as main_file:
-        parser = ConfigurationParser(main_file)
+    parser = ConfigurationParser(config_files)
 
-        coordinator = SharedFolderCoordinator(parser)
+    coordinator = SharedFolderCoordinator(parser)
 
-        patch_os_path(monkeypatch, False, True)
+    patch_os_path(monkeypatch, False, True)
 
-        with pytest.raises(FatalError) as error:
-            coordinator.create_host_folders()  # exists but not a folder
+    with pytest.raises(FatalError) as error:
+        coordinator.create_host_folders()  # exists but not a folder
 
-        assert 'edi_marker_valid_folder' in error.value.message
+    assert 'edi_marker_valid_folder' in error.value.message
 
 
 def test_no_shared_folders_for_distributable_image(config_files, monkeypatch):
     with mocked_executable('lxc'):
         with mocked_lxd_version_check():
-            with open(config_files, "r") as main_file:
-                with command_context({'edi_create_distributable_image': True}):
-                    parser = ConfigurationParser(main_file)
+            with command_context({'edi_create_distributable_image': True}):
+                parser = ConfigurationParser(config_files)
 
-                    coordinator = SharedFolderCoordinator(parser)
+                coordinator = SharedFolderCoordinator(parser)
 
-                    patch_os_path(monkeypatch, False, False)
+                patch_os_path(monkeypatch, False, False)
 
-                    def fake_run(*popenargs, **kwargs):
-                        # We should not run anything!
-                        assert False
+                def fake_run(*popenargs, **kwargs):
+                    # We should not run anything!
+                    assert False
 
-                    monkeypatch.setattr(mockablerun, 'run_mockable', fake_run)
+                monkeypatch.setattr(mockablerun, 'run_mockable', fake_run)
 
-                    coordinator.create_host_folders()
-                    coordinator.verify_container_mountpoints('does-not-exist')
-                    assert coordinator.get_mountpoints() == []
-                    assert coordinator.get_pre_config_profiles() == []
-                    assert coordinator.get_post_config_profiles() == []
+                coordinator.create_host_folders()
+                coordinator.verify_container_mountpoints('does-not-exist')
+                assert coordinator.get_mountpoints() == []
+                assert coordinator.get_pre_config_profiles() == []
+                assert coordinator.get_post_config_profiles() == []
 
 
 def test_create_host_folders_successful_create(config_files, monkeypatch):
-    with open(config_files, "r") as main_file:
-        parser = ConfigurationParser(main_file)
+    parser = ConfigurationParser(config_files)
 
-        coordinator = SharedFolderCoordinator(parser)
+    coordinator = SharedFolderCoordinator(parser)
 
-        patch_os_path(monkeypatch, False, False)
+    patch_os_path(monkeypatch, False, False)
 
-        def fake_mkdir_command(*popenargs, **kwargs):
-            if get_command(popenargs) == 'mkdir' and get_sub_command(popenargs) == '-p':
-                folder = popenargs[0][-1]
-                assert 'edi_marker_valid_folder' in folder or 'edi_marker_work' in folder
-                return subprocess.CompletedProcess("fakerun", 0, '')
-            else:
-                return subprocess.run(*popenargs, **kwargs)
+    def fake_mkdir_command(*popenargs, **kwargs):
+        if get_command(popenargs) == 'mkdir' and get_sub_command(popenargs) == '-p':
+            folder = popenargs[0][-1]
+            assert 'edi_marker_valid_folder' in folder or 'edi_marker_work' in folder
+            return subprocess.CompletedProcess("fakerun", 0, '')
+        else:
+            return subprocess.run(*popenargs, **kwargs)
 
-        monkeypatch.setattr(mockablerun, 'run_mockable', fake_mkdir_command)
+    monkeypatch.setattr(mockablerun, 'run_mockable', fake_mkdir_command)
 
-        coordinator.create_host_folders()  # successful mkdir
+    coordinator.create_host_folders()  # successful mkdir
 
 
 def test_create_host_folders_failed_create(config_files, monkeypatch):
-    with open(config_files, "r") as main_file:
-        parser = ConfigurationParser(main_file)
+    parser = ConfigurationParser(config_files)
 
-        coordinator = SharedFolderCoordinator(parser)
+    coordinator = SharedFolderCoordinator(parser)
 
-        patch_os_path(monkeypatch, False, False)
+    patch_os_path(monkeypatch, False, False)
 
-        def fake_mkdir_command(*popenargs, **kwargs):
-            if get_command(popenargs) == 'mkdir' and get_sub_command(popenargs) == '-p':
-                cmd = ['bash', '-c', '>&2 echo -e "no permission" ; exit 1']
-                return subprocess.run(cmd, **kwargs)
-            else:
-                return subprocess.run(*popenargs, **kwargs)
+    def fake_mkdir_command(*popenargs, **kwargs):
+        if get_command(popenargs) == 'mkdir' and get_sub_command(popenargs) == '-p':
+            cmd = ['bash', '-c', '>&2 echo -e "no permission" ; exit 1']
+            return subprocess.run(cmd, **kwargs)
+        else:
+            return subprocess.run(*popenargs, **kwargs)
 
-        monkeypatch.setattr(mockablerun, 'run_mockable', fake_mkdir_command)
+    monkeypatch.setattr(mockablerun, 'run_mockable', fake_mkdir_command)
 
-        with pytest.raises(FatalError) as error:
-            coordinator.create_host_folders()  # failed mkdir
+    with pytest.raises(FatalError) as error:
+        coordinator.create_host_folders()  # failed mkdir
 
-        assert 'edi_marker_valid_folder' in error.value.message
-        assert 'no permission' in error.value.message
+    assert 'edi_marker_valid_folder' in error.value.message
+    assert 'no permission' in error.value.message

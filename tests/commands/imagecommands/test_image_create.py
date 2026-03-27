@@ -94,14 +94,13 @@ def test_create_bookworm_image(capsys):
 
 
 def test_empty_configuration(empty_config_file, monkeypatch):
-    with open(empty_config_file, "r") as main_file:
-        suppress_chown_during_debuild(monkeypatch)
+    suppress_chown_during_debuild(monkeypatch)
 
-        create_cmd = Create()
-        result = create_cmd.run(main_file)
-        assert result == []
+    create_cmd = Create()
+    result = create_cmd.run(empty_config_file)
+    assert result == []
 
-        result = create_cmd.dry_run(main_file)
-        assert result == {}
+    result = create_cmd.dry_run(empty_config_file)
+    assert result == {}
 
-        create_cmd.clean_recursive(main_file, 100)
+    create_cmd.clean_recursive(empty_config_file, 100)

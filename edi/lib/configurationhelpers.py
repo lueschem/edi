@@ -22,7 +22,6 @@
 import os
 import jinja2
 import yaml
-from codecs import open
 from edi.lib.helpers import FatalError, get_edi_plugin_directory
 
 

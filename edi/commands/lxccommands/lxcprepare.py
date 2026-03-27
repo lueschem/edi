@@ -28,7 +28,6 @@ import yaml
 import shutil
 import glob
 from jinja2 import Template
-from codecs import open
 from edi.commands.lxc import Lxc
 from edi.commands.imagecommands.bootstrap import Bootstrap
 from edi.lib.yamlhelpers import LiteralString, normalize_yaml

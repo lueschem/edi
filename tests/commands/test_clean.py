@@ -30,6 +30,5 @@ import pytest
 def test_clean_empty_config(empty_config_file, monkeypatch):
     suppress_chown_during_debuild(monkeypatch)
     with workspace():
-        with open(empty_config_file, "r") as main_file:
-            clean_cmd = Clean()
-            clean_cmd.run(main_file)
+        clean_cmd = Clean()
+        clean_cmd.run(empty_config_file)

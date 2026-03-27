@@ -246,14 +246,14 @@ class ConfigurationParser:
     def __init__(self, base_config_file, config_type=1):
         self.base_config_file = base_config_file
         self.config_type = config_type
-        self.project_directory = dirname(abspath(base_config_file.name))
-        self.config_id = splitext(basename(base_config_file.name))[0]
+        self.project_directory = dirname(abspath(base_config_file))
+        self.config_id = splitext(basename(base_config_file))[0]
         if not ConfigurationParser._configurations.get(self.config_id):
             logging.info(("Load time dictionary:\n{}"
                           ).format(yaml.dump(remove_passwords(self._get_load_time_dictionary()),
                                              default_flow_style=False)))
             logging.info(("Using base configuration file '{0}'"
-                          ).format(base_config_file.name))
+                          ).format(base_config_file))
             base_config = self._get_base_config(base_config_file)
             global_config = self._get_overlay_config(base_config_file,
                                                      "global")
@@ -298,11 +298,16 @@ class ConfigurationParser:
         return template.render(self._get_load_time_dictionary())
 
     def _get_base_config(self, config_file):
-        return annotated_yaml_load(self._parse_jina2_file(config_file), config_file.name) or {}
+        if not isfile(config_file) or not os.access(config_file, os.R_OK):
+            raise FatalError('The configuration file "{}" does not '
+                             'exist or is not readable.'.format(config_file))
+
+        with open(config_file, encoding="UTF-8", mode="r") as f:
+            return annotated_yaml_load(self._parse_jina2_file(f), config_file) or {}
 
     def _get_overlay_config(self, base_config_file, overlay_name):
-        fname, extension = splitext(basename(base_config_file.name))
-        directory = dirname(base_config_file.name)
+        fname, extension = splitext(basename(base_config_file))
+        directory = dirname(base_config_file)
         overlay_file = "{0}.{1}{2}".format(fname, overlay_name,
                                            extension)
         overlay = join(directory, "configuration", "overlay",

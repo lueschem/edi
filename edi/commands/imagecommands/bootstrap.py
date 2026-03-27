@@ -23,7 +23,6 @@ import os
 import subprocess
 import shutil
 import logging
-from codecs import open
 from aptsources.sourceslist import SourceEntry
 from edi.commands.image import Image
 from edi.lib.helpers import (FatalError, chown_to_user, print_success,

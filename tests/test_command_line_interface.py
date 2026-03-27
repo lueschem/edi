@@ -27,7 +27,7 @@ def test_command_line_interface_setup(empty_config_file):
     assert 'embedded development infrastructure' in parser.description
     args = parser.parse_args(['-v', 'lxc', 'configure', 'some-container', empty_config_file])
     assert args.command_name == 'lxc'
-    assert str(args.config_file.name) == str(empty_config_file)
+    assert str(args.config_file) == str(empty_config_file)
     assert args.container_name == 'some-container'
     assert args.sub_command_name == 'configure'
     assert args.verbose is True
