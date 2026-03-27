@@ -67,6 +67,9 @@ def test_documentation_all(datadir):
 @pytest.mark.filterwarnings("ignore:Found eof")
 @pytest.mark.requires_buildah
 def test_documentation_in_user_namespace(datadir):
+    if os.getuid() == 0:
+        pytest.skip("this test is only valid for non root users")
+
     changelog_file = os.path.join(str(datadir), 'changelog.rst')
     assert not os.path.isfile(changelog_file)
     edi_exec = os.path.join(get_project_root(), 'bin', 'edi')

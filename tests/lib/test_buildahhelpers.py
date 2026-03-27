@@ -198,5 +198,5 @@ def test_buildah_container_creation_failure():
 
 @pytest.mark.requires_buildah
 def test_buildah_unshare():
-    result = run_buildah_unshare("","whoami")
+    result = run_buildah_unshare("", "whoami")
     assert result.stdout.strip() == "root"
