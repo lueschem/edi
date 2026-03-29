@@ -23,6 +23,9 @@ jobs:
          - distribution: ubuntu
            distribution_release: "25.10"
            repository_type: launchpad
+         - distribution: ubuntu
+           distribution_release: "26.04"
+           repository_type: launchpad
     steps:
       - name: Check out the source code
         uses: actions/checkout@v4
