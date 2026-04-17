@@ -22,7 +22,6 @@
 
 import os
 import edi.lib.helpers
-from codecs import open
 from edi.lib.sshkeyhelpers import get_user_ssh_pub_keys
 from tests.libtesting.helpers import get_command, get_sub_command
 from edi.lib import mockablerun

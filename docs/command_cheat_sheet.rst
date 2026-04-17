@@ -30,7 +30,6 @@ Check source code using flake8:
 
   flake8 --max-line-length=120 .
 
-
 Debian
 ++++++
 
@@ -51,21 +50,6 @@ Install the resulting package:
 ::
 
   sudo dpkg -i ../edi_X.X.X_all.deb
-
-Python
-++++++
-
-Create a source distribution of edi:
-
-::
-
-  python3 setup.py sdist
-
-Install edi in editable mode (development setup):
-
-::
-
-  pip3 install -e .
 
 Documentation
 +++++++++++++

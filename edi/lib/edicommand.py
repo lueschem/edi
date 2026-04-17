@@ -21,7 +21,6 @@
 
 from edi.lib.commandfactory import CommandFactory
 from edi.lib.configurationparser import ConfigurationParser
-import argparse
 import os
 import logging
 import yaml
@@ -104,8 +103,7 @@ class EdiCommand(metaclass=CommandFactory):
 
     @staticmethod
     def _require_config_file(parser):
-        parser.add_argument('config_file',
-                            type=argparse.FileType('r', encoding='UTF-8'))
+        parser.add_argument('config_file')
 
     @staticmethod
     def _offer_options(parser, introspection=False, clean=False):

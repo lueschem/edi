@@ -25,7 +25,6 @@ from tests.libtesting.helpers import get_command, get_command_parameter
 from edi.lib import mockablerun
 import shutil
 import subprocess
-from codecs import open
 import yaml
 
 
@@ -62,11 +61,10 @@ def test_lxd_connection(config_files, monkeypatch):
 
     monkeypatch.setattr(shutil, 'chown', fakechown)
 
-    with open(config_files, "r") as main_file:
-        parser = ConfigurationParser(main_file)
-        runner = PlaybookRunner(parser, "fake-container", "lxd")
+    parser = ConfigurationParser(config_files)
+    runner = PlaybookRunner(parser, "fake-container", "lxd")
 
-        playbooks = runner.run_all()
+    playbooks = runner.run_all()
 
-        expected_playbooks = ['10_base_system', '20_networking', '30_foo']
-        assert playbooks == expected_playbooks
+    expected_playbooks = ['10_base_system', '20_networking', '30_foo']
+    assert playbooks == expected_playbooks

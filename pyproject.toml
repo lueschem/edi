@@ -1,0 +1,62 @@
+[build-system]
+requires = ["setuptools>=61.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "edi"
+version = "2.3.0"
+authors = [{name = "Matthias Luescher", email = "lueschem@gmail.com"}]
+#license = "GPL-3.0-or-later"
+description = "Embedded Development Infrastructure - edi"
+keywords = [
+    "embedded",
+    "Linux",
+    "container",
+    "toolchain",
+    "lxd",
+    "lxc",
+    "podman",
+    "OCI",
+    "Ansible",
+    "Debian",
+]
+readme = "README.rst"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Build Tools",
+    "Programming Language :: Python :: 3.5",
+]
+urls = {Homepage = "https://github.com/lueschem/edi"}
+dependencies = [
+    "argcomplete",
+    "click",
+    "jinja2",
+    "packaging",
+    "python-apt",
+    "python-dateutil",
+    "python-debian",
+    "python-gnupg",
+    "pyyaml",
+    "requests",
+]
+
+[project.optional-dependencies]
+
+[project.scripts]
+edi = "edi:main"
+
+[tool.setuptools]
+include-package-data = false
+
+[tool.setuptools.packages.find]
+exclude = ["docs"]
+namespaces = false
+
+[tool.setuptools.package-data]
+edi = [
+    "plugins/**",
+]
+tests = [
+    "data/**",
+]

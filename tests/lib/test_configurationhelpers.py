@@ -26,7 +26,6 @@ from edi.lib.helpers import get_edi_plugin_directory, copy_tree
 from edi.lib.configurationhelpers import ConfigurationTemplate
 from edi.lib.configurationparser import ConfigurationParser
 from edi.lib.helpers import FatalError
-from codecs import open
 
 
 def test_configuration_rendering(tmpdir):
@@ -51,9 +50,8 @@ def test_configuration_rendering(tmpdir):
     gitignore = os.path.join(str(tmpdir), '.gitignore')
     assert os.path.isfile(gitignore)
 
-    with open(test_project_dev, mode='r', encoding='UTF-8') as config_file:
-        cp = ConfigurationParser(config_file)
-        assert cp.get_bootstrap_architecture() == 'amd64'
+    cp = ConfigurationParser(test_project_dev)
+    assert cp.get_bootstrap_architecture() == 'amd64'
 
 
 def test_configuration_rendering_failure(tmpdir):

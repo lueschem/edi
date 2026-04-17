@@ -25,7 +25,6 @@ import tempfile
 import yaml
 import jinja2
 import stat
-from codecs import open
 from collections import namedtuple
 
 from edi.lib.buildahhelpers import run_buildah_unshare

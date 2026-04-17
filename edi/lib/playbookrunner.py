@@ -25,7 +25,6 @@ import logging
 import subprocess
 import tempfile
 import yaml
-from codecs import open
 from edi.lib.helpers import chown_to_user, FatalError
 from edi.lib.helpers import print_error, get_user, get_workdir
 from edi.lib.shellhelpers import run, require

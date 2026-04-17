@@ -25,7 +25,7 @@ import pytest
 import tempfile
 from edi.lib.shellhelpers import (run, safely_remove_artifacts_folder, gpg_agent, require,
                                   Executables, get_user_home_directory, mockablerun, mount_aware_tempdir,
-                                  get_current_display)
+                                  get_current_display, is_running_in_user_namespace)
 from tests.libtesting.contextmanagers.workspace import workspace
 from tests.libtesting.helpers import (get_random_string, suppress_chown_during_debuild, get_command,
                                       get_sub_command, get_command_parameter)
@@ -214,3 +214,7 @@ def test_get_current_display(monkeypatch, env_var, result):
 
     monkeypatch.setattr(mockablerun, 'run_mockable', intercept_command_run)
     assert get_current_display() == result
+
+
+def test_is_running_in_user_namespace():
+    assert not is_running_in_user_namespace()

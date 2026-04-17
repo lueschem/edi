@@ -43,9 +43,9 @@ source /etc/os-release
 
 NEW_VERSION="${1}"
 
-SETUP_PY="setup.py"
-sed -i "s/^    version=.*/    version='${NEW_VERSION}',/g" ${SETUP_PY}
-git add ${SETUP_PY}
+PYPROJECT_TOML="pyproject.toml"
+sed -i "s/^version = .*/version = \"${NEW_VERSION}\"/g" ${PYPROJECT_TOML}
+git add ${PYPROJECT_TOML}
 
 SPHINX_CONFIG="docs/conf.py"
 sed -i "s/^version =.*/version = '${NEW_VERSION}'/g" ${SPHINX_CONFIG}

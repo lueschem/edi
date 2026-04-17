@@ -34,7 +34,6 @@ import edi
 import yaml
 import re
 import subprocess
-from codecs import open
 from shutil import copyfile
 
 
