@@ -1,3 +1,9 @@
+edi (2.3.1) resolute; urgency=medium
+
+  * Updated setup for Ubuntu 26.10.
+
+ -- Matthias Luescher <lueschem@gmail.com>  Fri, 16 Oct 2026 13:36:55 +0200
+
 edi (2.3.0) noble; urgency=medium
 
   * Removed Debian bullseye and Ubuntu 22.04 builds.
