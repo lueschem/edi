@@ -66,7 +66,7 @@ you can get started with the `edi-pi project configuration`_. It requires a few 
 
    .. code-block::
 
-      sudo apt install buildah containers-storage crun curl distrobox dosfstools e2fsprogs fakeroot genimage git mender-artifact mmdebstrap mtools parted python3-sphinx python3-testinfra podman rsync zerofree
+      sudo apt install buildah containers-storage crun curl debian-archive-keyring distrobox dosfstools e2fsprogs fakeroot genimage git mender-artifact mmdebstrap mtools parted python3-sphinx python3-testinfra podman rsync zerofree
 
 The edi-pi project configuration can be cloned as follows:
 
