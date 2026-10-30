@@ -57,7 +57,7 @@ else
     REPOSITORY_SUFFIX=""
 fi
 
-mkdir ${SSHDIR}
+mkdir -p ${SSHDIR}
 chmod 0700 ${SSHDIR}
 
 cp "${SECRETSDIR}/id_rsa" "${SSHDIR}/"
