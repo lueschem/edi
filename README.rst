@@ -13,8 +13,8 @@ Embedded Development Infrastructure - edi
     :target: https://packagecloud.io/get-edi/debian
 
 
-.. image:: https://readthedocs.org/projects/edi/badge/?version=latest
-    :target: https://docs.get-edi.io/en/latest/?badge=latest
+.. image:: https://app.readthedocs.org/projects/edi/badge/?version=latest
+    :target: https://docs.get-edi.io/en/latest/
     :alt: Documentation Status
 
 
